@@ -40,12 +40,16 @@ var lanes: Dictionary = {}
 var cases: Array = CaseData.all()
 var overlay: Control
 var prior_screen := Screen.INSPECT
+var hud_layer: Control
+var overlay_layer: Control
 
 func _ready() -> void:
+ hud_layer = get_node("HUDLayer")
+ overlay_layer = get_node("OverlayLayer")
  show_hub()
 
 func clear_ui() -> void:
- for c in get_children():
+ for c in hud_layer.get_children():
   c.queue_free()
  lanes.clear()
 
@@ -54,7 +58,7 @@ func base(title: String) -> VBoxContainer:
  var v := VBoxContainer.new()
  v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  v.add_theme_constant_override("separation", 10)
- add_child(v)
+ hud_layer.add_child(v)
  var t := Label.new()
  t.text = title
  t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -205,19 +209,21 @@ func _on_parcel_input(event: InputEvent) -> void:
   if event.pressed:
    pointer_start = pos
    pointer_last = pos
+   gesture_router.begin_box(pos)
    gesture = Gesture.BOX
    selected_lane = ""
   else:
    if gesture == Gesture.CLASSIFY:
     _finish_classification()
    elif gesture == Gesture.BOX:
-    if pointer_start.distance_to(pos) < DRAG_THRESHOLD:
+    if gesture_router.is_tap(pos):
      _try_pin(pos)
+   gesture_router.cancel()
    gesture = Gesture.NONE
  elif event is InputEventScreenDrag or event is InputEventMouseMotion:
   if gesture == Gesture.NONE:
    return
-  var delta := pos - pointer_last
+  var delta := gesture_router.move(pos)
   pointer_last = pos
   var total := pos - pointer_start
   if gesture == Gesture.BOX and total.y > 80.0:
@@ -249,10 +255,12 @@ func _on_rail_input(event: InputEvent) -> void:
  if event is InputEventScreenTouch or event is InputEventMouseButton:
   if event.pressed:
    gesture = Gesture.SCAN
+   gesture_router.begin_scan(_event_pos(event))
    scan_active = true
    scan_uses += 1
    _update_inspection_feedback()
   else:
+   gesture_router.cancel()
    gesture = Gesture.NONE
 
 func _on_scan_changed(value: float) -> void:
@@ -403,7 +411,7 @@ func _modal(title:String, body:String) -> VBoxContainer:
  overlay = ColorRect.new()
  overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  overlay.mouse_filter = Control.MOUSE_FILTER_STOP
- add_child(overlay)
+ overlay_layer.add_child(overlay)
  var panel := VBoxContainer.new()
  panel.set_anchors_preset(Control.PRESET_CENTER)
  panel.position = Vector2(55,180)
