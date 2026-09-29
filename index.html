@@ -210,7 +210,6 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="btn ghost hide-mobile" onclick="openQuickIdea()">＋ 아이디어</button>
         <button class="btn primary" onclick="runStudioCycle()">▶ Studio Cycle</button>
       </div>
     </header>
@@ -250,23 +249,10 @@ const NAV = [
   ]]
 ];
 
-const IDEA_POOL = [
-  ["Night Shift Familiar","야간 편의점에 찾아오는 마법 생물의 이상한 주문을 처리하는 짧은 운영 게임.","Cozy Management","세로형 모바일"],
-  ["Ghost Dating Agency","죽은 사람들의 마지막 데이트를 성사시키는 선택형 중개 시뮬레이션.","Narrative Sim","모바일"],
-  ["Goblin Tax Office","고블린 왕국 세금 신고서를 검토하며 거짓말을 잡아내는 추리 업무 게임.","Deduction / Job","PC·모바일"],
-  ["Tiny Dungeon Laundromat","모험가의 장비를 세탁하며 묻어온 흔적으로 던전 이야기를 추리하는 게임.","Cozy Puzzle","모바일"],
-  ["Last Train Florist","막차 승객에게 그날의 사연에 맞는 꽃을 조합해 건네는 감성 퍼즐.","Narrative Puzzle","모바일"],
-  ["Potion Return Center","실패한 포션의 반품 사유를 검사하고 제조사를 추적하는 판타지 업무 게임.","Management","모바일"],
-  ["Dragon Rental Desk","용을 빌리러 온 모험가의 목적과 실력을 보고 적합한 용을 배정하는 게임.","Management","모바일"],
-  ["Dream Pawn Shop","손님의 꿈을 담보로 잡고 가격을 흥정하는 초현실 중고거래 시뮬레이션.","Trading Sim","모바일"],
-  ["Elevator to Floor 0","존재하지 않는 0층으로 가는 엘리베이터의 승객 규칙을 지키는 미스터리.","Mystery","PC·모바일"],
-  ["Witch Delivery Route","마녀 배달원이 위험한 주문을 가장 짧은 경로로 전달하는 시간관리 게임.","Route Puzzle","모바일"]
-];
-
 function seedState() {
   return {
     cycle: 16,
-    settings: { autoIdeas:true, autoGreenlight:true, autoConcept:true, autoWireframe:true, autoBuild:true, humanGate:true },
+    settings: { autoIdeas:false, autoGreenlight:false, autoConcept:true, autoWireframe:true, autoBuild:true, humanGate:true },
     projects: [
       {id:"ld", title:"LET'S DEALER", desc:"손가락으로 직접 딜링하는 모바일 포커 딜러 게임.", genre:"Skill / Simulation", platform:"Mobile · Godot", stage:"directed", progress:68, build:"v0.4.2", repo:"Queenrain9/lets-dealer", decision:"KEEP", risk:"MED", visual:"Dealer table / premium iOS", note:"Collect는 sweep gesture. Board는 Flop 묶음 펼치기, Turn/River 단장 오픈.", created:1},
       {id:"mum", title:"Monster Used Market", desc:"괴물들의 기묘한 물건을 감정·거래하는 판타지 중고마켓.", genre:"Trading / Management", platform:"Mobile · Godot", stage:"directed", progress:54, build:"v0.3.1", repo:"Queenrain9/monster-used-market", decision:"KEEP", risk:"MED", visual:"Lantern night market", note:"현재 구조 목업과 실제 화면의 비율/레이어 일치가 우선.", created:2},
@@ -276,8 +262,6 @@ function seedState() {
       {id:"flower", title:"Last Train Florist", desc:"막차 승객의 사연을 듣고 꽃말을 조합하는 감성 퍼즐.", genre:"Narrative Puzzle", platform:"Mobile", stage:"wireframe", progress:100, build:null, repo:null, decision:null, risk:"LOW", visual:"Rainy last train", screens:9, created:6},
       {id:"laundry", title:"Tiny Dungeon Laundromat", desc:"모험가의 장비를 세탁하며 묻어온 흔적으로 이야기를 추리한다.", genre:"Cozy Puzzle", platform:"Mobile", stage:"concept", progress:78, build:null, repo:null, decision:null, risk:"LOW", visual:"Tiny medieval laundromat", conceptCount:6, created:7},
       {id:"dragon", title:"Dragon Rental Desk", desc:"모험가에게 목적과 실력에 맞는 용을 배정하는 서비스 데스크 게임.", genre:"Management", platform:"Mobile", stage:"greenlight", progress:0, build:null, repo:null, decision:null, risk:"MED", visual:"Bright guild counter", scores:{hook:88, feasibility:91, replay:74, visual:84}, created:8},
-      {id:"elevator", title:"Elevator to Floor 0", desc:"존재하지 않는 0층으로 가는 승객들의 규칙을 관리하는 미스터리.", genre:"Mystery", platform:"PC · Mobile", stage:"idea", progress:0, build:null, repo:null, decision:null, risk:"MED", visual:"Limnal elevator", scores:{hook:92, feasibility:80, replay:68, visual:90}, created:9},
-      {id:"potion", title:"Potion Return Center", desc:"실패한 포션 반품서를 검사해 제조 문제와 거짓 신고를 가려낸다.", genre:"Management", platform:"Mobile", stage:"idea", progress:0, build:null, repo:null, decision:null, risk:"LOW", visual:"Fantasy return desk", scores:{hook:82, feasibility:94, replay:83, visual:76}, created:10}
     ],
     activity: [
       {t:"18:41", text:"Ghost Dating Agency prototype v0.2.0이 플레이테스트실에 도착했습니다."},
@@ -525,8 +509,8 @@ function ideaCard(p){
 function ideasPage(){
   const ps=promotedIdeas;
   return genericHeader(
-    "Idea Lab · Promoted Only",
-    "매 시간 정각 ChatGPT가 내부에서 여러 후보를 생성·폐기·비평합니다. 이 화면에는 제작 가치가 있다고 판단된 후보만 최대 1개씩 들어옵니다.",
+    "Idea Lab · Scheduled Intake",
+    "ChatGPT 예약 작업이 내부 생성·비평·Producer 심사를 끝낸 뒤 Supabase에 실제 입고한 후보만 표시합니다. 샘플·수동·브라우저 생성 아이디어는 표시하지 않습니다.",
     `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
   ) +
   `<div class="panel" style="margin-bottom:14px">
@@ -534,7 +518,7 @@ function ideasPage(){
     <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
       <span><b style="color:#eaf3ff">매시간 00분</b> 내부 탐색</span>
       <span>Creator → Critic → Producer</span>
-      <span><b style="color:#8de4c7">승격 0~1개</b></span>
+      <span><b style="color:#8de4c7">승격 0~4개</b></span>
       <span>기준 미달이면 아무 것도 입고하지 않음</span>
     </div>
   </div>
@@ -611,12 +595,10 @@ function directedCard(p){
   </div>`;
 }
 function directedPage(){ const ps=state.projects.filter(p=>p.stage==="directed"); return genericHeader("Directed Development","이 단계에서는 AI가 핵심 방향을 임의로 바꾸지 않습니다.")+`<div class="cards">${ps.map(directedCard).join("")}</div>`; }
-function archivePage(){ const ps=state.projects.filter(p=>p.stage==="archive"); return genericHeader("Archive","버린 아이디어도 기록은 남습니다. 실패를 싸게 만드는 것이 이 공장의 장점입니다.")+`<div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-title">${esc(p.title)}</div><div class="card-desc">${esc(p.desc)}</div><div class="meta"><span>${esc(p.decision||"ARCHIVED")}</span><span>${esc(p.genre)}</span></div><div class="card-actions"><button class="btn" onclick="promote('${p.id}','idea')">Idea Pool로 복구</button></div></div>`).join("") || `<div class="empty">Archive가 비어 있습니다.</div>`}</div>`; }
+function archivePage(){ const ps=state.projects.filter(p=>p.stage==="archive"); return genericHeader("Archive","버린 아이디어도 기록은 남습니다. 실패를 싸게 만드는 것이 이 공장의 장점입니다.")+`<div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-title">${esc(p.title)}</div><div class="card-desc">${esc(p.desc)}</div><div class="meta"><span>${esc(p.decision||"ARCHIVED")}</span><span>${esc(p.genre)}</span></div><div class="card-actions"><span class="badge">ARCHIVED</span></div></div>`).join("") || `<div class="empty">Archive가 비어 있습니다.</div>`}</div>`; }
 function activityPage(){ return genericHeader("Studio Activity","자동 생성·승격·빌드와 대표 결정이 모두 기록됩니다.",`<button class="btn bad" onclick="clearLog()">로그 비우기</button>`)+`<div class="panel">${activityList(80)}</div>`; }
 function settingsPage(){
   const rows=[
-    ["autoIdeas","아이디어 자동 생성","Studio Cycle마다 새로운 후보군을 생성합니다."],
-    ["autoGreenlight","자동 Greenlight","Producer 기준을 통과한 후보를 다음 단계로 보냅니다."],
     ["autoConcept","Concept 자동 제작","기획안과 컨셉 후보군을 생성합니다."],
     ["autoWireframe","Wireframe 자동 제작","선정된 컨셉을 구현용 화면 설계도로 번역합니다."],
     ["autoBuild","Godot Build 자동화","Wireframe-ready 프로젝트를 greybox prototype으로 보냅니다."],
@@ -624,7 +606,8 @@ function settingsPage(){
   ];
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
-    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>saved locally</span></div>
+    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Idea Lab intake</h3><p>아이디어 연구소는 ChatGPT 예약 작업의 심사를 통과해 Supabase에 저장된 후보만 표시합니다. 브라우저의 샘플 생성 기능은 사용하지 않습니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
@@ -669,27 +652,9 @@ function decide(id,d){
   save(); render(); toast(`${p.title} · ${d}`);
 }
 function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9가-힣]+/g,"-").replace(/^-|-$/g,""); }
-function generateIdeas(n=3){
-  const existing=new Set(state.projects.map(p=>p.title));
-  let made=0;
-  for(let i=0;i<IDEA_POOL.length && made<n;i++){
-    const idx=(state.cycle+i*3)%IDEA_POOL.length; const x=IDEA_POOL[idx];
-    let title=x[0]; if(existing.has(title)) title=`${x[0]} ${state.cycle+made}`;
-    const id="i"+Date.now().toString(36)+made;
-    const base=74+((state.cycle+made*7)%18);
-    state.projects.push({id,title,desc:x[1],genre:x[2],platform:x[3],stage:"idea",progress:0,risk:(made%3===0?"LOW":"MED"),visual:"Direction pending",scores:{hook:Math.min(97,base+4),feasibility:Math.min(97,base+9),replay:Math.min(96,base-2),visual:Math.min(98,base+6)},created:Date.now()+made});
-    existing.add(title); made++;
-  }
-  addLog(`Idea Lab이 새로운 게임 아이디어 ${made}개를 생성했습니다.`); save(); render(); toast(`${made}개 아이디어 생성`);
-}
 function runStudioCycle(){
   state.cycle++;
   let actions=[];
-  if(state.settings.autoIdeas){ generateIdeasSilent(4); actions.push("아이디어 4개 생성"); }
-  if(state.settings.autoGreenlight){
-    const ideas=state.projects.filter(p=>p.stage==="idea").sort((a,b)=>(avgScore(b)-avgScore(a)));
-    if(ideas[0]){ideas[0].stage="greenlight"; actions.push(`${ideas[0].title} Greenlight 후보`);}
-  }
   if(state.settings.autoConcept){
     const g=state.projects.find(p=>p.stage==="greenlight");
     if(g && avgScore(g)>=80){g.stage="concept";g.progress=25;g.conceptCount=4;actions.push(`${g.title} Concept 시작`);}
@@ -706,15 +671,6 @@ function runStudioCycle(){
   }
   const summary=`Studio Cycle #${state.cycle}: ${actions.join(" · ") || "자동화된 작업 없음"}`;
   addLog(summary); save(); render(); toast(`Cycle #${state.cycle} 완료`);
-}
-function generateIdeasSilent(n){
-  const existing=new Set(state.projects.map(p=>p.title)); let made=0;
-  for(let i=0;i<IDEA_POOL.length && made<n;i++){
-    const idx=(state.cycle+i*2)%IDEA_POOL.length, x=IDEA_POOL[idx];
-    let title=x[0]; if(existing.has(title)) title=`${x[0]} · ${state.cycle}`;
-    const base=72+((state.cycle+made*5)%20), id="auto"+Date.now().toString(36)+made;
-    state.projects.push({id,title,desc:x[1],genre:x[2],platform:x[3],stage:"idea",progress:0,risk:made%2?"MED":"LOW",visual:"Direction pending",scores:{hook:Math.min(98,base+6),feasibility:Math.min(97,base+8),replay:Math.min(95,base),visual:Math.min(98,base+5)},created:Date.now()+made}); existing.add(title); made++;
-  }
 }
 function avgScore(p){ const s=p.scores||{hook:80,feasibility:80,replay:80,visual:80}; return (s.hook+s.feasibility+s.replay+s.visual)/4; }
 function showProject(id){
@@ -733,18 +689,6 @@ function editDirection(id){
     <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="saveDirection('${p.id}')">저장</button></div>`);
 }
 function saveDirection(id){ const p=getP(id); p.note=document.getElementById("directionText").value.trim(); addLog(`${p.title}에 대표 디렉팅 메모가 업데이트되었습니다.`); save(); closeModal(); render(); toast("디렉팅 메모 저장"); }
-function openQuickIdea(){
-  modal(`<div class="modal-head"><div><div class="kicker">Manual input</div><h2>아이디어 직접 투입</h2></div><button class="close" onclick="closeModal()">×</button></div>
-  <div class="form-row"><div><label>게임 이름</label><input id="qiTitle" placeholder="예: Goblin Library Night Shift"></div><div><label>장르</label><input id="qiGenre" placeholder="Management / Puzzle"></div></div>
-  <label>핵심 한 줄</label><textarea id="qiDesc" placeholder="플레이어가 무엇을 하며 무엇이 재밌는지 한두 문장으로."></textarea>
-  <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="saveQuickIdea()">Idea Pool에 넣기</button></div>`);
-}
-function saveQuickIdea(){
-  const title=document.getElementById("qiTitle").value.trim(), desc=document.getElementById("qiDesc").value.trim(), genre=document.getElementById("qiGenre").value.trim()||"Unclassified";
-  if(!title||!desc){toast("이름과 한 줄 설명을 입력해줘");return}
-  state.projects.push({id:"manual"+Date.now(),title,desc,genre,platform:"Mobile",stage:"idea",progress:0,risk:"MED",visual:"Direction pending",scores:{hook:80,feasibility:80,replay:75,visual:80},created:Date.now()});
-  addLog(`대표가 ${title} 아이디어를 Idea Pool에 직접 투입했습니다.`); save(); closeModal(); render(); toast("Idea Pool에 추가");
-}
 function copyRepo(id){ const p=getP(id); if(!p||!p.repo){toast("Repo가 아직 없습니다.");return;} navigator.clipboard?.writeText("https://github.com/"+p.repo).then(()=>toast("Repo 주소 복사됨")).catch(()=>toast(p.repo)); }
 function modal(inner){ document.getElementById("modal").innerHTML=inner; document.getElementById("modalBackdrop").classList.add("show"); }
 function closeModal(){ document.getElementById("modalBackdrop").classList.remove("show"); }
