@@ -1,4 +1,3 @@
-class_name GestureRouter
 extends RefCounted
 
 const DRAG_THRESHOLD:=18.0
