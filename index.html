@@ -619,8 +619,6 @@ function ideaCard(p){
 
     ${keyScores.length?`<div class="idea-summary">${keyScores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div>`:""}
 
-    ${p.next_test?`<div class="human-gate idea-next"><b>다음 부서에서 검증</b><br>${esc(p.next_test)}</div>`:""}
-
     <button class="btn ghost idea-toggle" onclick="toggleIdeaDetail('${p.id}',this)">전체 평가 보기</button>
 
     <div class="idea-detail">
