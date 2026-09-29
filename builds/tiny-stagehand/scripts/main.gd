@@ -83,8 +83,7 @@ func start_countdown()->void:
  var l:=Label.new(); l.text="Curtain up in 3"; l.custom_minimum_size=Vector2(0,500); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; l.vertical_alignment=VERTICAL_ALIGNMENT_CENTER; v.add_child(l)
 
 func start_live()->void:
- view=View.LIVE; running=true; paused=false
- var v:=root("LIVE PERFORMANCE")
+ view=View.LIVE; running=true; paused=false; incident_spawned.clear()\n var v:=root("LIVE PERFORMANCE")
  var top:=HBoxContainer.new(); v.add_child(top)
  continuity_label=Label.new(); continuity_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL; top.add_child(continuity_label)
  time_label=Label.new(); top.add_child(time_label)
@@ -98,10 +97,10 @@ func start_live()->void:
  _add_fader(controls,"LIGHT A","light_a")
  _add_fader(controls,"LIGHT B","light_b")
  curtain=VSlider.new(); curtain.min_value=0; curtain.max_value=100; curtain.custom_minimum_size=Vector2(80,230); curtain.value_changed.connect(_curtain_changed); controls.add_child(curtain)
- var tray:=VBoxContainer.new(); tray.size_flags_horizontal=Control.SIZE_EXPAND_FILL; controls.add_child(tray)
- var tl:=Label.new(); tl.text="PROP TRAY"; tray.add_child(tl)
- for p in ["ROSE","LETTER","LAMP"]: _add_prop(tray,p)
- incident_btn=Button.new(); incident_btn.visible=false; incident_btn.custom_minimum_size=Vector2(0,54); incident_btn.pressed.connect(_resolve_incident); tray.add_child(incident_btn)
+ var tray:=Control.new(); tray.custom_minimum_size=Vector2(170,230); controls.add_child(tray)
+ var tl:=Label.new(); tl.text="PROP TRAY"; tl.position=Vector2(5,0); tray.add_child(tl)
+ var names=["ROSE","LETTER","LAMP"]\n for i in range(names.size()): _add_prop(tray,names[i],Vector2(8,35+i*58))
+ incident_btn=Button.new(); incident_btn.visible=false; incident_btn.position=Vector2(300,55); incident_btn.size=Vector2(190,60); incident_btn.pressed.connect(_resolve_incident); stage.add_child(incident_btn)
  cue_label=Label.new(); cue_label.custom_minimum_size=Vector2(0,130); cue_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART; v.add_child(cue_label)
  _update_live()
 
@@ -110,8 +109,7 @@ func _add_fader(parent:Control,label_text:String,key:String)->void:
  var l:=Label.new(); l.text=label_text; box.add_child(l)
  var f:=VSlider.new(); f.min_value=0; f.max_value=100; f.step=1; f.custom_minimum_size=Vector2(90,210); f.value_changed.connect(_light_changed.bind(key)); box.add_child(f); faders[key]=f
 
-func _add_prop(parent:Control,name:String)->void:
- var p:=Panel.new(); p.custom_minimum_size=Vector2(130,52); p.gui_input.connect(_prop_input.bind(p,name)); parent.add_child(p)
+func _add_prop(parent:Control,name:String,pos:Vector2)->void:\n var p:=Panel.new(); p.position=pos; p.size=Vector2(145,50); p.gui_input.connect(_prop_input.bind(p,name)); parent.add_child(p)
  var l:=Label.new(); l.text=name; l.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; l.mouse_filter=Control.MOUSE_FILTER_IGNORE; p.add_child(l); props[name]=p
 
 func _light_changed(value:float,key:String)->void:
