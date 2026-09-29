@@ -89,6 +89,78 @@ def source_component_spec(source_type):
     return dict(spec)
 
 
+INTERACTIVE_HOST_TYPES = {
+    'manipulable', 'interactive_object', 'interactive_part', 'hotspots',
+    'hit_targets', 'hit_layer', 'draggable', 'draggable_objects',
+    'draggable_entities', 'draggable_token', 'draggable_tool', 'canvas',
+    'viewport', 'world_view', 'world', 'mask_canvas', 'editable_path',
+    'polygon_surface', 'node_graph', 'map',
+}
+
+
+def _target_tokens(value):
+    value = re.sub(r'[^a-z0-9_]+', '_', str(value or '').strip().lower())
+    tokens = [t for t in value.split('_') if t]
+    normalized = []
+    for token in tokens:
+        if token.endswith('ies') and len(token) > 3:
+            token = token[:-3] + 'y'
+        elif token.endswith('s') and len(token) > 3:
+            token = token[:-1]
+        normalized.append(token)
+    return normalized
+
+
+def resolve_interaction_target(screen, source_target):
+    """Return deterministic component ids for common semantic Wireframe targets.
+
+    This is a compiler aid only; it never changes source_target. If the result
+    uses selector, the target is a semantic child inside the returned owner
+    component rather than a separate Wireframe component.
+    """
+    components = screen.get('components', []) if isinstance(screen, dict) else []
+    target = str(source_target or '').strip()
+    target_tokens = set(_target_tokens(target))
+    if not target_tokens:
+        raise ValueError('Interaction target is empty')
+
+    exact = [
+        c for c in components
+        if target.lower() in (str(c.get('id') or '').lower(), str(c.get('label') or '').lower())
+    ]
+    if exact:
+        return {'component_ids': [c['id'] for c in exact], 'selector': None}
+
+    named = [
+        c for c in components
+        if set(_target_tokens(c.get('id'))).issubset(target_tokens)
+        and _target_tokens(c.get('id'))
+    ]
+    if len(named) == 1:
+        return {'component_ids': [named[0]['id']], 'selector': target}
+    if len(named) > 1:
+        raise ValueError('Interaction target names multiple possible owner components')
+
+    scored = []
+    for c in components:
+        ct = set(_target_tokens(c.get('id'))) | set(_target_tokens(c.get('label')))
+        overlap = len(target_tokens & ct)
+        if overlap:
+            scored.append((overlap, c))
+    if scored:
+        best = max(x[0] for x in scored)
+        winners = [c for score, c in scored if score == best]
+        plural_hint = any(x in target.lower() for x in ('buttons', 'slots', 'targets', 'lanes', 'cards'))
+        if len(winners) == 1 or plural_hint:
+            return {'component_ids': [c['id'] for c in winners], 'selector': None if len(winners) > 1 else target}
+
+    hosts = [c for c in components if c.get('type') in INTERACTIVE_HOST_TYPES]
+    if len(hosts) == 1:
+        return {'component_ids': [hosts[0]['id']], 'selector': target}
+
+    raise ValueError('No unique component owner for interaction target: ' + target)
+
+
 def canonical_reference_size(pack):
     """Resolve the deterministic construction canvas for a Wireframe Pack.
 
