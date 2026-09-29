@@ -1,3 +1,7 @@
+; SUPERSEDED HISTORICAL BUILD — 2026-09-30 PRE-PRODUCTION RESET
+; Preserved for history only. Do not reuse as the implementation, starter code,
+; implementation evidence, or Fidelity evidence for any newly approved Blueprint.
+
 [application]
 config/name="Parcel X-Ray Night Shift"
 run/main_scene="res://main.tscn"
