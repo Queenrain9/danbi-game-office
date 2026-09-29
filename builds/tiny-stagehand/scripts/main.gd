@@ -175,7 +175,7 @@ func _judge_control(kind:String,value)->void:
   var c:Array=scenes[selected].cues[i]
   if c[1]!=kind:continue
   var d=abs(float(c[0])-s.elapsed)
-  if d<=0.9 and str(c[2])==str(value):
+  var target_ok := String(c[2])==String(value) if kind=="prop" else abs(float(c[2])-float(value))<=2.0\n  if d<=0.9 and target_ok:
    var pts=100 if d<=0.35 else 65
    s.score+=pts; s.results.append([c[0],c[1],"PERFECT" if pts==100 else "GOOD"]); s.cue_index=max(s.cue_index,i+1); return
  _wrong(kind)
