@@ -4,6 +4,20 @@ The existing Compiler, Build Farm and Static Fidelity Gate scheduled prompts use
 
 The Compiler automation was paused before this integration and remains paused. The Builder and Gate schedules remain enabled. No existing game was reclassified or promoted.
 
+## Canonical reference size
+
+Wireframe geometry is stored as screen percentages, so construction still needs one deterministic pixel canvas for Godot offsets and project settings.
+
+Resolution rule:
+
+1. If the current Wireframe Pack explicitly contains `reference_size: {width, height}` (or the same field in `developer_handoff`), that source value wins.
+2. Otherwise, the studio mobile fallback is:
+   - `orientation: portrait` → **540 × 960**
+   - `orientation: landscape` → **960 × 540**
+3. Any other orientation without an explicit size is a real specification blocker.
+
+The Compiler must write the resolved value to `bindings.reference_size`. The Builder must use that exact size in `project.godot`; it must not infer a different viewport from an old build, screenshot, or superseded implementation. This fallback is a studio construction convention, not a reuse of historical game output.
+
 ## Compiler → independent Blueprint review
 
 Export **current full DB rows** for Contract, Wireframe Pack and Game Design to JSON. The Blueprint must keep `schema_version: fidelity-v1`, a frozen `source` with `pack`, `design`, and `requirements`, identical `screens` and `requirements`, plus `hash_algorithm: sha256-canonical-json-v1`. Add `bindings.scene_path`, `reference_size`, `coordinate_space: screen_percent`, `stretch_mode: canvas_items`, explicit `nodes`, `components`, `connections`, `interactions`, `implementations` (one or more `res://` file/node or symbol references per requirement), `reusable_components`, and `tests` with deterministic `checks` and `stage`. Use `construction_pattern` on each node; `registry` lists supported patterns. Every stage needs a static test, every requirement needs static implementation coverage, and executable behavior has a separate manual test. Use zero-based RFC6901 JSON pointers for `bindings.sources`.
