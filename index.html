@@ -287,7 +287,40 @@
       .top-actions .hide-mobile { display:none; }
       .form-row { grid-template-columns:1fr; }
     }
-  </style>
+  
+/* Planning HQ — representative decision dashboard */
+.planning-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.planning-action{min-height:142px;padding:16px;border:1px solid rgba(255,255,255,.06);border-radius:17px;background:linear-gradient(145deg,rgba(17,34,57,.96),rgba(10,24,41,.96));display:flex;flex-direction:column}
+.planning-action.attn{border-color:rgba(243,200,106,.28);box-shadow:inset 0 0 0 1px rgba(243,200,106,.04)}
+.planning-action.ok{border-color:rgba(85,214,168,.17)}
+.planning-action .pa-label{font-size:10px;color:#7189a7;letter-spacing:.08em;text-transform:uppercase}
+.planning-action .pa-value{font-size:27px;font-weight:800;letter-spacing:-.04em;margin:8px 0 4px}
+.planning-action .pa-copy{font-size:11px;color:#90a4bd;line-height:1.48}
+.planning-action .pa-copy b{color:#dce8f8;font-weight:650}
+.planning-action .card-actions{margin-top:auto;padding-top:11px}
+.planning-pipeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.planning-stage-card{border:1px solid rgba(255,255,255,.06);background:#0d1a2c;border-radius:17px;padding:16px}
+.planning-stage-top{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.planning-stage-title{font-size:15px;font-weight:750}
+.planning-stage-count{font-size:25px;font-weight:800;letter-spacing:-.04em}
+.planning-stage-sub{font-size:10px;color:#7188a4;margin-top:2px}
+.planning-mini-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.planning-mini{font-size:10px;color:#9cb0c8;padding:5px 7px;border-radius:8px;background:#091728;border:1px solid rgba(255,255,255,.04)}
+.planning-next-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.planning-queue{display:flex;flex-direction:column;gap:8px}
+.planning-queue-item{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:10px 11px;border-radius:12px;background:#091728;border:1px solid rgba(255,255,255,.045)}
+.planning-queue-num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#122541;color:#88b2f4;font-size:10px;font-weight:800}
+.planning-queue-title{font-size:12px;font-weight:690;color:#e3edf9}
+.planning-queue-sub{font-size:9px;color:#7188a4;margin-top:3px}
+.planning-priority-mark{font-size:10px;color:#f3c86a}
+.planning-output-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.planning-output{padding:11px 12px;border-radius:12px;background:#091728;border:1px solid rgba(255,255,255,.045)}
+.planning-output b{display:block;font-size:12px;color:#e2ecf8}
+.planning-output span{display:block;font-size:9px;color:#7188a4;margin-top:4px}
+@media(max-width:1100px){.planning-action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planning-pipeline{grid-template-columns:1fr}.planning-next-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.planning-action-grid{grid-template-columns:1fr}.planning-output-list{grid-template-columns:1fr}}
+
+</style>
 </head>
 <body>
 <div class="app">
@@ -842,38 +875,100 @@ function dashboard(){
   </div>`;
 }
 
-function planningRecent(items,emptyText){
-  const rows=(Array.isArray(items)?items:[]).slice(0,4);
+
+function planningAge(raw){
+  if(!raw) return "-";
+  const ms=Math.max(0,Date.now()-new Date(raw).getTime());
+  const h=Math.floor(ms/3600000);
+  if(h<1) return Math.max(1,Math.floor(ms/60000))+"분";
+  if(h<24) return h+"시간";
+  return Math.floor(h/24)+"일";
+}
+
+function planningQueue(items,status){
+  return (Array.isArray(items)?items:[]).filter(x=>!status || x.status===status);
+}
+
+function planningPriorityOrder(items){
+  return [...items].sort((a,b)=>{
+    const pa=a.human_priority?1:0,pb=b.human_priority?1:0;
+    if(pa!==pb) return pb-pa;
+    if(pa&&pb){
+      const ap=new Date(a.human_priority_at||a.created_at||0).getTime();
+      const bp=new Date(b.human_priority_at||b.created_at||0).getTime();
+      if(ap!==bp) return ap-bp;
+    }
+    return new Date(a.created_at||0)-new Date(b.created_at||0);
+  });
+}
+
+function planningQueueList(items,emptyText){
+  const rows=planningPriorityOrder(items).slice(0,3);
   if(!rows.length) return '<div class="empty" style="padding:18px">'+esc(emptyText)+'</div>';
-  return '<div class="activity">'+rows.map(p=>{
-    const raw=p.source_run_at||p.created_at;
-    const when=raw?new Date(raw).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}):"-";
-    const sub=p.one_line||p.primary_interaction||p.core_screen||"";
-    return '<div class="activity-item"><div class="activity-time">'+esc(when)+'</div><div class="activity-text"><span class="log-dot"></span><b style="color:#e6eef8">'+esc(p.title)+'</b>'+(sub?'<div style="margin-top:4px;color:#8195ad">'+esc(sub)+'</div>':'')+'</div></div>';
+  return '<div class="planning-queue">'+rows.map((p,i)=>{
+    const wait=planningAge(p.created_at||p.source_run_at);
+    return '<div class="planning-queue-item"><div class="planning-queue-num">'+(i+1)+'</div><div><div class="planning-queue-title">'+esc(p.title)+'</div><div class="planning-queue-sub">대기 '+esc(wait)+(p.human_priority?' · 대표 우선':' · 일반 순서')+'</div></div>'+(p.human_priority?'<div class="planning-priority-mark">★ 우선</div>':'')+'</div>';
+  }).join("")+'</div>';
+}
+
+function planningRecentOutputs(){
+  const rows=[
+    ...gameDesigns.map(x=>({title:x.title,type:"Game Design",raw:x.source_run_at||x.created_at,go:"design",archive:x.archive_commit})),
+    ...wireframePacks.map(x=>({title:x.title,type:"Wireframe Pack",raw:x.source_run_at||x.created_at,go:"wireframe"}))
+  ].sort((a,b)=>new Date(b.raw||0)-new Date(a.raw||0)).slice(0,6);
+  if(!rows.length) return '<div class="empty">아직 생성된 기획 산출물이 없습니다.</div>';
+  return '<div class="planning-output-list">'+rows.map(x=>{
+    const when=x.raw?new Date(x.raw).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}):"-";
+    const archive=x.type==="Game Design"?(x.archive?' · GitHub ✓':' · GitHub 미보관'):"";
+    return '<div class="planning-output"><b>'+esc(x.title)+'</b><span>'+esc(x.type)+' · '+esc(when)+archive+'</span></div>';
   }).join("")+'</div>';
 }
 
 function planningDashboard(){
-  const stages=[
-    {name:"Idea Lab",count:promotedIdeas.length,time:"매시간 00분",desc:"내부 Creator → Critic → Producer 심사를 통과한 후보",go:"ideas",items:promotedIdeas,empty:"현재 Idea Lab 대기 후보가 없습니다."},
-    {name:"Game Design",count:gameDesigns.length,time:"매시간 05분",desc:"플레이 가능한 규칙·상태·조작·MVP Spec",go:"design",items:gameDesigns,empty:"현재 Game Design 대기 Spec이 없습니다."},
-    {name:"Pre-production",count:wireframePacks.length,time:"매시간 30분",desc:"구현 가능한 Interaction Wireframe Pack",go:"wireframe",items:wireframePacks,empty:"현재 Pre-production 대기 Pack이 없습니다."}
-  ];
+  const ideaQueue=planningQueue(promotedIdeas,"idea_lab");
+  const designQueue=planningQueue(gameDesigns,"design");
+  const wireQueue=planningQueue(wireframePacks,"wireframe");
+
+  const ideaPriority=ideaQueue.filter(x=>x.human_priority);
+  const designPriority=designQueue.filter(x=>x.human_priority);
+  const unclassified=ideaQueue.filter(x=>!x.curation_bucket);
+  const attracted=ideaQueue.filter(x=>x.curation_bucket==="attract");
+  const unarchived=gameDesigns.filter(x=>!x.archive_commit);
+
+  const oldestIdea=planningPriorityOrder(ideaQueue).find(x=>!x.human_priority)||ideaQueue[0];
+  const oldestDesign=planningPriorityOrder(designQueue).find(x=>!x.human_priority)||designQueue[0];
+  const oldestWire=[...wireQueue].sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0))[0];
+
   return genericHeader(
     "AI 기획본부 대시보드",
-    "기획본부에서 실제로 생성되어 현재 각 단계에 머물러 있는 데이터만 모아봅니다. 각 방의 상세 설계와 원문은 기존 페이지에서 확인할 수 있습니다.",
-    '<button class="btn" onclick="Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false)]).then(()=>render())">↻ 전체 새로고침</button>'
+    "대표가 개입할 일, 다음 처리 순서, 기획 파이프라인 적체만 먼저 봅니다. 최근 항목 나열보다 ‘지금 무엇을 보면 되는지’를 우선합니다.",
+    '<button class="btn" onclick="Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false)]).then(()=>render())">↻ 전체 새로고침</button>'
   )+
-  '<div class="cards" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:18px">'+stages.map(x=>
-    '<div class="game-card"><div class="card-top"><div><div class="kicker">'+esc(x.time)+'</div><div class="card-title">'+esc(x.name)+'</div></div><span class="badge blue">'+x.count+'</span></div>'+
-    '<div class="card-desc">'+esc(x.desc)+'</div>'+
-    '<div class="card-actions"><button class="btn primary" onclick="go(\''+x.go+'\')">방 열기</button></div></div>'
-  ).join("")+'</div>'+
-  '<div class="dashboard-grid">'+
-    '<div class="panel"><div class="panel-title"><strong>Idea Lab 최근 현재 항목</strong><span>'+promotedIdeas.length+'개</span></div>'+planningRecent(promotedIdeas,"현재 대기 후보 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'ideas\')">아이디어 연구소 전체 보기</button></div></div>'+
-    '<div class="panel"><div class="panel-title"><strong>Game Design 최근 현재 항목</strong><span>'+gameDesigns.length+'개</span></div>'+planningRecent(gameDesigns,"현재 대기 Spec 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">게임 디자인실 전체 보기</button></div></div>'+
+
+  '<div class="planning-action-grid">'+
+    '<div class="planning-action '+(unclassified.length?'attn':'ok')+'"><div class="pa-label">대표가 볼 것 · Idea Lab</div><div class="pa-value">'+unclassified.length+'</div><div class="pa-copy">'+(unclassified.length?'<b>아직 분류하지 않은 후보</b>가 있습니다. 빠른 분류에서 끌림/보류/패스를 정하면 됩니다.':'현재 후보 분류는 끝났습니다. 끌림 '+attracted.length+'개를 필요할 때 비교하면 됩니다.')+'</div><div class="card-actions"><button class="btn '+(unclassified.length?'primary':'ghost')+'" onclick="go(\'ideas\')">'+(unclassified.length?'후보 선별하기':'아이디어 연구소')+'</button></div></div>'+
+
+    '<div class="planning-action '+(ideaPriority.length?'attn':'ok')+'"><div class="pa-label">Game Design 우선</div><div class="pa-value">'+ideaPriority.length+'</div><div class="pa-copy">'+(ideaPriority.length?'<b>'+esc(ideaPriority[0].title)+'</b>'+(ideaPriority.length>1?' 외 '+(ideaPriority.length-1)+'개':'')+'가 일반 오래된 후보보다 먼저 처리됩니다.':'대표가 별표로 올려둔 Idea가 없습니다.')+'</div><div class="card-actions"><button class="btn ghost" onclick="go(\'ideas\')">우선순위 보기</button></div></div>'+
+
+    '<div class="planning-action '+(designPriority.length?'attn':'ok')+'"><div class="pa-label">Pre-production 우선</div><div class="pa-value">'+designPriority.length+'</div><div class="pa-copy">'+(designPriority.length?'<b>'+esc(designPriority[0].title)+'</b>'+(designPriority.length>1?' 외 '+(designPriority.length-1)+'개':'')+'가 Wireframe 제작에서 먼저 처리됩니다.':'대표가 별표로 올려둔 Game Design이 없습니다.')+'</div><div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">우선순위 보기</button></div></div>'+
+
+    '<div class="planning-action '+(unarchived.length?'attn':'ok')+'"><div class="pa-label">Game Design 보관 상태</div><div class="pa-value">'+unarchived.length+'</div><div class="pa-copy">'+(unarchived.length?'<b>GitHub 보관 metadata가 없는 설계</b>가 있습니다. 자동 복구 대상입니다.':'현재 Game Design은 모두 GitHub 보관 연결이 정상입니다.')+'</div><div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">보관 상태 보기</button></div></div>'+
   '</div>'+
-  '<div class="panel" style="margin-top:18px"><div class="panel-title"><strong>Pre-production 최근 현재 항목</strong><span>'+wireframePacks.length+'개</span></div>'+planningRecent(wireframePacks,"현재 대기 Wireframe Pack 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'wireframe\')">프리프로덕션 전체 보기</button></div></div>';
+
+  '<div class="panel" style="margin-bottom:18px"><div class="panel-title"><strong>기획 파이프라인 현재 적체</strong><span>현재 status 기준 · 누적 생산량 아님</span></div>'+
+    '<div class="planning-pipeline">'+
+      '<div class="planning-stage-card"><div class="planning-stage-top"><div><div class="planning-stage-title">Idea Lab → Game Design</div><div class="planning-stage-sub">설계 대기 후보</div></div><div class="planning-stage-count">'+ideaQueue.length+'</div></div><div class="planning-mini-row"><span class="planning-mini">★ 우선 '+ideaPriority.length+'</span><span class="planning-mini">미분류 '+unclassified.length+'</span><span class="planning-mini">가장 오래 '+esc(planningAge(oldestIdea?.created_at))+'</span></div><div class="card-actions"><button class="btn ghost" onclick="go(\'ideas\')">Idea Lab 열기</button></div></div>'+
+      '<div class="planning-stage-card"><div class="planning-stage-top"><div><div class="planning-stage-title">Game Design → Pre-production</div><div class="planning-stage-sub">Wireframe 제작 대기</div></div><div class="planning-stage-count">'+designQueue.length+'</div></div><div class="planning-mini-row"><span class="planning-mini">★ 우선 '+designPriority.length+'</span><span class="planning-mini">GitHub 누락 '+unarchived.length+'</span><span class="planning-mini">가장 오래 '+esc(planningAge(oldestDesign?.created_at))+'</span></div><div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">Game Design 열기</button></div></div>'+
+      '<div class="planning-stage-card"><div class="planning-stage-top"><div><div class="planning-stage-title">Pre-production → 구현 설계</div><div class="planning-stage-sub">Implementation Contract 대기</div></div><div class="planning-stage-count">'+wireQueue.length+'</div></div><div class="planning-mini-row"><span class="planning-mini">Wireframe Pack '+wireQueue.length+'</span><span class="planning-mini">가장 오래 '+esc(planningAge(oldestWire?.created_at))+'</span></div><div class="card-actions"><button class="btn ghost" onclick="go(\'wireframe\')">Pre-production 열기</button></div></div>'+
+    '</div>'+
+  '</div>'+
+
+  '<div class="planning-next-grid">'+
+    '<div class="panel"><div class="panel-title"><strong>다음 Game Design 처리 순서</strong><span>★ 우선 → 일반 오래된 순</span></div>'+planningQueueList(ideaQueue,"현재 Game Design 대기 후보가 없습니다.")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'ideas\')">아이디어 연구소에서 조정</button></div></div>'+
+    '<div class="panel"><div class="panel-title"><strong>다음 Pre-production 처리 순서</strong><span>★ 우선 → 일반 오래된 순</span></div>'+planningQueueList(designQueue,"현재 Pre-production 대기 설계가 없습니다.")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">게임 디자인실에서 조정</button></div></div>'+
+  '</div>'+
+
+  '<div class="panel" style="margin-top:18px"><div class="panel-title"><strong>최근 완성된 기획 산출물</strong><span>Game Design + Wireframe Pack</span></div>'+planningRecentOutputs()+'<div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">Game Design</button><button class="btn ghost" onclick="go(\'wireframe\')">Pre-production</button></div></div>';
 }
 
 function activityList(limit=50){ return `<div class="activity">${state.activity.slice(0,limit).map(a=>`<div class="activity-item"><div class="activity-time">${a.t}</div><div class="activity-text"><span class="log-dot"></span>${esc(a.text)}</div></div>`).join("")}</div>`; }
