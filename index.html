@@ -334,7 +334,10 @@
       <div><span class="status-dot"></span><strong style="font-size:12px">Studio online</strong></div>
       <div class="small">앞단 제작은 자동으로 흐르고,<br>플레이테스트 이후부터 대표가 직접 개입합니다.</div>
       <div id="cloudStatus" class="small" style="margin-top:12px;color:#9bc0ff">☁ Cloud 연결 준비 중</div>
-      <button class="btn ghost" style="width:100%;margin-top:8px;padding:7px 9px;font-size:10px" onclick="resetCloudKey()">기기 연결키 변경</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <button class="btn ghost" style="padding:7px 9px;font-size:10px" onclick="resetCloudKey()">연결키 변경</button>
+        <button class="btn ghost" style="padding:7px 9px;font-size:10px" onclick="copyCloudKey()">연결키 복사</button>
+      </div>
     </div>
   </aside>
   <main class="main">
@@ -438,6 +441,16 @@ function resetCloudKey(){
   localStorage.setItem("danbiGameOfficeKey", value);
   cloudReady=false;
   initCloud();
+}
+
+function copyCloudKey(){
+  const key=getCloudKey();
+  if(!key){ toast("먼저 이 기기의 연결키를 설정해주세요."); return; }
+  const confirmed=confirm("연결키는 DANBI GAME OFFICE 클라우드 데이터에 접근하는 비밀키입니다.\n다른 내 기기로 옮길 때만 복사하고, 공개 채팅이나 저장소에는 붙여넣지 마세요.\n\n복사할까요?");
+  if(!confirmed) return;
+  navigator.clipboard?.writeText(key)
+    .then(()=>toast("연결키 복사됨 · 다른 PC 첫 접속 때 입력하세요."))
+    .catch(()=>prompt("복사가 차단되었습니다. 아래 값을 직접 복사하세요.", key));
 }
 
 async function cloudRequest(method, body){
@@ -1590,13 +1603,15 @@ function settingsPage(){
   ];
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
-    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
+    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + cloud</span></div>
       <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. Static Fidelity 통과 후에만 PLAYTEST READY로 보냅니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
-    <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
-      <div class="detail-box"><h3>Human-directed, AI-produced</h3><p>AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
-      <div class="human-gate" style="margin-top:12px">핵심 KPI: <b>“일주일에 대표가 플레이할 가치가 있는 게임이 몇 개 Review Room에 도착하는가.”</b></div>
+    <div class="panel"><div class="panel-title"><strong>Cloud Access</strong><span>cross-device</span></div>
+      <div class="detail-box"><h3>다른 PC에서도 같은 회사 열기</h3><p>이 사이트의 실제 제작 데이터는 Supabase에 있고 코드는 GitHub에 있습니다. 새 PC에서는 배포된 사이트를 열고 현재 기기의 같은 연결키를 한 번 입력하면 같은 회사 상태를 불러옵니다.</p></div>
+      <div class="human-gate" style="margin-top:12px"><b>중요</b><br>연결키는 GitHub에 저장되지 않으며 각 브라우저의 localStorage에만 보관됩니다. 공개 채팅·공개 저장소에 올리지 마세요.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn primary" onclick="copyCloudKey()">현재 연결키 복사</button><button class="btn" onclick="resetCloudKey()">이 기기 연결키 변경</button></div>
+      <div class="detail-box" style="margin-top:12px"><h3>Studio Principle</h3><p>Human-directed, AI-produced. AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
       <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">로컬 상태 초기화</button></div>
     </div>
   </div>`;
