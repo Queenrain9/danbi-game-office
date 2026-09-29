@@ -17,7 +17,7 @@ class FidelityTests(unittest.TestCase):
     def fixture(self):
         req = [{'id': 'R1', 'source_ref': '/source/pack/screens/0/components/0'}]
         box = {'x': 10, 'y': 20, 'w': 30, 'h': 10}
-        screens = [{'id': 'home', 'components': [{'id': 'start', 'box': box}], 'interactions': [{'trigger': 'tap', 'target': 'start'}]}]
+        screens = [{'id': 'home', 'components': [{'id': 'start', 'type': 'button', 'box': box}], 'interactions': [{'trigger': 'tap', 'target': 'start'}]}]
         b = {'schema_version': 'fidelity-v1', 'hash_algorithm': 'sha256-canonical-json-v1',
              'contract_id': 'contract', 'wireframe_pack_id': 'pack', 'screens': screens, 'requirements': req,
              'source': {'pack': {'id': 'pack', 'design_id': 'design', 'reference_size': {'width': 390, 'height': 844}, 'screens': screens}, 'design': {'id': 'design'}, 'requirements': req},
