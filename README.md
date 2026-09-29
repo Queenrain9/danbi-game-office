@@ -1,46 +1,64 @@
 # 단비 게임회사 · DANBI GAME OFFICE
 
-Work/Sites에서 만들던 내부 게임 제작 대시보드를, 현재 채팅에서 바로 실행 가능한 독립 웹앱으로 재구성한 v0.1입니다.
+단비 게임회사의 게임 제작 파이프라인을 관리하는 웹 대시보드입니다.
 
-## 핵심 구조
-- Idea Lab
-- Greenlight
-- Concept Studio
-- Pre-production / Wireframe
-- Build Farm
-- Review Room
-- Directed Development
-- Archive / Activity / Settings
+## 현재 구조
 
-## 실제 동작
-- `Studio Cycle` 버튼으로 mock 자동 제작 라인이 진행됩니다.
-- 아이디어 생성 / 단계 이동 / 빌드 진행이 실제 UI 데이터에 반영됩니다.
-- Review Room에서 KEEP / MAYBE / KILL 결정을 할 수 있습니다.
-- KEEP은 Directed Development로 이동합니다.
-- 디렉팅 메모를 저장할 수 있습니다.
-- 설정에서 자동화 단계를 켜고 끌 수 있습니다.
-- 상태는 브라우저 `localStorage`에 저장되어 새로고침 후에도 유지됩니다.
-- Repo 주소 복사 기능이 있습니다.
-- 데스크톱 / 모바일 반응형입니다.
+- **GitHub (`Queenrain9/danbi-game-office`)**: 사이트 코드, 파이프라인 도구, 문서의 Source of Truth
+- **Supabase (`hmblaasagxyntyfrfztg`)**: Idea Lab, Game Design, Wireframe, Implementation Contract, Build Job, Fidelity/Repair와 회사 상태의 중앙 저장소
+- **Supabase Edge Function (`danbi-game-office-sync`)**: 브라우저가 DB의 관리자 키를 직접 가지지 않도록 하는 동기화 게이트웨이
+- **GitHub Pages**: 어느 PC에서든 접속할 수 있는 정적 웹 배포 경로
+- **브라우저 localStorage**: 연결키와 네트워크 장애 시 사용할 로컬 캐시만 저장
 
-## 실행
-가장 간단하게는 `index.html`을 브라우저로 열면 됩니다.
+즉, PC 한 대가 회사의 원본을 들고 있는 구조가 아닙니다. GitHub + Supabase가 원본이고 PC는 접속 단말입니다.
 
-또는 로컬 서버:
+## 다른 PC에서 이어서 작업하기
+
+1. 배포 주소를 엽니다: `https://queenrain9.github.io/danbi-game-office/`
+2. 기존 PC의 왼쪽 아래 또는 **스튜디오 설정 → 현재 연결키 복사**에서 연결키를 복사합니다.
+3. 새 PC의 첫 접속 프롬프트에 같은 연결키를 입력합니다.
+4. Supabase에 저장된 동일한 회사 상태와 파이프라인 데이터를 불러옵니다.
+5. Godot 프로젝트를 직접 수정할 때만 해당 게임의 GitHub 저장소를 새 PC에 clone해서 Godot로 엽니다.
+
+> 연결키는 비밀값입니다. 공개 GitHub, 공개 채팅, 문서에 저장하지 마세요.
+
+## 로컬 실행
+
+배포 사이트 대신 로컬에서 확인할 수도 있습니다.
+
+```bash
+npm install
+npm run dev
+```
+
+또는 단순 정적 서버:
+
 ```bash
 python -m http.server 5173
 ```
-그 뒤:
-`http://127.0.0.1:5173`
 
-## 다음 연결 포인트
-현재 v0.1은 자동 제작 라인을 **실제로 경험 가능한 mock production system**으로 만든 상태입니다.
-다음 단계에서 GPT API, 이미지 생성, GitHub API, Godot build agent를 각각 adapter로 연결하면 됩니다.
+그 뒤 `http://127.0.0.1:5173`에서 열면 됩니다.
 
-## Cloud Sync (v0.2)
+## 배포
 
-- 중앙 상태 저장소: Supabase `danbi_game_office_state`
-- 브라우저는 DB에 직접 접근하지 않고 `danbi-game-office-sync` Edge Function만 호출합니다.
-- Edge Function은 별도 연결키를 SHA-256으로 검증한 뒤 server-side 권한으로 상태를 읽고 씁니다.
-- PC / iPhone / 다른 PC에서 같은 연결키를 입력하면 동일한 회사 상태를 불러옵니다.
-- 로컬 저장도 계속 유지하므로 일시적인 네트워크 오류에서도 화면은 동작합니다.
+`.github/workflows/pages.yml`이 `main` push마다 GitHub Pages에 정적 사이트를 배포합니다.
+
+처음 한 번 GitHub Pages가 아직 활성화되지 않은 저장소라면:
+
+**Repository → Settings → Pages → Build and deployment → Source → GitHub Actions**
+
+로 지정하면 이후에는 `main` 업데이트 때 자동 배포됩니다.
+
+## 보안 원칙
+
+- Supabase `service_role` / secret key는 브라우저 코드나 공개 GitHub에 넣지 않습니다.
+- 브라우저는 `danbi-game-office-sync` Edge Function만 호출합니다.
+- Edge Function이 서버 측 Supabase 권한으로 DB를 읽고 씁니다.
+- 브라우저 연결키는 각 기기의 localStorage에만 보관합니다.
+- `danbi_game_office_state` 및 제작 파이프라인 DB는 이 배포 작업에서 삭제하거나 reset하지 않습니다.
+
+## 제작 파이프라인
+
+`Idea Lab → Game Design → Interaction Wireframe Pack → Implementation Contract / Fidelity Blueprint → Build Farm → Static Fidelity Gate → Playtest Ready`
+
+현재 대시보드는 예약 ChatGPT 작업과 Supabase의 실제 제작 데이터를 읽어 운영 상태를 보여줍니다.
