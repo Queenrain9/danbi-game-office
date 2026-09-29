@@ -218,9 +218,7 @@
           <div class="page-subtitle" id="pageSubtitle">회사 전체 제작 라인을 한눈에 확인합니다.</div>
         </div>
       </div>
-      <div class="top-actions">
-        <button class="btn primary" id="studioCycleBtn" onclick="runStudioCycle()">▶ Studio Cycle</button>
-      </div>
+      <div class="top-actions"></div>
     </header>
     <div class="content" id="content"></div>
   </main>
@@ -232,24 +230,26 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const STAGES = ["idea","greenlight","concept","wireframe","build","playtest","directed","archive"];
+const STAGES = ["idea","design","wireframe","build","playtest","directed","visual","archive"];
 const STAGE_LABEL = {
-  idea:"Idea Lab", greenlight:"Greenlight", concept:"Concept Studio",
+  idea:"Idea Lab", design:"Game Design",
   wireframe:"Pre-production", build:"Build Farm", playtest:"Review Room",
-  directed:"Directed Development", archive:"Archive"
+  directed:"Directed Development", visual:"Visual Development", archive:"Archive"
 };
 const NAV = [
   ["대표실", [["dashboard","▦","대표 대시보드"]]],
   ["AI 제작본부", [
     ["ideas","♢","아이디어 연구소"],
-    ["greenlight","✓","그린라이트 심사실"],
-    ["concept","✦","컨셉 스튜디오"],
+    ["design","◇","게임 디자인실"],
     ["wireframe","▤","프리프로덕션"],
     ["build","⌘","빌드 팜"]
   ]],
   ["단비 업무실", [
     ["review","▶","플레이테스트실"],
     ["directed","◆","디렉팅 개발실"]
+  ]],
+  ["제품 제작", [
+    ["visual","✦","비주얼 개발실"]
   ]],
   ["운영", [
     ["archive","□","프로젝트 보관소"],
@@ -261,7 +261,7 @@ const NAV = [
 function seedState() {
   return {
     cycle: 16,
-    settings: { autoIdeas:false, autoGreenlight:false, autoConcept:true, autoWireframe:true, autoBuild:true, humanGate:true },
+    settings: { autoBuild:true, humanGate:true },
     projects: [
       {id:"ld", title:"LET'S DEALER", desc:"손가락으로 직접 딜링하는 모바일 포커 딜러 게임.", genre:"Skill / Simulation", platform:"Mobile · Godot", stage:"directed", progress:68, build:"v0.4.2", repo:"Queenrain9/lets-dealer", decision:"KEEP", risk:"MED", visual:"Dealer table / premium iOS", note:"Collect는 sweep gesture. Board는 Flop 묶음 펼치기, Turn/River 단장 오픈.", created:1},
       {id:"mum", title:"Monster Used Market", desc:"괴물들의 기묘한 물건을 감정·거래하는 판타지 중고마켓.", genre:"Trading / Management", platform:"Mobile · Godot", stage:"directed", progress:54, build:"v0.3.1", repo:"Queenrain9/monster-used-market", decision:"KEEP", risk:"MED", visual:"Lantern night market", note:"현재 구조 목업과 실제 화면의 비율/레이어 일치가 우선.", created:2},
@@ -269,15 +269,11 @@ function seedState() {
       {id:"goblin", title:"Goblin Tax Office", desc:"고블린 왕국 세금 신고서에서 수상한 항목을 찾아내는 업무 추리 게임.", genre:"Deduction / Job", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.1.4", repo:"danbi-lab/goblin-tax-office", decision:null, risk:"LOW", visual:"Bureaucratic fantasy", changes:"판정 피드백 개선 · 7분 플레이 가능", created:4},
       {id:"dream", title:"Dream Pawn Shop", desc:"손님의 꿈을 담보로 잡고 가치와 위험을 흥정하는 거래 시뮬레이션.", genre:"Trading Sim", platform:"Mobile · Godot", stage:"build", progress:62, build:"v0.0.7", repo:"danbi-lab/dream-pawn-shop", decision:null, risk:"MED", visual:"Surreal neon pawnshop", created:5},
       {id:"flower", title:"Last Train Florist", desc:"막차 승객의 사연을 듣고 꽃말을 조합하는 감성 퍼즐.", genre:"Narrative Puzzle", platform:"Mobile", stage:"wireframe", progress:100, build:null, repo:null, decision:null, risk:"LOW", visual:"Rainy last train", screens:9, created:6},
-      {id:"laundry", title:"Tiny Dungeon Laundromat", desc:"모험가의 장비를 세탁하며 묻어온 흔적으로 이야기를 추리한다.", genre:"Cozy Puzzle", platform:"Mobile", stage:"concept", progress:78, build:null, repo:null, decision:null, risk:"LOW", visual:"Tiny medieval laundromat", conceptCount:6, created:7},
-      {id:"dragon", title:"Dragon Rental Desk", desc:"모험가에게 목적과 실력에 맞는 용을 배정하는 서비스 데스크 게임.", genre:"Management", platform:"Mobile", stage:"greenlight", progress:0, build:null, repo:null, decision:null, risk:"MED", visual:"Bright guild counter", scores:{hook:88, feasibility:91, replay:74, visual:84}, created:8},
     ],
     activity: [
       {t:"18:41", text:"Ghost Dating Agency prototype v0.2.0이 플레이테스트실에 도착했습니다."},
-      {t:"18:34", text:"Tiny Dungeon Laundromat 컨셉 후보 6장 중 대표 방향을 선택했습니다."},
       {t:"18:20", text:"Last Train Florist의 9개 화면 Interaction Wireframe이 완료되었습니다."},
       {t:"18:02", text:"Dream Pawn Shop Build v0.0.7 진행률 62%."},
-      {t:"17:44", text:"Dragon Rental Desk가 Greenlight 심사 대상으로 승격되었습니다."}
     ]
   }
 }
@@ -422,12 +418,12 @@ function titleInfo(){
   const map={
     dashboard:["대표 대시보드","회사 전체 제작 라인을 한눈에 확인합니다."],
     ideas:["아이디어 연구소","GPT 내부 생성·비평·프로듀서 심사를 통과한 후보만 도착합니다."],
-    greenlight:["그린라이트 심사실","제작 비용을 쓰기 전에 AI Producer가 후보를 걸러냅니다."],
-    concept:["컨셉 스튜디오","기획안과 컨셉 방향을 만들고 대표 비주얼을 선정합니다."],
-    wireframe:["프리프로덕션","대표 컨셉을 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
+    design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
+    wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
     build:["빌드 팜","Wireframe-ready 프로젝트를 Godot playable greybox로 만듭니다."],
     review:["플레이테스트실","여기서부터 단비가 게임을 직접 만지고 KEEP / MAYBE / KILL을 결정합니다."],
     directed:["디렉팅 개발실","살아남은 게임만 대표의 지시를 받아 제품 수준으로 발전시킵니다."],
+    visual:["비주얼 개발실","KEEP 이후 살아남은 게임에만 실제 비주얼·에셋 제작 비용을 사용합니다."],
     archive:["프로젝트 보관소","KILL 또는 보류된 프로젝트를 기록하고 필요할 때 되살립니다."],
     activity:["제작 활동 로그","자율 제작 라인에서 일어난 일을 시간순으로 확인합니다."],
     settings:["스튜디오 설정","어디까지 AI가 자율적으로 진행할지 제작 정책을 정합니다."]
@@ -435,26 +431,25 @@ function titleInfo(){
 }
 function metricData(){
   return [
-    ["Ideas", count("idea"), "+ auto"],
-    ["Greenlit", count("greenlight"), "Producer"],
-    ["Concepts", count("concept"), "Art Director"],
+    ["Ideas", count("idea"), "Scheduled"],
+    ["Game Design", count("design"), "Brief"],
     ["Wireframes", count("wireframe"), "Spec ready"],
     ["Building", count("build"), "Godot"],
     ["Playable", count("playtest"), "Ready"],
     ["Waiting for Danbi", count("playtest"), "Human gate"],
-    ["Directed", count("directed"), "Human-led"]
+    ["Directed", count("directed"), "Human-led"],
+    ["Visual", count("visual"), "KEEP only"]
   ];
 }
 function dashboard(){
-  const stages=["idea","greenlight","concept","wireframe","build","playtest","directed"];
+  const stages=["idea","design","wireframe","build","playtest","directed","visual"];
   return `
   <section class="hero">
     <div class="hero-main">
       <div class="eyebrow">Autonomous game studio · cycle ${state.cycle}</div>
       <h1>단비가 없는 동안에도<br>앞단 제작은 계속 돌아갑니다.</h1>
-      <p>아이디어 생성부터 컨셉·와이어프레임·플레이 가능한 초기 빌드까지 AI 제작본부가 병렬로 진행합니다. 대표는 Review Room에 도착한 게임부터 직접 판단하고, 살아남은 게임만 밀착 디렉팅합니다.</p>
+      <p>아이디어 탐색 → 게임 규칙 정의 → Interaction Wireframe Pack → 플레이 가능한 초기 빌드까지 앞단을 싸게 검증합니다. 대표는 Review Room에 도착한 게임부터 직접 판단하고, KEEP된 게임에만 디렉팅과 비주얼 제작 비용을 사용합니다.</p>
       <div class="hero-actions">
-        <button class="btn primary" onclick="runStudioCycle()">▶ Studio Cycle 실행</button>
         <button class="btn" onclick="go('review')">플레이테스트 ${count("playtest")}개 확인</button>
         <button class="btn ghost" onclick="go('activity')">활동 로그 보기</button>
       </div>
@@ -463,9 +458,9 @@ function dashboard(){
       <div class="eyebrow">Automation policy</div>
       <div class="hero-side-title">현재 제작 자율도</div>
       <div class="automation-meter">
-        <div class="meter-row"><span>Pre-production</span><b>74%</b></div><div class="meter"><i></i></div>
+        <div class="meter-row"><span>Pre-playtest pipeline</span><b>High</b></div><div class="meter"><i></i></div>
       </div>
-      <div class="gate-note"><b style="color:#d8e6fb">Human Gate</b><br>PLAYTEST 이전은 높은 자동화. KEEP 이후에는 AI가 임의로 핵심 게임 디자인을 바꾸지 않습니다.</div>
+      <div class="gate-note"><b style="color:#d8e6fb">Human Gate</b><br>PLAYTEST 이전은 규칙·와이어프레임·greybox 중심. KEEP 이후에만 디렉팅과 비주얼 개발로 넘어갑니다.</div>
       <div class="human-gate">대표 업무: <b>어떤 게임을 계속 만들 가치가 있는지 판단</b> → 디렉팅 → 승인.</div>
     </div>
   </section>
@@ -562,32 +557,31 @@ function ideasPage(){
   </div>
   <div class="cards idea-cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.<br>다음 정각 실행에서 기준을 넘는 후보가 있을 때만 여기에 나타납니다.</div>`}</div>`;
 }
-function greenCard(p){
-  const s=p.scores||{hook:83,feasibility:86,replay:75,visual:81};
-  const avg=Math.round((s.hook+s.feasibility+s.replay+s.visual)/4);
+function designCard(p){
   return `<div class="game-card">
-    <div class="card-top"><div><div class="kicker">Producer review</div><div class="card-title">${esc(p.title)}</div></div><span class="badge amber">${avg} / 100</span></div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="score"><div><b>${s.hook}</b><span>HOOK</span></div><div><b>${s.feasibility}</b><span>FEAS.</span></div><div><b>${s.replay}</b><span>REPLAY</span></div><div><b>${s.visual}</b><span>VISUAL</span></div></div>
-    <div class="detail-box" style="margin-top:12px"><h3>AI Producer note</h3><p>${avg>84?"핵심 판타지가 명확하고 초기 프로토타입 비용이 낮습니다. 컨셉 제작 진행 가치가 있습니다.":"가능성은 있으나 차별화와 플레이 반복성을 한 번 더 검토합니다."}</p></div>
-    <div class="card-actions"><button class="btn good" onclick="promote('${p.id}','concept')">PASS → Concept</button><button class="btn warn" onclick="hold('${p.id}')">HOLD</button><button class="btn bad" onclick="kill('${p.id}')">REJECT</button></div>
+    <div class="card-top"><div><div class="kicker">Playable Concept Brief</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">GAME DESIGN</span></div>
+    <div class="card-desc">${esc(p.desc||"게임 규칙 정의 대기")}</div>
+    <div class="detail-box"><h3>이 부서의 산출물</h3><p>Player Fantasy · Core Loop · Primary Interaction · Round Structure · Success/Failure · Progression · MVP Scope · Screen Inventory · Text Visual Direction Brief</p></div>
+    <div class="meta"><span>규칙 정의</span><span>MVP 축소</span><span>화면 목록</span></div>
+    <div class="progress"><i style="width:${p.progress||0}%"></i></div><div class="progress-row"><span>Idea → Playable Concept Brief</span><b>${p.progress||0}%</b></div>
   </div>`;
 }
-function greenlightPage(){
-  const ps=state.projects.filter(p=>p.stage==="greenlight");
-  return genericHeader("Greenlight Queue","아이디어를 낸 역할과 통과시키는 역할을 분리합니다.")+`<div class="cards">${ps.map(greenCard).join("") || `<div class="empty">심사 대기 후보가 없습니다. Studio Cycle을 실행하면 새 후보가 들어옵니다.</div>`}</div>`;
+function designPage(){
+  const ps=state.projects.filter(p=>p.stage==="design");
+  return genericHeader(
+    "Game Design Room",
+    "좋은 아이디어를 실제로 구현·플레이할 수 있는 게임 규칙으로 바꾸는 부서입니다. 이미지 생성은 하지 않습니다."
+  )+`
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-title"><strong>Required handoff</strong><span>to Pre-production</span></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <span class="badge">Player Fantasy</span><span class="badge">Core Loop</span><span class="badge">Primary Interaction</span>
+      <span class="badge">Round Structure</span><span class="badge">Success / Failure</span><span class="badge">Progression</span>
+      <span class="badge">MVP Scope</span><span class="badge">Screen Inventory</span><span class="badge">Visual Direction Brief</span>
+    </div>
+  </div>
+  <div class="cards">${ps.map(designCard).join("") || `<div class="empty">아직 Game Design 예약 작업과 연결되지 않았습니다.<br>다음 단계에서 Idea Lab의 실제 후보가 이 방으로 들어오게 연결합니다.</div>`}</div>`;
 }
-function conceptCard(p){
-  return `<div class="game-card">
-    <div class="card-top"><div><div class="kicker">Concept pack</div><div class="card-title">${esc(p.title)}</div></div><span class="badge purple">${p.progress}%</span></div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="detail-box"><h3>Visual Direction</h3><p>${esc(p.visual||"Visual direction pending")}</p></div>
-    <div class="meta"><span>${p.conceptCount||4} concept candidates</span><span>AI Art Director review</span></div>
-    <div class="progress"><i style="width:${p.progress}%"></i></div><div class="progress-row"><span>brief → candidates → select</span><b>${p.progress}%</b></div>
-    <div class="card-actions"><button class="btn" onclick="advanceProgress('${p.id}',25,'wireframe')">컨셉 작업 진행</button><button class="btn ghost" onclick="showProject('${p.id}')">기획 보기</button></div>
-  </div>`;
-}
-function conceptPage(){ const ps=state.projects.filter(p=>p.stage==="concept"); return genericHeader("Concept Studio","기획안과 여러 컨셉 후보를 만들고 AI Art Director가 대표 방향을 선택합니다.")+`<div class="cards">${ps.map(conceptCard).join("") || `<div class="empty">현재 컨셉 제작 중인 프로젝트가 없습니다.</div>`}</div>`; }
 function wireCard(p){
   return `<div class="game-card">
     <div class="card-top"><div><div class="kicker">Implementation-ready</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">WIREFRAME</span></div>
@@ -597,7 +591,7 @@ function wireCard(p){
     <div class="card-actions"><button class="btn primary" onclick="promote('${p.id}','build')">Build Farm으로 보내기</button><button class="btn ghost" onclick="showProject('${p.id}')">설계서</button></div>
   </div>`;
 }
-function wirePage(){ const ps=state.projects.filter(p=>p.stage==="wireframe"); return genericHeader("Wireframe Department","예쁜 이미지를 실제 구현 구조와 상태·인터랙션으로 번역합니다.")+`<div class="cards">${ps.map(wireCard).join("") || `<div class="empty">Wireframe-ready 프로젝트가 없습니다.</div>`}</div>`; }
+function wirePage(){ const ps=state.projects.filter(p=>p.stage==="wireframe"); return genericHeader("Pre-production · Interaction Wireframe Pack","Game Design Brief를 레이아웃·상태·인터랙션·전환·게임 규칙이 명시된 개발용 와이어프레임 팩으로 번역합니다.")+`<div class="cards">${ps.map(wireCard).join("") || `<div class="empty">아직 Pre-production 예약 작업과 연결되지 않았습니다.<br>Game Design Brief가 준비된 프로젝트만 이 방으로 들어옵니다.</div>`}</div>`; }
 function buildCard(p){
   return `<div class="game-card">
     <div class="card-top"><div><div class="kicker">Godot build farm</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">${p.build||"v0.0.1"}</span></div>
@@ -633,19 +627,25 @@ function directedCard(p){
   </div>`;
 }
 function directedPage(){ const ps=state.projects.filter(p=>p.stage==="directed"); return genericHeader("Directed Development","이 단계에서는 AI가 핵심 방향을 임의로 바꾸지 않습니다.")+`<div class="cards">${ps.map(directedCard).join("")}</div>`; }
+function visualPage(){
+  const ps=state.projects.filter(p=>p.stage==="visual");
+  return genericHeader(
+    "Visual Development",
+    "플레이테스트에서 살아남은 게임에만 컨셉아트·실제 에셋·UI 비주얼·폴리시 비용을 사용합니다."
+  )+`<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Entry rule</strong><span>KEEP only</span></div><div class="human-gate" style="margin-top:0">재미가 검증되기 전에는 이미지 제작을 앞당기지 않습니다. 이 방은 플레이테스트 이후 제품화할 게임만 사용합니다.</div></div>
+  <div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-top"><div><div class="kicker">Post-playtest</div><div class="card-title">${esc(p.title)}</div></div><span class="badge purple">VISUAL</span></div><div class="card-desc">${esc(p.desc)}</div><div class="detail-box"><h3>Visual Production</h3><p>Visual DNA · Master Reference · UI Style · Production Assets · Polish</p></div></div>`).join("") || `<div class="empty">아직 비주얼 개발 대상이 없습니다.<br>KEEP 이후 제품화 단계에서 사용합니다.</div>`}</div>`;
+}
 function archivePage(){ const ps=state.projects.filter(p=>p.stage==="archive"); return genericHeader("Archive","버린 아이디어도 기록은 남습니다. 실패를 싸게 만드는 것이 이 공장의 장점입니다.")+`<div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-title">${esc(p.title)}</div><div class="card-desc">${esc(p.desc)}</div><div class="meta"><span>${esc(p.decision||"ARCHIVED")}</span><span>${esc(p.genre)}</span></div><div class="card-actions"><span class="badge">ARCHIVED</span></div></div>`).join("") || `<div class="empty">Archive가 비어 있습니다.</div>`}</div>`; }
 function activityPage(){ return genericHeader("Studio Activity","자동 생성·승격·빌드와 대표 결정이 모두 기록됩니다.",`<button class="btn bad" onclick="clearLog()">로그 비우기</button>`)+`<div class="panel">${activityList(80)}</div>`; }
 function settingsPage(){
   const rows=[
-    ["autoConcept","Concept 자동 제작","기획안과 컨셉 후보군을 생성합니다."],
-    ["autoWireframe","Wireframe 자동 제작","선정된 컨셉을 구현용 화면 설계도로 번역합니다."],
-    ["autoBuild","Godot Build 자동화","Wireframe-ready 프로젝트를 greybox prototype으로 보냅니다."],
-    ["humanGate","Playtest 이후 Human Gate","KEEP 이후 핵심 방향 변경은 대표 승인 없이는 진행하지 않습니다."]
+    ["autoBuild","Godot Build 자동화","Wireframe-ready 프로젝트를 playable greybox로 보냅니다."],
+    ["humanGate","Playtest 이후 Human Gate","KEEP 이후 핵심 방향 변경과 비주얼 제작은 대표 판단을 기준으로 합니다."]
   ];
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Idea Lab intake</h3><p>아이디어 연구소는 ChatGPT 예약 작업의 심사를 통과해 Supabase에 저장된 후보만 표시합니다. 브라우저의 샘플 생성 기능은 사용하지 않습니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab은 연결 완료. Game Design과 Pre-production은 다음 예약 작업에서 순서대로 연결합니다. 브라우저 자체의 가짜 아이디어·컨셉 생성은 사용하지 않습니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
@@ -656,23 +656,19 @@ function settingsPage(){
   </div>`;
 }
 function render(){
-  if(!["dashboard","ideas","greenlight","concept","wireframe","build","review","directed","archive","activity","settings"].includes(current)) current="dashboard";
+  if(!["dashboard","ideas","design","wireframe","build","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
   navRender();
   const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; document.getElementById("pageSubtitle").textContent=s;
-  const cycleBtn=document.getElementById("studioCycleBtn");
-  if(cycleBtn) cycleBtn.style.display=current==="ideas"?"none":"inline-flex";
-  const pages={dashboard,ideas:ideasPage,greenlight:greenlightPage,concept:conceptPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,archive:archivePage,activity:activityPage,settings:settingsPage};
+  const pages={dashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
   document.getElementById("content").innerHTML = pages[current]();
 }
 function getP(id){ return state.projects.find(p=>p.id===id); }
 function promote(id,stage){
   const p=getP(id); if(!p)return;
-  p.stage=stage; p.progress=stage==="concept"?20:stage==="wireframe"?100:stage==="build"?15:p.progress;
+  p.stage=stage; p.progress=stage==="design"?20:stage==="wireframe"?100:stage==="build"?15:p.progress;
   if(stage==="build"){ p.repo=p.repo||`danbi-lab/${slugify(p.title)}`; p.build=p.build||"v0.0.1"; }
   addLog(`${p.title} → ${STAGE_LABEL[stage]} 단계로 이동했습니다.`); save(); render(); toast(`${STAGE_LABEL[stage]}로 이동`);
 }
-function hold(id){ const p=getP(id); if(!p)return; addLog(`${p.title} Greenlight 심사를 HOLD했습니다.`); toast("HOLD 기록됨"); }
-function kill(id){ const p=getP(id); if(!p)return; p.stage="archive"; p.decision="REJECT"; addLog(`${p.title}를 Greenlight에서 REJECT하고 Archive로 보냈습니다.`); save(); render(); }
 function advanceProgress(id,amount,nextStage){
   const p=getP(id); if(!p)return; p.progress=Math.min(100,(p.progress||0)+amount);
   addLog(`${p.title} ${STAGE_LABEL[p.stage]} 진행률 ${p.progress}%.`);
@@ -692,27 +688,7 @@ function decide(id,d){
   save(); render(); toast(`${p.title} · ${d}`);
 }
 function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9가-힣]+/g,"-").replace(/^-|-$/g,""); }
-function runStudioCycle(){
-  state.cycle++;
-  let actions=[];
-  if(state.settings.autoConcept){
-    const g=state.projects.find(p=>p.stage==="greenlight");
-    if(g && avgScore(g)>=80){g.stage="concept";g.progress=25;g.conceptCount=4;actions.push(`${g.title} Concept 시작`);}
-  }
-  if(state.settings.autoWireframe){
-    const c=state.projects.find(p=>p.stage==="concept");
-    if(c){c.progress=Math.min(100,(c.progress||0)+25);if(c.progress>=100){c.stage="wireframe";c.screens=c.screens||8;actions.push(`${c.title} Wireframe 완료`);}}
-  }
-  if(state.settings.autoBuild){
-    const w=state.projects.find(p=>p.stage==="wireframe");
-    if(w){w.stage="build";w.progress=20;w.repo=w.repo||`danbi-lab/${slugify(w.title)}`;w.build="v0.0.1";actions.push(`${w.title} Build Farm 진입`);}
-    const b=state.projects.find(p=>p.stage==="build");
-    if(b){b.progress=Math.min(100,(b.progress||0)+22);if(b.progress>=100){b.stage="playtest";b.build="v0.1.0";b.changes="AI 제작본부가 핵심 루프의 playable greybox를 완성했습니다.";actions.push(`${b.title} Playtest ready`);}}
-  }
-  const summary=`Studio Cycle #${state.cycle}: ${actions.join(" · ") || "자동화된 작업 없음"}`;
-  addLog(summary); save(); render(); toast(`Cycle #${state.cycle} 완료`);
-}
-function avgScore(p){ const s=p.scores||{hook:80,feasibility:80,replay:80,visual:80}; return (s.hook+s.feasibility+s.replay+s.visual)/4; }
+
 function showProject(id){
   const p=getP(id); if(!p)return;
   modal(`<div class="modal-head"><div><div class="kicker">${STAGE_LABEL[p.stage]}</div><h2>${esc(p.title)}</h2></div><button class="close" onclick="closeModal()">×</button></div>
