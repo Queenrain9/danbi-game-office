@@ -1,0 +1,325 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "archived_from": "danbi_game_designs",
+  "spec": {
+    "id": "87eb607d-75a3-4681-9d9a-1e9f412c1b81",
+    "title": "Moonlight Window Washer",
+    "source": "chat_automation",
+    "economy": "Not required. MVP에는 구매/업그레이드가 없다.",
+    "idea_id": "e81b6fbe-b020-49e4-884c-4d796285e604",
+    "version": "v0.1",
+    "one_line": "잠든 거인의 온실 외벽을 로프에 매달려 세정액·문지르기·스퀴지를 순서대로 사용해 닦고, 얼룩 아래 숨은 별자리 생물을 발견하는 모바일 청소 퍼즐.",
+    "core_loop": "창 목표 확인 → 로프 위치를 작업 구역으로 이동 → 세정액으로 마른 얼룩을 적심 → 문질러 오염을 느슨하게 제거 → 스퀴지를 긴 스트로크로 밀어 물기/잔얼룩 제거 → 깨끗해진 영역에서 별자리 노드 발견 → 필요한 노드를 이어 숨은 생물 완성 → 청결도/줄무늬/발견 결과. 핵심 반복은 같은 화면에서 wet-scrub-squeegee의 서로 다른 손동작이 유리 상태를 단계적으로 바꾸는 것이다.",
+    "mvp_scope": "첫 Godot playable: 5 data-driven panes, dirt/wet/loosened/removed masks, spray hold-drag, scrub path, directional squeegee, streak generation, rope reach/reposition, constellation reveal/trace, one reusable hazard system, cleanliness/usage scoring, retry/next and route completion.",
+    "game_rules": {
+      "rules": [
+        "scrubbing dry hardened dirt has very low effect",
+        "squeegee removes water but does not efficiently remove hardened dirt",
+        "crossing an already clear area with dirty squeegee can create streak",
+        "constellation nodes become interactive only after local reveal threshold",
+        "rope position defines reachable interaction band"
+      ],
+      "score": {
+        "1": "finish requirements",
+        "2": "streaks <= 10%",
+        "3": "cleaner usage under par and no hazard miss"
+      },
+      "dirt_states": [
+        "dry",
+        "wet",
+        "loosened",
+        "removed"
+      ],
+      "clean_target": 0.9,
+      "water_states": [
+        "dry",
+        "wet",
+        "streaked",
+        "clear"
+      ],
+      "hazard_strikes": 3,
+      "finish_requires": [
+        "cleanliness >= 90%",
+        "required discovery complete"
+      ],
+      "discovery_reveal_threshold": 0.7
+    },
+    "not_in_mvp": [
+      "free-roaming exterior",
+      "complex rope physics",
+      "procedural dirt generation",
+      "economy/upgrades",
+      "story dialogue",
+      "final illustrated giant",
+      "online leaderboards"
+    ],
+    "known_risks": [
+      "연속 mask 업데이트 성능이 저사양 모바일에서 병목이 될 위험",
+      "청소가 목적 없는 문지르기로 느껴질 위험",
+      "도구 전환이 잦으면 촉각 흐름이 끊길 위험",
+      "별자리 tracing이 청소와 별개의 미니게임처럼 느껴질 위험",
+      "hazard가 잦으면 편안한 cleaning fantasy를 훼손할 위험"
+    ],
+    "progression": "창을 완료하면 온실의 다음 높이/구역과 새로운 별자리 생물이 열린다. MVP는 5개 창의 선형 route와 발견 도감 5칸만 제공한다.",
+    "screen_flow": "Night Route → Pane Brief → Window Cleaning. Cleaning 내부에서 tool gesture와 rope reposition, Discovery Overlay가 같은 pane state를 공유한다. Hazard Warning은 cleaning 위 상태. Finish → Pane Result → Next Pane; 3개 route 완료 시 Route Complete. 실패 시 Result → Retry.",
+    "state_model": [
+      {
+        "ui": "pane silhouette, discovery hint, hazards",
+        "exit": "start",
+        "enter": "pane selected",
+        "state": "pane_brief",
+        "inputs": [
+          "start",
+          "back"
+        ]
+      },
+      {
+        "ui": "glass, rope, tool dock, cleanliness",
+        "exit": "gesture/hazard/finish",
+        "enter": "start or gesture release",
+        "state": "cleaning_idle",
+        "inputs": [
+          "reposition",
+          "select tool",
+          "spray",
+          "scrub",
+          "squeegee",
+          "node trace",
+          "finish",
+          "pause"
+        ]
+      },
+      {
+        "ui": "other tools and reposition temporarily locked",
+        "exit": "release/cancel",
+        "enter": "valid cleaning gesture begins",
+        "state": "tool_gesture",
+        "inputs": [
+          "continue current gesture"
+        ]
+      },
+      {
+        "ui": "warning direction, latch emphasis",
+        "exit": "latch success or timer expiry",
+        "enter": "hazard telegraph",
+        "state": "hazard_warning",
+        "inputs": [
+          "safety latch"
+        ]
+      },
+      {
+        "ui": "constellation overlay above cleaned glass",
+        "exit": "complete/cancel",
+        "enter": "node trace starts/completes",
+        "state": "discovery",
+        "inputs": [
+          "trace nodes",
+          "cancel"
+        ]
+      },
+      {
+        "ui": "cleanliness, streaks, usage, discovery",
+        "exit": "choice",
+        "enter": "finish success or 3 hazard misses",
+        "state": "result",
+        "inputs": [
+          "retry",
+          "next"
+        ]
+      }
+    ],
+    "content_unit": "window pane: dirt mask + surface parameters + reach zones + constellation pattern",
+    "content_model": {
+      "axes": [
+        "pane shape",
+        "dirt mask",
+        "dirt hardness",
+        "wetting requirement",
+        "rope reach zones",
+        "streak sensitivity",
+        "constellation node pattern",
+        "hazard schedule",
+        "cleaner par"
+      ],
+      "unit": "window pane",
+      "authoring": "mask textures + numeric parameters + discovery node coordinates; reusable cleaning simulation",
+      "mvp_count": 5
+    },
+    "source_run_at": "2026-09-29T13:26:49.623245+00:00",
+    "player_fantasy": "플레이어는 밤의 거대 온실을 조용히 관리하는 로프 청소부다. 손가락 자국이 그대로 깨끗한 유리로 변하는 촉각적 만족, 효율적인 청소 동선의 숙련감, 마지막 얼룩 아래 예상치 못한 별자리 생물이 드러나는 발견감을 느낀다.",
+    "session_length": "창당 2~4분 · Route 7~10분",
+    "test_scenarios": [
+      "한 창에서 spray→scrub→squeegee 순서를 통해 같은 얼룩의 상태가 명확히 달라진다.",
+      "dry hard dirt를 바로 scrub할 때 낮은 효과가 시각/촉각으로 이해된다.",
+      "squeegee stroke가 실제 지나간 폭만 clear하고 급격한 역방향에서 streak를 만든다.",
+      "70% 이상 노출된 구역의 constellation node만 연결 가능하다.",
+      "rope reach 밖 입력은 상태를 바꾸지 않고 한계를 명확히 표시한다.",
+      "5 panes를 반복해도 mask와 discovery state가 다음 pane에 누수되지 않는다."
+    ],
+    "feedback_system": [
+      {
+        "event": "spray",
+        "sound": "soft mist",
+        "haptic": "none",
+        "visual": "wet sheen/droplets follow path"
+      },
+      {
+        "event": "scrub effective",
+        "sound": "soft squeak",
+        "haptic": "light texture ticks on hard patches",
+        "visual": "dirt alpha/strength visibly decreases"
+      },
+      {
+        "event": "squeegee clean",
+        "sound": "rubber glide",
+        "haptic": "light start/end tick",
+        "visual": "crisp transparent band follows blade"
+      },
+      {
+        "event": "streak created",
+        "sound": "wet chirp",
+        "haptic": "none",
+        "visual": "thin residual water line"
+      },
+      {
+        "event": "node revealed",
+        "sound": "single bell",
+        "haptic": "selection tick",
+        "visual": "star point blooms under glass"
+      },
+      {
+        "event": "constellation complete",
+        "sound": "short celestial phrase",
+        "haptic": "medium success",
+        "visual": "lines animate into creature silhouette"
+      },
+      {
+        "event": "hazard",
+        "sound": "low creak",
+        "haptic": "warning double tick",
+        "visual": "rope/foliage telegraph direction"
+      }
+    ],
+    "round_structure": "창 한 장 2~4분. Brief 후 Cleaning으로 진입한다. 목표 청결도 90% 이상과 필수 별자리 발견을 달성하면 Finish 활성화. 시간 제한은 기본적으로 없고, 위험 창에서는 3회 safety miss가 실패 조건. Result 후 Next Pane/Retry. 3개 창이 한 Night Route로 약 7~10분.",
+    "interaction_spec": [
+      {
+        "input": "hold-drag",
+        "cancel": "release stops spray",
+        "target": "glass with spray tool",
+        "invalid": "outside reach shows rope-limit arc",
+        "hit_test": "reachable glass band",
+        "priority": "tool gesture beats reposition"
+      },
+      {
+        "input": "rub path",
+        "cancel": "release commits removed amount",
+        "target": "wet dirt",
+        "invalid": "dry hard dirt barely changes and gives dry scrape cue",
+        "hit_test": "finger radius 18dp",
+        "priority": "scrub beats node trace until node is revealed"
+      },
+      {
+        "input": "directional drag",
+        "cancel": "release ends stroke; abrupt reversal increases streak risk",
+        "target": "wet glass with squeegee",
+        "invalid": "outside reach clips stroke at boundary",
+        "hit_test": "blade width swept along path",
+        "priority": "squeegee exclusive during stroke"
+      },
+      {
+        "input": "vertical drag",
+        "cancel": "release snaps carriage to reachable band",
+        "target": "rope/carriage handle or empty rope gutter",
+        "invalid": "rope bounds clamp",
+        "hit_test": "side gutter",
+        "priority": "disabled during tool gesture"
+      },
+      {
+        "input": "node drag",
+        "cancel": "leaving valid next-node radius breaks current chain only",
+        "target": "revealed constellation node",
+        "invalid": "wrong node pulses and chain remains at last valid node",
+        "hit_test": "node + 14dp",
+        "priority": "revealed node beats background scrub when discovery mode active"
+      },
+      {
+        "input": "tap",
+        "cancel": "none",
+        "target": "safety latch",
+        "invalid": "outside warning gives harmless click",
+        "hit_test": "fixed large button",
+        "priority": "hazard warning highest"
+      }
+    ],
+    "screen_inventory": [
+      "Night Route",
+      "Pane Brief",
+      "Window Cleaning",
+      "Discovery Overlay",
+      "Pause Overlay",
+      "Pane Result",
+      "Route Complete"
+    ],
+    "core_player_verbs": [
+      {
+        "verb": "Reposition",
+        "input": "drag rope anchor/vertical swipe",
+        "target": "washer carriage",
+        "feedback": "rope tension and reachable area move",
+        "condition": "not actively scrubbing/squeegeeing",
+        "state_change": "working zone moves"
+      },
+      {
+        "verb": "Spray",
+        "input": "hold-drag",
+        "target": "dirty glass",
+        "feedback": "wet mask and droplets",
+        "condition": "cleaner selected",
+        "state_change": "dry dirt becomes wet/loosened"
+      },
+      {
+        "verb": "Scrub",
+        "input": "finger rub",
+        "target": "wet loosened dirt",
+        "feedback": "dirt erases progressively",
+        "condition": "sponge selected or direct scrub mode",
+        "state_change": "dirt strength decreases along path"
+      },
+      {
+        "verb": "Squeegee",
+        "input": "continuous directional drag",
+        "target": "wet glass",
+        "feedback": "clean band follows blade",
+        "condition": "squeegee selected",
+        "state_change": "water removed; streak quality recorded"
+      },
+      {
+        "verb": "Trace Discovery",
+        "input": "drag through revealed nodes",
+        "target": "constellation nodes",
+        "feedback": "starlight line forms",
+        "condition": "reveal threshold reached",
+        "state_change": "nodes connect in order"
+      },
+      {
+        "verb": "Dodge/Hold",
+        "input": "tap safety latch",
+        "target": "rope latch",
+        "feedback": "rope tightens and hazard passes",
+        "condition": "hazard warning",
+        "state_change": "carriage locks briefly"
+      }
+    ],
+    "wireframe_handoff": [
+      "Night Route/Brief/Cleaning/Result/Route Complete와 Discovery/Pause/Hazard overlay를 표현",
+      "Cleaning 화면에 rope reachable band, tool dock, cleanliness, Finish disabled/enabled를 표시",
+      "spray hold-drag, scrub rub, squeegee directional stroke, rope reposition, node trace의 gesture annotation을 포함",
+      "surface의 dry/wet/loosened/clear/streak state variant와 constellation hidden/revealed/connected state를 표현",
+      "out-of-reach, dry-scrub low effect, invalid node, hazard warning/miss, finish-disabled 상태와 transition을 포함"
+    ],
+    "primary_interaction": "같은 유리 표면을 세정액 hold-drag → 손가락 scrub → 스퀴지 directional stroke로 단계적으로 변화시키고 드러난 별자리 노드를 이어 발견한다.",
+    "difficulty_variation": "초반은 넓은 단순 얼룩에서 wet→scrub→squeegee 순서를 익힌다. 중반은 서로 다른 hardness 얼룩과 좁은 로프 도달 구역 때문에 작업 순서를 계획한다. 후반은 스퀴지 줄무늬를 최소화하면서 별자리 노드를 충분히 노출해야 하고, 바람/거인의 뒤척임 같은 telegraphed hazard가 청소 리듬을 끊는다. 난이도는 타이머 단축이 아니라 표면 상태, 도달 영역, 발견 패턴, 위험 인터럽트 조합으로 오른다.",
+    "visual_direction_brief": "Portrait, tall pane composition. Glass occupies 70~80% of screen; rope/carriage runs along a side gutter and tool dock stays compact at bottom. Dirt, wetness, cleaned glass, streak and constellation must be visually distinct without fine text. Camera is fixed per pane rather than freely scrolling in MVP; carriage shifts the reachable work band. Background giant/greenhouse remains low-contrast so cleaning masks and finger paths read clearly."
+  }
+}

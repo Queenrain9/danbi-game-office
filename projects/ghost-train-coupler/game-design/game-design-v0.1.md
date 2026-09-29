@@ -1,0 +1,182 @@
+# Ghost Train Coupler — Playable Game Design Spec v0.1
+## 1. Product Definition
+유령 승객의 목적지·상극 조건을 읽고 객차를 레일 위에서 직접 밀고 연결·분리해 출발 가능한 편성을 만드는 공간 퍼즐. 장르: spatial shunting puzzle / Mobile portrait / 2–4분/yard puzzle. 목표 감각은 직접 만지고 조립하는 명료한 손맛과 결과 원인의 가독성. Non-goals: procedural puzzle generator, real train physics, narrative campaign, currency/upgrades, multiple stations in one puzzle.
+## 2. Player Fantasy
+나는 새벽 차고의 마지막 편성 기사다. 승객을 메뉴에서 배정하는 관리자가 아니라 실제 객차를 밀고 커플러를 붙였다 떼며 제한된 선로에서 올바른 열차를 만든다.
+## 3. Core Player Verbs
+- inspect: input=tap; target=passenger/car; condition=yard active; state=shows destination and constraint; feedback=symbol callout
+- shunt: input=horizontal drag; target=car; condition=track segment free; state=moves car along connected rail; feedback=wheel roll + position ticks
+- couple: input=drag car end into coupler range then release; target=adjacent car; condition=aligned/same track; state=joins consist; feedback=blue ghost magnet then clack+haptic
+- uncouple: input=tap coupler then swipe apart; target=coupler; condition=train stopped; state=splits consist; feedback=chain opens
+- switch: input=tap lever; target=junction; condition=no car occupying switch; state=changes route; feedback=rail highlight
+- dispatch: input=swipe signal up; target=departure signal; condition=consist on departure track; state=validates rules and departs or blocks; feedback=green signal or rule conflict highlights
+## 4. Core Loop
+승객/목적지 조건 10~15초 확인 → 객차 3~6량을 60~120초 동안 shunt/couple/uncouple/switch → 출발선에 편성 → 신호를 올려 검증 5초 → 충족 시 승객 반응과 출발, 실패 시 충돌 조건을 표시하고 계속 재편성. 퍼즐당 2~4분.
+## 5. Round / Session Structure
+Yard Brief로 요구 조건을 제시한 뒤 Yard Puzzle 시작. 시간 제한 없음. 플레이어는 move budget 안에서 자유롭게 재배치하고 언제든 dispatch 시도 가능. 모든 필수 승객/목적지/금지 인접/차장차 위치 규칙을 만족하면 완료. Undo 3단계 제공. 결과 후 Next Puzzle.
+## 6. Game Rules
+{
+  "cars_mvp": "3–6",
+  "tracks_mvp": "2–3 sidings + departure",
+  "move_budget": "8–18 shunt actions by puzzle",
+  "move_definition": "a continuous drag of one connected consist to a new snap point counts 1",
+  "couple_range_px": 28,
+  "collision": "cars cannot overlap or pass through occupied track",
+  "dispatch_requirements": [
+    "all required passengers in train",
+    "destination-compatible car order",
+    "all forbidden adjacency rules satisfied",
+    "engine at front",
+    "consist entirely inside departure zone"
+  ],
+  "score": {
+    "base": 100,
+    "move_over_par": -4,
+    "invalid_dispatch": -8,
+    "unused_move_bonus": 3,
+    "perfect": "score >=95"
+  },
+  "failure": "no hard fail from budget; reaching zero bonus moves caps score at 60 but puzzle remains solvable",
+  "undo": 3
+}
+## 7. State Model
+[
+  {
+    "id": "brief",
+    "entry": "puzzle selected",
+    "inputs": [
+      "start"
+    ],
+    "exit": "start",
+    "ui": "rule cards + yard preview"
+  },
+  {
+    "id": "yard_idle",
+    "entry": "start/drag release",
+    "inputs": [
+      "inspect",
+      "drag car",
+      "tap switch",
+      "tap coupler",
+      "dispatch"
+    ],
+    "exit": "gesture begins",
+    "ui": "track occupancy + rule strip"
+  },
+  {
+    "id": "shunting",
+    "entry": "car drag",
+    "inputs": [
+      "drag",
+      "release",
+      "cancel"
+    ],
+    "exit": "release/cancel",
+    "ui": "valid rail path and snap points"
+  },
+  {
+    "id": "coupling",
+    "entry": "ends within range",
+    "inputs": [
+      "release"
+    ],
+    "exit": "join/reject",
+    "ui": "coupler ghost"
+  },
+  {
+    "id": "validation",
+    "entry": "dispatch",
+    "inputs": [],
+    "exit": "pass/fail",
+    "ui": "rules checked one by one"
+  },
+  {
+    "id": "result",
+    "entry": "pass",
+    "inputs": [
+      "next",
+      "replay"
+    ],
+    "exit": "selection",
+    "ui": "moves/score"
+  }
+]
+## 8. Interaction Spec
+{
+  "drag": "cars constrained to rail spline/segments; grabbed consist moves as unit; finger offset preserved",
+  "snap": "release snaps to nearest free rail stop within 32px; otherwise returns to origin",
+  "couple": "only facing compatible ends on same aligned segment can couple",
+  "uncouple": "tap coupler selects it, outward swipe >=24px confirms split",
+  "switch_priority": "junction lever ignores tap while any car overlaps safety zone",
+  "collision": "drag stops before occupied car with bumper feedback",
+  "dispatch": "signal swipe requires >=36px upward travel",
+  "cancel": "drag back to origin or system cancel restores pre-gesture state without move cost",
+  "invalid": "blocked route flashes occupied segment; forbidden passenger rules are not checked until dispatch unless inspected",
+  "touch": "minimum 44pt invisible handles around small couplers"
+}
+## 9. Content Model
+{
+  "unit": "yard puzzle",
+  "axes": [
+    "car count",
+    "track topology",
+    "passenger destination",
+    "forbidden adjacency",
+    "required adjacency",
+    "car orientation",
+    "fixed car",
+    "junction state",
+    "par moves"
+  ],
+  "mvp_puzzles": 8,
+  "combination": "topology template + car set + 2–4 rule cards; each puzzle hand-authored for solvability"
+}
+## 10. Difficulty / Variation
+초반 3량/단일 siding/목적지 순서만. 중반 junction과 금지 인접, 고정 객차. 후반 5~6량에서 임시로 잘못 연결해야 공간을 만드는 shunting 계획, required+forbidden 규칙의 조합을 사용한다. 타이머 대신 선로 공간과 이동 순서의 계획 깊이를 높인다.
+## 11. Progression
+MVP 8퍼즐 순차 해금. 이후 새 차고 topology와 특수 객차(통과 불가, 방향 고정)를 규칙으로 해금. 능력치 성장 없음.
+## 12. Economy
+Not required. Move budget is puzzle scoring resource only.
+## 13. Screen Inventory
+- Puzzle Select
+- Yard Brief
+- Yard Puzzle
+- Dispatch Check Overlay
+- Result
+## 14. Screen Flow
+Puzzle Select → Yard Brief → Yard Puzzle ↔ Inspect callout; Dispatch → Check Overlay → 실패면 conflict highlight 후 Yard Puzzle, 성공이면 departure animation → Result → Next/Puzzle Select.
+## 15. Feedback System
+{
+  "shunt": "wheel rumble, rail highlight, light continuous haptic at snap ticks",
+  "couple": "magnetic ghost + metal clack + medium haptic",
+  "uncouple": "chain separation sound",
+  "collision": "bumper compression + short error haptic",
+  "switch": "route segment glow changes",
+  "dispatch_fail": "only violated rule cards pulse and implicated cars outline",
+  "dispatch_success": "signal green, passengers settle, consist exits screen"
+}
+## 16. Visual Direction Brief
+가로보다 세로 모바일에 맞춘 위에서 약간 내려다본 2D 차고. 상단 18% 규칙 스트립, 중앙 68% 선로/객차, 하단 14% moves/undo/dispatch. 객차는 손가락보다 넓고 커플러는 확대 hit area. 유령 표현은 반투명 장식이되 선로 점유와 객차 경계는 불투명하게 유지.
+## 17. MVP Scope
+MUST: 8 hand-authored yard puzzles, 3–6 cars, rail-constrained dragging, coupling/uncoupling, one junction switch type, occupancy/collision, passenger constraint validation, move score, undo, dispatch/result loop.
+NOT IN MVP: procedural puzzle generator, real train physics, narrative campaign, currency/upgrades, multiple stations in one puzzle
+## 18. Test Scenarios
+- 첫 플레이어가 20초 내 객차를 드래그해 선로를 따라 이동시킨다
+- 커플링/분리 동작 성공률이 튜토리얼 후 90% 이상이다
+- 실패 dispatch 후 어떤 규칙이 깨졌는지 5초 내 지목할 수 있다
+- 8퍼즐 모두 brute-force/state search 또는 수동 검증으로 최소 1개 해법을 가진다
+- 객차 6량에서도 작은 커플러 오터치가 전체 입력의 10% 미만이다
+## 19. Known Risks
+- 선로 제약 드래그가 손가락과 어긋나면 직접 밀어 편성한다는 핵심 손맛이 사라짐
+- 규칙 카드가 많아지면 공간 퍼즐보다 조건표 읽기 게임으로 변질될 수 있음
+- 세로 화면에서 복잡한 siding topology가 작아질 위험
+## 20. Wireframe Handoff
+- Puzzle Select/Brief/Yard/Dispatch Overlay/Result 5화면
+- 3/4/6량 yard geometry variant
+- car idle/dragging/snapping/coupled/blocked 상태
+- rail valid path/occupied path/switch route 상태
+- coupler hover/couple/uncouple gesture
+- rule card collapsed/inspected/violated/satisfied variant
+- dispatch signal swipe and validation input lock
+- collision/snap-back/invalid switch feedback
+- failed dispatch→yard, success→departure→result transitions

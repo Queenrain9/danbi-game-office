@@ -1,0 +1,350 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "archived_from": "danbi_game_designs",
+  "spec": {
+    "id": "db5d0574-51d2-4d8b-a017-14289d05ee13",
+    "title": "Pocket Museum Restorer",
+    "source": "chat_automation",
+    "economy": "Not required for MVP. 점수와 등급만 사용한다.",
+    "idea_id": "f2e6c923-043c-46f0-88df-69d67fbc694b",
+    "version": "v0.1",
+    "one_line": "폐관 후 작은 박물관 작업대에서 유물 조각을 물리적으로 맞추고 조사광으로 가짜 복원재를 찾아 제거한 뒤 균열을 접합하는 세로형 촉각 복원 퍼즐.",
+    "core_loop": "유물 케이스를 받는다 → 형태/파손면 관찰 → 조각 회전·드래그·스냅 → 조사광을 직접 훑어 이질 재료 판독 → 필요한 곳만 스크레이프 → 균열을 따라 접합 → 제출/평가 → 다음 유물. 핵심 반복은 정답 버튼이 아니라 관찰→공간 조작→표면 판독→정밀 제스처다.",
+    "mvp_scope": "첫 Godot playable: 고정 유물 3개, 전체 6화면 흐름, 회전/줌, 2~4 조각 drag+rotate+socket snap, 이동 조사광, mask 기반 이질 재료, scrape stroke, crack trace, integrity/score/grade, Pause/Help, early-submit warning. 판정은 실제 geometry/mask/transform에서 계산.",
+    "game_rules": {
+      "bond": {
+        "trace_tolerance_px": 18,
+        "completion_fraction": 0.9
+      },
+      "combo": {
+        "reset": "damage or wrong adhesive trace",
+        "bonus_each": 25,
+        "start_after_clean_ops": 3
+      },
+      "score": {
+        "base": 1000,
+        "hint": -80,
+        "crack": 100,
+        "damage_point": -6,
+        "foreign_patch": 120,
+        "correct_fragment": 80,
+        "unnecessary_stroke": -8,
+        "efficiency_bonus_max": 150
+      },
+      "damage": {
+        "integrity_start": 100,
+        "original_scrape": -3,
+        "integrity_below_70": "grade cap C"
+      },
+      "timing": {
+        "hard_fail": false,
+        "target_seconds": 90,
+        "efficiency_zero_after": 150
+      },
+      "success": {
+        "required": "required fragments joined; mandatory foreign patches >=90%; cracks >=90%",
+        "partial_submit": 0.7
+      },
+      "assembly": {
+        "near_snap_px": 45,
+        "snap_position_tolerance_px": 26,
+        "snap_rotation_tolerance_deg": 14
+      },
+      "inspection": {
+        "lamp_radius_px": 72,
+        "discovery_threshold_fraction": 0.35,
+        "foreign_patch_visible_only_under_lamp": true
+      }
+    },
+    "not_in_mvp": [
+      "procedural artifact generation",
+      "online/leaderboard",
+      "currency/shop",
+      "museum decoration",
+      "10+ artifacts",
+      "chemical simulation",
+      "story NPCs"
+    ],
+    "known_risks": [
+      "2D 회전 transform과 hit-test 불일치 위험",
+      "scrape가 노동으로 느껴질 위험",
+      "lamp가 정답 하이라이트로 퇴화할 위험",
+      "mask/파손면 저작 비용 병목",
+      "multi-touch와 fragment drag 충돌",
+      "도구 UI 과밀"
+    ],
+    "progression": "향후 Conservation Rank로 새 유물군과 재질 판독 규칙을 해금한다. MVP는 3개 유물 단일 세션으로 완결하며 도구 성능 강화로 핵심 판독을 우회하지 않는다.",
+    "screen_flow": "Night Desk → Intake → Workspace.Assembly(필요 시) → Surface Inspection → Scraping(발견 시 반복) → Bonding(필요 시) → Submit → Evaluation → next Intake. 세 번째 Evaluation → Summary → Desk. Pause/Help는 blocking modal. 70% 이후 조기 Submit은 warning confirm.",
+    "state_model": [
+      {
+        "ui": "condition tags + BEGIN",
+        "exit": "begin",
+        "enter": "new artifact",
+        "state": "case_intake",
+        "allowed": [
+          "rotate preview",
+          "begin"
+        ]
+      },
+      {
+        "ui": "tray + join count + tool rail",
+        "exit": "all required fragments joined",
+        "enter": "loose fragments exist",
+        "state": "assembly",
+        "allowed": [
+          "rotate",
+          "zoom",
+          "drag fragment",
+          "rotate fragment",
+          "undo"
+        ]
+      },
+      {
+        "ui": "lamp + integrity",
+        "exit": "mandatory patches cleared or partial proceed",
+        "enter": "assembly complete",
+        "state": "surface_inspection",
+        "allowed": [
+          "rotate",
+          "zoom",
+          "drag lamp",
+          "select scraper"
+        ]
+      },
+      {
+        "ui": "patch contour + integrity",
+        "exit": "patch cleared/cancel",
+        "enter": "scraper on revealed region",
+        "state": "scraping",
+        "allowed": [
+          "stroke",
+          "rotate",
+          "cancel"
+        ]
+      },
+      {
+        "ui": "adhesive + seam progress",
+        "exit": "required seams >=90%",
+        "enter": "eligible cracks exposed",
+        "state": "bonding",
+        "allowed": [
+          "trace",
+          "rotate",
+          "undo incomplete"
+        ]
+      },
+      {
+        "ui": "restoration/integrity/precision/efficiency/grade",
+        "exit": "continue",
+        "enter": "submit",
+        "state": "evaluation",
+        "allowed": [
+          "continue"
+        ]
+      },
+      {
+        "ui": "session totals",
+        "exit": "selection",
+        "enter": "3 evaluated",
+        "state": "summary",
+        "allowed": [
+          "replay",
+          "hub"
+        ]
+      }
+    ],
+    "content_unit": "ArtifactCase: 형태 + 조각/소켓 + 표면 재질 마스크 + 균열 + 요구 도구",
+    "content_model": {
+      "axes": {
+        "family": [
+          "ceramic",
+          "metal",
+          "stone"
+        ],
+        "silhouette": [
+          "bowl",
+          "mask",
+          "figurine",
+          "tablet"
+        ],
+        "crack_count": "0-3",
+        "fragment_count": "0-5",
+        "foreign_material": [
+          "resin",
+          "paint",
+          "plaster"
+        ],
+        "surface_response": [
+          "fluorescent",
+          "matte",
+          "specular"
+        ],
+        "fracture_topology": [
+          "edge",
+          "radial",
+          "branch"
+        ],
+        "foreign_patch_count": "0-3"
+      },
+      "unit": "ArtifactCase",
+      "expansion": "combine spatial placement and material response before new tools",
+      "mvp_authoring": "fixed authored masks/sockets"
+    },
+    "source_run_at": "2026-09-29T15:05:43.984292+00:00",
+    "player_fantasy": "플레이어는 야간 박물관의 신참 보존처리사다. 형태를 읽고 손끝으로 조각의 방향과 접합면을 찾아내며, 겉보기에는 멀쩡한 부분 속 이질 재료까지 발견해 원형을 되살리는 정밀함과 발견의 쾌감을 느껴야 한다.",
+    "session_length": "유물 60–120초 · 3개 세션 4–7분",
+    "test_scenarios": [
+      "20° 틀린 조각은 거부되고 14° 이내만 snap",
+      "유물 pitch 후 visual/socket hit-test 일치",
+      "lamp 밖 foreign patch 정답 비노출",
+      "original scrape가 integrity 감소",
+      "18px 밖 bond trace 진행 없음",
+      "3-case 연속 처리 상태 초기화",
+      "신규 플레이어가 30초 내 첫 조각 조작 발견"
+    ],
+    "feedback_system": {
+      "bond": {
+        "sound": "adhesive drag",
+        "haptic": "completion tick",
+        "visual": "wet seam fill"
+      },
+      "snap": {
+        "sound": "material click",
+        "haptic": "light",
+        "visual": "seam settles"
+      },
+      "evaluation": {
+        "sound": "museum stamp",
+        "visual": "before/after wipe + score"
+      },
+      "scrape_valid": {
+        "sound": "scrape",
+        "visual": "flakes + mask recedes"
+      },
+      "scrape_damage": {
+        "sound": "warning",
+        "haptic": "medium",
+        "visual": "amber scratch + integrity pulse"
+      },
+      "lamp_discovery": {
+        "sound": "tone rise",
+        "haptic": "light once",
+        "visual": "local fluorescence"
+      }
+    },
+    "round_structure": "세션은 3개 유물. 각 유물은 Intake → Assembly → Surface Inspection → Bonding → Evaluation이며 필요 없는 단계는 건너뛴다. 유물당 60~120초, 전체 4~7분. 하드 타임 실패 없이 효율 점수만 감소하며 세 번째 평가 후 Summary.",
+    "interaction_spec": {
+      "bond": {
+        "valid": "within 18px seam corridor",
+        "cancel": "lift before 20% discards trace",
+        "invalid": "no progress"
+      },
+      "lamp": {
+        "invalid": "keep last valid point",
+        "mapping": "surface-projected touch"
+      },
+      "pinch": {
+        "range": "0.85x-1.65x",
+        "conflict": "disabled during tool/fragment input"
+      },
+      "scrape": {
+        "valid": "stroke intersects revealed foreign mask",
+        "cancel": "leave artifact",
+        "invalid": "original material loses integrity"
+      },
+      "priority": [
+        "modal",
+        "active tool stroke",
+        "fragment drag",
+        "lamp drag",
+        "artifact rotate",
+        "pinch zoom"
+      ],
+      "fragment_drag": {
+        "drop": "snap only if position+rotation tolerances pass",
+        "start": "loose fragment touch",
+        "cancel": "return to tray",
+        "rotate": "second-finger twist or rotate handle"
+      },
+      "artifact_rotate": {
+        "start": "drag artifact free area",
+        "mapping": "horizontal yaw; vertical pitch ±22deg"
+      }
+    },
+    "screen_inventory": [
+      "Night Desk / Case Queue",
+      "Artifact Intake",
+      "Restoration Workspace",
+      "Evaluation",
+      "Session Summary",
+      "Pause / Tool Help Overlay"
+    ],
+    "core_player_verbs": [
+      {
+        "verb": "inspect",
+        "input": "one-finger drag on empty artifact / pinch",
+        "target": "artifact",
+        "feedback": "inertial turn, edge highlight",
+        "condition": "assembly or inspection state",
+        "state_change": "artifact rotation/zoom changes"
+      },
+      {
+        "verb": "place_fragment",
+        "input": "drag fragment; two-finger twist or rotate handle",
+        "target": "open fracture socket",
+        "feedback": "magnetic pull + soft click",
+        "condition": "assembly",
+        "state_change": "valid fragment snaps and joins"
+      },
+      {
+        "verb": "scan_surface",
+        "input": "drag inspection lamp",
+        "target": "artifact surface",
+        "feedback": "moving cone, fluorescence contrast",
+        "condition": "inspection",
+        "state_change": "illuminated region reveals material response"
+      },
+      {
+        "verb": "scrape",
+        "input": "short repeated strokes",
+        "target": "revealed foreign material",
+        "feedback": "flakes, resistance audio",
+        "condition": "scraper active",
+        "state_change": "foreign coverage decreases; bad strokes damage integrity"
+      },
+      {
+        "verb": "bond_crack",
+        "input": "trace seam",
+        "target": "eligible crack",
+        "feedback": "wet seam line",
+        "condition": "bonding",
+        "state_change": "bond coverage grows"
+      },
+      {
+        "verb": "submit",
+        "input": "tap seal",
+        "target": "report",
+        "feedback": "score reveal",
+        "condition": "completion >=70%",
+        "state_change": "evaluation"
+      }
+    ],
+    "wireframe_handoff": [
+      "전체 6화면 flow",
+      "Workspace 실제 component box",
+      "Assembly/Inspection/Scraping/Bonding state variants",
+      "fragment valid/near-invalid/invalid/cancel",
+      "gesture priority",
+      "lamp 발견 전/중/후",
+      "scrape valid/damage",
+      "bond corridor/off-seam/cancel",
+      "early submit/pause/help blocking modal",
+      "Evaluation transitions",
+      "visible geometry와 hit-test 동일 transform 규칙"
+    ],
+    "primary_interaction": "유물 조각 회전·드래그·소켓 스냅 + 조사광 표면 판독 + 정밀 스크레이프/균열 trace",
+    "difficulty_variation": "초반은 큰 이형 조각·단일 패치·강한 형광 반응. 중반은 유사 조각·회전 정밀도·복수 재료. 후반은 조립 후 이어지는 균열, 약한 조사 반응, 원형/가짜 영역 근접과 작업 순서 의존성을 추가한다. 속도보다 형태 모호성·신호 강도·단계 의존성·정밀도를 조합한다.",
+    "visual_direction_brief": "세로 9:16. 중앙 55~65% 대형 단일 유물, 하단 조각 트레이/도구 레일, 상단 최소 상태 정보. 정면 작업대형 2.5D/정사영 감각. 낮은 대비의 폐관 박물관과 따뜻한 작업광, 차가운 조사광 반응. 파손면·표면 마스크 판독성을 장식보다 우선하고 UI가 정답을 직접 표시하지 않는다."
+  }
+}

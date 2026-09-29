@@ -1,0 +1,238 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "archived_from": "danbi_game_designs",
+  "spec": {
+    "id": "0798b6f0-7f9b-4fb9-966c-6f5db6f002b2",
+    "title": "Tiny Stagehand",
+    "source": "chat_automation",
+    "economy": "Not required. 공연 점수와 grade만으로 MVP progression을 구성한다.",
+    "idea_id": "201b2137-fd0d-4acd-9daf-ea1559ba5553",
+    "version": "v0.1",
+    "one_line": "손바닥 극장 백스테이지에서 공연 큐를 읽고 조명·커튼·소품을 직접 조작해 무대 앞 장면을 끊기지 않게 완성하는 실시간 운영 게임.",
+    "core_loop": "3~6초 앞의 cue를 읽음 → 필요한 장치를 미리 준비 → 1~2초 timing window에 조명/커튼/소품 실행 → 무대 앞 결과를 즉시 확인 → 다음 cue 준비. 15~25초마다 돌발 사고가 겹쳐 우선순위를 바꾼다. 한 장면 60~90초 동안 이 리듬을 반복한다.",
+    "mvp_scope": "무대 1개와 60초 Scene 3개. cue timeline, 조명 fader 2개, curtain rope 1개, prop 3종 drag/snap, actor cue 결과, 사고 2종, continuity/점수, Result/Retry를 실제로 플레이 가능하게 구현.",
+    "game_rules": {
+      "scores": {
+        "good": 65,
+        "miss": 0,
+        "perfect": 100,
+        "continuity_bonus": "장면 종료 시 0~200",
+        "incident_resolve": 80
+      },
+      "failure": "continuity 0이면 공연 중단. MVP에서는 즉시 Result.",
+      "prestage": "소품은 목표 5초 전부터 mark에 둘 수 있으나 너무 일찍 놓으면 배우 동선 방해(-5 continuity)",
+      "continuity": {
+        "min": 0,
+        "miss": -15,
+        "start": 100,
+        "wrong_action": -8,
+        "incident_expire": -20
+      },
+      "cue_window": {
+        "good": "±0.9초",
+        "miss": "그 외/미실행",
+        "perfect": "목표 시점 ±0.35초"
+      },
+      "numbers_are": "첫 playable 튜닝 가설",
+      "multitask_rule": "동시에 active cue 최대 2개 + incident 1개"
+    },
+    "not_in_mvp": [
+      "극장 꾸미기",
+      "경제/티켓 판매",
+      "배우 성장",
+      "대사 선택",
+      "리듬 음악 판정",
+      "복수 무대",
+      "스토리 캠페인",
+      "온라인 랭킹"
+    ],
+    "known_risks": [
+      "화면 세 구역 동시 주시로 인한 인지 과부하",
+      "실시간 운영이 단순 리듬 탭으로 퇴화할 위험",
+      "작은 화면에서 무대와 컨트롤 판독성 충돌",
+      "큐 제작/튜닝 비용",
+      "돌발 사고가 핵심 흐름을 방해하는 별도 미니게임처럼 느껴질 위험"
+    ],
+    "progression": "Scene grade로 다음 장면과 새로운 장치/사고 유형을 해금한다. 장치 수치 강화는 없고 플레이어가 더 복잡한 공연을 운영하게 되는 수평적 확장을 사용한다.",
+    "screen_flow": "Lobby → Scene Briefing → 3초 Countdown → Live Performance → Result → Retry 또는 다음 Scene/Lobby. Performance 중 incident는 별도 화면으로 이동하지 않고 overlay 상태로 발생. Pause/Cue Help는 timeline을 정지한다.",
+    "state_model": [
+      {
+        "id": "briefing",
+        "ui": "cue types/scene goal",
+        "exit": "countdown",
+        "enter": "Scene 선택",
+        "inputs": [
+          "start"
+        ]
+      },
+      {
+        "id": "countdown",
+        "ui": "stage ready",
+        "exit": "3초",
+        "enter": "start",
+        "inputs": []
+      },
+      {
+        "id": "performance",
+        "ui": "stage+backstage controls+cue strip",
+        "exit": "timeline end/continuity 0",
+        "enter": "countdown 0",
+        "inputs": [
+          "fader",
+          "rope",
+          "prop drag",
+          "incident gesture"
+        ]
+      },
+      {
+        "id": "incident_focus",
+        "ui": "문제 위치 marker, 공연은 계속",
+        "exit": "resolved/expired",
+        "enter": "incident spawn",
+        "inputs": [
+          "normal controls",
+          "incident action"
+        ]
+      },
+      {
+        "id": "result",
+        "ui": "cue timeline 평가",
+        "exit": "briefing/scene select",
+        "enter": "scene end",
+        "inputs": [
+          "retry",
+          "next"
+        ]
+      }
+    ],
+    "content_unit": "Scene Card",
+    "content_model": {
+      "mvp": "무대 1개, scene 3개, 조명 2채널, 커튼 1, 소품 3, 사고 2종",
+      "axes": [
+        "cue sequence",
+        "cue spacing",
+        "lighting targets",
+        "curtain positions",
+        "prop set",
+        "actor blocking",
+        "incident pool",
+        "scene duration"
+      ],
+      "unit": "Scene Card",
+      "reuse": "동일 무대 세트를 cue/사고 조합으로 재사용"
+    },
+    "source_run_at": "2026-09-29T12:12:14.671112+00:00",
+    "player_fantasy": "플레이어는 관객에게 보이지 않는 작은 무대감독이다. 배우가 다음 동작을 하기 직전에 필요한 조명·커튼·소품을 정확히 준비하고, 사고가 생겨도 공연을 멈추지 않고 수습하는 유능한 백스테이지 전문가가 된다. 완벽한 타이밍과 여러 흐름을 동시에 통제하는 짜릿함이 핵심이다.",
+    "session_length": "Scene 60~90초 · 3~5분 플레이 묶음",
+    "test_scenarios": [
+      "튜토리얼 문장 없이 첫 20초 안에 cue strip과 대응 control 관계를 이해한다.",
+      "정상 cue 4개+사고 2개 60초 장면에서 조작 실패보다 판단 실패가 더 많이 발생한다.",
+      "플레이어가 무대 preview를 보면서도 다음 cue를 3초 이상 미리 인지한다.",
+      "두 장치 cue가 겹쳐도 어떤 입력이 우선인지 혼란이 없다.",
+      "첫 시도 후 Retry 의향이 생길 만큼 실수 원인이 명확하게 보인다."
+    ],
+    "feedback_system": {
+      "cue": "현재 cue solid, 다음 cue ghost, window 진입 시 짧은 tick",
+      "miss": "해당 장치 amber outline + continuity 감소 표시",
+      "prop": "valid mark glow + snap haptic, invalid spring back",
+      "light": "무대 밝기 직접 변화 + fader detent haptic",
+      "curtain": "직접 위치 변화 + rope sound",
+      "perfect": "작은 PERFECT tag와 crisp click, 공연을 가리지 않음",
+      "incident": "문제 위치 pulse + distinct two-note alert"
+    },
+    "round_structure": "Scene Card 선택 후 3초 ready count → 60~90초 공연. 큐 6~10개와 사고 1~3개가 timeline에서 발생한다. 마지막 cue 후 Performance Result로 정확도·timing·continuity를 평가하고 Retry/Next Scene으로 이동한다.",
+    "interaction_spec": {
+      "prop": {
+        "ghost": "valid mark visible",
+        "input": "long-ish pickup 80ms then drag",
+        "valid": "matching stage mark",
+        "cancel": "invalid release -> tray return"
+      },
+      "light": {
+        "snap": "0/25/50/75/100에 약한 detent",
+        "input": "vertical fader",
+        "cancel": "release keeps value"
+      },
+      "zones": "무대 preview 상단 38%, backstage controls 중단 42%, cue strip 하단 20%",
+      "curtain": {
+        "input": "rope drag",
+        "cancel": "release keeps position",
+        "mapping": "vertical delta to curtain"
+      },
+      "incident": {
+        "rule": "사고마다 한 단계 해결, 복잡 미니게임 금지",
+        "input": "tap/short drag only"
+      },
+      "priority": [
+        "active prop drag > curtain rope > light fader > cue tap",
+        "incident hotspot은 자신의 영역에서만 intercept"
+      ],
+      "wrong_input": "점수 차감보다 즉시 시각 피드백을 우선; 같은 오입력 연속 2회면 control label pulse"
+    },
+    "screen_inventory": [
+      "Backstage Lobby / Scene Select",
+      "Scene Briefing",
+      "Live Performance",
+      "Pause Overlay",
+      "Performance Result",
+      "Cue Help Overlay"
+    ],
+    "core_player_verbs": [
+      {
+        "verb": "Read Cue",
+        "input": "cue strip tap/시선 확인",
+        "target": "다가오는 큐",
+        "feedback": "현재/다음 cue 위치 이동",
+        "condition": "performance",
+        "state_change": "없음"
+      },
+      {
+        "verb": "Set Light",
+        "input": "lighting fader vertical drag",
+        "target": "조명 채널",
+        "feedback": "무대 조명 즉시 반영",
+        "condition": "해당 cue window",
+        "state_change": "intensity 변경"
+      },
+      {
+        "verb": "Pull Curtain",
+        "input": "rope vertical drag",
+        "target": "curtain",
+        "feedback": "커튼 위치 직접 추종",
+        "condition": "cue 또는 사고",
+        "state_change": "curtain 0~100"
+      },
+      {
+        "verb": "Place Prop",
+        "input": "prop tray→stage mark drag",
+        "target": "소품/마크",
+        "feedback": "ghost mark snap",
+        "condition": "mark open",
+        "state_change": "prop staged"
+      },
+      {
+        "verb": "Resolve Incident",
+        "input": "사고별 1-step contextual gesture",
+        "target": "문제 지점",
+        "feedback": "경고 해제+배우 회복",
+        "condition": "incident active",
+        "state_change": "incident resolved/expired"
+      }
+    ],
+    "wireframe_handoff": [
+      "Live Performance 전체 한 화면의 무대/컨트롤/cue strip 비율",
+      "현재/다음 cue 및 timing window 상태",
+      "Light fader drag 상태",
+      "Curtain rope drag 상태",
+      "Prop tray→ghost mark→snap/invalid return",
+      "Incident overlay와 기존 입력 공존",
+      "Continuity 0 failure",
+      "Pause/Cue Help overlay",
+      "Result의 cue-by-cue timeline"
+    ],
+    "primary_interaction": "cue 선읽기 + fader/rope drag + prop snap + 실시간 사고 대응",
+    "difficulty_variation": "초반은 단일 장치 큐와 넓은 window, 중반은 사전 준비가 필요한 소품과 연속 큐, 후반은 서로 다른 장치의 겹치는 큐와 사고 우선순위를 추가한다. 단순 BPM 상승보다 ‘무엇을 미리 준비하고 무엇을 지금 처리할지’ 판단을 어렵게 한다.",
+    "visual_direction_brief": "세로 모바일의 단면 인형극장. 화면 상단에서 관객이 보는 무대를 계속 보여주고, 중단에는 백스테이지 장치와 소품 트레이, 하단에는 좌→우 cue strip을 둔다. 캐릭터는 작아도 pose가 읽혀야 하며 UI가 무대를 덮지 않는다. 조명 변화는 장식이 아니라 조작 결과를 즉시 읽는 피드백으로 사용한다."
+  }
+}

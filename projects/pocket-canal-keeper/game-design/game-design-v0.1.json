@@ -1,0 +1,292 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "archived_from": "danbi_game_designs",
+  "spec": {
+    "id": "69cfd48e-f740-49c9-9f33-9171b44501b2",
+    "title": "Pocket Canal Keeper",
+    "source": "chat_automation",
+    "economy": "Not required. MVP에는 화폐/업그레이드 상점이 없다.",
+    "idea_id": "ae75ee43-2f25-40f6-9c27-a43030891f4e",
+    "version": "v0.1",
+    "one_line": "미니어처 수상도시에서 수문·회전교·lock chamber를 직접 조작해 배 흐름을 안전하게 풀어내는 모바일 교통 퍼즐.",
+    "core_loop": "배 spawn/흐름 관찰 → 목적지·trait 확인 → 수문/다리/수위/신호 조작 → 다음 구간 진입 관찰 → 공유 구간 충돌과 막힘을 예측해 순서 수정 → 모든 배 도착. 핵심은 타이밍 반응보다 네트워크 점유와 장치 상호배타 상태를 계획하는 것이다.",
+    "mvp_scope": "6개 데이터 스테이지, segment graph 이동, 3~6척 spawn, gate/bridge/lock/signal 조작, occupancy/safety, boat inspect, success/fail/3-star, retry/next, stage unlock 전체 루프를 구현한다.",
+    "game_rules": {
+      "score": "success + no strikes + under par operations",
+      "devices": {
+        "gate": [
+          "closed",
+          "half",
+          "open"
+        ],
+        "lock": [
+          "low",
+          "equalizing",
+          "high"
+        ],
+        "bridge": [
+          "road_open",
+          "water_open"
+        ],
+        "signal": [
+          "hold",
+          "go"
+        ]
+      },
+      "failure": "3 strikes or 45s boat timeout",
+      "success": "all boats delivered",
+      "collision": "unsafe shared-segment entry creates strike before overlap",
+      "occupancy": "one boat per narrow protected segment",
+      "simulation": "deterministic segment graph, not rigid-body",
+      "boat_traits": [
+        "destination",
+        "size",
+        "draft",
+        "height",
+        "priority"
+      ],
+      "lock_safety": "unequal-water door command rejected",
+      "boats_per_stage": "3-6"
+    },
+    "not_in_mvp": [
+      "free physics water",
+      "city building",
+      "economy/upgrades",
+      "procedural stage generator",
+      "pedestrian road simulation",
+      "online leaderboard",
+      "final art/audio polish"
+    ],
+    "known_risks": [
+      "배/장치가 작은 화면에서 겹칠 위험",
+      "장치 규칙이 많아지면 설명 과부하",
+      "deterministic route가 지나치게 자동적으로 느껴질 위험",
+      "graph/state 동기화 오류가 deadlock을 만들 위험"
+    ],
+    "progression": "6개 MVP 스테이지를 순차 unlock한다. 3별 획득은 선택적 숙련 목표이며 필수 진행 장벽으로 쓰지 않는다.",
+    "screen_flow": "Stage Select → Brief → Canal Board ↔ Device Busy/Warning/Boat Inspect → Result → Retry/Next → Stage Select. Pause는 running/busy에서 simulation을 freeze.",
+    "state_model": [
+      {
+        "ui": "map/boats/constraints",
+        "exit": "start",
+        "enter": "stage select",
+        "state": "stage_brief",
+        "inputs": [
+          "start",
+          "back"
+        ]
+      },
+      {
+        "ui": "live board/queues/safety",
+        "exit": "success/fail/pause",
+        "enter": "start",
+        "state": "running",
+        "inputs": [
+          "gate",
+          "bridge",
+          "lock",
+          "signal",
+          "inspect",
+          "pause"
+        ]
+      },
+      {
+        "ui": "busy device locked",
+        "exit": "animation done",
+        "enter": "device animates/equalizes",
+        "state": "device_busy",
+        "inputs": [
+          "independent devices",
+          "inspect",
+          "pause"
+        ]
+      },
+      {
+        "ui": "affected zone flashes; no invalid commit",
+        "exit": "timer/action",
+        "enter": "unsafe command",
+        "state": "warning",
+        "inputs": [
+          "next valid action"
+        ]
+      },
+      {
+        "ui": "frozen overlay",
+        "exit": "choice",
+        "enter": "pause",
+        "state": "paused",
+        "inputs": [
+          "resume",
+          "restart",
+          "exit"
+        ]
+      },
+      {
+        "ui": "stars/strikes/ops",
+        "exit": "choice",
+        "enter": "success/fail",
+        "state": "result",
+        "inputs": [
+          "retry",
+          "next"
+        ]
+      }
+    ],
+    "content_unit": "canal stage = graph + devices + boat schedule/traits + constraints",
+    "content_model": {
+      "axes": [
+        "canal graph",
+        "device placement",
+        "boat spawn schedule",
+        "boat traits",
+        "destinations",
+        "water bands",
+        "bridge constraints",
+        "par operations",
+        "special rule"
+      ],
+      "unit": "canal stage",
+      "authoring": "data-driven graph/routes; no bespoke standard-stage code",
+      "mvp_count": 6
+    },
+    "source_run_at": "2026-09-29T13:24:14.996435+00:00",
+    "player_fantasy": "손바닥만 한 운하 도시의 수문지기로서 배를 직접 운전하지 않고 장치 순서와 구간 점유를 읽어 여러 흐름을 매끄럽게 통과시키는 관제 숙련감과 막힘이 풀리는 만족을 느낀다.",
+    "session_length": "6~10분 / 2~3 스테이지",
+    "test_scenarios": [
+      "Stage1에서 gate만으로 3척 통과 가능",
+      "동일 protected segment 동시 진입이 실제 overlap 없이 차단/strike",
+      "bridge occupied 시 회전 불가 피드백",
+      "lock unsafe sequence가 state corruption 없이 거절",
+      "6 stages 연속/재시작 후 occupancy reset"
+    ],
+    "feedback_system": [
+      {
+        "event": "gate notch",
+        "sound": "lever clunk",
+        "haptic": "notch tick",
+        "visual": "gate/water arrows"
+      },
+      {
+        "event": "bridge rotation",
+        "sound": "gear/lock pin",
+        "haptic": "lock tick",
+        "visual": "bridge/path state"
+      },
+      {
+        "event": "lock equalize",
+        "sound": "water/pump",
+        "haptic": "completion tick",
+        "visual": "water/gauge/boat height"
+      },
+      {
+        "event": "unsafe command",
+        "sound": "warning knock",
+        "haptic": "double light",
+        "visual": "red protected zone"
+      },
+      {
+        "event": "boat delivered",
+        "sound": "bell",
+        "haptic": "light success",
+        "visual": "destination dock pulse"
+      }
+    ],
+    "round_structure": "스테이지 2~4분. Brief 후 3~6척이 순차 spawn. 모든 배 도착 시 성공. 3 safety strikes 또는 한 배 45초 timeout 시 실패. Result에서 Retry/Next. 세션 2~3 stages, 6~10분.",
+    "interaction_spec": [
+      {
+        "cancel": "before notch snap back",
+        "target": "lever knob + arc corridor",
+        "gesture": "arc drag",
+        "invalid": "busy/interlocked shake",
+        "priority": "beats board pan"
+      },
+      {
+        "cancel": "below threshold snap back",
+        "target": "bridge wheel ring",
+        "gesture": "circular drag",
+        "invalid": "red occupancy outline",
+        "priority": "beats boat tap",
+        "condition": "crossing empty"
+      },
+      {
+        "cancel": "nearest legal target",
+        "target": "lock control rail",
+        "gesture": "vertical drag",
+        "invalid": "warning/no commit",
+        "priority": "beats pan",
+        "condition": "safe sequence"
+      },
+      {
+        "target": "signal buoy",
+        "gesture": "tap",
+        "invalid": "locked pulse"
+      },
+      {
+        "effect": "non-destructive inspect",
+        "target": "boat",
+        "gesture": "tap"
+      }
+    ],
+    "screen_inventory": [
+      "Stage Select",
+      "Stage Brief",
+      "Canal Board",
+      "Boat Inspect Popover",
+      "Pause Overlay",
+      "Stage Result"
+    ],
+    "core_player_verbs": [
+      {
+        "verb": "Gate",
+        "input": "arc drag",
+        "change": "closed/half/open",
+        "target": "sluice lever",
+        "feedback": "gate/water arrows update",
+        "condition": "device idle"
+      },
+      {
+        "verb": "Bridge",
+        "input": "circular drag",
+        "change": "road-open/water-open",
+        "target": "swing bridge wheel",
+        "feedback": "bridge rotates/boats hold",
+        "condition": "crossing clear"
+      },
+      {
+        "verb": "Water Level",
+        "input": "vertical drag",
+        "change": "chamber low/high",
+        "target": "lock control",
+        "feedback": "surface/gauge/boat height animate",
+        "condition": "safe door sequence"
+      },
+      {
+        "verb": "Traffic Signal",
+        "input": "tap",
+        "change": "hold/go",
+        "target": "buoy",
+        "feedback": "buoy/intent arrow",
+        "condition": "signal available"
+      },
+      {
+        "verb": "Inspect Boat",
+        "input": "tap",
+        "change": "none",
+        "target": "boat",
+        "feedback": "destination/trait/path highlight",
+        "condition": "running"
+      }
+    ],
+    "wireframe_handoff": [
+      "전체 canal graph와 protected segment/occupancy 표현",
+      "gate arc drag, bridge circular drag, lock vertical drag, signal tap hit areas 표현",
+      "running/device_busy/warning/paused/result state variants",
+      "boat inspect popover와 path highlight",
+      "invalid interlock, collision strike, timeout, success/fail transitions 표현"
+    ],
+    "primary_interaction": "수문 레버를 끌고 회전교를 돌리고 lock 수위를 조절해 공유 운하 구간의 배 흐름을 직접 관제한다.",
+    "difficulty_variation": "초반은 수문 하나와 단일 교차 흐름으로 점유 규칙을 익힌다. 중반은 회전교와 양방향 대기열로 상호배타 상태를 추가한다. 후반은 lock 수위, 큰 배/낮은 다리 trait, spawn 순서와 priority를 결합한다. 속도가 아니라 네트워크 의존성과 장치 순서가 난도를 만든다.",
+    "visual_direction_brief": "Portrait, fixed oblique top-down tabletop canal board. 전체 네트워크와 3~6척의 배를 동시에 읽을 수 있어야 하며 장치 손잡이는 실제 운하보다 과장해 최소 44dp hit area를 확보한다. 물/육지/보호 구간/배 경로를 명확히 분리하고 UI는 가장자리의 최소 HUD로 유지한다."
+  }
+}
