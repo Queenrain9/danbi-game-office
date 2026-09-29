@@ -1,15 +1,32 @@
 {
+  "id": "e023e9c0-b1b7-4fc4-a0e7-996c7d95c099",
+  "design_id": "8336d50a-9b52-4295-9b7c-f648010b776f",
+  "idea_id": "422762b7-fdb5-446a-a939-bbcd755cbdb2",
   "title": "Parcel X-Ray Night Shift",
   "version": "v0.2",
   "target_device": "Mobile",
   "orientation": "portrait",
   "interaction_principles": [
-    "inspection target dominates play area",
-    "scan rail owns right-side gestures",
-    "classification drag > rotate > hotspot",
-    "invalid input recovers immediately"
+    "검사 대상이 화면의 최대 조작 면적을 차지",
+    "scan rail은 우측 전용 시작 영역",
+    "분류 drag가 회전보다 우선",
+    "오입력은 점수보다 즉시 복구 피드백"
   ],
+  "global_ui_rules": {
+    "persistent": [
+      "case counter",
+      "active rule",
+      "scan count"
+    ],
+    "safe_margin_percent": 4,
+    "modal_blocks_background": true,
+    "min_touch_target_percent": 8
+  },
   "screen_flow": {
+    "guards": [
+      "result only after valid lane release",
+      "summary after 8 cases"
+    ],
     "normal": [
       "night_hub",
       "parcel_intake",
@@ -20,13 +37,903 @@
     ],
     "branches": [
       "inspection→rule_manual→inspection",
-      "invalid lane drop→inspection"
-    ],
-    "guards": [
-      "result only after valid lane release",
-      "summary after 8 cases"
+      "inspection invalid lane drop→inspection"
     ]
   },
+  "screens": [
+    {
+      "id": "night_hub",
+      "name": "Night Hub / Shift Select",
+      "order": 1,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "hub",
+          "ui": "shift card visible",
+          "exit": "start_shift",
+          "enter": "app/start or summary exit",
+          "allowed_input": "shift select/start"
+        }
+      ],
+      "purpose": "Shift 선택과 시작",
+      "feedback": [],
+      "components": [
+        {
+          "id": "shift_card",
+          "box": {
+            "h": 32,
+            "w": 84,
+            "x": 8,
+            "y": 22
+          },
+          "type": "card",
+          "label": "Night Shift 01",
+          "state_binding": "hub"
+        },
+        {
+          "id": "start_shift",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 68
+          },
+          "type": "button",
+          "label": "START SHIFT",
+          "enabled_when": "shift_available",
+          "state_binding": "hub",
+          "interaction_role": "start"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "parcel_intake",
+          "from": "hub",
+          "trigger": "tap start_shift",
+          "animation": "short fade",
+          "condition": "shift_available"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "load first parcel",
+          "target": "start_shift",
+          "feedback": "button press + short fade",
+          "precondition": "shift_available",
+          "state_change": "intake",
+          "invalid_input": "disabled if no shift data"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "parcel_intake",
+      "name": "Parcel Intake",
+      "order": 2,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "intake",
+          "ui": "label/rules",
+          "exit": "begin",
+          "enter": "parcel loaded",
+          "allowed_input": "label tap, begin"
+        }
+      ],
+      "purpose": "외부 라벨과 현재 규칙을 읽고 검사 시작",
+      "feedback": [],
+      "components": [
+        {
+          "id": "case_counter",
+          "box": {
+            "h": 6,
+            "w": 22,
+            "x": 6,
+            "y": 5
+          },
+          "type": "status",
+          "label": "1 / 8",
+          "state_binding": "intake"
+        },
+        {
+          "id": "label_card",
+          "box": {
+            "h": 32,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "card",
+          "label": "Parcel Label",
+          "state_binding": "intake"
+        },
+        {
+          "id": "rule_chips",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 54
+          },
+          "type": "chip_group",
+          "label": "Active Rules",
+          "state_binding": "intake"
+        },
+        {
+          "id": "begin_inspect",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 76
+          },
+          "type": "button",
+          "label": "BEGIN INSPECT",
+          "enabled_when": "case_loaded",
+          "state_binding": "intake",
+          "interaction_role": "start"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "inspection",
+          "from": "intake",
+          "trigger": "tap begin_inspect",
+          "animation": "table push-in",
+          "condition": "case_loaded"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "enter inspection",
+          "target": "begin_inspect",
+          "feedback": "button depress",
+          "precondition": "case_loaded",
+          "state_change": "inspect",
+          "invalid_input": "ignore while loading"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "inspection",
+      "name": "X-Ray Inspection Table",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "top",
+            "role": "status",
+            "label": "Case / Rule HUD"
+          },
+          {
+            "h": 52,
+            "w": 75,
+            "x": 6,
+            "y": 13,
+            "id": "table",
+            "role": "primary play",
+            "label": "Inspection Field"
+          },
+          {
+            "h": 52,
+            "w": 13,
+            "x": 83,
+            "y": 13,
+            "id": "rail",
+            "role": "scan input",
+            "label": "Scan Rail"
+          },
+          {
+            "h": 17,
+            "w": 92,
+            "x": 4,
+            "y": 76,
+            "id": "lanes",
+            "role": "drop targets",
+            "label": "Classification Lanes"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "inspect",
+          "ui": "all controls",
+          "exit": "valid lane release",
+          "enter": "begin",
+          "allowed_input": "rotate/scan/pin/box drag/manual"
+        },
+        {
+          "id": "classifying",
+          "ui": "lane highlight",
+          "exit": "release/cancel",
+          "enter": "box drag enters lane zone",
+          "allowed_input": "drag/release"
+        }
+      ],
+      "purpose": "회전·단면 스캔·핀·3레인 분류가 일어나는 핵심 화면",
+      "feedback": [
+        "direct rotation",
+        "slice plane",
+        "pin ring",
+        "lane snap"
+      ],
+      "components": [
+        {
+          "id": "case_rule",
+          "box": {
+            "h": 6,
+            "w": 56,
+            "x": 5,
+            "y": 5
+          },
+          "type": "chip",
+          "label": "Rule chip",
+          "state_binding": "inspect"
+        },
+        {
+          "id": "scan_count",
+          "box": {
+            "h": 6,
+            "w": 20,
+            "x": 64,
+            "y": 5
+          },
+          "type": "status",
+          "label": "Scans 0/4",
+          "state_binding": "inspect"
+        },
+        {
+          "id": "manual_btn",
+          "box": {
+            "h": 6,
+            "w": 8,
+            "x": 87,
+            "y": 5
+          },
+          "type": "button",
+          "label": "?",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!input_lock"
+        },
+        {
+          "id": "xray_box",
+          "box": {
+            "h": 48,
+            "w": 72,
+            "x": 8,
+            "y": 15
+          },
+          "type": "interactive_object",
+          "label": "Parcel / X-ray",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!classifying"
+        },
+        {
+          "id": "scan_plane",
+          "box": {
+            "h": 2,
+            "w": 64,
+            "x": 12,
+            "y": 36
+          },
+          "type": "indicator",
+          "label": "Slice Plane",
+          "state_binding": "inspect"
+        },
+        {
+          "id": "scan_rail",
+          "box": {
+            "h": 48,
+            "w": 10,
+            "x": 84,
+            "y": 15
+          },
+          "type": "slider",
+          "label": "Slice 0–100",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!classifying"
+        },
+        {
+          "id": "pin_tray",
+          "box": {
+            "h": 6,
+            "w": 34,
+            "x": 8,
+            "y": 65
+          },
+          "type": "status",
+          "label": "Evidence Pins 0/4",
+          "state_binding": "inspect"
+        },
+        {
+          "id": "pass_lane",
+          "box": {
+            "h": 13,
+            "w": 28,
+            "x": 5,
+            "y": 78
+          },
+          "type": "drop_target",
+          "label": "PASS",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!input_lock"
+        },
+        {
+          "id": "repack_lane",
+          "box": {
+            "h": 13,
+            "w": 28,
+            "x": 36,
+            "y": 78
+          },
+          "type": "drop_target",
+          "label": "REPACK",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!input_lock"
+        },
+        {
+          "id": "isolate_lane",
+          "box": {
+            "h": 13,
+            "w": 28,
+            "x": 67,
+            "y": 78
+          },
+          "type": "drop_target",
+          "label": "ISOLATE",
+          "enabled_when": null,
+          "state_binding": "inspect",
+          "interaction_role": "!input_lock"
+        }
+      ],
+      "edge_cases": [
+        "pointer leaves screen: retain last pose",
+        "4 pins: further pin disabled",
+        "invalid lane release: return"
+      ],
+      "transitions": [
+        {
+          "to": "classification_result",
+          "from": "inspect",
+          "trigger": "valid lane release",
+          "animation": "snap then stamp",
+          "condition": "parcel center inside lane"
+        },
+        {
+          "to": "rule_manual",
+          "from": "inspect",
+          "trigger": "tap manual_btn",
+          "animation": "modal",
+          "condition": "!input_lock"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "1-finger drag",
+          "action": "rotate yaw/pitch",
+          "target": "xray_box",
+          "feedback": "direct follow + friction audio",
+          "precondition": "start inside box; not scan rail; !classifying",
+          "state_change": "box_pose",
+          "invalid_input": "UI/rail start ignored"
+        },
+        {
+          "input": "vertical swipe",
+          "action": "map y to slice_depth",
+          "target": "scan_rail",
+          "feedback": "scan plane + hum",
+          "precondition": "gesture starts in rail; !classifying",
+          "state_change": "slice_depth 0..100",
+          "invalid_input": "disabled during box classification drag"
+        },
+        {
+          "input": "tap",
+          "action": "toggle evidence pin",
+          "target": "visible internal shape in xray_box",
+          "feedback": "ring + light haptic",
+          "precondition": "scan active; pins<4; no drag threshold crossed",
+          "state_change": "pins",
+          "invalid_input": "empty tap -> faint no-target pulse"
+        },
+        {
+          "input": "drag-release",
+          "action": "classify parcel",
+          "target": "xray_box → pass_lane/repack_lane/isolate_lane",
+          "feedback": "lane outline + magnetic snap",
+          "precondition": "unclassified",
+          "state_change": "input_lock + result",
+          "invalid_input": "release outside lane -> spring to table"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "rotating",
+          "name": "ROTATING",
+          "notes": "scan rail remains visible; hotspot tap suppressed",
+          "condition": "box drag below classification zone",
+          "component_overrides": {
+            "xray_box": {
+              "label": "Parcel · Rotating"
+            }
+          }
+        },
+        {
+          "id": "scanning",
+          "name": "SCANNING",
+          "notes": "box rotate suppressed only while rail pointer held",
+          "condition": "scan rail active",
+          "component_overrides": {
+            "scan_rail": {
+              "label": "Slice · Active"
+            },
+            "scan_plane": {
+              "label": "Active Slice"
+            }
+          }
+        },
+        {
+          "id": "classifying",
+          "name": "CLASSIFYING",
+          "notes": "lane drag priority > rotate > hotspot",
+          "condition": "parcel drag enters bottom 22%",
+          "component_overrides": {
+            "xray_box": {
+              "box": {
+                "h": 24,
+                "w": 54,
+                "x": 18,
+                "y": 60
+              },
+              "label": "Parcel · Dragging"
+            },
+            "pass_lane": {
+              "label": "PASS · target"
+            },
+            "repack_lane": {
+              "label": "REPACK · target"
+            },
+            "isolate_lane": {
+              "label": "ISOLATE · target"
+            }
+          }
+        },
+        {
+          "id": "input_locked",
+          "name": "LOCKED",
+          "notes": "all gameplay input disabled until result",
+          "condition": "valid lane release",
+          "component_overrides": {
+            "xray_box": {
+              "label": "Decision locked"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "input priority: classification drag > rotate > hotspot; scan rail owns gestures starting in rail",
+        "hit target xray_box includes ~8% padding"
+      ]
+    },
+    {
+      "id": "classification_result",
+      "name": "Classification Result",
+      "order": 4,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "result",
+          "ui": "stamp/reason",
+          "exit": "continue",
+          "enter": "decision lock",
+          "allowed_input": "continue"
+        }
+      ],
+      "purpose": "판정·근거·점수를 즉시 설명",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stamp",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 8
+          },
+          "type": "result_stamp",
+          "label": "PASS / REPACK / ISOLATE",
+          "state_binding": "result"
+        },
+        {
+          "id": "score_delta",
+          "box": {
+            "h": 7,
+            "w": 32,
+            "x": 34,
+            "y": 20
+          },
+          "type": "status",
+          "label": "Score",
+          "state_binding": "result"
+        },
+        {
+          "id": "evidence_replay",
+          "box": {
+            "h": 34,
+            "w": 80,
+            "x": 10,
+            "y": 31
+          },
+          "type": "preview",
+          "label": "Evidence Slice",
+          "state_binding": "result"
+        },
+        {
+          "id": "reason",
+          "box": {
+            "h": 10,
+            "w": 80,
+            "x": 10,
+            "y": 68
+          },
+          "type": "text_card",
+          "label": "Why",
+          "state_binding": "result"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 9,
+            "w": 64,
+            "x": 18,
+            "y": 83
+          },
+          "type": "button",
+          "label": "NEXT PARCEL",
+          "state_binding": "result"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "parcel_intake",
+          "from": "result",
+          "trigger": "continue",
+          "animation": "fade",
+          "condition": "cases_done<8"
+        },
+        {
+          "to": "shift_summary",
+          "from": "result",
+          "trigger": "continue",
+          "animation": "fade",
+          "condition": "cases_done=8"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "advance",
+          "target": "continue",
+          "feedback": "press",
+          "precondition": "result shown",
+          "state_change": "next intake or summary",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "shift_summary",
+      "name": "Shift Summary",
+      "order": 5,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "summary",
+          "ui": "metrics",
+          "exit": "hub",
+          "enter": "8 results",
+          "allowed_input": "next"
+        }
+      ],
+      "purpose": "8개 처리 성과 요약",
+      "feedback": [],
+      "components": [
+        {
+          "id": "grade",
+          "box": {
+            "h": 18,
+            "w": 30,
+            "x": 35,
+            "y": 10
+          },
+          "type": "grade",
+          "label": "GRADE",
+          "state_binding": "summary"
+        },
+        {
+          "id": "accuracy",
+          "box": {
+            "h": 12,
+            "w": 26,
+            "x": 8,
+            "y": 36
+          },
+          "type": "metric",
+          "label": "Accuracy",
+          "state_binding": "summary"
+        },
+        {
+          "id": "critical",
+          "box": {
+            "h": 12,
+            "w": 26,
+            "x": 37,
+            "y": 36
+          },
+          "type": "metric",
+          "label": "Critical Miss",
+          "state_binding": "summary"
+        },
+        {
+          "id": "efficiency",
+          "box": {
+            "h": 12,
+            "w": 26,
+            "x": 66,
+            "y": 36
+          },
+          "type": "metric",
+          "label": "Efficiency",
+          "state_binding": "summary"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 80
+          },
+          "type": "button",
+          "label": "BACK TO HUB",
+          "state_binding": "summary"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "night_hub",
+          "from": "summary",
+          "trigger": "tap next",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "return hub",
+          "target": "next",
+          "feedback": "press",
+          "precondition": "summary",
+          "state_change": "hub",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "rule_manual",
+      "name": "Rule Manual Overlay",
+      "order": 6,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "rule_overlay",
+          "ui": "background blocked",
+          "exit": "close",
+          "enter": "manual tap",
+          "allowed_input": "close"
+        }
+      ],
+      "purpose": "Inspect 중 규칙 재확인",
+      "feedback": [],
+      "components": [
+        {
+          "id": "modal_scrim",
+          "box": {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "overlay",
+          "label": "Scrim",
+          "state_binding": "rule_overlay"
+        },
+        {
+          "id": "rule_panel",
+          "box": {
+            "h": 66,
+            "w": 84,
+            "x": 8,
+            "y": 16
+          },
+          "type": "modal",
+          "label": "Rules",
+          "state_binding": "rule_overlay"
+        },
+        {
+          "id": "close_rule",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 70,
+            "y": 74
+          },
+          "type": "button",
+          "label": "CLOSE",
+          "state_binding": "rule_overlay"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "inspection",
+          "from": "rule_overlay",
+          "trigger": "close",
+          "animation": "modal fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "dismiss",
+          "target": "close_rule",
+          "feedback": "fade",
+          "precondition": "overlay",
+          "state_change": "inspect",
+          "invalid_input": "background taps blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "pause",
+      "name": "Pause",
+      "order": 7,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "paused",
+          "ui": "game frozen",
+          "exit": "resume/quit",
+          "enter": "pause action",
+          "allowed_input": "resume/quit"
+        }
+      ],
+      "purpose": "일시정지와 재개",
+      "feedback": [],
+      "components": [
+        {
+          "id": "pause_scrim",
+          "box": {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "overlay",
+          "label": "Paused",
+          "state_binding": "paused"
+        },
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 40
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 54
+          },
+          "type": "button",
+          "label": "QUIT TO HUB",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "inspection",
+          "from": "paused",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "prior gameplay"
+        },
+        {
+          "to": "night_hub",
+          "from": "paused",
+          "trigger": "quit confirm",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume prior state",
+          "target": "resume",
+          "feedback": "fade",
+          "state_change": "prior",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "abandon shift",
+          "target": "quit",
+          "feedback": "confirm then fade",
+          "state_change": "hub",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "global_states": [
+    {
+      "id": "input_lock",
+      "rule": "valid classification release through result reveal"
+    },
+    {
+      "id": "paused",
+      "rule": "freeze shift state"
+    }
+  ],
   "input_map": [
     {
       "use": "classify",
@@ -49,117 +956,6 @@
       "priority": 2
     }
   ],
-  "screens": [
-    {
-      "id": "night_hub",
-      "components": [
-        "shift_card",
-        "start_shift"
-      ]
-    },
-    {
-      "id": "parcel_intake",
-      "components": [
-        "case_counter",
-        "label_card",
-        "rule_chips",
-        "begin_inspect"
-      ]
-    },
-    {
-      "id": "inspection",
-      "states": [
-        "inspect",
-        "classifying"
-      ],
-      "state_variants": [
-        "ROTATING",
-        "SCANNING",
-        "CLASSIFYING",
-        "LOCKED"
-      ],
-      "components": [
-        "case_rule",
-        "scan_count",
-        "manual_btn",
-        "xray_box",
-        "scan_plane",
-        "scan_rail",
-        "pin_tray",
-        "pass_lane",
-        "repack_lane",
-        "isolate_lane"
-      ],
-      "interactions": [
-        {
-          "input": "1-finger drag",
-          "target": "xray_box",
-          "action": "rotate yaw/pitch",
-          "precondition": "start inside box; not rail; !classifying",
-          "invalid": "UI/rail start ignored"
-        },
-        {
-          "input": "vertical swipe",
-          "target": "scan_rail",
-          "action": "slice_depth 0..100",
-          "precondition": "starts in rail; !classifying",
-          "invalid": "disabled during classification"
-        },
-        {
-          "input": "tap",
-          "target": "visible internal shape",
-          "action": "toggle evidence pin",
-          "precondition": "scan active; pins<4; no drag threshold",
-          "invalid": "empty tap pulse"
-        },
-        {
-          "input": "drag-release",
-          "target": "xray_box → lanes",
-          "action": "classify",
-          "precondition": "unclassified",
-          "invalid": "outside lane → spring to table"
-        }
-      ]
-    },
-    {
-      "id": "classification_result",
-      "components": [
-        "stamp",
-        "score_delta",
-        "evidence_replay",
-        "reason",
-        "continue"
-      ]
-    },
-    {
-      "id": "shift_summary",
-      "components": [
-        "grade",
-        "accuracy",
-        "critical",
-        "efficiency",
-        "next"
-      ]
-    },
-    {
-      "id": "rule_manual",
-      "components": [
-        "modal_scrim",
-        "rule_panel",
-        "close_rule"
-      ],
-      "rule": "background blocked"
-    },
-    {
-      "id": "pause",
-      "components": [
-        "pause_scrim",
-        "resume",
-        "quit"
-      ],
-      "rule": "freeze shift state"
-    }
-  ],
   "edge_cases": [
     {
       "case": "pointer lost",
@@ -171,6 +967,12 @@
     }
   ],
   "developer_handoff": {
+    "persistence": "shift progress only",
+    "required_data": [
+      "ParcelCase",
+      "HazardRules",
+      "ShiftProgress"
+    ],
     "scene_hierarchy": [
       "AppRoot",
       "ShiftController",
@@ -178,6 +980,7 @@
       "HUDLayer",
       "OverlayLayer"
     ],
+    "state_ownership": "ShiftController owns case index/score; Inspection owns transient gesture state",
     "reusable_components": [
       "ParcelView",
       "ScanRail",
@@ -186,20 +989,32 @@
       "RuleChip",
       "ResultStamp"
     ],
-    "required_data": [
-      "ParcelCase",
-      "HazardRules",
-      "ShiftProgress"
-    ],
-    "state_ownership": "ShiftController owns case index/score; Inspection owns transient gesture state",
-    "persistence": "shift progress only"
+    "implementation_order": [
+      "navigation/state",
+      "parcel rotation",
+      "slice scan",
+      "pins",
+      "classification drag",
+      "result evaluator",
+      "summary"
+    ]
   },
   "acceptance_criteria": [
-    "7 inventory screens/overlays navigable",
-    "rotate/scan/pin/classify work without gesture conflicts",
-    "invalid lane release returns parcel",
-    "Rule Manual blocks background input",
-    "valid lane release locks gameplay until result",
-    "8 cases reach Summary"
-  ]
+    "7개 inventory 화면/overlay가 모두 이동 가능",
+    "Inspection에서 rotate/scan/pin/classify가 서로 충돌 없이 작동",
+    "유효 레인 밖 release는 table로 복귀",
+    "Rule Manual은 background 입력을 차단",
+    "valid lane release 후 result까지 gameplay 입력 잠금",
+    "8개 처리 후 Summary로 이동"
+  ],
+  "primary_interaction": "상자 회전 + X-ray slice rail + evidence pin + 3레인 drag 분류",
+  "core_screen": "X-Ray Inspection Table",
+  "screen_count": 7,
+  "state_count": 12,
+  "pack_markdown": "# Parcel X-Ray Night Shift — Interaction Wireframe Pack v0.2\n\n## Pack Overview\nMobile portrait. Core Screen: X-Ray Inspection Table\n\n## Interaction Principles\n- 검사 대상이 화면의 최대 조작 면적을 차지\n- scan rail은 우측 전용 시작 영역\n- 분류 drag가 회전보다 우선\n- 오입력은 점수보다 즉시 복구 피드백\n\n## Screen Flow\n{\n  \"normal\": [\n    \"night_hub\",\n    \"parcel_intake\",\n    \"inspection\",\n    \"classification_result\",\n    \"parcel_intake|shift_summary\",\n    \"night_hub\"\n  ],\n  \"branches\": [\n    \"inspection→rule_manual→inspection\",\n    \"inspection invalid lane drop→inspection\"\n  ],\n  \"guards\": [\n    \"result only after valid lane release\",\n    \"summary after 8 cases\"\n  ]\n}\n\n## Screens\n### 1. Night Hub / Shift Select\nPurpose: Shift 선택과 시작\nComponents: shift_card, start_shift\nStates: hub\nVariants: None\nInteractions: tap → start_shift\n\n### 2. Parcel Intake\nPurpose: 외부 라벨과 현재 규칙을 읽고 검사 시작\nComponents: case_counter, label_card, rule_chips, begin_inspect\nStates: intake\nVariants: None\nInteractions: tap → begin_inspect\n\n### 3. X-Ray Inspection Table\nPurpose: 회전·단면 스캔·핀·3레인 분류가 일어나는 핵심 화면\nComponents: case_rule, scan_count, manual_btn, xray_box, scan_plane, scan_rail, pin_tray, pass_lane, repack_lane, isolate_lane\nStates: inspect, classifying\nVariants: ROTATING, SCANNING, CLASSIFYING, LOCKED\nInteractions: 1-finger drag → xray_box; vertical swipe → scan_rail; tap → visible internal shape in xray_box; drag-release → xray_box → pass_lane/repack_lane/isolate_lane\n\n### 4. Classification Result\nPurpose: 판정·근거·점수를 즉시 설명\nComponents: stamp, score_delta, evidence_replay, reason, continue\nStates: result\nVariants: None\nInteractions: tap → continue\n\n### 5. Shift Summary\nPurpose: 8개 처리 성과 요약\nComponents: grade, accuracy, critical, efficiency, next\nStates: summary\nVariants: None\nInteractions: tap → next\n\n### 6. Rule Manual Overlay\nPurpose: Inspect 중 규칙 재확인\nComponents: modal_scrim, rule_panel, close_rule\nStates: rule_overlay\nVariants: None\nInteractions: tap → close_rule\n\n### 7. Pause\nPurpose: 일시정지와 재개\nComponents: pause_scrim, resume, quit\nStates: paused\nVariants: None\nInteractions: tap → resume; tap → quit\n\n## Global States\n[\n  {\n    \"id\": \"input_lock\",\n    \"rule\": \"valid classification release through result reveal\"\n  },\n  {\n    \"id\": \"paused\",\n    \"rule\": \"freeze shift state\"\n  }\n]\n\n## Input Map\n[\n  {\n    \"use\": \"classify\",\n    \"input\": \"drag-release\",\n    \"priority\": 5\n  },\n  {\n    \"use\": \"scan\",\n    \"input\": \"rail swipe\",\n    \"priority\": 4\n  },\n  {\n    \"use\": \"rotate\",\n    \"input\": \"drag\",\n    \"priority\": 3\n  },\n  {\n    \"use\": \"pin\",\n    \"input\": \"tap\",\n    \"priority\": 2\n  }\n]\n\n## Edge Cases\n[\n  {\n    \"case\": \"pointer lost\",\n    \"recovery\": \"keep last pose/value\"\n  },\n  {\n    \"case\": \"invalid lane\",\n    \"recovery\": \"spring parcel to table\"\n  }\n]\n\n## Developer Handoff\n{\n  \"scene_hierarchy\": [\n    \"AppRoot\",\n    \"ShiftController\",\n    \"CaseRouter\",\n    \"HUDLayer\",\n    \"OverlayLayer\"\n  ],\n  \"reusable_components\": [\n    \"ParcelView\",\n    \"ScanRail\",\n    \"EvidencePin\",\n    \"DropLane\",\n    \"RuleChip\",\n    \"ResultStamp\"\n  ],\n  \"required_data\": [\n    \"ParcelCase\",\n    \"HazardRules\",\n    \"ShiftProgress\"\n  ],\n  \"state_ownership\": \"ShiftController owns case index/score; Inspection owns transient gesture state\",\n  \"persistence\": \"shift progress only\",\n  \"implementation_order\": [\n    \"navigation/state\",\n    \"parcel rotation\",\n    \"slice scan\",\n    \"pins\",\n    \"classification drag\",\n    \"result evaluator\",\n    \"summary\"\n  ]\n}\n\n## Acceptance Criteria\n- 7개 inventory 화면/overlay가 모두 이동 가능\n- Inspection에서 rotate/scan/pin/classify가 서로 충돌 없이 작동\n- 유효 레인 밖 release는 table로 복귀\n- Rule Manual은 background 입력을 차단\n- valid lane release 후 result까지 gameplay 입력 잠금\n- 8개 처리 후 Summary로 이동",
+  "source": "chat_automation",
+  "source_run_at": "2026-09-29T12:28:24.071001+00:00",
+  "status": "build",
+  "created_at": "2026-09-29T12:28:24.071001+00:00",
+  "updated_at": "2026-09-29T13:44:19.912566+00:00"
 }
