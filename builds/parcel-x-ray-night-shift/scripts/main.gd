@@ -1,19 +1,15 @@
 extends Control
 
+const ShiftState = preload("res://scripts/shift_state.gd")
+const HazardEvaluator = preload("res://scripts/hazard_evaluator.gd")
+const GestureRouter = preload("res://scripts/gesture_router.gd")
+const CaseData = preload("res://scripts/case_data.gd")
+
 enum Screen { HUB, INTAKE, INSPECT, RESULT, SUMMARY }
 enum Gesture { NONE, BOX, SCAN, CLASSIFY }
 
 const SHIFT_SIZE := 8
-const DRAG_THRESHOLD := 18.0
-const CLASSIFY_THRESHOLD_Y := 440.0
-
-var screen := Screen.HUB
-var case_index := 0
-var score := 0
-var correct := 0
-var critical := 0
-var streak := 0
-var total_scan_reversals := 0
+var shift := ShiftState.new()
 
 var slice_depth := 50.0
 var scan_reversals := 0
@@ -36,18 +32,9 @@ var info: Label
 var pin_layer: Control
 var lanes: Dictionary = {}
 
-var cases := [
- {"label":"NX-104","near_wall":false,"linked_pair":false,"power_contact":false,"objects":[["metal",.25,.25,.45],["foam",.65,.62,.55]]},
- {"label":"KR-218","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["metal",.08,.42,.48],["foam",.55,.58,.52]]},
- {"label":"PX-331","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.28,.30,.35],["metal",.65,.55,.62],["cell",.48,.68,.60],["cable",.48,.45,.50]]},
- {"label":"MT-407","near_wall":false,"linked_pair":false,"power_contact":false,"objects":[["tool",.42,.35,.32],["foam",.62,.64,.70],["decoy",.20,.72,.44]]},
- {"label":"QV-512","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["tool",.91,.42,.52],["foam",.45,.66,.62]]},
- {"label":"HB-609","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.32,.30,.45],["metal",.62,.52,.58],["cell",.48,.70,.55],["cable",.50,.43,.52]]},
- {"label":"AC-774","near_wall":false,"linked_pair":true,"power_contact":false,"objects":[["metal",.30,.34,.45],["metal",.66,.58,.54],["cable",.50,.46,.50]]},
- {"label":"ZX-880","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["metal",.07,.50,.48],["decoy",.68,.30,.55]]},
- {"label":"DV-901","near_wall":false,"linked_pair":false,"power_contact":true,"objects":[["cell",.48,.55,.52],["foam",.25,.30,.45]]},
- {"label":"LS-993","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.26,.30,.42],["metal",.70,.58,.64],["cable",.50,.46,.54],["cell",.52,.72,.58]]}
-]
+var cases: Array = CaseData.all()
+var overlay: Control
+var prior_screen := Screen.INSPECT
 
 func _ready() -> void:
  show_hub()
@@ -89,20 +76,15 @@ func show_hub() -> void:
  add_button(v, "START SHIFT", start_shift)
 
 func start_shift() -> void:
- case_index = 0
- score = 0
- correct = 0
- critical = 0
- streak = 0
- total_scan_reversals = 0
+ shift.begin_shift(cases)
  show_intake()
 
 func show_intake() -> void:
  screen = Screen.INTAKE
  reset_case_state()
- var v := base("PARCEL INTAKE %d / %d" % [case_index + 1, SHIFT_SIZE])
+ var v := base("PARCEL INTAKE %d / %d" % [shift.case_index + 1, SHIFT_SIZE])
  var l := Label.new()
- l.text = "LABEL  %s\n\nR1  dense object near outer wall → REPACK\nR2  linked dense pair + power contact → ISOLATE\nR3  otherwise → PASS" % cases[case_index].label
+ l.text = "LABEL  %s\n\nR1  dense object near outer wall → REPACK\nR2  linked dense pair + power contact → ISOLATE\nR3  otherwise → PASS" % shift.current_case().label
  l.custom_minimum_size = Vector2(0, 420)
  l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  v.add_child(l)
@@ -194,7 +176,7 @@ func show_inspect() -> void:
 func _rebuild_xray() -> void:
  for c in parcel_visual.get_children():
   c.queue_free()
- var data: Dictionary = cases[case_index]
+ var data: Dictionary = shift.current_case()
  for i in range(data.objects.size()):
   var o: Array = data.objects[i]
   var depth := float(o[3])
@@ -293,7 +275,7 @@ func _try_pin(local_pos: Vector2) -> void:
  info.text = "Evidence pinned · %d / 4" % pins.size()
 
 func _hotspot_at(local_pos: Vector2) -> int:
- var data: Dictionary = cases[case_index]
+ var data: Dictionary = shift.current_case()
  for i in range(data.objects.size()):
   var o: Array = data.objects[i]
   if abs(float(o[3]) - slice_depth / 100.0) > 0.22:
@@ -308,7 +290,7 @@ func _redraw_pins() -> void:
   return
  for c in pin_layer.get_children():
   c.queue_free()
- var data: Dictionary = cases[case_index]
+ var data: Dictionary = shift.current_case()
  for pin in pins:
   var o: Array = data.objects[int(pin.object_index)]
   if abs(float(o[3]) - slice_depth / 100.0) > 0.24:
@@ -341,63 +323,36 @@ func _finish_classification() -> void:
  _evaluate(selected_lane)
 
 func expected_lane(data: Dictionary) -> String:
- if data.linked_pair and data.power_contact:
-  return "ISOLATE"
- if data.near_wall:
-  return "REPACK"
- return "PASS"
+ return HazardEvaluator.expected_lane(data)
 
 func _evaluate(choice: String) -> void:
- var data: Dictionary = cases[case_index]
+ var data: Dictionary = shift.current_case()
  var expected := expected_lane(data)
- var is_correct := choice == expected
- var delta := 150 if is_correct and expected == "ISOLATE" else (100 if is_correct else (-180 if choice == "PASS" and expected == "ISOLATE" else -80))
- if is_correct:
-  correct += 1
-  streak += 1
-  if streak >= 3:
-   delta += 10
- else:
-  streak = 0
-  if choice == "PASS" and expected == "ISOLATE":
-   critical += 1
- if scan_reversals <= 3:
-  delta += 20
- total_scan_reversals += scan_reversals
- score += delta
- show_result(choice, expected, delta)
+ var result: Dictionary = shift.record(choice, expected, scan_reversals)
+ show_result(choice, expected, int(result.delta))
 
 func show_result(choice: String, expected: String, delta: int) -> void:
  screen = Screen.RESULT
  var v := base(("CORRECT" if choice == expected else "INCORRECT") + " · " + choice)
- var reason := "No hazard relationship → PASS"
- var data: Dictionary = cases[case_index]
- if data.linked_pair and data.power_contact:
-  reason = "Linked dense pair contacts power cell → ISOLATE"
- elif data.near_wall:
-  reason = "Dense object is inside outer-wall band → REPACK"
+ var reason := HazardEvaluator.reason(shift.current_case())
+ var data: Dictionary = shift.current_case()
  var l := Label.new()
- l.text = "Expected: %s\nScore change: %+d\nTotal: %d\n\nEVIDENCE REPLAY\nSlice %.0f%% · Pins %d\n%s" % [expected, delta, score, slice_depth, pins.size(), reason]
+ l.text = "Expected: %s\nScore change: %+d\nTotal: %d\n\nEVIDENCE REPLAY\nSlice %.0f%% · Pins %d\n%s" % [expected, delta, shift.score, slice_depth, pins.size(), reason]
  l.custom_minimum_size = Vector2(0, 430)
  l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  v.add_child(l)
- add_button(v, "NEXT PARCEL" if case_index < SHIFT_SIZE - 1 else "SHIFT SUMMARY", advance)
+ add_button(v, "NEXT PARCEL" if shift.case_index < SHIFT_SIZE - 1 else "SHIFT SUMMARY", advance)
 
 func advance() -> void:
- case_index += 1
- if case_index >= SHIFT_SIZE:
-  show_summary()
- else:
-  show_intake()
+ if shift.advance(): show_summary()
+ else: show_intake()
 
 func show_summary() -> void:
  screen = Screen.SUMMARY
  var v := base("SHIFT SUMMARY")
- var grade := "A" if correct >= 7 and critical == 0 else ("B" if correct >= 6 and critical < 2 else "C")
- if critical >= 2:
-  grade = "C"
+ var grade := shift.grade()
  var l := Label.new()
- l.text = "GRADE %s\n\nAccuracy %d / %d\nCritical Miss %d\nScan reversals %d\nScore %d" % [grade, correct, SHIFT_SIZE, critical, total_scan_reversals, score]
+ l.text = "GRADE %s\n\nAccuracy %d / %d\nCritical Miss %d\nScan reversals %d\nScore %d" % [grade, shift.correct, SHIFT_SIZE, shift.critical, shift.total_scan_reversals, shift.score]
  l.custom_minimum_size = Vector2(0, 430)
  l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  v.add_child(l)
