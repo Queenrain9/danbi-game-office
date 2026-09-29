@@ -26,6 +26,7 @@ For interactions, preserve the original Wireframe target text in `bindings.inter
 
 - `target_node`: the primary component that owns the input start/handler.
 - `related_nodes`: optional additional components participating in the same interaction, such as two rotate buttons or drop lanes.
+- `target_selector`: required when the Wireframe names a semantic child/sub-target inside one component (for example `shadow_piece`, `hotspot`, `visible internal shape in xray_box`). The selector preserves what inside the component receives the interaction without inventing another top-level Wireframe component.
 - A normal Button tap uses `button_tap_v1` and a `pressed` connection.
 - A tap on a hotspot, card, object region, or internal shape uses `explicit_script_v1` plus an explicit `input_handler`; it must not be converted to a Button.
 - Non-tap gestures (drag/swipe/hold/pinch/trace/release/etc.) use `explicit_script_v1` on the primary target with an explicit reviewed handler.
