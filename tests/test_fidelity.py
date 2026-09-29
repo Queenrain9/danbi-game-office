@@ -1,0 +1,106 @@
+import copy
+import importlib.util
+import pathlib
+import tempfile
+import unittest
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+SPEC = importlib.util.spec_from_file_location('construction', ROOT / 'tools/fidelity/construction.py')
+m = importlib.util.module_from_spec(SPEC) if SPEC else None
+
+class FidelityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        assert SPEC and SPEC.loader and pathlib.Path(SPEC.origin).exists(), 'Canonical construction tool is missing'
+        SPEC.loader.exec_module(m)
+
+    def fixture(self):
+        req = [{'id': 'R1', 'source_ref': '/source/pack/screens/0/components/0'}]
+        box = {'x': 10, 'y': 20, 'w': 30, 'h': 10}
+        screens = [{'id': 'home', 'components': [{'id': 'start', 'box': box}], 'interactions': [{'trigger': 'tap', 'target': 'start'}]}]
+        b = {'schema_version': 'fidelity-v1', 'hash_algorithm': 'sha256-canonical-json-v1',
+             'contract_id': 'contract', 'wireframe_pack_id': 'pack', 'screens': screens, 'requirements': req,
+             'source': {'pack': {'id': 'pack', 'design_id': 'design', 'screens': screens}, 'design': {'id': 'design'}, 'requirements': req},
+             'bindings': {'scene_path': 'res://main.tscn', 'reference_size': {'width': 390, 'height': 844}, 'coordinate_space': 'screen_percent', 'stretch_mode': 'canvas_items',
+                 'nodes': [{'node_path': '/root/AppRoot', 'godot_type': 'Control', 'full_rect': True, 'script_path': 'res://main.gd'},
+                           {'node_path': '/root/AppRoot/home', 'godot_type': 'Control', 'full_rect': True}],
+                 'components': [{'screen_id': 'home', 'component_id': 'start', 'node_path': '/root/AppRoot/home/start', 'godot_type': 'Button', 'source_box': box, 'construction_pattern': 'button_tap_v1'}],
+                 'interactions': [{'screen_id': 'home', 'interaction_index': 0, 'input': 'tap', 'target_node': '/root/AppRoot/home/start', 'action_symbol': 'start_game', 'action_script': 'res://main.gd'}],
+                 'connections': [{'from': '/root/AppRoot/home/start', 'signal': 'pressed', 'to': '/root/AppRoot', 'method': 'start_game'}],
+                 'implementations': {'R1': [{'file': 'res://main.tscn', 'node_path': '/root/AppRoot/home/start'}, {'file': 'res://main.gd', 'symbol': 'start_game', 'kind': 'func'}]},
+                 'symbols': [{'file': 'res://main.gd', 'symbol': 'ready_to_start', 'kind': 'var'}],
+                 'tests': [{'id': 'T1', 'kind': 'static', 'stage': 'input', 'requirement_ids': ['R1'], 'checks': [{'kind': 'symbol', 'file': 'res://main.gd', 'symbol': 'start_game', 'symbol_kind': 'func'}]}, {'id': 'M1', 'kind': 'runtime', 'requirement_ids': ['R1']} ]}}
+        return m.seal(b)
+
+    def project(self, b, folder):
+        p = pathlib.Path(folder)
+        (p/'main.gd').write_text('extends Control\nvar ready_to_start := true\nfunc start_game() -> void:\n\tready_to_start = false\n')
+        (p/'main.tscn').write_text(m.construct(b))
+        (p/'project.godot').write_text('[application]\nrun/main_scene="res://main.tscn"\n[display]\nwindow/size/viewport_width=390\nwindow/size/viewport_height=844\nwindow/stretch/mode="canvas_items"\n')
+        return p
+
+    def codes(self, b, p=None, claims=None):
+        return {e['code'] for e in m.validate(b, p, claims=claims)['errors']}
+
+    def test_exact_geometry_and_parent_relative_offset(self):
+        r = m.geometry({'x': 18, 'y': 83, 'w': 64, 'h': 9}, {'width': 390, 'height': 844})
+        self.assertEqual(r, {'x': 70.2, 'y': 700.52, 'w': 249.6, 'h': 75.96})
+        b = self.fixture()
+        b['bindings']['nodes'][1].update(full_rect=False, source_box={'x': 5, 'y': 10, 'w': 90, 'h': 80})
+        scene = m.construct(m.seal(b))
+        self.assertIn('offset_left = 19.5', scene)
+        self.assertIn('offset_top = 84.4', scene)
+
+    def test_valid_project_passes_without_runtime(self):
+        b = self.fixture()
+        with tempfile.TemporaryDirectory() as d:
+            report = m.validate(b, self.project(b,d))
+            self.assertEqual(report['errors'], [])
+            self.assertEqual(report['manual_test_ids'], ['M1'])
+            self.assertFalse(report['runtime_qa_performed'])
+
+    def test_missing_script_resource_node_symbol_and_geometry(self):
+        for mutation, expected in [('script','MISSING_FILE'),('resource','RESOURCE_PATH'),('node','NODE_PATH'),('symbol','SYMBOL'),('geometry','GEOMETRY')]:
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as d:
+                b=self.fixture(); p=self.project(b,d)
+                if mutation=='script': (p/'main.gd').unlink()
+                elif mutation=='resource': (p/'main.gd').write_text((p/'main.gd').read_text()+'\nconst Missing = preload("res://missing.gd")\n')
+                elif mutation=='node': (p/'main.tscn').write_text((p/'main.tscn').read_text().replace('name="start"','name="wrong"'))
+                elif mutation=='symbol': (p/'main.gd').write_text('extends Control\n# func start_game():\nvar ready_to_start := true\n')
+                else: (p/'main.tscn').write_text((p/'main.tscn').read_text().replace('offset_left = 39','offset_left = 99'))
+                self.assertIn(expected,self.codes(b,p))
+
+    def test_drift_duplicate_requirement_and_unresolved_source_fail(self):
+        for mutation, expected in [('hash','HASH'),('duplicate','REQUIREMENT_IDS'),('source','SOURCE_REF')]:
+            b=self.fixture()
+            if mutation=='hash': b['bindings']['stretch_mode']='viewport'
+            elif mutation=='duplicate': b['requirements'].append(copy.deepcopy(b['requirements'][0])); b=m.seal(b)
+            else: b['requirements'][0]['source_ref']='/source/pack/screens/99'; b=m.seal(b)
+            self.assertIn(expected,self.codes(b))
+
+    def test_drag_cannot_be_replaced_with_button(self):
+        b=self.fixture(); b['screens'][0]['interactions'][0]['trigger']='drag'; b=m.seal(b)
+        self.assertIn('INPUT_MODALITY',self.codes(b))
+
+    def test_reusable_mapping_requires_real_script(self):
+        b=self.fixture(); b['bindings']['components'][0]['reusable_component']='ShadowPiece'; b=m.seal(b)
+        self.assertIn('REUSABLE', self.codes(b))
+
+    def test_missing_duplicate_stale_claims(self):
+        b=self.fixture()
+        good={'requirement_id':'R1','status':'IMPLEMENTED','commit':'b'*40,'blueprint_hash':b['blueprint_hash'],'implementation_refs':b['bindings']['implementations']['R1']}
+        for claims,code in [([], 'CLAIM_COVERAGE'),([good,good],'CLAIM_COVERAGE'),([dict(good,blueprint_hash='c'*64)],'CLAIM_STALE')]:
+            self.assertIn(code,self.codes(b,claims=claims))
+
+    def test_unsupported_static_check_fails_closed(self):
+        b=self.fixture(); b['bindings']['tests'][0]['checks']=[{'kind':'looks_good'}]; b=m.seal(b)
+        self.assertIn('TEST_CHECK',self.codes(b))
+
+    def test_path_traversal_nan_and_duplicate_nodes(self):
+        with self.assertRaises(ValueError): m.geometry({'x':float('nan'),'y':0,'w':1,'h':1},{'width':390,'height':844})
+        b=self.fixture(); b['bindings']['nodes'][0]['script_path']='res://../escape.gd'; b=m.seal(b)
+        self.assertIn('PATH',self.codes(b))
+        b=self.fixture(); b['bindings']['nodes'].append(copy.deepcopy(b['bindings']['nodes'][0])); b=m.seal(b)
+        self.assertIn('NODE_DUPLICATE',self.codes(b))
+
+if __name__ == '__main__': unittest.main()
