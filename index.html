@@ -333,8 +333,7 @@
     <div class="sidebar-bottom">
       <div><span class="status-dot"></span><strong style="font-size:12px">Studio online</strong></div>
       <div class="small">앞단 제작은 자동으로 흐르고,<br>플레이테스트 이후부터 대표가 직접 개입합니다.</div>
-      <div id="cloudStatus" class="small" style="margin-top:12px;color:#9bc0ff">☁ 계정 확인 중</div>
-      <button id="authButton" class="btn ghost" style="width:100%;margin-top:8px;padding:7px 9px;font-size:10px" onclick="authSession?signOutAccount():signInAccount()">단비 계정 로그인</button>
+      <div id="cloudStatus" class="small" style="margin-top:12px;color:#9bc0ff">☁ Cloud 연결 중…</div>
     </div>
   </aside>
   <main class="main">
@@ -357,7 +356,6 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const STAGES = ["idea","design","wireframe","build","playtest","directed","visual","archive"];
 const STAGE_LABEL = {
@@ -399,13 +397,7 @@ function seedState() {
     activity: []
   };
 }
-const SUPABASE_URL = "https://hmblaasagxyntyfrfztg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_-8JyZ7lwfSmUUpPS4GBUfg_mNG9zT_B";
-const CLOUD_URL = SUPABASE_URL + "/functions/v1/danbi-game-office-sync";
-const authClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, flowType:"pkce" }
-});
-let authSession = null;
+const CLOUD_URL = "https://hmblaasagxyntyfrfztg.supabase.co/functions/v1/danbi-game-office-sync";
 let cloudReady = false;
 let cloudTimer = null;
 let pipelinePollTimer = null;
@@ -428,12 +420,8 @@ function save(){
   queueCloudSave();
 }
 
-function authToken(){ return authSession?.access_token || ""; }
-function authHeaders(){
-  const token=authToken();
-  return token
-    ? {"Content-Type":"application/json","Authorization":"Bearer "+token}
-    : {"Content-Type":"application/json"};
+function publicHeaders(){
+  return {"Content-Type":"application/json"};
 }
 
 function setCloudStatus(text, ok=false){
@@ -443,63 +431,25 @@ function setCloudStatus(text, ok=false){
   el.style.color=ok?"#75dcb9":"#9bc0ff";
 }
 
-function updateAuthUi(){
-  const btn=document.getElementById("authButton");
-  if(btn) btn.textContent=authSession?"로그아웃":"단비 계정 로그인";
-}
-
-async function signInAccount(){
-  const email=(prompt("단비 게임회사에 로그인할 이메일을 입력해주세요.")||"").trim();
-  if(!email) return;
-  setCloudStatus("✉ 로그인 메일 전송 중…");
-  const redirectTo=location.origin+location.pathname;
-  const { error }=await authClient.auth.signInWithOtp({
-    email,
-    options:{ shouldCreateUser:false, emailRedirectTo:redirectTo }
-  });
-  if(error){
-    console.error("Login link failed",error);
-    setCloudStatus("🔒 로그인 필요");
-    toast("로그인 메일 전송 실패 · Supabase Auth 설정을 확인해주세요.");
-    return;
-  }
-  setCloudStatus("✉ 이메일에서 로그인 링크를 열어주세요");
-  toast("로그인 링크를 보냈습니다.");
-}
-
-async function signOutAccount(){
-  await authClient.auth.signOut();
-  authSession=null;
-  cloudReady=false;
-  clearInterval(pipelinePollTimer);
-  setCloudStatus("🔒 로그인 필요");
-  updateAuthUi();
-  render();
-  toast("로그아웃됨");
-}
-
 async function cloudRequest(method, body){
-  if(!authToken()) throw new Error("auth_required");
   const res=await fetch(CLOUD_URL,{
     method,
-    headers:authHeaders(),
+    headers:publicHeaders(),
     body: body ? JSON.stringify(body) : undefined,
     cache:"no-store"
   });
   if(!res.ok) {
     const payload=await res.json().catch(()=>({}));
-    if(res.status===401) throw new Error("unauthorized");
     throw new Error(payload.error || ("HTTP "+res.status));
   }
   return res.json();
 }
 
 async function loadPromotedIdeas(showToast=false){
-  if(!authToken()) return;
   try{
     const res=await fetch(CLOUD_URL+"?view=ideas&limit=300",{
       method:"GET",
-      headers:authHeaders(),
+      headers:publicHeaders(),
       cache:"no-store"
     });
     if(!res.ok){
@@ -517,11 +467,10 @@ async function loadPromotedIdeas(showToast=false){
 }
 
 async function loadIdeaSelection(showToast=false){
-  if(!authToken()) return;
   try{
     const res=await fetch(CLOUD_URL+"?view=idea_selection&limit=1000",{
       method:"GET",
-      headers:authHeaders(),
+      headers:publicHeaders(),
       cache:"no-store"
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
@@ -655,11 +604,10 @@ async function setDesignPriority(id, priority){
 }
 
 async function loadGameDesigns(showToast=false){
-  if(!authToken()) return;
   try{
     const res=await fetch(CLOUD_URL+"?view=designs&limit=50",{
       method:"GET",
-      headers:authHeaders(),
+      headers:publicHeaders(),
       cache:"no-store"
     });
     if(!res.ok){
@@ -677,11 +625,10 @@ async function loadGameDesigns(showToast=false){
 }
 
 async function loadWireframePacks(showToast=false){
-  if(!authToken()) return;
   try{
     const res=await fetch(CLOUD_URL+"?view=wireframes&limit=50",{
       method:"GET",
-      headers:authHeaders(),
+      headers:publicHeaders(),
       cache:"no-store"
     });
     if(!res.ok){
@@ -699,9 +646,8 @@ async function loadWireframePacks(showToast=false){
 }
 
 async function loadBuildJobs(showToast=false){
-  if(!authToken()) return;
   try{
-    const res=await fetch(CLOUD_URL+"?view=builds&limit=50",{method:"GET",headers:authHeaders(),cache:"no-store"});
+    const res=await fetch(CLOUD_URL+"?view=builds&limit=50",{method:"GET",headers:publicHeaders(),cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     buildJobs=Array.isArray(payload.builds)?payload.builds:[];
@@ -714,9 +660,8 @@ async function loadBuildJobs(showToast=false){
 }
 
 async function loadImplementationContracts(showToast=false){
-  if(!authToken()) return;
   try{
-    const res=await fetch(CLOUD_URL+"?view=contracts&limit=50",{method:"GET",headers:authHeaders(),cache:"no-store"});
+    const res=await fetch(CLOUD_URL+"?view=contracts&limit=50",{method:"GET",headers:publicHeaders(),cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     implementationContracts=Array.isArray(payload.contracts)?payload.contracts:[];
@@ -729,9 +674,8 @@ async function loadImplementationContracts(showToast=false){
 }
 
 async function loadFidelityReviews(showToast=false){
-  if(!authToken()) return;
   try{
-    const res=await fetch(CLOUD_URL+"?view=fidelity&limit=50",{method:"GET",headers:authHeaders(),cache:"no-store"});
+    const res=await fetch(CLOUD_URL+"?view=fidelity&limit=50",{method:"GET",headers:publicHeaders(),cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     fidelityReviews=Array.isArray(payload.fidelity)?payload.fidelity:[];
@@ -744,9 +688,8 @@ async function loadFidelityReviews(showToast=false){
 }
 
 async function loadRepairTickets(showToast=false){
-  if(!authToken()) return;
   try{
-    const res=await fetch(CLOUD_URL+"?view=repairs&limit=100",{method:"GET",headers:authHeaders(),cache:"no-store"});
+    const res=await fetch(CLOUD_URL+"?view=repairs&limit=100",{method:"GET",headers:publicHeaders(),cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     repairTickets=Array.isArray(payload.repairs)?payload.repairs:[];
@@ -773,19 +716,6 @@ function startPipelinePolling(){
 }
 
 async function initCloud(){
-  setCloudStatus("☁ 계정 확인 중…");
-  const { data, error }=await authClient.auth.getSession();
-  if(error) console.error("Session read failed",error);
-  authSession=data?.session||null;
-  updateAuthUi();
-
-  if(!authSession){
-    cloudReady=false;
-    setCloudStatus("🔒 로그인 필요");
-    render();
-    return;
-  }
-
   setCloudStatus("☁ Cloud 동기화 중…");
   try{
     const remote=await cloudRequest("GET");
@@ -802,23 +732,10 @@ async function initCloud(){
     render();
   }catch(err){
     cloudReady=false;
-    setCloudStatus(err.message==="unauthorized"?"🔒 이 계정은 접근 권한 없음":"☁ Cloud 연결 오류");
+    setCloudStatus("☁ Cloud 연결 오류");
     console.error("Cloud sync failed",err);
   }
 }
-
-authClient.auth.onAuthStateChange((_event,session)=>{
-  const wasSignedIn=!!authSession;
-  authSession=session||null;
-  updateAuthUi();
-  if(authSession && (!wasSignedIn || !cloudReady)) setTimeout(()=>initCloud(),0);
-  if(!authSession){
-    cloudReady=false;
-    clearInterval(pipelinePollTimer);
-    setCloudStatus("🔒 로그인 필요");
-    render();
-  }
-});
 
 function queueCloudSave(){
   if(!cloudReady) return;
@@ -1643,10 +1560,9 @@ function settingsPage(){
       <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. Static Fidelity 통과 후에만 PLAYTEST READY로 보냅니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
-    <div class="panel"><div class="panel-title"><strong>Cloud Access</strong><span>account login</span></div>
-      <div class="detail-box"><h3>다른 PC에서도 같은 회사 열기</h3><p>이 사이트의 실제 제작 데이터는 Supabase에 있고 코드는 GitHub에 있습니다. 새 PC에서는 배포된 사이트를 열고 단비 계정으로 로그인하면 같은 회사 상태를 자동으로 불러옵니다.</p></div>
-      <div class="human-gate" style="margin-top:12px"><b>계정 보호</b><br>연결키는 더 이상 사용하지 않습니다. 로그인된 Supabase Auth 계정의 세션으로만 회사 데이터에 접근합니다.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn primary" onclick="authSession?signOutAccount():signInAccount()">${authSession?"로그아웃":"단비 계정 로그인"}</button></div>
+    <div class="panel"><div class="panel-title"><strong>Cloud Access</strong><span>open access</span></div>
+      <div class="detail-box"><h3>다른 PC에서도 같은 회사 열기</h3><p>배포 주소를 열면 별도 연결키나 로그인 없이 Supabase의 동일한 회사 상태와 제작 파이프라인 데이터를 자동으로 불러옵니다.</p></div>
+      <div class="human-gate" style="margin-top:12px"><b>현재 운영 모드</b><br>초기 제작 단계라 접근 보호를 잠시 두지 않습니다. 주소만 알면 동일한 회사 데이터를 볼 수 있습니다.</div>
       <div class="detail-box" style="margin-top:12px"><h3>Studio Principle</h3><p>Human-directed, AI-produced. AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
       <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">로컬 상태 초기화</button></div>
     </div>
