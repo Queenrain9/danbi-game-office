@@ -290,7 +290,9 @@ const NAV = [
     ["wireframe","▤","프리프로덕션"]
   ]],
   ["AI 제작본부", [
-    ["build","⌘","빌드 팜"]
+    ["implementation","≣","구현 설계실"],
+    ["build","⌘","빌드 팜"],
+    ["fidelity","✓","설계 검수실"]
   ]],
   ["단비 업무실", [
     ["review","▶","플레이테스트실"],
@@ -320,7 +322,10 @@ let pipelinePollTimer = null;
 let promotedIdeas = [];
 let gameDesigns = [];
 let wireframePacks = [];
+let implementationContracts = [];
 let buildJobs = [];
+let fidelityReviews = [];
+let repairTickets = [];
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
 
@@ -443,11 +448,59 @@ async function loadBuildJobs(showToast=false){
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     buildJobs=Array.isArray(payload.builds)?payload.builds:[];
-    if(current==="build" || current==="dashboard") render();
+    if(current==="build" || current==="fidelity" || current==="dashboard") render();
     if(showToast) toast("Build Farm 새로고침 · "+buildJobs.length+"개");
   }catch(err){
     console.error("Build Farm load failed",err);
     if(showToast) toast("Build Farm 불러오기 실패");
+  }
+}
+
+async function loadImplementationContracts(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=contracts&limit=50",{method:"GET",headers:{"Content-Type":"application/json","X-Office-Key":key},cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const payload=await res.json();
+    implementationContracts=Array.isArray(payload.contracts)?payload.contracts:[];
+    if(current==="implementation" || current==="dashboard") render();
+    if(showToast) toast("Implementation Contract 새로고침 · "+implementationContracts.length+"개");
+  }catch(err){
+    console.error("Implementation Contract load failed",err);
+    if(showToast) toast("Implementation Contract 불러오기 실패");
+  }
+}
+
+async function loadFidelityReviews(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=fidelity&limit=50",{method:"GET",headers:{"Content-Type":"application/json","X-Office-Key":key},cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const payload=await res.json();
+    fidelityReviews=Array.isArray(payload.fidelity)?payload.fidelity:[];
+    if(current==="fidelity" || current==="dashboard") render();
+    if(showToast) toast("Fidelity Gate 새로고침 · "+fidelityReviews.length+"개");
+  }catch(err){
+    console.error("Fidelity review load failed",err);
+    if(showToast) toast("Fidelity Gate 불러오기 실패");
+  }
+}
+
+async function loadRepairTickets(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=repairs&limit=100",{method:"GET",headers:{"Content-Type":"application/json","X-Office-Key":key},cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const payload=await res.json();
+    repairTickets=Array.isArray(payload.repairs)?payload.repairs:[];
+    if(current==="fidelity" || current==="build") render();
+    if(showToast) toast("Repair Ticket 새로고침 · "+repairTickets.length+"개");
+  }catch(err){
+    console.error("Repair ticket load failed",err);
+    if(showToast) toast("Repair Ticket 불러오기 실패");
   }
 }
 
@@ -457,7 +510,10 @@ function startPipelinePolling(){
     loadPromotedIdeas(false);
     loadGameDesigns(false);
     loadWireframePacks(false);
+    loadImplementationContracts(false);
     loadBuildJobs(false);
+    loadFidelityReviews(false);
+    loadRepairTickets(false);
   },60000);
 }
 
@@ -479,7 +535,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false),loadBuildJobs(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -530,7 +586,9 @@ function titleInfo(){
     ideas:["아이디어 연구소","GPT 내부 생성·비평·프로듀서 심사를 통과한 후보만 도착합니다."],
     design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
     wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
-    build:["빌드 팜","Wireframe-ready 프로젝트를 Godot playable greybox로 만듭니다."],
+    implementation:["구현 설계실","Wireframe Pack을 1:1 원자 단위 Implementation Contract로 변환합니다."],
+    build:["빌드 팜","Implementation Contract를 실제 Godot playable로 구현합니다."],
+    fidelity:["설계 검수실","Wireframe + Contract와 실제 코드를 독립적으로 대조하고 실패하면 Build Farm으로 반송합니다."],
     review:["플레이테스트실","여기서부터 단비가 게임을 직접 만지고 KEEP / MAYBE / KILL을 결정합니다."],
     directed:["디렉팅 개발실","살아남은 게임만 대표의 지시를 받아 제품 수준으로 발전시킵니다."],
     visual:["비주얼 개발실","KEEP 이후 살아남은 게임에만 실제 비주얼·에셋 제작 비용을 사용합니다."],
@@ -544,7 +602,9 @@ function metricData(){
     ["Idea Lab", promotedIdeas.length, "실제 대기"],
     ["Game Design", gameDesigns.length, "실제 대기"],
     ["Pre-production", wireframePacks.length, "실제 대기"],
-    ["Build Farm", buildJobs.length, "실제 작업"]
+    ["Implementation", implementationContracts.length, "실제 계약"],
+    ["Build Farm", buildJobs.length, "실제 작업"],
+    ["Fidelity Gate", fidelityReviews.length, "실제 검수"]
   ];
 }
 
@@ -582,10 +642,10 @@ function dashboard(){
     <div class="panel">
       <div class="panel-title"><strong>AI 제작본부</strong><span>현재 확정 범위</span></div>
       <div class="detail-box">
-        <h3>Build Farm</h3>
-        <p>실제 Build Job <b>${buildJobs.length}</b>개. QA 이후 구조는 아직 메인 대시보드에 확정해 표시하지 않습니다.</p>
+        <h3>3단계 제작 라인</h3>
+        <p>Implementation Contract <b>${implementationContracts.length}</b> · Build Job <b>${buildJobs.length}</b> · Fidelity Review <b>${fidelityReviews.length}</b></p>
       </div>
-      <div class="card-actions"><button class="btn" onclick="go('build')">빌드 팜 열기</button></div>
+      <div class="card-actions"><button class="btn" onclick="go('implementation')">구현 설계실</button><button class="btn" onclick="go('build')">빌드 팜</button><button class="btn" onclick="go('fidelity')">설계 검수실</button></div>
     </div>
   </div>`;
 }
@@ -1016,19 +1076,59 @@ function showWireframePack(id,screenIndex=0,section="screens",variantIndex=0){
   `,true);
 }
 
+
+function implementationContractCard(p){
+  const counts=p.category_counts||{};
+  const cats=Object.entries(counts).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">IMPLEMENTATION CONTRACT</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge blue">'+esc(p.status)+'</span></div>'+
+    '<div class="meta"><span>'+esc(p.version||"v0.1")+'</span><span>'+Number(p.requirement_count||0)+' requirements</span></div>'+
+    '<div class="detail-box" style="margin-top:12px"><h3>Atomic Checklist</h3><p>'+cats.map(([k,v])=>esc(k)+' '+Number(v)).join(' · ')+'</p></div>'+
+    '<div class="card-desc">Builder는 각 requirement에 IMPLEMENTED 증거만 남깁니다. VERIFIED 판정은 설계 검수실만 할 수 있습니다.</div></div>';
+}
+function implementationPage(){
+  return genericHeader("Implementation Contract","Wireframe Pack의 component / interaction / state / transition / rule을 1:1 시공 체크리스트로 컴파일합니다.",'<button class="btn" onclick="loadImplementationContracts(true)">↻ 새로고침</button>')+
+    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Implementation Contract Hourly</strong><span>translation only</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 35분</b></span><span>Wireframe → Atomic Requirements</span><span>기획 변경 금지</span></div></div>'+
+    '<div class="cards">'+(implementationContracts.map(implementationContractCard).join("") || '<div class="empty">아직 Implementation Contract가 없습니다.<br>35분 예약 작업이 Wireframe Pack을 시공 계약으로 변환합니다.</div>')+'</div>';
+}
+
+function fidelityName(buildId){
+  const b=buildJobs.find(x=>x.id===buildId);
+  return b?b.title:"Build "+String(buildId||"").slice(0,8);
+}
+function fidelityReviewCard(r){
+  const bad=Number(r.partial_count||0)+Number(r.missing_count||0)+Number(r.conflict_count||0)+Number(r.broken_count||0);
+  const cls=r.verdict==="pass"?"green":r.verdict==="fail"?"red":"blue";
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">FIDELITY REVIEW · ROUND '+Number(r.review_round||1)+'</div><div class="card-title">'+esc(fidelityName(r.build_job_id))+'</div></div><span class="badge '+cls+'">'+esc((r.verdict||r.status||"pending").toUpperCase())+'</span></div>'+
+    '<div class="meta"><span>VERIFIED '+Number(r.verified_count||0)+'</span><span>ISSUES '+bad+'</span>'+(r.reviewed_commit?'<span>'+esc(String(r.reviewed_commit).slice(0,8))+'</span>':'')+'</div>'+
+    (r.review_summary?'<div class="detail-box" style="margin-top:12px"><h3>Independent Review</h3><p>'+esc(r.review_summary)+'</p></div>':'')+'</div>';
+}
+function fidelityPendingCard(b){
+  const tickets=repairTickets.filter(x=>x.build_job_id===b.id && x.status==="open");
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">FIDELITY GATE QUEUE</div><div class="card-title">'+esc(b.title)+'</div></div><span class="badge blue">'+esc((b.fidelity_status||"pending").toUpperCase())+'</span></div>'+
+    '<div class="card-desc">Implementation complete. Wireframe + Contract + actual repository code must be independently compared before QA Ready.</div>'+
+    (tickets.length?'<div class="human-gate"><b>Open repair tickets · '+tickets.length+'</b><br>'+tickets.slice(0,6).map(x=>esc(x.requirement_id)+' · '+esc(x.verdict)+' · '+esc(x.title)).join("<br>")+'</div>':'')+'</div>';
+}
+function fidelityPage(){
+  const pending=buildJobs.filter(b=>b.status==="fidelity_pending" || b.status==="repair");
+  return genericHeader("Fidelity Gate","빌더의 자기평가를 믿지 않고 Wireframe + Implementation Contract + 실제 코드를 독립적으로 대조합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
+    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Fidelity Gate Hourly</strong><span>independent verifier</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 50분</b></span><span>VERIFIED / PARTIAL / MISSING / CONFLICT / BROKEN</span><span>FAIL → Repair → Build Farm</span><span>ALL VERIFIED → QA Ready</span></div></div>'+
+    (pending.length?'<div class="section-head"><div><h2>검수 대기 / Repair</h2><p>QA Ready 이전의 실제 제작 후보</p></div></div><div class="cards">'+pending.map(fidelityPendingCard).join("")+'</div>':'')+
+    '<div class="section-head"><div><h2>Review History</h2><p>독립 검수 결과</p></div></div><div class="cards">'+(fidelityReviews.map(fidelityReviewCard).join("") || '<div class="empty">아직 Fidelity Review 기록이 없습니다.</div>')+'</div>';
+}
+
 function buildCard(p){
-  const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"QA Ready"};
+  const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"Implementation Complete"};
   const blockers=Array.isArray(p.blockers)?p.blockers:[];
   return '<div class="game-card"><div class="card-top"><div><div class="kicker">GODOT BUILD JOB</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge blue">'+esc(p.status)+'</span></div>'+
   '<div class="meta"><span>'+esc(p.build_version)+'</span><span>'+esc(labels[p.current_stage]||p.current_stage)+'</span><span>Godot 4.x</span></div>'+
-  '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>Full MVP build</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
+  '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>Contract implementation</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
   (p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>Current Work</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
   '<div class="meta"><span>'+esc(p.project_path||"-")+'</span>'+(p.last_commit?'<span>'+esc(String(p.last_commit).slice(0,8))+'</span>':'')+'</div>'+
   (blockers.length?'<div class="human-gate"><b>Blocker</b><br>'+blockers.map(x=>esc(typeof x==="string"?x:JSON.stringify(x))).join("<br>")+'</div>':'')+'</div>';
 }
 function buildPage(){
-  return genericHeader("Build Farm","Wireframe Pack 전체 MVP를 Godot playable로 제작합니다. 중간 빌드는 대표에게 테스트를 요청하지 않습니다.",'<button class="btn" onclick="loadBuildJobs(true)">↻ 새로고침</button>')+
-  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → New Intake</span><span>Full MVP → QA Ready</span></div></div>'+
+  return genericHeader("Build Farm","Implementation Contract의 모든 requirement를 실제 Godot playable로 구현합니다. Builder는 스스로 VERIFIED 판정을 내리지 않습니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → Contract Intake</span><span>Implementation Complete → Fidelity Gate</span></div></div>'+
   '<div class="cards">'+(buildJobs.map(buildCard).join("") || '<div class="empty">현재 실제 Build Job이 없습니다.<br>40분 예약 작업이 첫 Wireframe Pack을 입고하면 여기에 나타납니다.</div>')+'</div>';
 }
 
@@ -1075,7 +1175,7 @@ function settingsPage(){
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production까지 실제 예약 작업 + Supabase 데이터로 연결되어 있습니다. Pre-production은 매시간 30분 실행되어 Wireframe Pack을 생성합니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. 설계 검수 통과 전에는 QA Ready로 보내지 않습니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
@@ -1086,10 +1186,10 @@ function settingsPage(){
   </div>`;
 }
 function render(){
-  if(!["dashboard","planning","ideas","design","wireframe","build","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
+  if(!["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
   navRender();
   const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; document.getElementById("pageSubtitle").textContent=s;
-  const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
+  const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,implementation:implementationPage,build:buildPage,fidelity:fidelityPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
   document.getElementById("content").innerHTML = pages[current]();
 }
 function getP(id){ return state.projects.find(p=>p.id===id); }
