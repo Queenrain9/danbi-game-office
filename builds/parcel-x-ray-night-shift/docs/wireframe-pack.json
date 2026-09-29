@@ -1,0 +1,205 @@
+{
+  "title": "Parcel X-Ray Night Shift",
+  "version": "v0.2",
+  "target_device": "Mobile",
+  "orientation": "portrait",
+  "interaction_principles": [
+    "inspection target dominates play area",
+    "scan rail owns right-side gestures",
+    "classification drag > rotate > hotspot",
+    "invalid input recovers immediately"
+  ],
+  "screen_flow": {
+    "normal": [
+      "night_hub",
+      "parcel_intake",
+      "inspection",
+      "classification_result",
+      "parcel_intake|shift_summary",
+      "night_hub"
+    ],
+    "branches": [
+      "inspection→rule_manual→inspection",
+      "invalid lane drop→inspection"
+    ],
+    "guards": [
+      "result only after valid lane release",
+      "summary after 8 cases"
+    ]
+  },
+  "input_map": [
+    {
+      "use": "classify",
+      "input": "drag-release",
+      "priority": 5
+    },
+    {
+      "use": "scan",
+      "input": "rail swipe",
+      "priority": 4
+    },
+    {
+      "use": "rotate",
+      "input": "drag",
+      "priority": 3
+    },
+    {
+      "use": "pin",
+      "input": "tap",
+      "priority": 2
+    }
+  ],
+  "screens": [
+    {
+      "id": "night_hub",
+      "components": [
+        "shift_card",
+        "start_shift"
+      ]
+    },
+    {
+      "id": "parcel_intake",
+      "components": [
+        "case_counter",
+        "label_card",
+        "rule_chips",
+        "begin_inspect"
+      ]
+    },
+    {
+      "id": "inspection",
+      "states": [
+        "inspect",
+        "classifying"
+      ],
+      "state_variants": [
+        "ROTATING",
+        "SCANNING",
+        "CLASSIFYING",
+        "LOCKED"
+      ],
+      "components": [
+        "case_rule",
+        "scan_count",
+        "manual_btn",
+        "xray_box",
+        "scan_plane",
+        "scan_rail",
+        "pin_tray",
+        "pass_lane",
+        "repack_lane",
+        "isolate_lane"
+      ],
+      "interactions": [
+        {
+          "input": "1-finger drag",
+          "target": "xray_box",
+          "action": "rotate yaw/pitch",
+          "precondition": "start inside box; not rail; !classifying",
+          "invalid": "UI/rail start ignored"
+        },
+        {
+          "input": "vertical swipe",
+          "target": "scan_rail",
+          "action": "slice_depth 0..100",
+          "precondition": "starts in rail; !classifying",
+          "invalid": "disabled during classification"
+        },
+        {
+          "input": "tap",
+          "target": "visible internal shape",
+          "action": "toggle evidence pin",
+          "precondition": "scan active; pins<4; no drag threshold",
+          "invalid": "empty tap pulse"
+        },
+        {
+          "input": "drag-release",
+          "target": "xray_box → lanes",
+          "action": "classify",
+          "precondition": "unclassified",
+          "invalid": "outside lane → spring to table"
+        }
+      ]
+    },
+    {
+      "id": "classification_result",
+      "components": [
+        "stamp",
+        "score_delta",
+        "evidence_replay",
+        "reason",
+        "continue"
+      ]
+    },
+    {
+      "id": "shift_summary",
+      "components": [
+        "grade",
+        "accuracy",
+        "critical",
+        "efficiency",
+        "next"
+      ]
+    },
+    {
+      "id": "rule_manual",
+      "components": [
+        "modal_scrim",
+        "rule_panel",
+        "close_rule"
+      ],
+      "rule": "background blocked"
+    },
+    {
+      "id": "pause",
+      "components": [
+        "pause_scrim",
+        "resume",
+        "quit"
+      ],
+      "rule": "freeze shift state"
+    }
+  ],
+  "edge_cases": [
+    {
+      "case": "pointer lost",
+      "recovery": "keep last pose/value"
+    },
+    {
+      "case": "invalid lane",
+      "recovery": "spring parcel to table"
+    }
+  ],
+  "developer_handoff": {
+    "scene_hierarchy": [
+      "AppRoot",
+      "ShiftController",
+      "CaseRouter",
+      "HUDLayer",
+      "OverlayLayer"
+    ],
+    "reusable_components": [
+      "ParcelView",
+      "ScanRail",
+      "EvidencePin",
+      "DropLane",
+      "RuleChip",
+      "ResultStamp"
+    ],
+    "required_data": [
+      "ParcelCase",
+      "HazardRules",
+      "ShiftProgress"
+    ],
+    "state_ownership": "ShiftController owns case index/score; Inspection owns transient gesture state",
+    "persistence": "shift progress only"
+  },
+  "acceptance_criteria": [
+    "7 inventory screens/overlays navigable",
+    "rotate/scan/pin/classify work without gesture conflicts",
+    "invalid lane release returns parcel",
+    "Rule Manual blocks background input",
+    "valid lane release locks gameplay until result",
+    "8 cases reach Summary"
+  ]
+}
