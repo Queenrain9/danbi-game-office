@@ -141,6 +141,18 @@ class FidelityTests(unittest.TestCase):
         screen={'components':[{'id':'xray_box','type':'interactive_object','label':'Parcel / X-ray'}]}
         self.assertEqual(m.resolve_interaction_target(screen,'visible internal shape in xray_box')['component_ids'], ['xray_box'])
 
+        screen={'components':[
+            {'id':'slot_a','type':'dropzone','label':'A'},
+            {'id':'slot_b','type':'dropzone','label':'B'},
+        ]}
+        self.assertEqual(set(m.resolve_interaction_target(screen,'slot')['component_ids']), {'slot_a','slot_b'})
+        screen={'components':[
+            {'id':'hold','type':'button','label':'HOLD'},
+            {'id':'report','type':'button','label':'REPORT'},
+            {'id':'return','type':'button','label':'RETURN'},
+        ]}
+        self.assertEqual(set(m.resolve_interaction_target(screen,'decision buttons')['component_ids']), {'hold','report','return'})
+
     def test_reusable_mapping_requires_real_script(self):
         b=self.fixture(); b['bindings']['components'][0]['reusable_component']='ShadowPiece'; b=m.seal(b)
         self.assertIn('REUSABLE', self.codes(b))
