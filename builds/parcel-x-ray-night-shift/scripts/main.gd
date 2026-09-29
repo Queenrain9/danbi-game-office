@@ -1,106 +1,424 @@
 extends Control
+
 enum Screen { HUB, INTAKE, INSPECT, RESULT, SUMMARY }
-var screen=Screen.HUB
-var case_index=0
-var score=0
-var correct=0
-var critical=0
-var slice_depth=50.0
-var pins=0
-var cases=[
-{"label":"NX-104","answer":"PASS","reason":"No hazard relationship."},
-{"label":"KR-218","answer":"REPACK","reason":"Dense metal near outer wall."},
-{"label":"PX-331","answer":"ISOLATE","reason":"Dense pair linked to power cell."},
-{"label":"MT-407","answer":"PASS","reason":"Decoys only."},
-{"label":"QV-512","answer":"REPACK","reason":"Dense tool in outer-wall band."},
-{"label":"HB-609","answer":"ISOLATE","reason":"Linked dense pair contacts power cell."},
-{"label":"AC-774","answer":"PASS","reason":"No linked dense pair."},
-{"label":"ZX-880","answer":"REPACK","reason":"Dense plate too close to wall."},
-{"label":"DV-901","answer":"PASS","reason":"No power cell contact."},
-{"label":"LS-993","answer":"ISOLATE","reason":"Linked pair reaches power cell."}]
-var box
-var info
-var drag_start=Vector2.ZERO
-var rotating=false
-func _ready(): show_hub()
-func clear_ui():
- for c in get_children(): c.queue_free()
-func base(title):
+enum Gesture { NONE, BOX, SCAN, CLASSIFY }
+
+const SHIFT_SIZE := 8
+const DRAG_THRESHOLD := 18.0
+const CLASSIFY_THRESHOLD_Y := 440.0
+
+var screen := Screen.HUB
+var case_index := 0
+var score := 0
+var correct := 0
+var critical := 0
+var streak := 0
+var total_scan_reversals := 0
+
+var slice_depth := 50.0
+var scan_reversals := 0
+var scan_last_direction := 0
+var pins: Array[Dictionary] = []
+var box_pose := Vector2.ZERO
+var input_locked := false
+var gesture := Gesture.NONE
+var pointer_start := Vector2.ZERO
+var pointer_last := Vector2.ZERO
+var box_home := Vector2.ZERO
+var selected_lane := ""
+
+var play_area: Control
+var parcel: Panel
+var parcel_visual: Control
+var scan_plane: ColorRect
+var rail: VSlider
+var info: Label
+var pin_layer: Control
+var lanes: Dictionary = {}
+
+var cases := [
+ {"label":"NX-104","near_wall":false,"linked_pair":false,"power_contact":false,"objects":[["metal",.25,.25,.45],["foam",.65,.62,.55]]},
+ {"label":"KR-218","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["metal",.08,.42,.48],["foam",.55,.58,.52]]},
+ {"label":"PX-331","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.28,.30,.35],["metal",.65,.55,.62],["cell",.48,.68,.60],["cable",.48,.45,.50]]},
+ {"label":"MT-407","near_wall":false,"linked_pair":false,"power_contact":false,"objects":[["tool",.42,.35,.32],["foam",.62,.64,.70],["decoy",.20,.72,.44]]},
+ {"label":"QV-512","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["tool",.91,.42,.52],["foam",.45,.66,.62]]},
+ {"label":"HB-609","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.32,.30,.45],["metal",.62,.52,.58],["cell",.48,.70,.55],["cable",.50,.43,.52]]},
+ {"label":"AC-774","near_wall":false,"linked_pair":true,"power_contact":false,"objects":[["metal",.30,.34,.45],["metal",.66,.58,.54],["cable",.50,.46,.50]]},
+ {"label":"ZX-880","near_wall":true,"linked_pair":false,"power_contact":false,"objects":[["metal",.07,.50,.48],["decoy",.68,.30,.55]]},
+ {"label":"DV-901","near_wall":false,"linked_pair":false,"power_contact":true,"objects":[["cell",.48,.55,.52],["foam",.25,.30,.45]]},
+ {"label":"LS-993","near_wall":false,"linked_pair":true,"power_contact":true,"objects":[["metal",.26,.30,.42],["metal",.70,.58,.64],["cable",.50,.46,.54],["cell",.52,.72,.58]]}
+]
+
+func _ready() -> void:
+ show_hub()
+
+func clear_ui() -> void:
+ for c in get_children():
+  c.queue_free()
+ lanes.clear()
+
+func base(title: String) -> VBoxContainer:
  clear_ui()
- var v=VBoxContainer.new()
+ var v := VBoxContainer.new()
  v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
- v.add_theme_constant_override("separation",12)
+ v.add_theme_constant_override("separation", 10)
  add_child(v)
- var t=Label.new(); t.text=title; t.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- t.add_theme_font_size_override("font_size",24); v.add_child(t)
+ var t := Label.new()
+ t.text = title
+ t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ t.add_theme_font_size_override("font_size", 24)
+ v.add_child(t)
  return v
-func add_button(v,text,call):
- var b=Button.new(); b.text=text; b.custom_minimum_size=Vector2(0,58); b.pressed.connect(call); v.add_child(b)
-func show_hub():
- screen=Screen.HUB
- var v=base("PARCEL X-RAY · NIGHT SHIFT")
- var l=Label.new(); l.text="Night Shift 01\n8 parcels · 3 hazard rules"; l.custom_minimum_size=Vector2(0,300); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; v.add_child(l)
- add_button(v,"START SHIFT",start_shift)
-func start_shift():
- case_index=0; score=0; correct=0; critical=0; show_intake()
-func show_intake():
- screen=Screen.INTAKE; pins=0; slice_depth=50
- var v=base("PARCEL INTAKE %d / 8" % (case_index+1))
- var l=Label.new(); l.text="LABEL "+cases[case_index].label+"\n\nR1 Dense metal near wall → REPACK\nR2 Dense pair + cable + power cell → ISOLATE\nR3 Otherwise → PASS"; l.custom_minimum_size=Vector2(0,420); v.add_child(l)
- add_button(v,"BEGIN INSPECT",show_inspect)
-func show_inspect():
- screen=Screen.INSPECT
- var v=base("X-RAY INSPECTION")
- info=Label.new(); info.text="Drag parcel to rotate · rail scans · tap parcel pins"; v.add_child(info)
- var area=Control.new(); area.custom_minimum_size=Vector2(0,590); v.add_child(area)
- box=Panel.new(); box.position=Vector2(40,40); box.size=Vector2(360,380); box.gui_input.connect(parcel_input); area.add_child(box)
- var bl=Label.new(); bl.name="Readout"; bl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); bl.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; bl.vertical_alignment=VERTICAL_ALIGNMENT_CENTER; bl.mouse_filter=Control.MOUSE_FILTER_IGNORE; bl.text=readout(); box.add_child(bl)
- var rail=VSlider.new(); rail.min_value=0; rail.max_value=100; rail.value=50; rail.position=Vector2(430,40); rail.size=Vector2(70,380); rail.value_changed.connect(scan_changed); area.add_child(rail)
- var lanes=HBoxContainer.new(); lanes.position=Vector2(10,470); lanes.size=Vector2(500,70); area.add_child(lanes)
- for name in ["PASS","REPACK","ISOLATE"]:
-  var b=Button.new(); b.text=name; b.size_flags_horizontal=Control.SIZE_EXPAND_FILL; b.pressed.connect(classify.bind(name)); lanes.add_child(b)
- var rules=Button.new(); rules.text="? RULES"; rules.position=Vector2(410,0); rules.pressed.connect(show_rules); area.add_child(rules)
- add_button(v,"PAUSE",show_pause)
-func readout():
- return "PARCEL / X-RAY\n\nSlice %d%%\nPins %d / 4\n\nRotate view" % [int(slice_depth),pins]
-func parcel_input(e):
- if e is InputEventScreenTouch:
-  if e.pressed: drag_start=e.position; rotating=false
+
+func add_button(parent: Control, text: String, callback: Callable) -> Button:
+ var b := Button.new()
+ b.text = text
+ b.custom_minimum_size = Vector2(0, 54)
+ b.pressed.connect(callback)
+ parent.add_child(b)
+ return b
+
+func show_hub() -> void:
+ screen = Screen.HUB
+ var v := base("PARCEL X-RAY · NIGHT SHIFT")
+ var l := Label.new()
+ l.text = "Night Shift 01\n8 parcels · 3 hazard rules\n\nRotate · Slice · Pin · Drag-classify"
+ l.custom_minimum_size = Vector2(0, 300)
+ l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ v.add_child(l)
+ add_button(v, "START SHIFT", start_shift)
+
+func start_shift() -> void:
+ case_index = 0
+ score = 0
+ correct = 0
+ critical = 0
+ streak = 0
+ total_scan_reversals = 0
+ show_intake()
+
+func show_intake() -> void:
+ screen = Screen.INTAKE
+ reset_case_state()
+ var v := base("PARCEL INTAKE %d / %d" % [case_index + 1, SHIFT_SIZE])
+ var l := Label.new()
+ l.text = "LABEL  %s\n\nR1  dense object near outer wall → REPACK\nR2  linked dense pair + power contact → ISOLATE\nR3  otherwise → PASS" % cases[case_index].label
+ l.custom_minimum_size = Vector2(0, 420)
+ l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ v.add_child(l)
+ add_button(v, "BEGIN INSPECT", show_inspect)
+
+func reset_case_state() -> void:
+ slice_depth = 50.0
+ scan_reversals = 0
+ scan_last_direction = 0
+ pins.clear()
+ box_pose = Vector2.ZERO
+ input_locked = false
+ gesture = Gesture.NONE
+ selected_lane = ""
+
+func show_inspect() -> void:
+ screen = Screen.INSPECT
+ var v := base("X-RAY INSPECTION")
+ info = Label.new()
+ info.text = "Drag parcel to rotate · right rail scans · tap visible shapes · drag parcel down to classify"
+ info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ v.add_child(info)
+ play_area = Control.new()
+ play_area.custom_minimum_size = Vector2(0, 660)
+ v.add_child(play_area)
+
+ parcel = Panel.new()
+ parcel.position = Vector2(52, 40)
+ parcel.size = Vector2(340, 360)
+ box_home = parcel.position
+ parcel.gui_input.connect(_on_parcel_input)
+ play_area.add_child(parcel)
+
+ parcel_visual = Control.new()
+ parcel_visual.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ parcel_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ parcel.add_child(parcel_visual)
+ _rebuild_xray()
+
+ scan_plane = ColorRect.new()
+ scan_plane.position = Vector2(0, 178)
+ scan_plane.size = Vector2(340, 3)
+ scan_plane.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ parcel.add_child(scan_plane)
+
+ pin_layer = Control.new()
+ pin_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ pin_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ parcel.add_child(pin_layer)
+
+ rail = VSlider.new()
+ rail.min_value = 0
+ rail.max_value = 100
+ rail.value = slice_depth
+ rail.position = Vector2(430, 40)
+ rail.size = Vector2(72, 360)
+ rail.value_changed.connect(_on_scan_changed)
+ rail.gui_input.connect(_on_rail_input)
+ play_area.add_child(rail)
+
+ var rules := Button.new()
+ rules.text = "? RULES"
+ rules.position = Vector2(420, 0)
+ rules.size = Vector2(90, 36)
+ rules.pressed.connect(show_rules)
+ play_area.add_child(rules)
+
+ var lane_row := HBoxContainer.new()
+ lane_row.position = Vector2(10, 500)
+ lane_row.size = Vector2(510, 100)
+ play_area.add_child(lane_row)
+ for lane_name in ["PASS", "REPACK", "ISOLATE"]:
+  var lane := Panel.new()
+  lane.custom_minimum_size = Vector2(160, 96)
+  lane.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+  var label := Label.new()
+  label.text = lane_name
+  label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+  label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+  label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+  label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+  lane.add_child(label)
+  lane_row.add_child(lane)
+  lanes[lane_name] = lane
+
+ add_button(v, "PAUSE", show_pause)
+ _update_inspection_feedback()
+
+func _rebuild_xray() -> void:
+ for c in parcel_visual.get_children():
+  c.queue_free()
+ var data: Dictionary = cases[case_index]
+ for i in range(data.objects.size()):
+  var o: Array = data.objects[i]
+  var depth := float(o[3])
+  if abs(depth - slice_depth / 100.0) > 0.22:
+   continue
+  var shape := ColorRect.new()
+  shape.name = "Hotspot_%d" % i
+  shape.position = Vector2(float(o[1]) * 280.0 + 18.0, float(o[2]) * 280.0 + 18.0)
+  shape.size = Vector2(34, 34) if o[0] != "cable" else Vector2(80, 12)
+  shape.mouse_filter = Control.MOUSE_FILTER_IGNORE
+  shape.modulate.a = 0.45 + (0.22 - abs(depth - slice_depth / 100.0))
+  parcel_visual.add_child(shape)
+
+func _on_parcel_input(event: InputEvent) -> void:
+ if input_locked:
+  return
+ var pos := _event_pos(event)
+ if event is InputEventScreenTouch or event is InputEventMouseButton:
+  if event.pressed:
+   pointer_start = pos
+   pointer_last = pos
+   gesture = Gesture.BOX
+   selected_lane = ""
   else:
-   if not rotating and pins<4: pins+=1; info.text="Evidence pin placed · %d/4" % pins
-   rotating=false
- elif e is InputEventScreenDrag:
-  rotating=true; info.text="ROTATING"
- if box and box.has_node("Readout"): box.get_node("Readout").text=readout()
-func scan_changed(v):
- slice_depth=v
- if box and box.has_node("Readout"): box.get_node("Readout").text=readout()
-func classify(choice):
- var c=cases[case_index]
- var delta=100 if choice==c.answer else (-180 if choice=="PASS" and c.answer=="ISOLATE" else -80)
- if choice==c.answer: correct+=1
- elif choice=="PASS" and c.answer=="ISOLATE": critical+=1
- score+=delta; show_result(choice,delta)
-func show_result(choice,delta):
- screen=Screen.RESULT
- var v=base(("CORRECT" if choice==cases[case_index].answer else "INCORRECT")+" · "+choice)
- var l=Label.new(); l.text="Expected: "+cases[case_index].answer+"\nScore: %d\n\nEVIDENCE\n"+cases[case_index].reason; l.custom_minimum_size=Vector2(0,430); v.add_child(l)
- add_button(v,"NEXT PARCEL" if case_index<7 else "SHIFT SUMMARY",advance)
-func advance():
- case_index+=1
- if case_index>=8: show_summary()
- else: show_intake()
-func show_summary():
- screen=Screen.SUMMARY
- var v=base("SHIFT SUMMARY")
- var grade="A" if correct>=7 and critical==0 else ("B" if correct>=6 and critical<2 else "C")
- var l=Label.new(); l.text="GRADE "+grade+"\n\nAccuracy %d / 8\nCritical Miss %d\nScore %d" % [correct,critical,score]; l.custom_minimum_size=Vector2(0,430); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; v.add_child(l)
- add_button(v,"BACK TO HUB",show_hub)
-func show_rules():
- var v=base("RULE MANUAL")
- var l=Label.new(); l.text="R1 Dense metal near outer wall → REPACK\n\nR2 Dense pair + cable + power cell → ISOLATE\n\nR3 Otherwise → PASS"; l.custom_minimum_size=Vector2(0,430); v.add_child(l)
- add_button(v,"CLOSE",show_inspect)
-func show_pause():
- var v=base("PAUSED")
- add_button(v,"RESUME",show_inspect)
- add_button(v,"QUIT TO HUB",show_hub)
+   if gesture == Gesture.CLASSIFY:
+    _finish_classification()
+   elif gesture == Gesture.BOX:
+    if pointer_start.distance_to(pos) < DRAG_THRESHOLD:
+     _try_pin(pos)
+   gesture = Gesture.NONE
+ elif event is InputEventScreenDrag or event is InputEventMouseMotion:
+  if gesture == Gesture.NONE:
+   return
+  var delta := pos - pointer_last
+  pointer_last = pos
+  var total := pos - pointer_start
+  if gesture == Gesture.BOX and total.y > 80.0:
+   gesture = Gesture.CLASSIFY
+  if gesture == Gesture.CLASSIFY:
+   parcel.position += delta
+   selected_lane = _lane_under_parcel()
+   info.text = ("CLASSIFY → " + selected_lane) if selected_lane != "" else "Release outside a lane to cancel"
+  else:
+   box_pose.x = clamp(box_pose.x + delta.x * 0.35, -65.0, 65.0)
+   box_pose.y = clamp(box_pose.y + delta.y * 0.25, -35.0, 35.0)
+   parcel.rotation = deg_to_rad(box_pose.x * 0.18)
+   parcel.scale = Vector2.ONE * (1.0 - abs(box_pose.y) / 700.0)
+   parcel_visual.position.x = box_pose.y * 0.35
+   info.text = "ROTATING · yaw %.0f · pitch %.0f" % [box_pose.x, box_pose.y]
+
+func _event_pos(event: InputEvent) -> Vector2:
+ if event is InputEventScreenTouch or event is InputEventScreenDrag:
+  return event.position
+ if event is InputEventMouseButton or event is InputEventMouseMotion:
+  return event.position
+ return Vector2.ZERO
+
+func _on_rail_input(event: InputEvent) -> void:
+ if input_locked or gesture == Gesture.CLASSIFY:
+  if event is InputEventScreenTouch:
+   accept_event()
+  return
+ if event is InputEventScreenTouch or event is InputEventMouseButton:
+  gesture = Gesture.SCAN if event.pressed else Gesture.NONE
+
+func _on_scan_changed(value: float) -> void:
+ if input_locked or gesture == Gesture.CLASSIFY:
+  return
+ var direction := sign(value - slice_depth)
+ if scan_last_direction != 0 and direction != 0 and direction != scan_last_direction:
+  scan_reversals += 1
+ scan_last_direction = direction
+ slice_depth = value
+ if scan_plane:
+  scan_plane.position.y = 20.0 + (slice_depth / 100.0) * 320.0
+ _rebuild_xray()
+ _redraw_pins()
+ _update_inspection_feedback()
+
+func _try_pin(local_pos: Vector2) -> void:
+ if pins.size() >= 4:
+  info.text = "PIN LIMIT · 4 / 4"
+  return
+ var hit := _hotspot_at(local_pos)
+ if hit < 0:
+  info.text = "NO TARGET · pin not placed"
+  return
+ for i in range(pins.size()):
+  if pins[i].object_index == hit:
+   pins.remove_at(i)
+   _redraw_pins()
+   info.text = "Evidence pin removed"
+   return
+ pins.append({"object_index":hit, "slice":slice_depth})
+ _redraw_pins()
+ info.text = "Evidence pinned · %d / 4" % pins.size()
+
+func _hotspot_at(local_pos: Vector2) -> int:
+ var data: Dictionary = cases[case_index]
+ for i in range(data.objects.size()):
+  var o: Array = data.objects[i]
+  if abs(float(o[3]) - slice_depth / 100.0) > 0.22:
+   continue
+  var center := Vector2(float(o[1]) * 280.0 + 35.0, float(o[2]) * 280.0 + 35.0)
+  if center.distance_to(local_pos) <= 42.0:
+   return i
+ return -1
+
+func _redraw_pins() -> void:
+ if not pin_layer:
+  return
+ for c in pin_layer.get_children():
+  c.queue_free()
+ var data: Dictionary = cases[case_index]
+ for pin in pins:
+  var o: Array = data.objects[int(pin.object_index)]
+  if abs(float(o[3]) - slice_depth / 100.0) > 0.24:
+   continue
+  var mark := Label.new()
+  mark.text = "◎"
+  mark.position = Vector2(float(o[1]) * 280.0 + 18.0, float(o[2]) * 280.0 + 12.0)
+  mark.add_theme_font_size_override("font_size", 28)
+  pin_layer.add_child(mark)
+
+func _lane_under_parcel() -> String:
+ if parcel.position.y < CLASSIFY_THRESHOLD_Y:
+  return ""
+ var center := parcel.global_position + parcel.size * 0.5
+ for lane_name in lanes:
+  var lane: Control = lanes[lane_name]
+  if lane.get_global_rect().has_point(center):
+   return lane_name
+ return ""
+
+func _finish_classification() -> void:
+ selected_lane = _lane_under_parcel()
+ if selected_lane == "":
+  parcel.position = box_home
+  parcel.rotation = deg_to_rad(box_pose.x * 0.18)
+  info.text = "INVALID DROP · parcel returned to table"
+  return
+ input_locked = true
+ parcel.position = (lanes[selected_lane] as Control).position
+ _evaluate(selected_lane)
+
+func expected_lane(data: Dictionary) -> String:
+ if data.linked_pair and data.power_contact:
+  return "ISOLATE"
+ if data.near_wall:
+  return "REPACK"
+ return "PASS"
+
+func _evaluate(choice: String) -> void:
+ var data: Dictionary = cases[case_index]
+ var expected := expected_lane(data)
+ var is_correct := choice == expected
+ var delta := 150 if is_correct and expected == "ISOLATE" else (100 if is_correct else (-180 if choice == "PASS" and expected == "ISOLATE" else -80))
+ if is_correct:
+  correct += 1
+  streak += 1
+  if streak >= 3:
+   delta += 10
+ else:
+  streak = 0
+  if choice == "PASS" and expected == "ISOLATE":
+   critical += 1
+ if scan_reversals <= 3:
+  delta += 20
+ total_scan_reversals += scan_reversals
+ score += delta
+ show_result(choice, expected, delta)
+
+func show_result(choice: String, expected: String, delta: int) -> void:
+ screen = Screen.RESULT
+ var v := base(("CORRECT" if choice == expected else "INCORRECT") + " · " + choice)
+ var reason := "No hazard relationship → PASS"
+ var data: Dictionary = cases[case_index]
+ if data.linked_pair and data.power_contact:
+  reason = "Linked dense pair contacts power cell → ISOLATE"
+ elif data.near_wall:
+  reason = "Dense object is inside outer-wall band → REPACK"
+ var l := Label.new()
+ l.text = "Expected: %s\nScore change: %+d\nTotal: %d\n\nEVIDENCE REPLAY\nSlice %.0f%% · Pins %d\n%s" % [expected, delta, score, slice_depth, pins.size(), reason]
+ l.custom_minimum_size = Vector2(0, 430)
+ l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ v.add_child(l)
+ add_button(v, "NEXT PARCEL" if case_index < SHIFT_SIZE - 1 else "SHIFT SUMMARY", advance)
+
+func advance() -> void:
+ case_index += 1
+ if case_index >= SHIFT_SIZE:
+  show_summary()
+ else:
+  show_intake()
+
+func show_summary() -> void:
+ screen = Screen.SUMMARY
+ var v := base("SHIFT SUMMARY")
+ var grade := "A" if correct >= 7 and critical == 0 else ("B" if correct >= 6 and critical < 2 else "C")
+ if critical >= 2:
+  grade = "C"
+ var l := Label.new()
+ l.text = "GRADE %s\n\nAccuracy %d / %d\nCritical Miss %d\nScan reversals %d\nScore %d" % [grade, correct, SHIFT_SIZE, critical, total_scan_reversals, score]
+ l.custom_minimum_size = Vector2(0, 430)
+ l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ v.add_child(l)
+ add_button(v, "BACK TO HUB", show_hub)
+
+func show_rules() -> void:
+ if input_locked:
+  return
+ var v := base("RULE MANUAL")
+ var l := Label.new()
+ l.text = "R1\nDense object near outer wall → REPACK\n\nR2\nLinked dense pair + cable + power contact → ISOLATE\n\nR3\nOtherwise → PASS"
+ l.custom_minimum_size = Vector2(0, 430)
+ l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+ v.add_child(l)
+ add_button(v, "CLOSE", show_inspect)
+
+func show_pause() -> void:
+ var v := base("PAUSED")
+ add_button(v, "RESUME", show_inspect)
+ add_button(v, "QUIT TO HUB", show_hub)
+
+func _update_inspection_feedback() -> void:
+ if info:
+  info.text = "Slice %d%% · Pins %d/4 · Reversals %d" % [int(slice_depth), pins.size(), scan_reversals]
