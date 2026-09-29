@@ -559,6 +559,31 @@ async function setIdeaPriority(id, priority){
   }
 }
 
+async function setDesignPriority(id, priority){
+  const p=gameDesigns.find(x=>x.id===id);
+  if(!p) return;
+  const previous=!!p.human_priority;
+  const previousAt=p.human_priority_at||null;
+  p.human_priority=!!priority;
+  p.human_priority_at=priority?new Date().toISOString():null;
+  if(current==="design") render();
+  try{
+    const result=await cloudRequest("POST",{action:"set_design_priority",design_id:id,priority:!!priority});
+    if(result?.design){
+      p.human_priority=!!result.design.human_priority;
+      p.human_priority_at=result.design.human_priority_at||null;
+    }
+    render();
+    toast(priority?"Pre-production 우선순위로 지정":"Pre-production 우선순위 해제");
+  }catch(err){
+    p.human_priority=previous;
+    p.human_priority_at=previousAt;
+    render();
+    console.error("Design priority update failed",err);
+    toast("우선순위 저장 실패");
+  }
+}
+
 async function loadGameDesigns(showToast=false){
   const key=getCloudKey();
   if(!key) return;
@@ -1012,13 +1037,16 @@ function designCard(p){
   const screens=Array.isArray(p.screen_inventory)?p.screen_inventory:[];
   const risks=Array.isArray(p.known_risks)?p.known_risks:[];
   const archived=!!p.archive_commit;
-  return `<div class="game-card design-card">
+  return `<div class="game-card design-card ${p.human_priority?"priority":""}">
     <div class="card-top">
       <div>
         <div class="kicker">설계 완료 ${esc(when)}</div>
         <div class="card-title">${esc(p.title)}</div>
       </div>
-      <span class="badge blue">${esc(p.version||"v0.1")}</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <span class="badge blue">${esc(p.version||"v0.1")}</span>
+        <button class="idea-star ${p.human_priority?"on":""}" title="${p.human_priority?"Pre-production 우선 해제":"Pre-production 우선"}" onclick="event.stopPropagation();setDesignPriority('${p.id}',${p.human_priority?"false":"true"})">${p.human_priority?"★":"☆"}</button>
+      </div>
     </div>
     <div class="card-desc">${esc(p.one_line)}</div>
     <div class="meta">
@@ -1043,11 +1071,20 @@ function openDesignArchive(id){
 }
 
 function designPage(){
-  const ps=gameDesigns;
+  const ps=[...gameDesigns].sort((a,b)=>{
+    const pa=a.human_priority?1:0,pb=b.human_priority?1:0;
+    if(pa!==pb) return pb-pa;
+    if(pa&&pb){
+      const ta=new Date(a.human_priority_at||a.created_at||0), tb=new Date(b.human_priority_at||b.created_at||0);
+      if(+ta!==+tb) return ta-tb;
+    }
+    return new Date(b.created_at||0)-new Date(a.created_at||0);
+  });
   const archivedCount=ps.filter(x=>x.archive_commit).length;
+  const priorityCount=ps.filter(x=>x.human_priority).length;
   return genericHeader(
     "Game Design Room",
-    `완성된 Playable Game Design Spec을 요약해서 보고, 상세 문서는 클릭해서 확인합니다. · GitHub 보관 ${archivedCount}/${ps.length}`,
+    `완성된 Playable Game Design Spec을 요약해서 보고, ★로 Pre-production 우선순위를 지정합니다. · 우선 ${priorityCount}개 · GitHub 보관 ${archivedCount}/${ps.length}`,
     `<button class="btn" onclick="loadGameDesigns(true)">↻ 새로고침</button>`
   )+`
   <div class="panel" style="margin-bottom:14px">
@@ -1112,7 +1149,10 @@ function showDesignSpec(id){
       <div class="detail-box"><h3>20. Wireframe Handoff</h3>${list(p.wireframe_handoff)}</div>
     </div>
     <div class="detail-box" style="margin-top:12px"><h3>Stored Design Markdown</h3><pre style="white-space:pre-wrap;word-break:break-word;color:#9fb3cb;font-size:11px;line-height:1.65;margin:0">${esc(p.design_markdown||"")}</pre></div>
-    <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">닫기</button></div>
+    <div class="card-actions" style="justify-content:flex-end">
+      <button class="btn ${p.human_priority?"good":"primary"}" onclick="setDesignPriority('${p.id}',${p.human_priority?"false":"true"})">${p.human_priority?"★ Pre-production 우선 해제":"☆ Pre-production 우선"}</button>
+      <button class="btn" onclick="closeModal()">닫기</button>
+    </div>
   `);
 }
 
