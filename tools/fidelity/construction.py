@@ -19,7 +19,7 @@ PATTERNS = {
     'absolute_control_v1': {'types': ['Control', 'Label', 'Panel', 'ColorRect', 'TextureRect', 'Button', 'ProgressBar'], 'mouse_filter': 2},
     'button_tap_v1': {'types': ['Button'], 'mouse_filter': 0, 'signal': 'pressed'},
     'modal_scrim_v1': {'types': ['Control', 'ColorRect', 'Panel'], 'mouse_filter': 0},
-    'explicit_script_v1': {'types': ['Control', 'Button', 'Panel', 'ColorRect', 'TextureRect'], 'mouse_filter': 0, 'script_required': True},
+    'explicit_script_v1': {'types': ['Control', 'Button', 'Panel', 'ColorRect', 'TextureRect', 'Label', 'ProgressBar'], 'mouse_filter': 0, 'script_required': True},
 }
 CHECKS = {'file', 'node', 'symbol', 'geometry', 'connection', 'resources'}
 NAME = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
@@ -28,6 +28,65 @@ STUDIO_REFERENCE_SIZES = {
     'portrait': {'width': 540, 'height': 960},
     'landscape': {'width': 960, 'height': 540},
 }
+
+# Wireframe component types are semantic, not Godot class names. The Compiler
+# must use this registry instead of inventing a mapping per game. A component
+# that receives a non-Button gesture keeps its canonical Godot type and is
+# promoted to explicit_script_v1.
+SOURCE_COMPONENT_TYPES = {}
+
+
+def _component_types(names, godot_type, default_pattern='absolute_control_v1', extra_patterns=()):
+    patterns = tuple(dict.fromkeys((default_pattern,) + tuple(extra_patterns)))
+    for name in names.split():
+        SOURCE_COMPONENT_TYPES[name] = {
+            'godot_type': godot_type,
+            'default_pattern': default_pattern,
+            'allowed_patterns': patterns,
+        }
+
+
+_component_types('button', 'Button', 'button_tap_v1', ('explicit_script_v1',))
+_component_types('hold_button hold_control toggle', 'Button', 'explicit_script_v1', ('button_tap_v1',))
+_component_types(
+    'label status counter metric grade headline large_number stat timer rating '
+    'result_stamp legend text report cue',
+    'Label', 'absolute_control_v1', ('explicit_script_v1',)
+)
+_component_types('meter progress', 'ProgressBar', 'absolute_control_v1', ('explicit_script_v1',))
+_component_types(
+    'panel card goal_card request_card risk_card rule_card text_card modal popover '
+    'header context summary resource_row banner overlay_banner',
+    'Panel', 'absolute_control_v1', ('explicit_script_v1', 'modal_scrim_v1')
+)
+_component_types('overlay world_overlay', 'ColorRect', 'modal_scrim_v1', ('absolute_control_v1', 'explicit_script_v1'))
+_component_types(
+    'preview portrait diagram grid_preview comparison animation object world_view',
+    'TextureRect', 'absolute_control_v1', ('explicit_script_v1',)
+)
+_component_types(
+    'canvas card_list cards chip chip_group chips list list_buttons grid grid_buttons '
+    'metric_grid tags tray part_tray tool_tray horizontal_strip stack resource route_cards '
+    'goal_overlays reach_overlay world',
+    'Control', 'absolute_control_v1', ('explicit_script_v1',)
+)
+_component_types(
+    'arc_control crank cuttable drag_handle drag_tool draggable draggable_entities '
+    'draggable_list draggable_objects draggable_token draggable_tool drop_slot drop_target '
+    'drop_zone dropzone editable_path fader geometry graph grinder hit_layer hit_targets '
+    'hotspots indicator interactive_layer interactive_object interactive_part latch manipulable '
+    'manipulation_zone map mask_canvas node_graph part_tray path polygon_surface rail rope rotary '
+    'route_selector scripted_sim slider spline_playfield tool vertical_handle vertical_slider '
+    'vertical_swipe_control viewport wipe world_entities world_entity world_object world_targets',
+    'Control', 'explicit_script_v1', ('absolute_control_v1',)
+)
+
+
+def source_component_spec(source_type):
+    spec = SOURCE_COMPONENT_TYPES.get(str(source_type or '').strip())
+    if not spec:
+        raise ValueError('Unsupported Wireframe component type: ' + str(source_type))
+    return dict(spec)
 
 
 def canonical_reference_size(pack):
@@ -293,6 +352,14 @@ def validate(b, project=None, claims=None, commit=None):
     for n in bindings.get('components',[]):
         src=source_components.get((n.get('screen_id'),n.get('component_id')), {})
         if src.get('box')!=n.get('source_box'): error('GEOMETRY',n.get('node_path'),'Component box differs from source')
+        try:
+            spec=source_component_spec(src.get('type'))
+            if n.get('godot_type')!=spec['godot_type']:
+                error('COMPONENT_TYPE',n.get('node_path'),'Godot type must follow SOURCE_COMPONENT_TYPES registry for '+str(src.get('type')))
+            if n.get('construction_pattern','absolute_control_v1') not in spec['allowed_patterns']:
+                error('COMPONENT_PATTERN',n.get('node_path'),'Construction pattern is not allowed for source component type '+str(src.get('type')))
+        except ValueError as exc:
+            error('COMPONENT_TYPE',n.get('node_path'),str(exc))
     for name, spec in bindings.get('reusable_components', {}).items():
         if not any(n.get('reusable_component') == name and n.get('script_path') == spec.get('script_path') for n in ns):
             error('REUSABLE', name, 'Declared reusable component has no compatible use site')
@@ -305,13 +372,39 @@ def validate(b, project=None, claims=None, commit=None):
     if len(set(keys))!=len(keys) or set(keys)!=set(source_interactions): error('INTERACTION_COVERAGE','','Exact source interaction mapping required')
     for v in ints:
         src=source_interactions.get((v.get('screen_id'),v.get('interaction_index')), {})
-        target=nodes.get(v.get('target_node'), {})
-        if v.get('input')!=src.get('trigger',src.get('input')): error('INPUT_MODALITY',v.get('target_node'),'Gesture differs from source')
-        if not target or 'component_id' not in target: error('INPUT_TARGET',v.get('target_node'),'Gesture must resolve to explicit spatial component, not whole screen')
-        if not v.get('action_symbol') or not v.get('action_script'): error('ACTION',v.get('target_node'),'Explicit game action symbol/script required')
+        primary_path=v.get('target_node')
+        target_paths=[primary_path] if primary_path else []
+        target_paths.extend(v.get('related_nodes',[]) if isinstance(v.get('related_nodes'),list) else [])
+        if v.get('source_target') != src.get('target'):
+            error('INPUT_TARGET',primary_path,'source_target must preserve the Wireframe interaction target text exactly')
+        if v.get('input')!=src.get('trigger',src.get('input')):
+            error('INPUT_MODALITY',primary_path,'Gesture differs from source')
+        if not target_paths:
+            error('INPUT_TARGET',primary_path,'Interaction needs at least one explicit component target')
+            continue
+        target_nodes=[]
+        for path in target_paths:
+            target=nodes.get(path,{})
+            if not target or 'component_id' not in target or target.get('screen_id')!=v.get('screen_id'):
+                error('INPUT_TARGET',path,'Gesture target must resolve to an explicit component on the same screen')
+            else:
+                target_nodes.append((path,target))
+        if not v.get('action_symbol') or not v.get('action_script'):
+            error('ACTION',primary_path,'Explicit game action symbol/script required')
         if v.get('input')=='tap':
-            if target.get('construction_pattern')!='button_tap_v1' or not any(c.get('from')==v.get('target_node') and c.get('signal')=='pressed' and c.get('method')==v.get('action_symbol') and nodes.get(c.get('to'),{}).get('script_path')==v.get('action_script') for c in conns): error('CONNECTION',v.get('target_node'),'Tap requires Button.pressed bound to exact action owner')
-        elif target.get('construction_pattern')!='explicit_script_v1' or not v.get('input_handler'): error('INPUT_MODALITY',v.get('target_node'),'No canonical gesture adapter here; explicit reviewed script/handler required')
+            for path,target in target_nodes:
+                if target.get('construction_pattern')=='button_tap_v1':
+                    if not any(c.get('from')==path and c.get('signal')=='pressed' and c.get('method')==v.get('action_symbol') and nodes.get(c.get('to'),{}).get('script_path')==v.get('action_script') for c in conns):
+                        error('CONNECTION',path,'Button tap requires pressed bound to the exact action owner')
+                elif target.get('construction_pattern')=='explicit_script_v1':
+                    if not v.get('input_handler') or target.get('script_path') is None:
+                        error('INPUT_MODALITY',path,'Non-Button tap requires explicit_script_v1 with a reviewed input_handler')
+                else:
+                    error('INPUT_MODALITY',path,'Tap target must use button_tap_v1 or explicit_script_v1')
+        else:
+            primary=nodes.get(primary_path,{})
+            if primary.get('construction_pattern')!='explicit_script_v1' or not v.get('input_handler') or primary.get('script_path') is None:
+                error('INPUT_MODALITY',primary_path,'Non-tap gesture requires explicit_script_v1 on the primary target with a reviewed input_handler')
     impl=bindings.get('implementations',{})
     if set(impl)!=set(ids): error('IMPLEMENTATION_COVERAGE','','Every requirement needs explicit implementation references')
     refs=[]
@@ -334,7 +427,8 @@ def validate(b, project=None, claims=None, commit=None):
         else: refs.append(ref)
     for v in ints:
         if v.get('action_script'): refs.append({'file':v['action_script'],'symbol':v.get('action_symbol'),'kind':'func'})
-        if v.get('input_handler'): refs.append({'file':nodes.get(v.get('target_node'),{}).get('script_path'),'symbol':v['input_handler'],'kind':'func'})
+        if v.get('input_handler') and nodes.get(v.get('target_node'),{}).get('script_path'):
+            refs.append({'file':nodes.get(v.get('target_node'),{}).get('script_path'),'symbol':v['input_handler'],'kind':'func'})
     for ref in refs:
         try: resource_path(ref.get('file'))
         except ValueError as exc: error('PATH',ref.get('file'),str(exc))
