@@ -291,6 +291,8 @@ function seedState() {
 const CLOUD_URL = "https://hmblaasagxyntyfrfztg.supabase.co/functions/v1/danbi-game-office-sync";
 let cloudReady = false;
 let cloudTimer = null;
+let ideaPollTimer = null;
+let promotedIdeas = [];
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
 
@@ -336,6 +338,34 @@ async function cloudRequest(method, body){
   return res.json();
 }
 
+async function loadPromotedIdeas(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=ideas&limit=50",{
+      method:"GET",
+      headers:{"Content-Type":"application/json","X-Office-Key":key},
+      cache:"no-store"
+    });
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    promotedIdeas=Array.isArray(payload.ideas)?payload.ideas:[];
+    if(current==="ideas" || current==="dashboard") render();
+    if(showToast) toast(`Idea Lab 새로고침 · ${promotedIdeas.length}개`);
+  }catch(err){
+    console.error("Idea Lab load failed",err);
+    if(showToast) toast("Idea Lab 불러오기 실패");
+  }
+}
+
+function startIdeaPolling(){
+  clearInterval(ideaPollTimer);
+  ideaPollTimer=setInterval(()=>loadPromotedIdeas(false),60000);
+}
+
 async function initCloud(){
   let key=getCloudKey();
   if(!key){
@@ -354,6 +384,8 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
+    await loadPromotedIdeas(false);
+    startIdeaPolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
   }catch(err){
@@ -389,11 +421,14 @@ function navRender(){
     </div>`).join("");
 }
 function go(id){ current=id; location.hash=id; render(); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
-function count(stage){ return state.projects.filter(p=>p.stage===stage).length; }
+function count(stage){
+  if(stage==="idea") return promotedIdeas.length;
+  return state.projects.filter(p=>p.stage===stage).length;
+}
 function titleInfo(){
   const map={
     dashboard:["대표 대시보드","회사 전체 제작 라인을 한눈에 확인합니다."],
-    ideas:["아이디어 연구소","아이디어가 계속 생성되고 후보군으로 축적됩니다."],
+    ideas:["아이디어 연구소","GPT 내부 생성·비평·프로듀서 심사를 통과한 후보만 도착합니다."],
     greenlight:["그린라이트 심사실","제작 비용을 쓰기 전에 AI Producer가 후보를 걸러냅니다."],
     concept:["컨셉 스튜디오","기획안과 컨셉 방향을 만들고 대표 비주얼을 선정합니다."],
     wireframe:["프리프로덕션","대표 컨셉을 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
@@ -462,19 +497,48 @@ function activityList(limit=50){ return `<div class="activity">${state.activity.
 function genericHeader(title,desc,action=""){ return `<div class="section-head" style="margin-top:0"><div><h2>${title}</h2><p>${desc}</p></div>${action}</div>`; }
 
 function ideaCard(p){
-  const s=p.scores||{hook:76,feasibility:80,replay:72,visual:79};
+  const promotedAt=p.source_run_at||p.created_at;
+  const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
+  const reasons=Array.isArray(p.why_promoted)?p.why_promoted:[];
+  const scores=[
+    ["HOOK",p.hook_score],
+    ["LOOP",p.core_loop_score],
+    ["MOBILE",p.mobile_fit_score],
+    ["PROTO",p.prototype_score],
+    ["ASSET",p.asset_score],
+    ["VISUAL",p.visual_score],
+    ["GROWTH",p.growth_score]
+  ].filter(x=>x[1]!==null && x[1]!==undefined);
   return `<div class="game-card">
-    <div class="card-top"><div><div class="kicker">Candidate #${esc(p.id.slice(-4))}</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">IDEA</span></div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span><span>Risk ${esc(p.risk)}</span></div>
-    <div class="score"><div><b>${s.hook}</b><span>HOOK</span></div><div><b>${s.feasibility}</b><span>FEAS.</span></div><div><b>${s.replay}</b><span>REPLAY</span></div><div><b>${s.visual}</b><span>VISUAL</span></div></div>
-    <div class="card-actions"><button class="btn" onclick="promote('${p.id}','greenlight')">심사실로 보내기</button><button class="btn ghost" onclick="showProject('${p.id}')">상세</button></div>
+    <div class="card-top">
+      <div><div class="kicker">AI PROMOTED · ${esc(when)}</div><div class="card-title">${esc(p.title)}</div></div>
+      <span class="badge green">내부심사 통과</span>
+    </div>
+    <div class="card-desc">${esc(p.one_line)}</div>
+    <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span><span>Scheduled Chat</span></div>
+    <div class="detail-box"><h3>핵심 플레이 행동</h3><p>${esc(p.core_action)}</p></div>
+    ${scores.length?`<div class="score" style="grid-template-columns:repeat(4,1fr)">${scores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div>`:""}
+    ${reasons.length?`<div class="detail-box" style="margin-top:12px"><h3>왜 회사에 올렸나</h3><p>${reasons.map(x=>"• "+esc(x)).join("<br>")}</p></div>`:""}
+    ${p.next_test?`<div class="human-gate"><b>다음 부서에서 검증</b><br>${esc(p.next_test)}</div>`:""}
   </div>`;
 }
 function ideasPage(){
-  const ps=state.projects.filter(p=>p.stage==="idea");
-  return genericHeader("Idea Pool","아이디어를 많이 만들고, 아직 제작 비용은 거의 쓰지 않는 단계입니다.",`<button class="btn primary" onclick="generateIdeas(3)">＋ 3개 생성</button>`) +
-    `<div class="cards">${ps.map(ideaCard).join("")}</div>`;
+  const ps=promotedIdeas;
+  return genericHeader(
+    "Idea Lab · Promoted Only",
+    "매 시간 정각 ChatGPT가 내부에서 여러 후보를 생성·폐기·비평합니다. 이 화면에는 제작 가치가 있다고 판단된 후보만 최대 1개씩 들어옵니다.",
+    `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
+  ) +
+  `<div class="panel" style="margin-bottom:14px">
+    <div class="panel-title"><strong>Hourly Gate</strong><span>raw ideas are not stored</span></div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
+      <span><b style="color:#eaf3ff">매시간 00분</b> 내부 탐색</span>
+      <span>Creator → Critic → Producer</span>
+      <span><b style="color:#8de4c7">승격 0~1개</b></span>
+      <span>기준 미달이면 아무 것도 입고하지 않음</span>
+    </div>
+  </div>
+  <div class="cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.<br>다음 정각 실행에서 기준을 넘는 후보가 있을 때만 여기에 나타납니다.</div>`}</div>`;
 }
 function greenCard(p){
   const s=p.scores||{hook:83,feasibility:86,replay:75,visual:81};
