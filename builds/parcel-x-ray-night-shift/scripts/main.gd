@@ -330,13 +330,18 @@ func _lane_under_parcel() -> String:
 func _finish_classification() -> void:
  selected_lane = _lane_under_parcel()
  if selected_lane == "":
-  parcel.position = box_home
-  parcel.rotation = deg_to_rad(box_pose.x * 0.18)
+  var return_tween:=create_tween()
+  return_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+  return_tween.tween_property(parcel,"position",box_home,0.18)
   info.text = "INVALID DROP · parcel returned to table"
   return
  input_locked = true
- parcel.position = (lanes[selected_lane] as Control).position
- _evaluate(selected_lane)
+ var lane:Control=lanes[selected_lane]
+ var target:=play_area.to_local(lane.global_position + lane.size*0.5 - parcel.size*0.5)
+ var snap:=create_tween()
+ snap.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+ snap.tween_property(parcel,"position",target,0.12)
+ snap.tween_callback(_evaluate.bind(selected_lane))
 
 func expected_lane(data: Dictionary) -> String:
  return HazardEvaluator.expected_lane(data)
@@ -353,11 +358,30 @@ func show_result(choice: String, expected: String, delta: int) -> void:
  var reason := HazardEvaluator.reason(shift.current_case())
  var data: Dictionary = shift.current_case()
  var l := Label.new()
- l.text = "Expected: %s\nScore change: %+d\nTotal: %d\n\nEVIDENCE REPLAY\nSlice %.0f%% · Pins %d\n%s" % [expected, delta, shift.score, slice_depth, pins.size(), reason]
- l.custom_minimum_size = Vector2(0, 430)
+ l.text = "Expected: %s\nScore change: %+d\nTotal: %d\nSlice %.0f%% · Pins %d\n%s" % [expected, delta, shift.score, slice_depth, pins.size(), reason]
+ l.custom_minimum_size = Vector2(0, 150)
  l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  v.add_child(l)
+ add_evidence_preview(v)
  add_button(v, "NEXT PARCEL" if shift.case_index < SHIFT_SIZE - 1 else "SHIFT SUMMARY", advance)
+
+func add_evidence_preview(parent:Control) -> void:
+ var preview:=Panel.new()
+ preview.custom_minimum_size=Vector2(0,260)
+ parent.add_child(preview)
+ var data:Dictionary=shift.current_case()
+ for o in data.objects:
+  if abs(float(o[3])-slice_depth/100.0)>0.22: continue
+  var shape:=ColorRect.new()
+  shape.position=Vector2(float(o[1])*420.0+25.0,float(o[2])*190.0+25.0)
+  shape.size=Vector2(42,42) if o[0]!="cable" else Vector2(110,14)
+  shape.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  preview.add_child(shape)
+ var line:=ColorRect.new()
+ line.position=Vector2(10,20.0+(slice_depth/100.0)*210.0)
+ line.size=Vector2(500,3)
+ line.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ preview.add_child(line)
 
 func advance() -> void:
  if shift.advance(): show_summary()
@@ -368,7 +392,7 @@ func show_summary() -> void:
  var v := base("SHIFT SUMMARY")
  var grade := shift.grade()
  var l := Label.new()
- l.text = "GRADE %s\n\nAccuracy %d / %d\nCritical Miss %d\nScan reversals %d\nScore %d" % [grade, shift.correct, SHIFT_SIZE, shift.critical, shift.total_scan_reversals, shift.score]
+ l.text = "GRADE %s\n\nAccuracy %d / %d\nCritical Miss %d\nEfficiency · %d scan reversals\nScore %d" % [grade, shift.correct, SHIFT_SIZE, shift.critical, shift.total_scan_reversals, shift.score]
  l.custom_minimum_size = Vector2(0, 430)
  l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  v.add_child(l)
@@ -411,7 +435,13 @@ func show_pause() -> void:
  prior_screen=screen
  var p:=_modal("PAUSED","Shift state is frozen while this overlay blocks gameplay input.")
  add_button(p,"RESUME",close_overlay)
- add_button(p,"QUIT TO HUB",quit_shift)
+ add_button(p,"QUIT TO HUB",confirm_quit)
+
+func confirm_quit() -> void:
+ close_overlay()
+ var p:=_modal("ABANDON SHIFT?","Current shift progress will be discarded.")
+ add_button(p,"KEEP PLAYING",close_overlay)
+ add_button(p,"ABANDON",quit_shift)
 
 func quit_shift() -> void:
  close_overlay()
