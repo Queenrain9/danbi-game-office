@@ -18,6 +18,21 @@ Resolution rule:
 
 The Compiler must write the resolved value to `bindings.reference_size`. The Builder must use that exact size in `project.godot`; it must not infer a different viewport from an old build, screenshot, or superseded implementation. This fallback is a studio construction convention, not a reuse of historical game output.
 
+## Semantic component and interaction binding
+
+Wireframe `component.type` values are semantic design types, not Godot class names. The Compiler must resolve them through `SOURCE_COMPONENT_TYPES` in `tools/fidelity/construction.py`; it must not block merely because values such as `status`, `card`, `canvas`, `hotspots`, `interactive_object`, `drop_target`, `preview`, or `slider` are not literal Godot classes.
+
+For interactions, preserve the original Wireframe target text in `bindings.interactions[].source_target` and bind it to concrete spatial components:
+
+- `target_node`: the primary component that owns the input start/handler.
+- `related_nodes`: optional additional components participating in the same interaction, such as two rotate buttons or drop lanes.
+- A normal Button tap uses `button_tap_v1` and a `pressed` connection.
+- A tap on a hotspot, card, object region, or internal shape uses `explicit_script_v1` plus an explicit `input_handler`; it must not be converted to a Button.
+- Non-tap gestures (drag/swipe/hold/pinch/trace/release/etc.) use `explicit_script_v1` on the primary target with an explicit reviewed handler.
+- Natural-language targets such as “rotate buttons”, “symptom target”, or “visible internal shape in xray_box” are not specification failures when they can be bound explicitly to one or more existing Wireframe components while `source_target` remains unchanged.
+
+This binding layer preserves the source meaning while allowing the Godot implementation to use concrete node paths.
+
 ## Compiler → independent Blueprint review
 
 Export **current full DB rows** for Contract, Wireframe Pack and Game Design to JSON. The Blueprint must keep `schema_version: fidelity-v1`, a frozen `source` with `pack`, `design`, and `requirements`, identical `screens` and `requirements`, plus `hash_algorithm: sha256-canonical-json-v1`. Add `bindings.scene_path`, `reference_size`, `coordinate_space: screen_percent`, `stretch_mode: canvas_items`, explicit `nodes`, `components`, `connections`, `interactions`, `implementations` (one or more `res://` file/node or symbol references per requirement), `reusable_components`, and `tests` with deterministic `checks` and `stage`. Use `construction_pattern` on each node; `registry` lists supported patterns. Every stage needs a static test, every requirement needs static implementation coverage, and executable behavior has a separate manual test. Use zero-based RFC6901 JSON pointers for `bindings.sources`.
