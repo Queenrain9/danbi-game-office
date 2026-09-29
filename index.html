@@ -196,6 +196,8 @@
     <div class="sidebar-bottom">
       <div><span class="status-dot"></span><strong style="font-size:12px">Studio online</strong></div>
       <div class="small">앞단 제작은 자동으로 흐르고,<br>플레이테스트 이후부터 대표가 직접 개입합니다.</div>
+      <div id="cloudStatus" class="small" style="margin-top:12px;color:#9bc0ff">☁ Cloud 연결 준비 중</div>
+      <button class="btn ghost" style="width:100%;margin-top:8px;padding:7px 9px;font-size:10px" onclick="resetCloudKey()">기기 연결키 변경</button>
     </div>
   </aside>
   <main class="main">
@@ -286,10 +288,97 @@ function seedState() {
     ]
   }
 }
+const CLOUD_URL = "https://hmblaasagxyntyfrfztg.supabase.co/functions/v1/danbi-game-office-sync";
+let cloudReady = false;
+let cloudTimer = null;
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
+
 function load(){ try{ return JSON.parse(localStorage.getItem("danbiGameOfficeV1")) || seedState(); }catch(e){ return seedState(); } }
-function save(){ localStorage.setItem("danbiGameOfficeV1", JSON.stringify(state)); }
+
+function save(){
+  localStorage.setItem("danbiGameOfficeV1", JSON.stringify(state));
+  queueCloudSave();
+}
+
+function getCloudKey(){ return localStorage.getItem("danbiGameOfficeKey") || ""; }
+
+function setCloudStatus(text, ok=false){
+  const el=document.getElementById("cloudStatus");
+  if(!el) return;
+  el.textContent=text;
+  el.style.color=ok?"#75dcb9":"#9bc0ff";
+}
+
+function resetCloudKey(){
+  const next=prompt("이 기기에서 사용할 DANBI GAME OFFICE 연결키를 입력해주세요.", getCloudKey());
+  if(next===null) return;
+  const value=next.trim();
+  if(!value) return;
+  localStorage.setItem("danbiGameOfficeKey", value);
+  cloudReady=false;
+  initCloud();
+}
+
+async function cloudRequest(method, body){
+  const key=getCloudKey();
+  if(!key) throw new Error("cloud_key_missing");
+  const res=await fetch(CLOUD_URL,{
+    method,
+    headers:{"Content-Type":"application/json","X-Office-Key":key},
+    body: body ? JSON.stringify(body) : undefined,
+    cache:"no-store"
+  });
+  if(!res.ok) {
+    const payload=await res.json().catch(()=>({}));
+    throw new Error(payload.error || ("HTTP "+res.status));
+  }
+  return res.json();
+}
+
+async function initCloud(){
+  let key=getCloudKey();
+  if(!key){
+    key=(prompt("어디서든 같은 회사 상태를 쓰려면 DANBI GAME OFFICE 연결키를 입력해주세요.\n이 기기에서 한 번만 입력하면 됩니다.")||"").trim();
+    if(!key){ setCloudStatus("☁ Cloud 미연결"); return; }
+    localStorage.setItem("danbiGameOfficeKey", key);
+  }
+
+  setCloudStatus("☁ Cloud 동기화 중…");
+  try{
+    const remote=await cloudRequest("GET");
+    if(remote && remote.state){
+      state=remote.state;
+      localStorage.setItem("danbiGameOfficeV1", JSON.stringify(state));
+    }else{
+      await cloudRequest("POST",{state});
+    }
+    cloudReady=true;
+    setCloudStatus("☁ Cloud synced", true);
+    render();
+  }catch(err){
+    cloudReady=false;
+    setCloudStatus(err.message==="unauthorized"?"☁ 연결키 확인 필요":"☁ Cloud 연결 오류");
+    console.error("Cloud sync failed",err);
+  }
+}
+
+function queueCloudSave(){
+  if(!cloudReady) return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(cloudSave,450);
+}
+
+async function cloudSave(){
+  try{
+    setCloudStatus("☁ 저장 중…");
+    await cloudRequest("POST",{state});
+    setCloudStatus("☁ Cloud synced", true);
+  }catch(err){
+    setCloudStatus("☁ 저장 실패");
+    console.error("Cloud save failed",err);
+  }
+}
 function addLog(text){ const d=new Date(); state.activity.unshift({t:d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hour12:false}), text}); state.activity=state.activity.slice(0,80); save(); }
 function esc(s){ return String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function toast(msg){ const e=document.getElementById("toast"); e.textContent=msg; e.classList.add("show"); clearTimeout(window._toast); window._toast=setTimeout(()=>e.classList.remove("show"),1800); }
@@ -602,6 +691,7 @@ function resetStudio(){ if(confirm("로컬 데이터를 초기 샘플 상태로 
 function toggleMenu(){ document.getElementById("sidebar").classList.toggle("open"); }
 window.addEventListener("hashchange",()=>{current=(location.hash||"#dashboard").slice(1);render();});
 render();
+initCloud();
 </script>
 </body>
 </html>
