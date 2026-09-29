@@ -1,4 +1,3 @@
-class_name CaseData
 extends RefCounted
 
 static func all() -> Array:
