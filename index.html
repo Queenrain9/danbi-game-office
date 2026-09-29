@@ -573,6 +573,7 @@ async function setDesignPriority(id, priority){
       p.human_priority=!!result.design.human_priority;
       p.human_priority_at=result.design.human_priority_at||null;
     }
+    closeModal();
     render();
     toast(priority?"Pre-production 우선순위로 지정":"Pre-production 우선순위 해제");
   }catch(err){
