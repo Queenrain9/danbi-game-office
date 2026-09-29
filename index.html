@@ -284,6 +284,7 @@ const STAGE_LABEL = {
 const NAV = [
   ["대표실", [["dashboard","▦","대표 대시보드"]]],
   ["AI 기획본부", [
+    ["planning","▦","기획본부 대시보드"],
     ["ideas","♢","아이디어 연구소"],
     ["design","◇","게임 디자인실"],
     ["wireframe","▤","프리프로덕션"]
@@ -307,18 +308,10 @@ const NAV = [
 
 function seedState() {
   return {
-    cycle: 16,
     settings: { autoBuild:true, humanGate:true },
-    projects: [
-      {id:"ld", title:"LET'S DEALER", desc:"손가락으로 직접 딜링하는 모바일 포커 딜러 게임.", genre:"Skill / Simulation", platform:"Mobile · Godot", stage:"directed", progress:68, build:"v0.4.2", repo:"Queenrain9/lets-dealer", decision:"KEEP", risk:"MED", visual:"Dealer table / premium iOS", note:"Collect는 sweep gesture. Board는 Flop 묶음 펼치기, Turn/River 단장 오픈.", created:1},
-      {id:"mum", title:"Monster Used Market", desc:"괴물들의 기묘한 물건을 감정·거래하는 판타지 중고마켓.", genre:"Trading / Management", platform:"Mobile · Godot", stage:"directed", progress:54, build:"v0.3.1", repo:"Queenrain9/monster-used-market", decision:"KEEP", risk:"MED", visual:"Lantern night market", note:"현재 구조 목업과 실제 화면의 비율/레이어 일치가 우선.", created:2},
-      {id:"ghost", title:"Ghost Dating Agency", desc:"죽은 사람들의 마지막 데이트를 성사시키는 선택형 중개 시뮬레이션.", genre:"Narrative Sim", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.2.0", repo:"danbi-lab/ghost-dating-agency", decision:null, risk:"LOW", visual:"Noir pastel office", changes:"첫 플레이 루프 완성 · 3개 의뢰 · 결과 카드 추가", created:3},
-      {id:"goblin", title:"Goblin Tax Office", desc:"고블린 왕국 세금 신고서에서 수상한 항목을 찾아내는 업무 추리 게임.", genre:"Deduction / Job", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.1.4", repo:"danbi-lab/goblin-tax-office", decision:null, risk:"LOW", visual:"Bureaucratic fantasy", changes:"판정 피드백 개선 · 7분 플레이 가능", created:4},
-    ],
-    activity: [
-      {t:"18:41", text:"Ghost Dating Agency prototype v0.2.0이 플레이테스트실에 도착했습니다."},
-    ]
-  }
+    projects: [],
+    activity: []
+  };
 }
 const CLOUD_URL = "https://hmblaasagxyntyfrfztg.supabase.co/functions/v1/danbi-game-office-sync";
 let cloudReady = false;
@@ -532,7 +525,8 @@ function count(stage){
 }
 function titleInfo(){
   const map={
-    dashboard:["대표 대시보드","회사 전체 제작 라인을 한눈에 확인합니다."],
+    dashboard:["대표 대시보드","확정된 실제 제작 데이터만 표시합니다."],
+    planning:["기획본부 대시보드","Idea Lab → Game Design → Pre-production의 실제 현재 상태를 한눈에 봅니다."],
     ideas:["아이디어 연구소","GPT 내부 생성·비평·프로듀서 심사를 통과한 후보만 도착합니다."],
     design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
     wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
@@ -547,55 +541,89 @@ function titleInfo(){
 }
 function metricData(){
   return [
-    ["Ideas", count("idea"), "Scheduled"],
-    ["Game Design", count("design"), "Brief"],
-    ["Wireframes", count("wireframe"), "Spec ready"],
-    ["Building", count("build"), "Godot"],
-    ["Playable", count("playtest"), "Ready"],
-    ["Waiting for Danbi", count("playtest"), "Human gate"],
-    ["Directed", count("directed"), "Human-led"],
-    ["Visual", count("visual"), "KEEP only"]
+    ["Idea Lab", promotedIdeas.length, "실제 대기"],
+    ["Game Design", gameDesigns.length, "실제 대기"],
+    ["Pre-production", wireframePacks.length, "실제 대기"],
+    ["Build Farm", buildJobs.length, "실제 작업"]
   ];
 }
+
 function dashboard(){
-  const stages=["idea","design","wireframe","build","playtest","directed","visual"];
   return `
   <section class="hero">
     <div class="hero-main">
-      <div class="eyebrow">Autonomous game studio · cycle ${state.cycle}</div>
-      <h1>단비가 없는 동안에도<br>앞단 제작은 계속 돌아갑니다.</h1>
-      <p>아이디어 탐색 → 게임 규칙 정의 → Interaction Wireframe Pack → 플레이 가능한 초기 빌드까지 앞단을 싸게 검증합니다. 대표는 Review Room에 도착한 게임부터 직접 판단하고, KEEP된 게임에만 디렉팅과 비주얼 제작 비용을 사용합니다.</p>
+      <div class="eyebrow">DANBI GAME OFFICE</div>
+      <h1>회사 전체 파이프라인은<br>지금 재구성 중입니다.</h1>
+      <p>아직 확정하지 않은 단계는 메인 대시보드에서 임의로 채우지 않습니다. 현재는 Supabase와 예약 작업에서 실제로 들어오는 기획본부·빌드팜 데이터만 표시합니다.</p>
       <div class="hero-actions">
-        <button class="btn" onclick="go('review')">플레이테스트 ${count("playtest")}개 확인</button>
-        <button class="btn ghost" onclick="go('activity')">활동 로그 보기</button>
+        <button class="btn primary" onclick="go('planning')">기획본부 둘러보기</button>
+        <button class="btn ghost" onclick="go('build')">빌드 팜 보기</button>
       </div>
     </div>
     <div class="hero-side">
-      <div class="eyebrow">Automation policy</div>
-      <div class="hero-side-title">현재 제작 자율도</div>
-      <div class="automation-meter">
-        <div class="meter-row"><span>Pre-playtest pipeline</span><b>High</b></div><div class="meter"><i></i></div>
-      </div>
-      <div class="gate-note"><b style="color:#d8e6fb">Human Gate</b><br>PLAYTEST 이전은 규칙·와이어프레임·greybox 중심. KEEP 이후에만 디렉팅과 비주얼 개발로 넘어갑니다.</div>
-      <div class="human-gate">대표 업무: <b>어떤 게임을 계속 만들 가치가 있는지 판단</b> → 디렉팅 → 승인.</div>
+      <div class="eyebrow">Dashboard policy</div>
+      <div class="hero-side-title">실제 데이터만 표시</div>
+      <div class="gate-note"><b style="color:#d8e6fb">No demo data</b><br>가짜 프로젝트, 샘플 진행률, 임의의 제작 활동은 메인 대시보드에 표시하지 않습니다.</div>
+      <div class="human-gate">전체 회사 대시보드는 나머지 파이프라인 구조가 확정된 뒤 다시 설계합니다.</div>
     </div>
   </section>
-  <div class="stats">${metricData().map(([l,n,d])=>`<div class="stat"><div class="n">${n}</div><div class="label">${l}</div><div class="delta">${d}</div></div>`).join("")}</div>
 
-  <div class="section-head"><div><h2>Production Pipeline</h2><p>수십 개 후보가 서로 다른 부서에서 동시에 흐릅니다.</p></div></div>
-  <div class="panel"><div class="pipeline">${stages.map(s=>`<div class="stage ${s==="playtest"?"current":""}"><div class="stage-name">${STAGE_LABEL[s]}</div><div class="stage-count">${count(s)}</div><div class="stage-auto">${s==="playtest"||s==="directed"?"HUMAN GATE":"AUTO FLOW"}</div></div>`).join("")}</div></div>
+  <div class="stats">${metricData().map(([l,n,d])=>`<div class="stat"><div class="n">${n}</div><div class="label">${l}</div><div class="delta">${d}</div></div>`).join("")}</div>
 
   <div class="dashboard-grid" style="margin-top:18px">
     <div class="panel">
-      <div class="panel-title"><strong>Ready for Danbi</strong><span>${count("playtest")} playable prototypes</span></div>
-      <div class="cards" style="grid-template-columns:repeat(2,minmax(0,1fr))">${state.projects.filter(p=>p.stage==="playtest").map(p=>reviewCard(p,true)).join("") || `<div class="empty">현재 기다리는 플레이테스트가 없습니다.</div>`}</div>
+      <div class="panel-title"><strong>AI 기획본부</strong><span>실제 자동화 데이터</span></div>
+      <div class="detail-box">
+        <h3>현재 연결된 앞단</h3>
+        <p>Idea Lab <b>${promotedIdeas.length}</b> · Game Design <b>${gameDesigns.length}</b> · Pre-production <b>${wireframePacks.length}</b></p>
+      </div>
+      <div class="card-actions"><button class="btn primary" onclick="go('planning')">기획본부 대시보드 열기</button></div>
     </div>
     <div class="panel">
-      <div class="panel-title"><strong>Recent AI Activity</strong><span>live queue</span></div>
-      ${activityList(8)}
+      <div class="panel-title"><strong>AI 제작본부</strong><span>현재 확정 범위</span></div>
+      <div class="detail-box">
+        <h3>Build Farm</h3>
+        <p>실제 Build Job <b>${buildJobs.length}</b>개. QA 이후 구조는 아직 메인 대시보드에 확정해 표시하지 않습니다.</p>
+      </div>
+      <div class="card-actions"><button class="btn" onclick="go('build')">빌드 팜 열기</button></div>
     </div>
   </div>`;
 }
+
+function planningRecent(items,emptyText){
+  const rows=(Array.isArray(items)?items:[]).slice(0,4);
+  if(!rows.length) return '<div class="empty" style="padding:18px">'+esc(emptyText)+'</div>';
+  return '<div class="activity">'+rows.map(p=>{
+    const raw=p.source_run_at||p.created_at;
+    const when=raw?new Date(raw).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}):"-";
+    const sub=p.one_line||p.primary_interaction||p.core_screen||"";
+    return '<div class="activity-item"><div class="activity-time">'+esc(when)+'</div><div class="activity-text"><span class="log-dot"></span><b style="color:#e6eef8">'+esc(p.title)+'</b>'+(sub?'<div style="margin-top:4px;color:#8195ad">'+esc(sub)+'</div>':'')+'</div></div>';
+  }).join("")+'</div>';
+}
+
+function planningDashboard(){
+  const stages=[
+    {name:"Idea Lab",count:promotedIdeas.length,time:"매시간 00분",desc:"내부 Creator → Critic → Producer 심사를 통과한 후보",go:"ideas",items:promotedIdeas,empty:"현재 Idea Lab 대기 후보가 없습니다."},
+    {name:"Game Design",count:gameDesigns.length,time:"매시간 05분",desc:"플레이 가능한 규칙·상태·조작·MVP Spec",go:"design",items:gameDesigns,empty:"현재 Game Design 대기 Spec이 없습니다."},
+    {name:"Pre-production",count:wireframePacks.length,time:"매시간 30분",desc:"구현 가능한 Interaction Wireframe Pack",go:"wireframe",items:wireframePacks,empty:"현재 Pre-production 대기 Pack이 없습니다."}
+  ];
+  return genericHeader(
+    "AI 기획본부 대시보드",
+    "기획본부에서 실제로 생성되어 현재 각 단계에 머물러 있는 데이터만 모아봅니다. 각 방의 상세 설계와 원문은 기존 페이지에서 확인할 수 있습니다.",
+    '<button class="btn" onclick="Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false)]).then(()=>render())">↻ 전체 새로고침</button>'
+  )+
+  '<div class="cards" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:18px">'+stages.map(x=>
+    '<div class="game-card"><div class="card-top"><div><div class="kicker">'+esc(x.time)+'</div><div class="card-title">'+esc(x.name)+'</div></div><span class="badge blue">'+x.count+'</span></div>'+
+    '<div class="card-desc">'+esc(x.desc)+'</div>'+
+    '<div class="card-actions"><button class="btn primary" onclick="go(\''+x.go+'\')">방 열기</button></div></div>'
+  ).join("")+'</div>'+
+  '<div class="dashboard-grid">'+
+    '<div class="panel"><div class="panel-title"><strong>Idea Lab 최근 현재 항목</strong><span>'+promotedIdeas.length+'개</span></div>'+planningRecent(promotedIdeas,"현재 대기 후보 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'ideas\')">아이디어 연구소 전체 보기</button></div></div>'+
+    '<div class="panel"><div class="panel-title"><strong>Game Design 최근 현재 항목</strong><span>'+gameDesigns.length+'개</span></div>'+planningRecent(gameDesigns,"현재 대기 Spec 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'design\')">게임 디자인실 전체 보기</button></div></div>'+
+  '</div>'+
+  '<div class="panel" style="margin-top:18px"><div class="panel-title"><strong>Pre-production 최근 현재 항목</strong><span>'+wireframePacks.length+'개</span></div>'+planningRecent(wireframePacks,"현재 대기 Wireframe Pack 없음")+'<div class="card-actions"><button class="btn ghost" onclick="go(\'wireframe\')">프리프로덕션 전체 보기</button></div></div>';
+}
+
 function activityList(limit=50){ return `<div class="activity">${state.activity.slice(0,limit).map(a=>`<div class="activity-item"><div class="activity-time">${a.t}</div><div class="activity-text"><span class="log-dot"></span>${esc(a.text)}</div></div>`).join("")}</div>`; }
 
 function genericHeader(title,desc,action=""){ return `<div class="section-head" style="margin-top:0"><div><h2>${title}</h2><p>${desc}</p></div>${action}</div>`; }
@@ -1053,15 +1081,15 @@ function settingsPage(){
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
       <div class="detail-box"><h3>Human-directed, AI-produced</h3><p>AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
       <div class="human-gate" style="margin-top:12px">핵심 KPI: <b>“일주일에 대표가 플레이할 가치가 있는 게임이 몇 개 Review Room에 도착하는가.”</b></div>
-      <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">샘플 데이터로 초기화</button></div>
+      <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">로컬 상태 초기화</button></div>
     </div>
   </div>`;
 }
 function render(){
-  if(!["dashboard","ideas","design","wireframe","build","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
+  if(!["dashboard","planning","ideas","design","wireframe","build","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
   navRender();
   const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; document.getElementById("pageSubtitle").textContent=s;
-  const pages={dashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
+  const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
   document.getElementById("content").innerHTML = pages[current]();
 }
 function getP(id){ return state.projects.find(p=>p.id===id); }
@@ -1113,7 +1141,7 @@ function closeModal(){ document.getElementById("modalBackdrop").classList.remove
 function backdropClose(e){ if(e.target.id==="modalBackdrop")closeModal(); }
 function toggleSetting(k){ state.settings[k]=!state.settings[k]; addLog(`Studio Policy: ${k} = ${state.settings[k]?"ON":"OFF"}`); save(); render(); }
 function clearLog(){ if(confirm("활동 로그를 비울까요?")){state.activity=[];save();render();} }
-function resetStudio(){ if(confirm("로컬 데이터를 초기 샘플 상태로 되돌릴까요?")){state=seedState();save();render();toast("초기화 완료");} }
+function resetStudio(){ if(confirm("로컬 상태를 비울까요?")){state=seedState();save();render();toast("초기화 완료");} }
 function toggleMenu(){ document.getElementById("sidebar").classList.toggle("open"); }
 window.addEventListener("hashchange",()=>{current=(location.hash||"#dashboard").slice(1);render();});
 render();
