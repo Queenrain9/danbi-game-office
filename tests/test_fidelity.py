@@ -25,7 +25,7 @@ class FidelityTests(unittest.TestCase):
                  'nodes': [{'node_path': '/root/AppRoot', 'godot_type': 'Control', 'full_rect': True, 'script_path': 'res://main.gd'},
                            {'node_path': '/root/AppRoot/home', 'godot_type': 'Control', 'full_rect': True}],
                  'components': [{'screen_id': 'home', 'component_id': 'start', 'node_path': '/root/AppRoot/home/start', 'godot_type': 'Button', 'source_box': box, 'construction_pattern': 'button_tap_v1'}],
-                 'interactions': [{'screen_id': 'home', 'interaction_index': 0, 'input': 'tap', 'target_node': '/root/AppRoot/home/start', 'action_symbol': 'start_game', 'action_script': 'res://main.gd'}],
+                 'interactions': [{'screen_id': 'home', 'interaction_index': 0, 'input': 'tap', 'source_target': 'start', 'target_node': '/root/AppRoot/home/start', 'action_symbol': 'start_game', 'action_script': 'res://main.gd'}],
                  'connections': [{'from': '/root/AppRoot/home/start', 'signal': 'pressed', 'to': '/root/AppRoot', 'method': 'start_game'}],
                  'implementations': {'R1': [{'file': 'res://main.tscn', 'node_path': '/root/AppRoot/home/start'}, {'file': 'res://main.gd', 'symbol': 'start_game', 'kind': 'func'}]},
                  'symbols': [{'file': 'res://main.gd', 'symbol': 'ready_to_start', 'kind': 'var'}],
@@ -90,6 +90,41 @@ class FidelityTests(unittest.TestCase):
     def test_drag_cannot_be_replaced_with_button(self):
         b=self.fixture(); b['screens'][0]['interactions'][0]['trigger']='drag'; b=m.seal(b)
         self.assertIn('INPUT_MODALITY',self.codes(b))
+
+    def test_non_button_tap_uses_explicit_script_and_preserves_source_target(self):
+        b=self.fixture()
+        b['screens'][0]['components'][0]['type']='card'
+        b['source']['pack']['screens']=b['screens']
+        comp=b['bindings']['components'][0]
+        comp['godot_type']='Panel'
+        comp['construction_pattern']='explicit_script_v1'
+        comp['script_path']='res://tap_target.gd'
+        interaction=b['bindings']['interactions'][0]
+        interaction['source_target']='start'
+        interaction['input_handler']='handle_tap'
+        b['bindings']['connections']=[]
+        b=m.seal(b)
+        self.assertNotIn('INPUT_MODALITY',self.codes(b))
+        interaction=b['bindings']['interactions'][0]
+        interaction['source_target']='wrong'
+        b=m.seal(b)
+        self.assertIn('INPUT_TARGET',self.codes(b))
+
+    def test_tap_can_bind_multiple_explicit_buttons(self):
+        b=self.fixture()
+        box2={'x':50,'y':20,'w':30,'h':10}
+        b['screens'][0]['components'].append({'id':'other','type':'button','box':box2})
+        b['source']['pack']['screens']=b['screens']
+        b['bindings']['components'].append({'screen_id':'home','component_id':'other','node_path':'/root/AppRoot/home/other','godot_type':'Button','source_box':box2,'construction_pattern':'button_tap_v1'})
+        b['bindings']['interactions'][0]['source_target']='start'
+        b['bindings']['interactions'][0]['related_nodes']=['/root/AppRoot/home/other']
+        b['bindings']['connections'].append({'from':'/root/AppRoot/home/other','signal':'pressed','to':'/root/AppRoot','method':'start_game'})
+        b=m.seal(b)
+        self.assertNotIn('CONNECTION',self.codes(b))
+
+    def test_current_wireframe_semantic_types_have_registry_entries(self):
+        for name in ('animation','button','canvas','card','chip','chip_group','comparison','drop_target','dropzone','grade','hold_button','hotspots','indicator','interactive_object','label','list','manipulable','metric','modal','object','overlay','panel','portrait','preview','result_stamp','slider','status','text_card','tray'):
+            self.assertIn(name,m.SOURCE_COMPONENT_TYPES)
 
     def test_reusable_mapping_requires_real_script(self):
         b=self.fixture(); b['bindings']['components'][0]['reusable_component']='ShadowPiece'; b=m.seal(b)
