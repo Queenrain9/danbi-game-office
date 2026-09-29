@@ -116,6 +116,39 @@
 .idea-detail-score > div { background:rgba(0,0,0,.12); border-radius:10px; padding:9px; }
 .idea-detail-score b { display:block; font-size:14px; }
 .idea-detail-score span { font-size:9px; color:#6e86a3; }
+.idea-mode-switch { display:inline-flex; gap:4px; padding:4px; border-radius:11px; background:#081422; border:1px solid rgba(255,255,255,.06); }
+.idea-mode-switch button { border:0; background:transparent; color:#7188a5; padding:7px 10px; border-radius:8px; font-size:10px; font-weight:700; }
+.idea-mode-switch button.active { background:#173050; color:#eef6ff; }
+.curation-shell { display:grid; gap:14px; }
+.curation-stats { display:flex; flex-wrap:wrap; gap:8px; }
+.curation-stat { min-width:86px; padding:9px 11px; border-radius:11px; background:#0a1627; border:1px solid rgba(255,255,255,.05); }
+.curation-stat b { display:block; font-size:16px; }
+.curation-stat span { font-size:9px; color:#6f87a3; }
+.curation-focus { max-width:760px; margin:0 auto; padding:20px; border-radius:18px; background:linear-gradient(145deg,#102039,#0b1728); border:1px solid rgba(116,167,255,.15); }
+.curation-focus h2 { margin:0 0 10px; font-size:22px; }
+.curation-focus .lead { color:#c7d7e9; font-size:14px; line-height:1.65; }
+.curation-focus .core { color:#8ea5bf; font-size:11px; line-height:1.6; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.05); }
+.curation-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+.curation-actions .btn { padding:12px 10px; font-size:12px; }
+.curation-actions .attract { border-color:rgba(85,214,168,.28); color:#8de4c7; background:rgba(85,214,168,.07); }
+.curation-actions .hold { border-color:rgba(243,200,106,.25); color:#f3c86a; background:rgba(243,200,106,.06); }
+.curation-actions .pass { border-color:rgba(255,255,255,.08); color:#8094aa; background:rgba(255,255,255,.025); }
+.ab-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:stretch; }
+.ab-card { border:1px solid rgba(255,255,255,.07); border-radius:16px; background:#0c192a; padding:18px; display:flex; flex-direction:column; min-height:220px; }
+.ab-card h3 { margin:0 0 8px; font-size:17px; }
+.ab-card p { color:#a6b8cc; line-height:1.6; font-size:12px; }
+.ab-card .btn { margin-top:auto; }
+.ab-vs { display:grid; place-items:center; color:#56718e; font-size:11px; font-weight:800; }
+.curation-rank { display:grid; gap:7px; }
+.curation-rank-row { display:grid; grid-template-columns:34px minmax(0,1fr) auto auto; gap:9px; align-items:center; padding:9px 10px; background:#0a1627; border:1px solid rgba(255,255,255,.05); border-radius:11px; }
+.curation-rank-row .rank { color:#6f87a3; font-size:11px; font-weight:800; }
+.curation-rank-row strong { font-size:12px; }
+.curation-rank-row span { color:#6f87a3; font-size:9px; }
+.idea-bucket { font-size:9px; padding:3px 6px; border-radius:999px; border:1px solid rgba(255,255,255,.06); color:#7188a5; }
+.idea-bucket.attract { color:#8de4c7; border-color:rgba(85,214,168,.18); }
+.idea-bucket.hold { color:#f3c86a; border-color:rgba(243,200,106,.18); }
+.idea-bucket.pass { color:#75889d; }
+@media(max-width:760px){ .ab-grid{grid-template-columns:1fr}.ab-vs{min-height:20px}.curation-actions{grid-template-columns:1fr}.curation-rank-row{grid-template-columns:28px minmax(0,1fr) auto}.curation-rank-row .wins{display:none} }
     .game-card { border:1px solid rgba(255,255,255,.06); background:linear-gradient(145deg,#102039,#0b1728); border-radius:18px; padding:17px; position:relative; overflow:hidden; }
     .game-card:hover { border-color:rgba(116,167,255,.18); }
     .card-top { display:flex; justify-content:space-between; gap:12px; align-items:start; }
@@ -329,6 +362,8 @@ let cloudReady = false;
 let cloudTimer = null;
 let pipelinePollTimer = null;
 let promotedIdeas = [];
+let ideaPairwiseVotes = [];
+let ideaLabMode = localStorage.getItem("danbiIdeaLabMode") || "all";
 let gameDesigns = [];
 let wireframePacks = [];
 let implementationContracts = [];
@@ -384,7 +419,7 @@ async function loadPromotedIdeas(showToast=false){
   const key=getCloudKey();
   if(!key) return;
   try{
-    const res=await fetch(CLOUD_URL+"?view=ideas&limit=50",{
+    const res=await fetch(CLOUD_URL+"?view=ideas&limit=300",{
       method:"GET",
       headers:{"Content-Type":"application/json","X-Office-Key":key},
       cache:"no-store"
@@ -401,6 +436,94 @@ async function loadPromotedIdeas(showToast=false){
     console.error("Idea Lab load failed",err);
     if(showToast) toast("Idea Lab 불러오기 실패");
   }
+}
+
+async function loadIdeaSelection(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=idea_selection&limit=1000",{
+      method:"GET",
+      headers:{"Content-Type":"application/json","X-Office-Key":key},
+      cache:"no-store"
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const payload=await res.json();
+    ideaPairwiseVotes=Array.isArray(payload.votes)?payload.votes:[];
+    if(current==="ideas") render();
+    if(showToast) toast("대표 선별 기록 새로고침");
+  }catch(err){
+    console.error("Idea selection load failed",err);
+    if(showToast) toast("대표 선별 기록 불러오기 실패");
+  }
+}
+
+function setIdeaLabMode(mode){
+  ideaLabMode=mode==="curate"?"curate":"all";
+  localStorage.setItem("danbiIdeaLabMode",ideaLabMode);
+  render();
+}
+
+async function setIdeaBucket(id,bucket){
+  const p=promotedIdeas.find(x=>x.id===id);
+  if(!p) return;
+  const prev=p.curation_bucket||null;
+  p.curation_bucket=bucket||null;
+  p.curation_bucket_at=bucket?new Date().toISOString():null;
+  render();
+  try{
+    const result=await cloudRequest("POST",{action:"set_idea_bucket",idea_id:id,bucket:bucket||null});
+    if(result?.idea){
+      p.curation_bucket=result.idea.curation_bucket||null;
+      p.curation_bucket_at=result.idea.curation_bucket_at||null;
+    }
+    render();
+  }catch(err){
+    p.curation_bucket=prev;
+    render();
+    console.error("Idea bucket update failed",err);
+    toast("선별 저장 실패");
+  }
+}
+
+async function recordIdeaPairwise(winnerId,loserId){
+  try{
+    const result=await cloudRequest("POST",{action:"record_idea_pairwise",winner_id:winnerId,loser_id:loserId});
+    if(result?.vote) ideaPairwiseVotes.unshift(result.vote);
+    render();
+    toast("선택 기록됨");
+  }catch(err){
+    console.error("Pairwise vote failed",err);
+    toast("A/B 선택 저장 실패");
+  }
+}
+
+function ideaWins(id){
+  return ideaPairwiseVotes.reduce((n,v)=>n+(v.winner_id===id?1:0),0);
+}
+function ideaLosses(id){
+  return ideaPairwiseVotes.reduce((n,v)=>n+(v.loser_id===id?1:0),0);
+}
+function ideaCompared(a,b){
+  return ideaPairwiseVotes.some(v=>(v.winner_id===a&&v.loser_id===b)||(v.winner_id===b&&v.loser_id===a));
+}
+function nextIdeaPair(){
+  const pool=promotedIdeas.filter(x=>x.curation_bucket==="attract");
+  if(pool.length<2) return null;
+  const sorted=[...pool].sort((a,b)=>{
+    const da=ideaWins(a.id)-ideaLosses(a.id), db=ideaWins(b.id)-ideaLosses(b.id);
+    if(da!==db) return db-da;
+    return new Date(a.curation_bucket_at||a.created_at||0)-new Date(b.curation_bucket_at||b.created_at||0);
+  });
+  let best=null;
+  for(let i=0;i<sorted.length;i++){
+    for(let j=i+1;j<sorted.length;j++){
+      if(ideaCompared(sorted[i].id,sorted[j].id)) continue;
+      const gap=Math.abs((ideaWins(sorted[i].id)-ideaLosses(sorted[i].id))-(ideaWins(sorted[j].id)-ideaLosses(sorted[j].id)));
+      if(!best || gap<best.gap) best={a:sorted[i],b:sorted[j],gap};
+    }
+  }
+  return best ? [best.a,best.b] : null;
 }
 
 async function setIdeaPriority(id, priority){
@@ -542,6 +665,7 @@ function startPipelinePolling(){
   clearInterval(pipelinePollTimer);
   pipelinePollTimer=setInterval(()=>{
     loadPromotedIdeas(false);
+    loadIdeaSelection(false);
     loadGameDesigns(false);
     loadWireframePacks(false);
     loadImplementationContracts(false);
@@ -569,7 +693,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -722,10 +846,18 @@ function activityList(limit=50){ return `<div class="activity">${state.activity.
 
 function genericHeader(title,desc,action=""){ return `<div class="section-head" style="margin-top:0"><div><h2>${title}</h2><p>${desc}</p></div>${action}</div>`; }
 
+function ideaBucketLabel(bucket){
+  if(bucket==="attract") return "끌림";
+  if(bucket==="hold") return "보류";
+  if(bucket==="pass") return "패스";
+  return "";
+}
+
 function ideaCard(p){
   const promotedAt=p.source_run_at||p.created_at;
   const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
   const priority=!!p.human_priority;
+  const bucket=ideaBucketLabel(p.curation_bucket);
   return `<div class="game-card idea-card ${priority?"priority":""}" id="idea-${esc(p.id)}" onclick="showIdeaDetail('${p.id}')">
     <div class="card-top">
       <div>
@@ -733,6 +865,7 @@ function ideaCard(p){
         <div class="card-title">${esc(p.title)}</div>
       </div>
       <div class="idea-card-top-actions">
+        ${bucket?`<span class="idea-bucket ${esc(p.curation_bucket)}">${bucket}</span>`:""}
         <button class="idea-star ${priority?"on":""}" title="${priority?"우선 설계 해제":"Game Design 우선 설계"}" onclick="event.stopPropagation();setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★":"☆"}</button>
       </div>
     </div>
@@ -749,13 +882,8 @@ function showIdeaDetail(id){
   const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
   const reasons=Array.isArray(p.why_promoted)?p.why_promoted:[];
   const scores=[
-    ["HOOK",p.hook_score],
-    ["LOOP",p.core_loop_score],
-    ["MOBILE",p.mobile_fit_score],
-    ["PROTO",p.prototype_score],
-    ["ASSET",p.asset_score],
-    ["VISUAL",p.visual_score],
-    ["GROWTH",p.growth_score]
+    ["HOOK",p.hook_score],["LOOP",p.core_loop_score],["MOBILE",p.mobile_fit_score],
+    ["PROTO",p.prototype_score],["ASSET",p.asset_score],["VISUAL",p.visual_score],["GROWTH",p.growth_score]
   ].filter(x=>x[1]!==null && x[1]!==undefined);
   const priority=!!p.human_priority;
   modal(`
@@ -763,24 +891,11 @@ function showIdeaDetail(id){
       <div><div class="kicker">IDEA LAB · ${esc(when)}</div><h2>${esc(p.title)}</h2></div>
       <button class="close" onclick="closeModal()">×</button>
     </div>
-
-    <div class="detail-box">
-      <h3>게임 한눈에 보기</h3>
-      <p style="font-size:14px;color:#dce8f8">${esc(p.one_line)}</p>
-      <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span></div>
-    </div>
-
-    <div class="detail-box" style="margin-top:12px">
-      <h3>플레이어가 실제로 하는 일</h3>
-      <p>${esc(p.core_action)}</p>
-    </div>
-
+    <div class="detail-box"><h3>게임 한눈에 보기</h3><p style="font-size:14px;color:#dce8f8">${esc(p.one_line)}</p><div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span></div></div>
+    <div class="detail-box" style="margin-top:12px"><h3>플레이어가 실제로 하는 일</h3><p>${esc(p.core_action)}</p></div>
     ${reasons.length?`<div class="detail-box" style="margin-top:12px"><h3>왜 Idea Lab을 통과했나</h3><p>${reasons.map(x=>"• "+esc(x)).join("<br>")}</p></div>`:""}
-
     ${scores.length?`<div class="detail-box" style="margin-top:12px"><h3>내부 심사 점수</h3><div class="idea-detail-score">${scores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div></div>`:""}
-
     ${p.next_test?`<div class="human-gate" style="margin-top:12px"><b>다음 검증 포인트</b><br>${esc(p.next_test)}</div>`:""}
-
     <div class="card-actions" style="justify-content:flex-end">
       <button class="btn" onclick="closeModal()">닫기</button>
       <button class="btn ${priority?"good":"primary"}" onclick="setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★ 우선순위 해제":"☆ Game Design 우선"}</button>
@@ -788,23 +903,99 @@ function showIdeaDetail(id){
   `);
 }
 
-function ideasPage(){
-  const ps=[...promotedIdeas].sort((a,b)=>{
-    const pa=a.human_priority?1:0, pb=b.human_priority?1:0;
+function ideaModeHeader(ps){
+  const priorityCount=ps.filter(x=>x.human_priority).length;
+  return genericHeader(
+    "Idea Lab",
+    ideaLabMode==="all" ? `후보 ${ps.length}개 · 전체 보관함` : `후보 ${ps.length}개 · 빠르게 줄이고 서로 비교하기`,
+    `<div style="display:flex;gap:8px;align-items:center">
+      <div class="idea-mode-switch">
+        <button class="${ideaLabMode==="all"?"active":""}" onclick="setIdeaLabMode('all')">전체 보기</button>
+        <button class="${ideaLabMode==="curate"?"active":""}" onclick="setIdeaLabMode('curate')">대표 선별</button>
+      </div>
+      <button class="btn" onclick="Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false)]).then(()=>toast('Idea Lab 새로고침'))">↻</button>
+    </div>`
+  ) + `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-2px 0 12px;color:#7087a3;font-size:10px"><span>★ Game Design 우선 ${priorityCount}개</span><span>선별 결과는 클라우드에 저장됩니다.</span></div>`;
+}
+
+function ideasAllView(ps){
+  const sorted=[...ps].sort((a,b)=>{
+    const pa=a.human_priority?1:0,pb=b.human_priority?1:0;
     if(pa!==pb) return pb-pa;
     return new Date(b.created_at||0)-new Date(a.created_at||0);
   });
-  const priorityCount=ps.filter(x=>x.human_priority).length;
-  return genericHeader(
-    "Idea Lab · Scheduled Intake",
-    `후보 ${ps.length}개 · 별표는 Game Design 우선순위 · 카드를 누르면 상세 보기`,
-    `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
-  ) +
-  `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-2px 0 12px;color:#7087a3;font-size:10px">
-      <span>★ 우선 선택 ${priorityCount}개</span>
-      <span>우선 후보 → 일반 후보 오래된 순 · 회차당 최대 2개</span>
+  return `<div class="cards idea-cards">${sorted.map(ideaCard).join("") || '<div class="empty">아직 Idea Lab 후보가 없습니다.</div>'}</div>`;
+}
+
+function ideasCurationView(ps){
+  const unclassified=[...ps].filter(x=>!x.curation_bucket).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  const attract=ps.filter(x=>x.curation_bucket==="attract");
+  const hold=ps.filter(x=>x.curation_bucket==="hold");
+  const pass=ps.filter(x=>x.curation_bucket==="pass");
+  const currentIdea=unclassified[0]||null;
+  const pair=nextIdeaPair();
+  const ranked=[...attract].sort((a,b)=>{
+    const sa=ideaWins(a.id)-ideaLosses(a.id), sb=ideaWins(b.id)-ideaLosses(b.id);
+    if(sa!==sb) return sb-sa;
+    if(ideaWins(a.id)!==ideaWins(b.id)) return ideaWins(b.id)-ideaWins(a.id);
+    return new Date(a.curation_bucket_at||a.created_at||0)-new Date(b.curation_bucket_at||b.created_at||0);
+  });
+
+  return `<div class="curation-shell">
+    <div class="curation-stats">
+      <div class="curation-stat"><b>${unclassified.length}</b><span>아직 안 봄</span></div>
+      <div class="curation-stat"><b>${attract.length}</b><span>끌림</span></div>
+      <div class="curation-stat"><b>${hold.length}</b><span>보류</span></div>
+      <div class="curation-stat"><b>${pass.length}</b><span>패스</span></div>
+      <div class="curation-stat"><b>${ideaPairwiseVotes.length}</b><span>A/B 선택</span></div>
     </div>
-    <div class="cards idea-cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.</div>`}</div>`;
+
+    <div class="panel">
+      <div class="panel-title"><strong>1 · 빠른 분류</strong><span>${ps.length-unclassified.length} / ${ps.length} 확인</span></div>
+      ${currentIdea?`
+        <div class="curation-focus">
+          <div class="kicker">${esc(currentIdea.genre)} · ${esc(currentIdea.platform)}</div>
+          <h2>${esc(currentIdea.title)}</h2>
+          <div class="lead">${esc(currentIdea.one_line)}</div>
+          <div class="core"><b>실제 플레이</b><br>${esc(currentIdea.core_action)}</div>
+          <div class="curation-actions">
+            <button class="btn attract" onclick="setIdeaBucket('${currentIdea.id}','attract')">♥ 끌림</button>
+            <button class="btn hold" onclick="setIdeaBucket('${currentIdea.id}','hold')">○ 보류</button>
+            <button class="btn pass" onclick="setIdeaBucket('${currentIdea.id}','pass')">× 패스</button>
+          </div>
+        </div>`:
+        '<div class="empty">현재 후보를 모두 한 번씩 분류했어요. 아래에서 끌림 후보를 서로 비교하면 됩니다.</div>'}
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><strong>2 · A/B 비교</strong><span>점수는 숨김 · 둘 중 지금 더 보고 싶은 것</span></div>
+      ${pair?`<div class="ab-grid">
+        <div class="ab-card"><div class="kicker">${esc(pair[0].genre)}</div><h3>${esc(pair[0].title)}</h3><p>${esc(pair[0].one_line)}</p><button class="btn primary" onclick="recordIdeaPairwise('${pair[0].id}','${pair[1].id}')">이쪽이 더 끌려</button></div>
+        <div class="ab-vs">VS</div>
+        <div class="ab-card"><div class="kicker">${esc(pair[1].genre)}</div><h3>${esc(pair[1].title)}</h3><p>${esc(pair[1].one_line)}</p><button class="btn primary" onclick="recordIdeaPairwise('${pair[1].id}','${pair[0].id}')">이쪽이 더 끌려</button></div>
+      </div>`:
+      attract.length<2?'<div class="empty">‘끌림’ 후보가 2개 이상 생기면 A/B 비교가 시작됩니다.</div>':'<div class="empty">현재 끌림 후보의 1차 조합 비교를 마쳤어요. 아래 순위를 보고 우선 설계를 고르면 됩니다.</div>'}
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><strong>현재 TOP 후보</strong><span>A/B 승패 기준 · AI 점수 미사용</span></div>
+      <div class="curation-rank">
+        ${ranked.length?ranked.slice(0,12).map((p,i)=>`<div class="curation-rank-row">
+          <div class="rank">#${i+1}</div>
+          <div><strong>${esc(p.title)}</strong><br><span>${esc(p.genre)}</span></div>
+          <div class="wins"><span>${ideaWins(p.id)}승 · ${ideaLosses(p.id)}패</span></div>
+          <button class="btn ${p.human_priority?"good":"ghost"}" onclick="setIdeaPriority('${p.id}',${p.human_priority?"false":"true"})">${p.human_priority?"★ 우선":"☆ 우선"}</button>
+        </div>`).join(""):'<div class="empty">아직 ‘끌림’으로 분류한 후보가 없습니다.</div>'}
+      </div>
+    </div>
+
+    ${hold.length?`<div style="font-size:10px;color:#6f87a3;text-align:center">보류 ${hold.length}개는 전체 보기에 그대로 남아 있습니다.</div>`:""}
+  </div>`;
+}
+
+function ideasPage(){
+  const ps=[...promotedIdeas];
+  return ideaModeHeader(ps) + (ideaLabMode==="curate" ? ideasCurationView(ps) : ideasAllView(ps));
 }
 
 function designCard(p){
