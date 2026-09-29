@@ -158,6 +158,26 @@
     .modal-backdrop { position:fixed; inset:0; background:rgba(1,6,11,.7); z-index:30; display:none; place-items:center; padding:20px; backdrop-filter:blur(7px); }
     .modal-backdrop.show { display:grid; }
     .modal { width:min(720px,100%); max-height:82vh; overflow:auto; background:#0c192a; border:1px solid #29425f; border-radius:20px; box-shadow:0 30px 90px rgba(0,0,0,.45); padding:21px; }
+    .modal.wide { width:min(1180px,100%); }
+    .wf-viewer { display:grid; grid-template-columns:190px minmax(280px,420px) minmax(0,1fr); gap:14px; align-items:start; }
+    .wf-screen-list { display:flex; flex-direction:column; gap:7px; max-height:65vh; overflow:auto; }
+    .wf-screen-tab { border:1px solid rgba(255,255,255,.07); border-radius:10px; background:#0a1627; color:#8298b4; padding:9px 10px; text-align:left; font-size:10px; }
+    .wf-screen-tab.active { background:#173050; border-color:#416b9e; color:#eef6ff; }
+    .wf-device-wrap { display:flex; justify-content:center; align-items:flex-start; }
+    .wf-device { width:min(100%,390px); aspect-ratio:390/844; position:relative; overflow:hidden; border:1px solid #3a526d; border-radius:24px; background:#08121f; box-shadow:inset 0 0 0 5px #0e1b2d; }
+    .wf-device.landscape { aspect-ratio:844/390; max-width:100%; }
+    .wf-region,.wf-component { position:absolute; display:flex; align-items:center; justify-content:center; text-align:center; padding:3px; overflow:hidden; line-height:1.15; }
+    .wf-region { border:1px dashed #46617e; background:rgba(92,124,160,.08); color:#7390b0; font-size:8px; }
+    .wf-component { border:1px solid #6b88aa; background:rgba(116,167,255,.12); color:#c6daf2; font-size:8px; z-index:2; }
+    .wf-component.action { border-color:#6aa991; background:rgba(85,214,168,.12); color:#bdebdc; }
+    .wf-component.overlay { border-color:#9376bd; background:rgba(188,156,255,.12); color:#dccbff; }
+    .wf-detail { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .wf-detail pre { white-space:pre-wrap; word-break:break-word; color:#9fb3cb; font-size:10px; line-height:1.55; margin:0; }
+    .wf-flow { display:flex; flex-wrap:wrap; gap:6px; }
+    .wf-card-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:12px 0; }
+    .wf-card-stats > div { background:rgba(0,0,0,.12); border-radius:10px; padding:9px; }
+    .wf-card-stats b { display:block; font-size:14px; }
+    .wf-card-stats span { font-size:9px; color:#6e86a3; }
     .modal-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:16px; }
     .modal-head h2 { margin:0; font-size:18px; }
     .close { background:transparent; border:0; color:#8ba0ba; font-size:22px; }
@@ -182,7 +202,9 @@
       .mobile-menu { display:inline-flex; }
       .topbar { padding:0 16px; height:65px; }
       .content { padding:22px 16px 70px; }
-      .hero, .dashboard-grid, .two-col { grid-template-columns:1fr; }
+      .hero, .dashboard-grid, .two-col, .wf-viewer { grid-template-columns:1fr; }
+      .wf-screen-list { flex-direction:row; max-height:none; overflow:auto; }
+      .wf-screen-tab { min-width:130px; }
     }
     @media (max-width:620px) {
       .stats { grid-template-columns: repeat(2,1fr); }
@@ -268,7 +290,6 @@ function seedState() {
       {id:"ghost", title:"Ghost Dating Agency", desc:"죽은 사람들의 마지막 데이트를 성사시키는 선택형 중개 시뮬레이션.", genre:"Narrative Sim", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.2.0", repo:"danbi-lab/ghost-dating-agency", decision:null, risk:"LOW", visual:"Noir pastel office", changes:"첫 플레이 루프 완성 · 3개 의뢰 · 결과 카드 추가", created:3},
       {id:"goblin", title:"Goblin Tax Office", desc:"고블린 왕국 세금 신고서에서 수상한 항목을 찾아내는 업무 추리 게임.", genre:"Deduction / Job", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.1.4", repo:"danbi-lab/goblin-tax-office", decision:null, risk:"LOW", visual:"Bureaucratic fantasy", changes:"판정 피드백 개선 · 7분 플레이 가능", created:4},
       {id:"dream", title:"Dream Pawn Shop", desc:"손님의 꿈을 담보로 잡고 가치와 위험을 흥정하는 거래 시뮬레이션.", genre:"Trading Sim", platform:"Mobile · Godot", stage:"build", progress:62, build:"v0.0.7", repo:"danbi-lab/dream-pawn-shop", decision:null, risk:"MED", visual:"Surreal neon pawnshop", created:5},
-      {id:"flower", title:"Last Train Florist", desc:"막차 승객의 사연을 듣고 꽃말을 조합하는 감성 퍼즐.", genre:"Narrative Puzzle", platform:"Mobile", stage:"wireframe", progress:100, build:null, repo:null, decision:null, risk:"LOW", visual:"Rainy last train", screens:9, created:6},
     ],
     activity: [
       {t:"18:41", text:"Ghost Dating Agency prototype v0.2.0이 플레이테스트실에 도착했습니다."},
@@ -283,6 +304,7 @@ let cloudTimer = null;
 let pipelinePollTimer = null;
 let promotedIdeas = [];
 let gameDesigns = [];
+let wireframePacks = [];
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
 
@@ -374,11 +396,35 @@ async function loadGameDesigns(showToast=false){
   }
 }
 
+async function loadWireframePacks(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=wireframes&limit=50",{
+      method:"GET",
+      headers:{"Content-Type":"application/json","X-Office-Key":key},
+      cache:"no-store"
+    });
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    wireframePacks=Array.isArray(payload.wireframes)?payload.wireframes:[];
+    if(current==="wireframe" || current==="dashboard") render();
+    if(showToast) toast(`Wireframe Pack 새로고침 · ${wireframePacks.length}개`);
+  }catch(err){
+    console.error("Wireframe Pack load failed",err);
+    if(showToast) toast("Wireframe Pack 불러오기 실패");
+  }
+}
+
 function startPipelinePolling(){
   clearInterval(pipelinePollTimer);
   pipelinePollTimer=setInterval(()=>{
     loadPromotedIdeas(false);
     loadGameDesigns(false);
+    loadWireframePacks(false);
   },60000);
 }
 
@@ -400,7 +446,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false),loadWireframePacks(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -440,6 +486,7 @@ function go(id){ current=id; location.hash=id; render(); document.getElementById
 function count(stage){
   if(stage==="idea") return promotedIdeas.length;
   if(stage==="design") return gameDesigns.length;
+  if(stage==="wireframe") return wireframePacks.length;
   return state.projects.filter(p=>p.stage===stage).length;
 }
 function titleInfo(){
@@ -685,15 +732,134 @@ function showDesignSpec(id){
 }
 
 function wireCard(p){
+  const madeAt=p.source_run_at||p.created_at;
+  const when=madeAt ? new Date(madeAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
+  const screens=Array.isArray(p.screens)?p.screens:[];
+  const principles=Array.isArray(p.interaction_principles)?p.interaction_principles:[];
+  const screenCount=p.screen_count||screens.length||0;
   return `<div class="game-card">
-    <div class="card-top"><div><div class="kicker">Implementation-ready</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">WIREFRAME</span></div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="detail-box"><h3>${p.screens||8} Screens</h3><p>Layout · Components · Interaction · State · Transition · Game Rules</p></div>
-    <div class="progress"><i style="width:${p.progress}%"></i></div><div class="progress-row"><span>Pre-production package</span><b>${p.progress}%</b></div>
-    <div class="card-actions"><button class="btn primary" onclick="promote('${p.id}','build')">Build Farm으로 보내기</button><button class="btn ghost" onclick="showProject('${p.id}')">설계서</button></div>
+    <div class="card-top">
+      <div><div class="kicker">PACK RECEIVED · ${esc(when)}</div><div class="card-title">${esc(p.title)}</div></div>
+      <span class="badge green">${esc(p.version||"v0.1")}</span>
+    </div>
+    <div class="card-desc">Game Design Spec을 구현 가능한 화면·상태·인터랙션 구조로 번역한 개발용 Pack.</div>
+    <div class="wf-card-stats">
+      <div><b>${screenCount}</b><span>SCREENS</span></div>
+      <div><b>${p.state_count||0}</b><span>STATES</span></div>
+      <div><b>${screens.filter(x=>Array.isArray(x.interactions)&&x.interactions.length).length}</b><span>INTERACTIVE</span></div>
+    </div>
+    <div class="detail-box"><h3>Primary Interaction</h3><p>${esc(p.primary_interaction||"-")}</p></div>
+    <div class="meta">
+      <span>${esc(p.target_device||"Mobile")}</span>
+      <span>${esc(p.orientation||"portrait")}</span>
+      ${p.core_screen?`<span>Core · ${esc(p.core_screen)}</span>`:""}
+    </div>
+    ${principles.length?`<div class="human-gate"><b>Interaction Principle</b><br>${esc(principles[0])}</div>`:""}
+    <div class="card-actions"><button class="btn primary" onclick="showWireframePack('${p.id}',0)">Wireframe Pack 열기</button></div>
   </div>`;
 }
-function wirePage(){ const ps=state.projects.filter(p=>p.stage==="wireframe"); return genericHeader("Pre-production · Interaction Wireframe Pack","Game Design Brief를 레이아웃·상태·인터랙션·전환·게임 규칙이 명시된 개발용 와이어프레임 팩으로 번역합니다.")+`<div class="cards">${ps.map(wireCard).join("") || `<div class="empty">아직 Pre-production 예약 작업과 연결되지 않았습니다.<br>Game Design Brief가 준비된 프로젝트만 이 방으로 들어옵니다.</div>`}</div>`; }
+
+function wirePage(){
+  const ps=wireframePacks;
+  return genericHeader(
+    "Pre-production · Interaction Wireframe Pack",
+    "Game Design Spec을 구현용 화면 구조로 번역한 최종 Pack만 받는 실제 수신부입니다.",
+    `<button class="btn" onclick="loadWireframePacks(true)">↻ 새로고침</button>`
+  )+`
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-title"><strong>Wireframe Pack Receiver</strong><span>data contract ready</span></div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
+      <span><b style="color:#8de4c7">DB / API 연결 완료</b></span>
+      <span>Screen Flow + Screens + States + Interactions</span>
+      <span>좌표 기반 Wireframe Preview 지원</span>
+      <span>예약 작업은 아직 연결하지 않음</span>
+    </div>
+  </div>
+  <div class="cards">${ps.map(wireCard).join("") || `<div class="empty">실제 Wireframe Pack 수신 준비가 완료되었습니다.<br>다음 단계에서 Game Design → Wireframe 예약 작업을 연결하면 여기에 Pack이 도착합니다.</div>`}</div>`;
+}
+
+function wfJson(value){
+  if(value===null||value===undefined||value===""||(Array.isArray(value)&&!value.length)) return "<p>-</p>";
+  const text=typeof value==="string"?value:JSON.stringify(value,null,2);
+  return `<pre>${esc(text)}</pre>`;
+}
+function wfList(arr){
+  return Array.isArray(arr)&&arr.length ? `<ul>${arr.map(x=>`<li>${esc(typeof x==="string"?x:JSON.stringify(x))}</li>`).join("")}</ul>` : "<p>-</p>";
+}
+function wfPct(v,fallback=0){
+  const n=Number(v);
+  return Number.isFinite(n)?Math.max(0,Math.min(100,n)):fallback;
+}
+function wireframePreview(screen,orientation){
+  const regions=Array.isArray(screen?.layout?.regions)?screen.layout.regions:[];
+  const components=Array.isArray(screen?.components)?screen.components:[];
+  const boxes=[];
+  regions.forEach(r=>{
+    boxes.push(`<div class="wf-region" style="left:${wfPct(r.x)}%;top:${wfPct(r.y)}%;width:${wfPct(r.w,10)}%;height:${wfPct(r.h,8)}%">${esc(r.label||r.id||"region")}</div>`);
+  });
+  components.forEach(c=>{
+    const b=c.box||{};
+    const type=String(c.type||"").toLowerCase();
+    const cls=type.includes("overlay")||type.includes("modal")?"overlay":(type.includes("button")||type.includes("action")?"action":"");
+    if([b.x,b.y,b.w,b.h].some(v=>v!==undefined)){
+      boxes.push(`<div class="wf-component ${cls}" style="left:${wfPct(b.x)}%;top:${wfPct(b.y)}%;width:${wfPct(b.w,12)}%;height:${wfPct(b.h,6)}%">${esc(c.label||c.id||c.type||"component")}</div>`);
+    }
+  });
+  const empty=!boxes.length?`<div style="position:absolute;inset:20%;display:grid;place-items:center;text-align:center;color:#617997;font-size:10px;padding:20px">이 Screen Spec에는 아직 좌표 박스가 없습니다.<br>예약 작업은 0–100% 좌표를 생성하도록 연결할 예정입니다.</div>`:"";
+  return `<div class="wf-device ${String(orientation).toLowerCase().includes("land")?"landscape":""}">${boxes.join("")}${empty}</div>`;
+}
+function showWireframePack(id,screenIndex=0){
+  const p=wireframePacks.find(x=>x.id===id);
+  if(!p) return;
+  const screens=Array.isArray(p.screens)?p.screens:[];
+  const idx=Math.max(0,Math.min(screens.length-1,Number(screenIndex)||0));
+  const sc=screens[idx]||{};
+  const tabs=screens.map((x,i)=>`<button class="wf-screen-tab ${i===idx?"active":""}" onclick="showWireframePack('${p.id}',${i})">${String(i+1).padStart(2,"0")} · ${esc(x.name||x.id||("Screen "+(i+1)))}</button>`).join("");
+  const interactions=Array.isArray(sc.interactions)?sc.interactions:[];
+  const states=Array.isArray(sc.states)?sc.states:[];
+  const transitions=Array.isArray(sc.transitions)?sc.transitions:[];
+  modal(`
+    <div class="modal-head">
+      <div><div class="kicker">Interaction Wireframe Pack · ${esc(p.version||"v0.1")}</div><h2>${esc(p.title)}</h2></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="meta"><span>${esc(p.target_device||"Mobile")}</span><span>${esc(p.orientation||"portrait")}</span><span>${p.screen_count||screens.length} screens</span><span>${p.state_count||0} states</span></div>
+    <div class="wf-viewer">
+      <div>
+        <div class="kicker">Screens</div>
+        <div class="wf-screen-list">${tabs||'<div class="empty" style="padding:18px">No screens</div>'}</div>
+      </div>
+      <div>
+        <div class="kicker">${esc(sc.name||"Wireframe Preview")}</div>
+        <div class="wf-device-wrap">${wireframePreview(sc,p.orientation)}</div>
+      </div>
+      <div class="wf-detail">
+        <div class="detail-box"><h3>Purpose</h3><p>${esc(sc.purpose||"-")}</p></div>
+        <div class="detail-box"><h3>States · ${states.length}</h3>${wfJson(states)}</div>
+        <div class="detail-box"><h3>Interactions · ${interactions.length}</h3>${wfJson(interactions)}</div>
+        <div class="detail-box"><h3>Transitions · ${transitions.length}</h3>${wfJson(transitions)}</div>
+        <div class="detail-box"><h3>Feedback</h3>${wfJson(sc.feedback||[])}</div>
+        <div class="detail-box"><h3>Edge Cases</h3>${wfJson(sc.edge_cases||[])}</div>
+        <div class="detail-box"><h3>Implementation Notes</h3>${wfJson(sc.implementation_notes||[])}</div>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:14px">
+      <div class="detail-box"><h3>Global Interaction Principles</h3>${wfList(p.interaction_principles)}</div>
+      <div class="detail-box"><h3>Input Map</h3>${wfJson(p.input_map)}</div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>Screen Flow</h3>${wfJson(p.screen_flow)}</div>
+      <div class="detail-box"><h3>Global States</h3>${wfJson(p.global_states)}</div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>Developer Handoff</h3>${wfJson(p.developer_handoff)}</div>
+      <div class="detail-box"><h3>Acceptance Criteria</h3>${wfList(p.acceptance_criteria)}</div>
+    </div>
+    <div class="detail-box" style="margin-top:12px"><h3>Stored Pack Markdown</h3><pre style="white-space:pre-wrap;word-break:break-word;color:#9fb3cb;font-size:10px;line-height:1.6;margin:0">${esc(p.pack_markdown||"")}</pre></div>
+    <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">닫기</button></div>
+  `,true);
+}
+
 function buildCard(p){
   return `<div class="game-card">
     <div class="card-top"><div><div class="kicker">Godot build farm</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">${p.build||"v0.0.1"}</span></div>
@@ -747,7 +913,7 @@ function settingsPage(){
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab과 Game Design은 실제 예약 작업 + Supabase 데이터로 연결됩니다. Pre-production은 다음 단계에서 연결합니다. 브라우저 자체의 가짜 아이디어·컨셉 생성은 사용하지 않습니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab과 Game Design은 실제 예약 작업 + Supabase 데이터로 연결되어 있습니다. Pre-production은 실제 Wireframe Pack DB/API/Viewer까지 준비됐고 예약 작업 연결만 남아 있습니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
@@ -808,7 +974,7 @@ function editDirection(id){
 }
 function saveDirection(id){ const p=getP(id); p.note=document.getElementById("directionText").value.trim(); addLog(`${p.title}에 대표 디렉팅 메모가 업데이트되었습니다.`); save(); closeModal(); render(); toast("디렉팅 메모 저장"); }
 function copyRepo(id){ const p=getP(id); if(!p||!p.repo){toast("Repo가 아직 없습니다.");return;} navigator.clipboard?.writeText("https://github.com/"+p.repo).then(()=>toast("Repo 주소 복사됨")).catch(()=>toast(p.repo)); }
-function modal(inner){ document.getElementById("modal").innerHTML=inner; document.getElementById("modalBackdrop").classList.add("show"); }
+function modal(inner,wide=false){ const el=document.getElementById("modal"); el.className=wide?"modal wide":"modal"; el.innerHTML=inner; document.getElementById("modalBackdrop").classList.add("show"); }
 function closeModal(){ document.getElementById("modalBackdrop").classList.remove("show"); }
 function backdropClose(e){ if(e.target.id==="modalBackdrop")closeModal(); }
 function toggleSetting(k){ state.settings[k]=!state.settings[k]; addLog(`Studio Policy: ${k} = ${state.settings[k]?"ON":"OFF"}`); save(); render(); }
