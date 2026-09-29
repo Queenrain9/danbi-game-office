@@ -1,4 +1,3 @@
-class_name HazardEvaluator
 extends RefCounted
 
 static func expected_lane(data:Dictionary) -> String:
