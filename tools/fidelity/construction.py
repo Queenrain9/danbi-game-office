@@ -151,8 +151,16 @@ def resolve_interaction_target(screen, source_target):
         best = max(x[0] for x in scored)
         winners = [c for score, c in scored if score == best]
         plural_hint = any(x in target.lower() for x in ('buttons', 'slots', 'targets', 'lanes', 'cards'))
-        if len(winners) == 1 or plural_hint:
+        shared_id_token = len(target_tokens) == 1 and all(
+            target_tokens.issubset(set(_target_tokens(c.get('id')))) for c in winners
+        )
+        if len(winners) == 1 or plural_hint or shared_id_token:
             return {'component_ids': [c['id'] for c in winners], 'selector': None if len(winners) > 1 else target}
+
+    if 'button' in target_tokens:
+        buttons = [c for c in components if c.get('type') in ('button', 'hold_button', 'hold_control')]
+        if buttons:
+            return {'component_ids': [c['id'] for c in buttons], 'selector': None}
 
     hosts = [c for c in components if c.get('type') in INTERACTIVE_HOST_TYPES]
     if len(hosts) == 1:
