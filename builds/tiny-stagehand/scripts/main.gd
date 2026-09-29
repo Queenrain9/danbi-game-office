@@ -96,7 +96,7 @@ func start_live()->void:
  var controls:=HBoxContainer.new(); controls.custom_minimum_size=Vector2(0,260); v.add_child(controls)
  _add_fader(controls,"LIGHT A","light_a")
  _add_fader(controls,"LIGHT B","light_b")
- curtain=VSlider.new(); curtain.min_value=0; curtain.max_value=100; curtain.custom_minimum_size=Vector2(80,230); curtain.value_changed.connect(_curtain_changed); controls.add_child(curtain)
+ curtain=VSlider.new(); curtain.min_value=0; curtain.max_value=100; curtain.custom_minimum_size=Vector2(80,230); curtain.value_changed.connect(_curtain_changed); curtain.gui_input.connect(_curtain_input); controls.add_child(curtain)
  var tray:=Control.new(); tray.custom_minimum_size=Vector2(170,230); controls.add_child(tray)
  var tl:=Label.new(); tl.text="PROP TRAY"; tl.position=Vector2(5,0); tray.add_child(tl)
  var names=["ROSE","LETTER","LAMP"]\n for i in range(names.size()): _add_prop(tray,names[i],Vector2(8,35+i*58))
@@ -107,7 +107,7 @@ func start_live()->void:
 func _add_fader(parent:Control,label_text:String,key:String)->void:
  var box:=VBoxContainer.new(); parent.add_child(box)
  var l:=Label.new(); l.text=label_text; box.add_child(l)
- var f:=VSlider.new(); f.min_value=0; f.max_value=100; f.step=1; f.custom_minimum_size=Vector2(90,210); f.value_changed.connect(_light_changed.bind(key)); box.add_child(f); faders[key]=f
+ var f:=VSlider.new(); f.min_value=0; f.max_value=100; f.step=1; f.custom_minimum_size=Vector2(90,210); f.value_changed.connect(_light_changed.bind(key)); f.gui_input.connect(_fader_input.bind(key)); box.add_child(f); faders[key]=f
 
 func _add_prop(parent:Control,name:String,pos:Vector2)->void:\n var p:=Panel.new(); p.position=pos; p.size=Vector2(145,50); p.gui_input.connect(_prop_input.bind(p,name)); parent.add_child(p)
  var l:=Label.new(); l.text=name; l.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); l.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER; l.mouse_filter=Control.MOUSE_FILTER_IGNORE; p.add_child(l); props[name]=p
@@ -125,6 +125,16 @@ func _curtain_changed(value:float)->void:
  s.curtain=value
  stage_label.text="CURTAIN %d%%" % int(value)
  _judge_control("curtain",value)
+
+func _fader_input(event:InputEvent,key:String)->void:
+ if paused:return
+ if (event is InputEventScreenTouch or event is InputEventMouseButton) and not event.pressed:
+  _judge_control(key,round(float(s.get(key))/25.0)*25.0)
+
+func _curtain_input(event:InputEvent)->void:
+ if paused:return
+ if (event is InputEventScreenTouch or event is InputEventMouseButton) and not event.pressed:
+  _judge_control("curtain",round(s.curtain/25.0)*25.0)
 
 func _prop_input(event:InputEvent,p:Control,name:String)->void:
  if paused:return
