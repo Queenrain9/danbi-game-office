@@ -1,0 +1,14 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "idea_id": "a5b7a285-1c6d-44d1-ab73-cac9492a5233",
+  "title": "Candle Creature Keeper",
+  "version": "v0.1",
+  "primary_interaction": "heat, shape, cool, fit",
+  "session_length": "4-6 min per case",
+  "content_unit": "one creature care puzzle",
+  "mvp_scope": "3 cases, 9 puzzles, 1 species, 5 body regions, 3 forms per region, 3 habitats",
+  "screen_inventory": ["Case Select","Creature Care","Creature Result Overlay","Case Result","Pause"],
+  "game_rules": {"heat_range":[0,100],"shapeable":[50,89],"warning":80,"overheat":90,"lock_below":25,"integrity":3,"tests_per_puzzle":3,"correction_seconds":20},
+  "source": "chat_automation"
+}
