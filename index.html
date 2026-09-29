@@ -768,13 +768,13 @@ function wirePage(){
   <div class="panel" style="margin-bottom:14px">
     <div class="panel-title"><strong>Wireframe Pack Receiver</strong><span>data contract ready</span></div>
     <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
-      <span><b style="color:#8de4c7">DB / API 연결 완료</b></span>
+      <span><b style="color:#8de4c7">매시간 30분 실행</b></span>
+      <span>미처리 Game Design <b style="color:#8de4c7">최대 2개</b></span>
       <span>Screen Flow + Screens + States + Interactions</span>
       <span>좌표 기반 Wireframe Preview 지원</span>
-      <span>예약 작업은 아직 연결하지 않음</span>
     </div>
   </div>
-  <div class="cards">${ps.map(wireCard).join("") || `<div class="empty">실제 Wireframe Pack 수신 준비가 완료되었습니다.<br>다음 단계에서 Game Design → Wireframe 예약 작업을 연결하면 여기에 Pack이 도착합니다.</div>`}</div>`;
+  <div class="cards">${ps.map(wireCard).join("") || `<div class="empty">Pre-production 예약 작업이 연결되었습니다.<br>매시간 30분, 미처리 Game Design 최대 2개를 Interaction Wireframe Pack으로 변환해 이곳에 입고합니다.</div>`}</div>`;
 }
 
 function wfJson(value){
@@ -912,7 +912,7 @@ function settingsPage(){
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab과 Game Design은 실제 예약 작업 + Supabase 데이터로 연결되어 있습니다. Pre-production은 실제 Wireframe Pack DB/API/Viewer까지 준비됐고 예약 작업 연결만 남아 있습니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production까지 실제 예약 작업 + Supabase 데이터로 연결되어 있습니다. Pre-production은 매시간 30분 실행되어 Wireframe Pack을 생성합니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
