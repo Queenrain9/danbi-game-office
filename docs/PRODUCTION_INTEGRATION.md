@@ -34,6 +34,16 @@ For interactions, preserve the original Wireframe target text in `bindings.inter
 
 This binding layer preserves the source meaning while allowing the Godot implementation to use concrete node paths.
 
+Compiler target resolution follows the reference helper `resolve_interaction_target(screen, source_target)` in `construction.py`:
+
+1. exact component id/label,
+2. component id explicitly named inside the natural-language target,
+3. singular/plural or shared token match, including legitimate multi-target controls,
+4. otherwise, a semantic child target may bind to the **only** interactive spatial host on that screen with `target_selector=source_target`,
+5. if more than one plausible owner remains, fail closed instead of guessing.
+
+Example: Midnight Lost Property's `hotspot` tap on the inspection screen resolves to the only `manipulable` Lost Item component with `target_selector="hotspot"`; the source target string remains unchanged.
+
 ## Compiler → independent Blueprint review
 
 Export **current full DB rows** for Contract, Wireframe Pack and Game Design to JSON. The Blueprint must keep `schema_version: fidelity-v1`, a frozen `source` with `pack`, `design`, and `requirements`, identical `screens` and `requirements`, plus `hash_algorithm: sha256-canonical-json-v1`. Add `bindings.scene_path`, `reference_size`, `coordinate_space: screen_percent`, `stretch_mode: canvas_items`, explicit `nodes`, `components`, `connections`, `interactions`, `implementations` (one or more `res://` file/node or symbol references per requirement), `reusable_components`, and `tests` with deterministic `checks` and `stage`. Use `construction_pattern` on each node; `registry` lists supported patterns. Every stage needs a static test, every requirement needs static implementation coverage, and executable behavior has a separate manual test. Use zero-based RFC6901 JSON pointers for `bindings.sources`.
