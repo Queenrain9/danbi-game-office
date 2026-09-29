@@ -17,6 +17,8 @@ var gesture_router := GestureRouter.new()
 var slice_depth := 50.0
 var scan_reversals := 0
 var scan_last_direction := 0
+var scan_uses := 0
+var scan_active := false
 var pins: Array[Dictionary] = []
 var box_pose := Vector2.ZERO
 var input_locked := false
@@ -97,6 +99,8 @@ func reset_case_state() -> void:
  slice_depth = 50.0
  scan_reversals = 0
  scan_last_direction = 0
+ scan_uses = 0
+ scan_active = false
  pins.clear()
  box_pose = Vector2.ZERO
  input_locked = false
@@ -243,7 +247,13 @@ func _on_rail_input(event: InputEvent) -> void:
    accept_event()
   return
  if event is InputEventScreenTouch or event is InputEventMouseButton:
-  gesture = Gesture.SCAN if event.pressed else Gesture.NONE
+  if event.pressed:
+   gesture = Gesture.SCAN
+   scan_active = true
+   scan_uses += 1
+   _update_inspection_feedback()
+  else:
+   gesture = Gesture.NONE
 
 func _on_scan_changed(value: float) -> void:
  if input_locked or gesture == Gesture.CLASSIFY:
@@ -260,6 +270,9 @@ func _on_scan_changed(value: float) -> void:
  _update_inspection_feedback()
 
 func _try_pin(local_pos: Vector2) -> void:
+ if not scan_active:
+  info.text = "SCAN FIRST · evidence pins require an active X-ray slice"
+  return
  if pins.size() >= 4:
   info.text = "PIN LIMIT · 4 / 4"
   return
@@ -406,4 +419,4 @@ func quit_shift() -> void:
 
 func _update_inspection_feedback() -> void:
  if info:
-  info.text = "Slice %d%% · Pins %d/4 · Reversals %d" % [int(slice_depth), pins.size(), scan_reversals]
+  info.text = "Slice %d%% · Scans %d/4 · Pins %d/4 · Reversals %d" % [int(slice_depth), scan_uses, pins.size(), scan_reversals]
