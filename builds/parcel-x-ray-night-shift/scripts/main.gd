@@ -9,7 +9,10 @@ enum Screen { HUB, INTAKE, INSPECT, RESULT, SUMMARY }
 enum Gesture { NONE, BOX, SCAN, CLASSIFY }
 
 const SHIFT_SIZE := 8
+const DRAG_THRESHOLD := 18.0
+const CLASSIFY_THRESHOLD_Y := 440.0
 var shift := ShiftState.new()
+var gesture_router := GestureRouter.new()
 
 var slice_depth := 50.0
 var scan_reversals := 0
@@ -358,21 +361,48 @@ func show_summary() -> void:
  v.add_child(l)
  add_button(v, "BACK TO HUB", show_hub)
 
+func _modal(title:String, body:String) -> VBoxContainer:
+ if overlay: overlay.queue_free()
+ overlay = ColorRect.new()
+ overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+ add_child(overlay)
+ var panel := VBoxContainer.new()
+ panel.set_anchors_preset(Control.PRESET_CENTER)
+ panel.position = Vector2(55,180)
+ panel.size = Vector2(430,520)
+ overlay.add_child(panel)
+ var h:=Label.new()
+ h.text=title
+ h.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ panel.add_child(h)
+ var l:=Label.new()
+ l.text=body
+ l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ l.custom_minimum_size=Vector2(0,300)
+ panel.add_child(l)
+ return panel
+
+func close_overlay() -> void:
+ if overlay:
+  overlay.queue_free()
+  overlay = null
+
 func show_rules() -> void:
- if input_locked:
-  return
- var v := base("RULE MANUAL")
- var l := Label.new()
- l.text = "R1\nDense object near outer wall → REPACK\n\nR2\nLinked dense pair + cable + power contact → ISOLATE\n\nR3\nOtherwise → PASS"
- l.custom_minimum_size = Vector2(0, 430)
- l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
- v.add_child(l)
- add_button(v, "CLOSE", show_inspect)
+ if input_locked or overlay: return
+ var p:=_modal("RULE MANUAL","R1\nDense object near outer wall → REPACK\n\nR2\nLinked dense pair + cable + power contact → ISOLATE\n\nR3\nOtherwise → PASS")
+ add_button(p,"CLOSE",close_overlay)
 
 func show_pause() -> void:
- var v := base("PAUSED")
- add_button(v, "RESUME", show_inspect)
- add_button(v, "QUIT TO HUB", show_hub)
+ if overlay: return
+ prior_screen=screen
+ var p:=_modal("PAUSED","Shift state is frozen while this overlay blocks gameplay input.")
+ add_button(p,"RESUME",close_overlay)
+ add_button(p,"QUIT TO HUB",quit_shift)
+
+func quit_shift() -> void:
+ close_overlay()
+ show_hub()
 
 func _update_inspection_feedback() -> void:
  if info:
