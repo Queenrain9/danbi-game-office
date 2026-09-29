@@ -178,6 +178,26 @@
     .wf-card-stats > div { background:rgba(0,0,0,.12); border-radius:10px; padding:9px; }
     .wf-card-stats b { display:block; font-size:14px; }
     .wf-card-stats span { font-size:9px; color:#6e86a3; }
+    .wf-pack-nav { display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 16px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,.06); }
+    .wf-pack-nav button { border:1px solid rgba(255,255,255,.07); background:#0a1627; color:#7890ad; border-radius:9px; padding:7px 11px; font-size:10px; }
+    .wf-pack-nav button.active { color:#eef6ff; background:#173050; border-color:#416b9e; }
+    .wf-preview-column { position:sticky; top:0; align-self:start; }
+    .wf-variant-list { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 10px; }
+    .wf-variant-btn { border:1px solid rgba(255,255,255,.07); background:#0a1627; color:#768eaa; border-radius:999px; padding:5px 8px; font-size:9px; }
+    .wf-variant-btn.active { color:#dff7ee; border-color:rgba(85,214,168,.34); background:rgba(85,214,168,.09); }
+    .wf-human-card { border:1px solid rgba(255,255,255,.055); background:#0a1627; border-radius:12px; padding:11px; }
+    .wf-human-card + .wf-human-card { margin-top:8px; }
+    .wf-human-card h4 { margin:0 0 8px; font-size:11px; color:#dce9fa; }
+    .wf-kv { display:grid; grid-template-columns:92px 1fr; gap:6px 10px; align-items:start; font-size:10px; line-height:1.45; }
+    .wf-kv b { color:#6f87a4; font-weight:650; text-transform:uppercase; letter-spacing:.04em; }
+    .wf-kv span { color:#aebfd3; word-break:break-word; }
+    .wf-state-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .wf-rule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .wf-raw pre { white-space:pre-wrap; word-break:break-word; color:#91a8c2; font-size:10px; line-height:1.55; margin:0; }
+    .wf-core-flag { display:inline-flex; margin-left:6px; color:#8de4c7; font-size:8px; border:1px solid rgba(85,214,168,.22); padding:2px 5px; border-radius:999px; }
+    .wf-screen-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+    .wf-screen-header strong { font-size:11px; }
+
     .modal-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:16px; }
     .modal-head h2 { margin:0; font-size:18px; }
     .close { background:transparent; border:0; color:#8ba0ba; font-size:22px; }
@@ -205,6 +225,9 @@
       .hero, .dashboard-grid, .two-col, .wf-viewer { grid-template-columns:1fr; }
       .wf-screen-list { flex-direction:row; max-height:none; overflow:auto; }
       .wf-screen-tab { min-width:130px; }
+      .wf-preview-column { position:relative; top:auto; }
+      .wf-rule-grid, .wf-state-grid { grid-template-columns:1fr; }
+
     }
     @media (max-width:620px) {
       .stats { grid-template-columns: repeat(2,1fr); }
@@ -766,12 +789,12 @@ function wirePage(){
     `<button class="btn" onclick="loadWireframePacks(true)">↻ 새로고침</button>`
   )+`
   <div class="panel" style="margin-bottom:14px">
-    <div class="panel-title"><strong>Wireframe Pack Receiver</strong><span>data contract ready</span></div>
+    <div class="panel-title"><strong>Wireframe Pack Receiver</strong><span>Fidelity v0.2</span></div>
     <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
       <span><b style="color:#8de4c7">매시간 30분 실행</b></span>
       <span>미처리 Game Design <b style="color:#8de4c7">최대 2개</b></span>
-      <span>Screen Flow + Screens + States + Interactions</span>
-      <span>좌표 기반 Wireframe Preview 지원</span>
+      <span>Core Screen 고밀도 설계 + State Variants</span>
+      <span>좌표 기반 Preview + Implementation Critic</span>
     </div>
   </div>
   <div class="cards">${ps.map(wireCard).join("") || `<div class="empty">Pre-production 예약 작업이 연결되었습니다.<br>매시간 30분, 미처리 Game Design 최대 2개를 Interaction Wireframe Pack으로 변환해 이곳에 입고합니다.</div>`}</div>`;
@@ -789,9 +812,59 @@ function wfPct(v,fallback=0){
   const n=Number(v);
   return Number.isFinite(n)?Math.max(0,Math.min(100,n)):fallback;
 }
-function wireframePreview(screen,orientation){
+function wfText(v){
+  if(v===null||v===undefined||v==="") return "-";
+  if(typeof v==="string"||typeof v==="number"||typeof v==="boolean") return String(v);
+  return JSON.stringify(v);
+}
+function wfCard(title,rows){
+  const content=rows.filter(x=>x[1]!==undefined&&x[1]!==null&&x[1]!=="").map(([k,v])=>`<b>${esc(k)}</b><span>${esc(wfText(v))}</span>`).join("");
+  return `<div class="wf-human-card"><h4>${esc(title)}</h4><div class="wf-kv">${content||"<span>-</span>"}</div></div>`;
+}
+function wfInteractionCard(x,i){
+  if(typeof x==="string") return wfCard("Interaction "+String(i+1).padStart(2,"0"),[["ACTION",x]]);
+  return wfCard("Interaction "+String(i+1).padStart(2,"0"),[
+    ["INPUT",x.input||x.trigger||x.gesture],
+    ["TARGET",x.target||x.object],
+    ["WHEN",x.precondition||x.condition],
+    ["ACTION",x.action],
+    ["STATE",x.state_change||x.change],
+    ["FEEDBACK",x.feedback],
+    ["INVALID",x.invalid_input||x.error]
+  ]);
+}
+function wfStateCard(x,i){
+  if(typeof x==="string") return wfCard("State · "+x,[["STATE",x]]);
+  return wfCard("State · "+(x.id||x.state||String(i+1)),[
+    ["ENTER",x.enter||x.entry_condition||x.condition],
+    ["INPUT",x.input||x.allowed_input],
+    ["UI",x.ui||x.visible_change||x.display],
+    ["EXIT",x.exit||x.exit_condition]
+  ]);
+}
+function wfTransitionCard(x,i){
+  if(typeof x==="string") return wfCard("Transition "+String(i+1).padStart(2,"0"),[["FLOW",x]]);
+  return wfCard("Transition "+String(i+1).padStart(2,"0"),[
+    ["FROM",x.from],
+    ["TO",x.to],
+    ["TRIGGER",x.trigger],
+    ["WHEN",x.condition],
+    ["MOTION",x.animation||x.transition]
+  ]);
+}
+function wfVariantData(screen,variantIndex){
+  const variants=Array.isArray(screen?.state_variants)?screen.state_variants:[];
+  const variant=variantIndex>0?variants[variantIndex-1]:null;
+  return {variants,variant};
+}
+function wireframePreview(screen,orientation,variantIndex=0){
   const regions=Array.isArray(screen?.layout?.regions)?screen.layout.regions:[];
-  const components=Array.isArray(screen?.components)?screen.components:[];
+  const baseComponents=Array.isArray(screen?.components)?screen.components:[];
+  const {variant}=wfVariantData(screen,variantIndex);
+  const hidden=new Set(Array.isArray(variant?.hide_components)?variant.hide_components:[]);
+  const overrides=variant?.component_overrides&&typeof variant.component_overrides==="object"?variant.component_overrides:{};
+  const extra=Array.isArray(variant?.components)?variant.components:[];
+  const components=baseComponents.filter(c=>!hidden.has(c.id)).map(c=>({...c,...(overrides[c.id]||{}),box:{...(c.box||{}),...((overrides[c.id]||{}).box||{})}})).concat(extra);
   const boxes=[];
   regions.forEach(r=>{
     boxes.push(`<div class="wf-region" style="left:${wfPct(r.x)}%;top:${wfPct(r.y)}%;width:${wfPct(r.w,10)}%;height:${wfPct(r.h,8)}%">${esc(r.label||r.id||"region")}</div>`);
@@ -799,62 +872,101 @@ function wireframePreview(screen,orientation){
   components.forEach(c=>{
     const b=c.box||{};
     const type=String(c.type||"").toLowerCase();
-    const cls=type.includes("overlay")||type.includes("modal")?"overlay":(type.includes("button")||type.includes("action")?"action":"");
+    const cls=type.includes("overlay")||type.includes("modal")?"overlay":(type.includes("button")||type.includes("action")||type.includes("slider")?"action":"");
     if([b.x,b.y,b.w,b.h].some(v=>v!==undefined)){
-      boxes.push(`<div class="wf-component ${cls}" style="left:${wfPct(b.x)}%;top:${wfPct(b.y)}%;width:${wfPct(b.w,12)}%;height:${wfPct(b.h,6)}%">${esc(c.label||c.id||c.type||"component")}</div>`);
+      boxes.push(`<div class="wf-component ${cls}" title="${esc(c.id||c.label||"")}" style="left:${wfPct(b.x)}%;top:${wfPct(b.y)}%;width:${wfPct(b.w,12)}%;height:${wfPct(b.h,6)}%">${esc(c.label||c.id||c.type||"component")}</div>`);
     }
   });
-  const empty=!boxes.length?`<div style="position:absolute;inset:20%;display:grid;place-items:center;text-align:center;color:#617997;font-size:10px;padding:20px">이 Screen Spec에는 아직 좌표 박스가 없습니다.<br>예약 작업은 0–100% 좌표를 생성하도록 연결할 예정입니다.</div>`:"";
-  return `<div class="wf-device ${String(orientation).toLowerCase().includes("land")?"landscape":""}">${boxes.join("")}${empty}</div>`;
+  const empty=!boxes.length?`<div style="position:absolute;inset:20%;display:grid;place-items:center;text-align:center;color:#617997;font-size:10px;padding:20px">좌표 컴포넌트가 없습니다.</div>`:"";
+  const variantLabel=variant?.name||variant?.id;
+  return `<div class="wf-device ${String(orientation).toLowerCase().includes("land")?"landscape":""}">${boxes.join("")}${empty}${variantLabel?`<div style="position:absolute;right:8px;top:8px;z-index:4;font-size:8px;color:#9fe4cc;background:#10291f;border:1px solid #2a6653;padding:4px 6px;border-radius:999px">${esc(variantLabel)}</div>`:""}</div>`;
 }
-function showWireframePack(id,screenIndex=0){
-  const p=wireframePacks.find(x=>x.id===id);
-  if(!p) return;
+function wfPackNav(p,id,screenIndex,section,variantIndex){
+  return `<div class="wf-pack-nav">
+    ${[["screens","SCREENS"],["rules","RULES"],["handoff","HANDOFF"],["raw","RAW"]].map(([k,label])=>`<button class="${section===k?"active":""}" onclick="showWireframePack('${id}',${screenIndex},'${k}',${variantIndex})">${label}</button>`).join("")}
+  </div>`;
+}
+function wfScreensSection(p,id,screenIndex,variantIndex){
   const screens=Array.isArray(p.screens)?p.screens:[];
-  const idx=Math.max(0,Math.min(screens.length-1,Number(screenIndex)||0));
+  const idx=Math.max(0,Math.min(Math.max(0,screens.length-1),Number(screenIndex)||0));
   const sc=screens[idx]||{};
-  const tabs=screens.map((x,i)=>`<button class="wf-screen-tab ${i===idx?"active":""}" onclick="showWireframePack('${p.id}',${i})">${String(i+1).padStart(2,"0")} · ${esc(x.name||x.id||("Screen "+(i+1)))}</button>`).join("");
   const interactions=Array.isArray(sc.interactions)?sc.interactions:[];
   const states=Array.isArray(sc.states)?sc.states:[];
   const transitions=Array.isArray(sc.transitions)?sc.transitions:[];
-  modal(`
-    <div class="modal-head">
-      <div><div class="kicker">Interaction Wireframe Pack · ${esc(p.version||"v0.1")}</div><h2>${esc(p.title)}</h2></div>
-      <button class="close" onclick="closeModal()">×</button>
-    </div>
-    <div class="meta"><span>${esc(p.target_device||"Mobile")}</span><span>${esc(p.orientation||"portrait")}</span><span>${p.screen_count||screens.length} screens</span><span>${p.state_count||0} states</span></div>
+  const {variants}=wfVariantData(sc,variantIndex);
+  const tabs=screens.map((x,i)=>`<button class="wf-screen-tab ${i===idx?"active":""}" onclick="showWireframePack('${id}',${i},'screens',0)">${String(i+1).padStart(2,"0")} · ${esc(x.name||x.id||("Screen "+(i+1)))}${(p.core_screen&&(x.name===p.core_screen||x.id===p.core_screen))?' · CORE':''}</button>`).join("");
+  const variantButtons=`<button class="wf-variant-btn ${variantIndex===0?"active":""}" onclick="showWireframePack('${id}',${idx},'screens',0)">BASE</button>`+
+    variants.map((v,i)=>`<button class="wf-variant-btn ${variantIndex===i+1?"active":""}" onclick="showWireframePack('${id}',${idx},'screens',${i+1})">${esc(v.name||v.id||("STATE "+(i+1)))}</button>`).join("");
+  const isCore=p.core_screen&&(sc.name===p.core_screen||sc.id===p.core_screen);
+  return `
     <div class="wf-viewer">
       <div>
         <div class="kicker">Screens</div>
         <div class="wf-screen-list">${tabs||'<div class="empty" style="padding:18px">No screens</div>'}</div>
       </div>
-      <div>
-        <div class="kicker">${esc(sc.name||"Wireframe Preview")}</div>
-        <div class="wf-device-wrap">${wireframePreview(sc,p.orientation)}</div>
+      <div class="wf-preview-column">
+        <div class="wf-screen-header"><strong>${esc(sc.name||"Wireframe Preview")}</strong>${isCore?'<span class="wf-core-flag">CORE SCREEN</span>':""}</div>
+        <div class="wf-variant-list">${variantButtons}</div>
+        <div class="wf-device-wrap">${wireframePreview(sc,p.orientation,variantIndex)}</div>
       </div>
       <div class="wf-detail">
         <div class="detail-box"><h3>Purpose</h3><p>${esc(sc.purpose||"-")}</p></div>
-        <div class="detail-box"><h3>States · ${states.length}</h3>${wfJson(states)}</div>
-        <div class="detail-box"><h3>Interactions · ${interactions.length}</h3>${wfJson(interactions)}</div>
-        <div class="detail-box"><h3>Transitions · ${transitions.length}</h3>${wfJson(transitions)}</div>
-        <div class="detail-box"><h3>Feedback</h3>${wfJson(sc.feedback||[])}</div>
-        <div class="detail-box"><h3>Edge Cases</h3>${wfJson(sc.edge_cases||[])}</div>
-        <div class="detail-box"><h3>Implementation Notes</h3>${wfJson(sc.implementation_notes||[])}</div>
+        <div>
+          <div class="kicker">Interactions · ${interactions.length}</div>
+          ${interactions.map(wfInteractionCard).join("")||'<div class="wf-human-card">-</div>'}
+        </div>
+        <div>
+          <div class="kicker">States · ${states.length}</div>
+          <div class="wf-state-grid">${states.map(wfStateCard).join("")||'<div class="wf-human-card">-</div>'}</div>
+        </div>
+        <div>
+          <div class="kicker">Transitions · ${transitions.length}</div>
+          ${transitions.map(wfTransitionCard).join("")||'<div class="wf-human-card">-</div>'}
+        </div>
+        <div class="detail-box"><h3>Feedback</h3>${wfList(sc.feedback||[])}</div>
+        <div class="detail-box"><h3>Edge Cases</h3>${wfList(sc.edge_cases||[])}</div>
+        <div class="detail-box"><h3>Implementation Notes</h3>${wfList(sc.implementation_notes||[])}</div>
       </div>
+    </div>`;
+}
+function wfRulesSection(p){
+  return `<div class="wf-rule-grid">
+    <div class="detail-box"><h3>Interaction Principles</h3>${wfList(p.interaction_principles)}</div>
+    <div class="detail-box"><h3>Global UI Rules</h3>${wfJson(p.global_ui_rules)}</div>
+    <div class="detail-box"><h3>Screen Flow</h3>${wfJson(p.screen_flow)}</div>
+    <div class="detail-box"><h3>Global States</h3>${wfJson(p.global_states)}</div>
+    <div class="detail-box"><h3>Input Map</h3>${wfJson(p.input_map)}</div>
+    <div class="detail-box"><h3>Global Edge Cases</h3>${wfJson(p.edge_cases)}</div>
+  </div>`;
+}
+function wfHandoffSection(p){
+  return `<div class="wf-rule-grid">
+    <div class="detail-box"><h3>Developer Handoff</h3>${wfJson(p.developer_handoff)}</div>
+    <div class="detail-box"><h3>Acceptance Criteria</h3>${wfList(p.acceptance_criteria)}</div>
+  </div>`;
+}
+function wfRawSection(p){
+  return `<div class="wf-raw">
+    <div class="detail-box"><h3>Raw Structured Pack</h3><pre>${esc(JSON.stringify({screen_flow:p.screen_flow,screens:p.screens,global_states:p.global_states,input_map:p.input_map,edge_cases:p.edge_cases,developer_handoff:p.developer_handoff},null,2))}</pre></div>
+    <div class="detail-box" style="margin-top:12px"><h3>Stored Pack Markdown</h3><pre>${esc(p.pack_markdown||"")}</pre></div>
+  </div>`;
+}
+function showWireframePack(id,screenIndex=0,section="screens",variantIndex=0){
+  const p=wireframePacks.find(x=>x.id===id);
+  if(!p) return;
+  const screens=Array.isArray(p.screens)?p.screens:[];
+  const idx=Math.max(0,Math.min(Math.max(0,screens.length-1),Number(screenIndex)||0));
+  const allowed=["screens","rules","handoff","raw"];
+  const active=allowed.includes(section)?section:"screens";
+  const body=active==="screens"?wfScreensSection(p,id,idx,variantIndex):active==="rules"?wfRulesSection(p):active==="handoff"?wfHandoffSection(p):wfRawSection(p);
+  modal(`
+    <div class="modal-head">
+      <div><div class="kicker">Interaction Wireframe Pack · ${esc(p.version||"v0.1")}</div><h2>${esc(p.title)}</h2></div>
+      <button class="close" onclick="closeModal()">×</button>
     </div>
-    <div class="two-col" style="margin-top:14px">
-      <div class="detail-box"><h3>Global Interaction Principles</h3>${wfList(p.interaction_principles)}</div>
-      <div class="detail-box"><h3>Input Map</h3>${wfJson(p.input_map)}</div>
-    </div>
-    <div class="two-col" style="margin-top:12px">
-      <div class="detail-box"><h3>Screen Flow</h3>${wfJson(p.screen_flow)}</div>
-      <div class="detail-box"><h3>Global States</h3>${wfJson(p.global_states)}</div>
-    </div>
-    <div class="two-col" style="margin-top:12px">
-      <div class="detail-box"><h3>Developer Handoff</h3>${wfJson(p.developer_handoff)}</div>
-      <div class="detail-box"><h3>Acceptance Criteria</h3>${wfList(p.acceptance_criteria)}</div>
-    </div>
-    <div class="detail-box" style="margin-top:12px"><h3>Stored Pack Markdown</h3><pre style="white-space:pre-wrap;word-break:break-word;color:#9fb3cb;font-size:10px;line-height:1.6;margin:0">${esc(p.pack_markdown||"")}</pre></div>
+    <div class="meta"><span>${esc(p.target_device||"Mobile")}</span><span>${esc(p.orientation||"portrait")}</span><span>${p.screen_count||screens.length} screens</span><span>${p.state_count||0} states</span>${p.core_screen?`<span>Core · ${esc(p.core_screen)}</span>`:""}</div>
+    ${wfPackNav(p,id,idx,active,variantIndex)}
+    ${body}
     <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">닫기</button></div>
   `,true);
 }
