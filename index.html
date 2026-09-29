@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>단비 게임회사 · DANBI GAME OFFICE</title>
+  <meta name="theme-color" content="#0a1424" />
+  <style>
+    :root {
+      --bg: #07111e;
+      --panel: #0d1a2c;
+      --panel-2: #12223a;
+      --panel-3: #172b48;
+      --line: #233853;
+      --text: #edf4ff;
+      --muted: #8fa3bf;
+      --accent: #74a7ff;
+      --accent-2: #9cc0ff;
+      --green: #55d6a8;
+      --amber: #f3c86a;
+      --red: #ff7d8e;
+      --purple: #bc9cff;
+      --cyan: #67d9eb;
+      --shadow: 0 18px 50px rgba(0,0,0,.22);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Inter, Pretendard, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    body { background:
+      radial-gradient(circle at 70% -10%, rgba(76,122,199,.16), transparent 28%),
+      linear-gradient(180deg, #081321 0%, #06101b 100%); }
+    .app { display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: 26px 18px 20px; border-right: 1px solid rgba(255,255,255,.06); background: rgba(8,18,31,.92); backdrop-filter: blur(18px); overflow-y: auto; }
+    .brand { display: flex; gap: 12px; align-items: center; padding: 4px 10px 24px; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 13px; display:grid; place-items:center; background: linear-gradient(145deg,#315b9c,#1e3d6e); border: 1px solid rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); font-size: 21px; }
+    .brand strong { display:block; font-size: 17px; letter-spacing: -.02em; }
+    .brand span { display:block; color: var(--muted); font-size: 11px; letter-spacing: .15em; margin-top: 4px; }
+    .nav-group { margin: 14px 0 22px; }
+    .nav-label { padding: 0 11px 8px; font-size: 11px; color: #607793; text-transform: uppercase; letter-spacing: .13em; font-weight: 700; }
+    .nav-item { width: 100%; border: 0; color: #b7c7dc; background: transparent; border-radius: 12px; padding: 10px 12px; margin: 2px 0; display:flex; align-items:center; gap: 10px; text-align:left; transition:.18s ease; }
+    .nav-item:hover { background: rgba(116,167,255,.08); color: #e5efff; }
+    .nav-item.active { color: white; background: linear-gradient(90deg, rgba(72,111,170,.48), rgba(43,72,114,.42)); border: 1px solid rgba(132,174,236,.12); }
+    .nav-icon { width: 23px; height: 23px; display:grid; place-items:center; color:#8fbaff; flex:none; }
+    .sidebar-bottom { margin-top: 28px; padding: 14px 12px; background: rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.05); border-radius:14px; }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 12px rgba(85,214,168,.8); display:inline-block; margin-right:7px; }
+    .sidebar-bottom .small { font-size:11px; color:var(--muted); line-height:1.5; margin-top:7px; }
+    .main { min-width:0; }
+    .topbar { position: sticky; top:0; z-index:10; height:72px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; background:rgba(7,17,30,.78); backdrop-filter: blur(16px); border-bottom:1px solid rgba(255,255,255,.05); }
+    .page-title { font-weight:760; font-size:18px; letter-spacing:-.02em; }
+    .page-subtitle { font-size:12px; color:var(--muted); margin-top:3px; }
+    .top-actions { display:flex; gap:10px; align-items:center; }
+    .btn { border:1px solid rgba(255,255,255,.09); border-radius:12px; padding:9px 13px; color:#dbe8fa; background:#11213a; transition:.18s; }
+    .btn:hover { transform: translateY(-1px); border-color:rgba(116,167,255,.32); }
+    .btn.primary { background:linear-gradient(135deg,#4779c9,#315b9c); color:white; border-color:#6090dc; box-shadow:0 9px 30px rgba(58,104,176,.22); }
+    .btn.good { color:#c9f9e7; background:rgba(42,134,104,.2); border-color:rgba(85,214,168,.28); }
+    .btn.warn { color:#ffe5a2; background:rgba(160,112,29,.18); border-color:rgba(243,200,106,.28); }
+    .btn.bad { color:#ffc1c9; background:rgba(153,53,71,.18); border-color:rgba(255,125,142,.28); }
+    .btn.ghost { background: transparent; }
+    .content { padding:30px 28px 80px; max-width: 1600px; margin:0 auto; }
+    .hero { display:grid; grid-template-columns: 1.5fr .85fr; gap:18px; margin-bottom:22px; }
+    .hero-main, .hero-side { border:1px solid rgba(255,255,255,.065); background:linear-gradient(145deg,rgba(18,35,59,.9),rgba(10,23,40,.95)); border-radius:24px; box-shadow:var(--shadow); }
+    .hero-main { padding:26px; position:relative; overflow:hidden; }
+    .hero-main:after { content:""; position:absolute; right:-90px; top:-80px; width:270px; height:270px; border-radius:50%; background:radial-gradient(circle, rgba(116,167,255,.18), transparent 66%); pointer-events:none; }
+    .eyebrow { font-size:11px; letter-spacing:.14em; font-weight:800; color:#7faeff; text-transform:uppercase; }
+    .hero h1 { margin:8px 0 8px; font-size:31px; letter-spacing:-.04em; line-height:1.12; }
+    .hero p { margin:0; max-width:720px; color:#9eb0c8; line-height:1.7; font-size:14px; }
+    .hero-actions { margin-top:22px; display:flex; flex-wrap:wrap; gap:10px; }
+    .hero-side { padding:22px; }
+    .hero-side-title { font-weight:700; margin-bottom:14px; }
+    .automation-meter { margin:15px 0 17px; }
+    .meter-row { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:7px; }
+    .meter { height:8px; background:#07101b; border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,.04); }
+    .meter > i { display:block; height:100%; width:74%; background:linear-gradient(90deg,#5b8ddb,#61d2dc); border-radius:inherit; }
+    .gate-note { font-size:12px; color:#93a9c2; line-height:1.55; padding:12px; border-radius:12px; background:rgba(0,0,0,.12); }
+    .section-head { display:flex; align-items:end; justify-content:space-between; margin:30px 0 14px; gap:16px; }
+    .section-head h2 { margin:0; font-size:17px; letter-spacing:-.02em; }
+    .section-head p { margin:5px 0 0; font-size:12px; color:var(--muted); }
+    .stats { display:grid; grid-template-columns: repeat(8,minmax(0,1fr)); gap:10px; }
+    .stat { padding:15px 14px; border:1px solid rgba(255,255,255,.055); background:#0d1a2c; border-radius:15px; min-height:90px; }
+    .stat .n { font-size:25px; font-weight:780; letter-spacing:-.04em; }
+    .stat .label { color:#8297b2; font-size:11px; margin-top:5px; line-height:1.35; }
+    .stat .delta { margin-top:7px; color:#59d3aa; font-size:10px; }
+    .dashboard-grid { display:grid; grid-template-columns: 1.35fr .85fr; gap:18px; }
+    .panel { border:1px solid rgba(255,255,255,.06); background:rgba(13,26,44,.92); border-radius:18px; padding:18px; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    .panel-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .panel-title strong { font-size:14px; }
+    .panel-title span { font-size:11px; color:var(--muted); }
+    .pipeline { display:flex; align-items:stretch; gap:8px; overflow:auto; padding-bottom:4px; }
+    .stage { min-width:115px; flex:1; background:#0a1627; border:1px solid rgba(255,255,255,.055); border-radius:14px; padding:13px 12px; }
+    .stage.current { border-color:rgba(116,167,255,.28); background:#10213a; }
+    .stage .stage-name { color:#8da2bc; font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+    .stage .stage-count { font-size:23px; margin:7px 0 2px; font-weight:770; }
+    .stage .stage-auto { font-size:9px; color:#54708f; }
+    .activity { display:flex; flex-direction:column; gap:10px; max-height:310px; overflow:auto; }
+    .activity-item { display:grid; grid-template-columns: 54px 1fr; gap:10px; font-size:12px; }
+    .activity-time { color:#60748f; font-variant-numeric:tabular-nums; }
+    .activity-text { color:#bdcce0; line-height:1.45; }
+    .cards { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:14px; }
+    .game-card { border:1px solid rgba(255,255,255,.06); background:linear-gradient(145deg,#102039,#0b1728); border-radius:18px; padding:17px; position:relative; overflow:hidden; }
+    .game-card:hover { border-color:rgba(116,167,255,.18); }
+    .card-top { display:flex; justify-content:space-between; gap:12px; align-items:start; }
+    .card-title { font-weight:760; font-size:15px; letter-spacing:-.02em; }
+    .card-desc { color:#91a6bf; font-size:12px; line-height:1.55; margin:7px 0 12px; min-height:38px; }
+    .badge { display:inline-flex; align-items:center; gap:6px; font-size:9px; font-weight:750; letter-spacing:.06em; text-transform:uppercase; border:1px solid rgba(255,255,255,.08); color:#95afd1; background:rgba(255,255,255,.03); padding:5px 7px; border-radius:999px; white-space:nowrap; }
+    .badge.green { color:#8de4c7; border-color:rgba(85,214,168,.22); background:rgba(85,214,168,.08); }
+    .badge.amber { color:#f3c86a; border-color:rgba(243,200,106,.22); background:rgba(243,200,106,.07); }
+    .badge.blue { color:#9bc0ff; border-color:rgba(116,167,255,.24); background:rgba(116,167,255,.08); }
+    .badge.purple { color:#d0baff; border-color:rgba(188,156,255,.24); background:rgba(188,156,255,.08); }
+    .meta { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+    .meta span { font-size:10px; color:#7188a5; background:rgba(0,0,0,.16); border-radius:7px; padding:4px 6px; }
+    .progress { height:7px; background:#07101c; border-radius:999px; overflow:hidden; margin:11px 0 6px; }
+    .progress i { display:block; height:100%; background:linear-gradient(90deg,#4b7cc6,#6bb5ea); border-radius:inherit; }
+    .progress-row { display:flex; justify-content:space-between; font-size:10px; color:#7188a5; }
+    .card-actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:14px; }
+    .card-actions .btn { padding:7px 9px; border-radius:9px; font-size:11px; }
+    .filters { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { border:1px solid rgba(255,255,255,.07); background:#0c182a; color:#89a0bc; border-radius:999px; padding:7px 10px; font-size:11px; }
+    .chip.active { color:white; border-color:rgba(116,167,255,.3); background:rgba(77,123,194,.2); }
+    .empty { text-align:center; padding:48px 20px; color:#758ba6; border:1px dashed rgba(255,255,255,.08); border-radius:18px; }
+    .table-wrap { overflow:auto; border:1px solid rgba(255,255,255,.05); border-radius:14px; }
+    table { width:100%; border-collapse:collapse; min-width:780px; }
+    th,td { padding:12px 13px; text-align:left; border-bottom:1px solid rgba(255,255,255,.045); font-size:11px; }
+    th { color:#6f87a3; font-weight:650; background:#0a1627; }
+    td { color:#b8c7d9; }
+    tr:last-child td { border-bottom:0; }
+    .score { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:12px; }
+    .score > div { background:rgba(0,0,0,.12); border-radius:10px; padding:8px; }
+    .score b { display:block; font-size:13px; }
+    .score span { font-size:9px; color:#6e86a3; }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .detail-box { background:#0a1627; border:1px solid rgba(255,255,255,.055); border-radius:14px; padding:14px; }
+    .detail-box h3 { margin:0 0 9px; font-size:12px; }
+    .detail-box p, .detail-box li { font-size:11px; color:#91a5bd; line-height:1.6; }
+    textarea, input, select { width:100%; color:#d9e8fa; background:#081422; border:1px solid #243a56; border-radius:11px; padding:10px 11px; outline:none; }
+    textarea:focus, input:focus, select:focus { border-color:#4c79b8; box-shadow:0 0 0 3px rgba(76,121,184,.12); }
+    textarea { min-height:100px; resize:vertical; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+    label { display:block; font-size:10px; color:#7890ad; margin:0 0 6px; }
+    .switch-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid rgba(255,255,255,.045); }
+    .switch-row:last-child { border-bottom:0; }
+    .switch-row strong { display:block; font-size:12px; }
+    .switch-row span { display:block; color:#6f85a0; font-size:10px; margin-top:3px; }
+    .switch { width:42px; height:24px; border-radius:999px; border:0; padding:3px; background:#26384d; flex:none; }
+    .switch i { display:block; width:18px; height:18px; border-radius:50%; background:#8090a4; transition:.2s; }
+    .switch.on { background:#315f99; }
+    .switch.on i { transform:translateX(18px); background:#d9eaff; }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(1,6,11,.7); z-index:30; display:none; place-items:center; padding:20px; backdrop-filter:blur(7px); }
+    .modal-backdrop.show { display:grid; }
+    .modal { width:min(720px,100%); max-height:82vh; overflow:auto; background:#0c192a; border:1px solid #29425f; border-radius:20px; box-shadow:0 30px 90px rgba(0,0,0,.45); padding:21px; }
+    .modal-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .modal-head h2 { margin:0; font-size:18px; }
+    .close { background:transparent; border:0; color:#8ba0ba; font-size:22px; }
+    .toast { position:fixed; right:24px; bottom:24px; z-index:50; background:#17304f; border:1px solid #365d8d; color:#e9f3ff; border-radius:12px; padding:11px 14px; font-size:12px; box-shadow:var(--shadow); opacity:0; transform:translateY(10px); pointer-events:none; transition:.22s; }
+    .toast.show { opacity:1; transform:none; }
+    .mobile-menu { display:none; }
+    .kicker { color:#6f86a4; font-size:10px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+    .human-gate { padding:12px; border-radius:12px; border:1px solid rgba(188,156,255,.16); background:rgba(188,156,255,.06); font-size:11px; color:#aa9ad0; line-height:1.55; margin-top:11px; }
+    .review-card { border-color:rgba(116,167,255,.14); }
+    .review-status { font-size:10px; color:#7e96b3; margin-top:8px; }
+    .decision { margin-top:13px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; }
+    .decision .btn { padding:8px 5px; font-size:10px; }
+    .log-dot { width:7px; height:7px; border-radius:50%; background:#5d84b7; display:inline-block; margin-right:7px; }
+    @media (max-width:1200px) {
+      .stats { grid-template-columns: repeat(4,1fr); }
+      .cards { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width:900px) {
+      .app { grid-template-columns:1fr; }
+      .sidebar { position:fixed; z-index:40; left:0; top:0; width:280px; transform:translateX(-102%); transition:.22s; box-shadow:20px 0 60px rgba(0,0,0,.35); }
+      .sidebar.open { transform:none; }
+      .mobile-menu { display:inline-flex; }
+      .topbar { padding:0 16px; height:65px; }
+      .content { padding:22px 16px 70px; }
+      .hero, .dashboard-grid, .two-col { grid-template-columns:1fr; }
+    }
+    @media (max-width:620px) {
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .cards { grid-template-columns:1fr; }
+      .hero h1 { font-size:25px; }
+      .hero-main, .hero-side { border-radius:18px; }
+      .top-actions .hide-mobile { display:none; }
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🎮</div>
+      <div><strong>단비 게임회사</strong><span>DANBI GAME OFFICE</span></div>
+    </div>
+    <div id="nav"></div>
+    <div class="sidebar-bottom">
+      <div><span class="status-dot"></span><strong style="font-size:12px">Studio online</strong></div>
+      <div class="small">앞단 제작은 자동으로 흐르고,<br>플레이테스트 이후부터 대표가 직접 개입합니다.</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn ghost mobile-menu" onclick="toggleMenu()">☰</button>
+        <div>
+          <div class="page-title" id="pageTitle">대표 대시보드</div>
+          <div class="page-subtitle" id="pageSubtitle">회사 전체 제작 라인을 한눈에 확인합니다.</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost hide-mobile" onclick="openQuickIdea()">＋ 아이디어</button>
+        <button class="btn primary" onclick="runStudioCycle()">▶ Studio Cycle</button>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STAGES = ["idea","greenlight","concept","wireframe","build","playtest","directed","archive"];
+const STAGE_LABEL = {
+  idea:"Idea Lab", greenlight:"Greenlight", concept:"Concept Studio",
+  wireframe:"Pre-production", build:"Build Farm", playtest:"Review Room",
+  directed:"Directed Development", archive:"Archive"
+};
+const NAV = [
+  ["대표실", [["dashboard","▦","대표 대시보드"]]],
+  ["AI 제작본부", [
+    ["ideas","♢","아이디어 연구소"],
+    ["greenlight","✓","그린라이트 심사실"],
+    ["concept","✦","컨셉 스튜디오"],
+    ["wireframe","▤","프리프로덕션"],
+    ["build","⌘","빌드 팜"]
+  ]],
+  ["단비 업무실", [
+    ["review","▶","플레이테스트실"],
+    ["directed","◆","디렉팅 개발실"]
+  ]],
+  ["운영", [
+    ["archive","□","프로젝트 보관소"],
+    ["activity","≋","제작 활동 로그"],
+    ["settings","⚙","스튜디오 설정"]
+  ]]
+];
+
+const IDEA_POOL = [
+  ["Night Shift Familiar","야간 편의점에 찾아오는 마법 생물의 이상한 주문을 처리하는 짧은 운영 게임.","Cozy Management","세로형 모바일"],
+  ["Ghost Dating Agency","죽은 사람들의 마지막 데이트를 성사시키는 선택형 중개 시뮬레이션.","Narrative Sim","모바일"],
+  ["Goblin Tax Office","고블린 왕국 세금 신고서를 검토하며 거짓말을 잡아내는 추리 업무 게임.","Deduction / Job","PC·모바일"],
+  ["Tiny Dungeon Laundromat","모험가의 장비를 세탁하며 묻어온 흔적으로 던전 이야기를 추리하는 게임.","Cozy Puzzle","모바일"],
+  ["Last Train Florist","막차 승객에게 그날의 사연에 맞는 꽃을 조합해 건네는 감성 퍼즐.","Narrative Puzzle","모바일"],
+  ["Potion Return Center","실패한 포션의 반품 사유를 검사하고 제조사를 추적하는 판타지 업무 게임.","Management","모바일"],
+  ["Dragon Rental Desk","용을 빌리러 온 모험가의 목적과 실력을 보고 적합한 용을 배정하는 게임.","Management","모바일"],
+  ["Dream Pawn Shop","손님의 꿈을 담보로 잡고 가격을 흥정하는 초현실 중고거래 시뮬레이션.","Trading Sim","모바일"],
+  ["Elevator to Floor 0","존재하지 않는 0층으로 가는 엘리베이터의 승객 규칙을 지키는 미스터리.","Mystery","PC·모바일"],
+  ["Witch Delivery Route","마녀 배달원이 위험한 주문을 가장 짧은 경로로 전달하는 시간관리 게임.","Route Puzzle","모바일"]
+];
+
+function seedState() {
+  return {
+    cycle: 16,
+    settings: { autoIdeas:true, autoGreenlight:true, autoConcept:true, autoWireframe:true, autoBuild:true, humanGate:true },
+    projects: [
+      {id:"ld", title:"LET'S DEALER", desc:"손가락으로 직접 딜링하는 모바일 포커 딜러 게임.", genre:"Skill / Simulation", platform:"Mobile · Godot", stage:"directed", progress:68, build:"v0.4.2", repo:"Queenrain9/lets-dealer", decision:"KEEP", risk:"MED", visual:"Dealer table / premium iOS", note:"Collect는 sweep gesture. Board는 Flop 묶음 펼치기, Turn/River 단장 오픈.", created:1},
+      {id:"mum", title:"Monster Used Market", desc:"괴물들의 기묘한 물건을 감정·거래하는 판타지 중고마켓.", genre:"Trading / Management", platform:"Mobile · Godot", stage:"directed", progress:54, build:"v0.3.1", repo:"Queenrain9/monster-used-market", decision:"KEEP", risk:"MED", visual:"Lantern night market", note:"현재 구조 목업과 실제 화면의 비율/레이어 일치가 우선.", created:2},
+      {id:"ghost", title:"Ghost Dating Agency", desc:"죽은 사람들의 마지막 데이트를 성사시키는 선택형 중개 시뮬레이션.", genre:"Narrative Sim", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.2.0", repo:"danbi-lab/ghost-dating-agency", decision:null, risk:"LOW", visual:"Noir pastel office", changes:"첫 플레이 루프 완성 · 3개 의뢰 · 결과 카드 추가", created:3},
+      {id:"goblin", title:"Goblin Tax Office", desc:"고블린 왕국 세금 신고서에서 수상한 항목을 찾아내는 업무 추리 게임.", genre:"Deduction / Job", platform:"Mobile · Godot", stage:"playtest", progress:100, build:"v0.1.4", repo:"danbi-lab/goblin-tax-office", decision:null, risk:"LOW", visual:"Bureaucratic fantasy", changes:"판정 피드백 개선 · 7분 플레이 가능", created:4},
+      {id:"dream", title:"Dream Pawn Shop", desc:"손님의 꿈을 담보로 잡고 가치와 위험을 흥정하는 거래 시뮬레이션.", genre:"Trading Sim", platform:"Mobile · Godot", stage:"build", progress:62, build:"v0.0.7", repo:"danbi-lab/dream-pawn-shop", decision:null, risk:"MED", visual:"Surreal neon pawnshop", created:5},
+      {id:"flower", title:"Last Train Florist", desc:"막차 승객의 사연을 듣고 꽃말을 조합하는 감성 퍼즐.", genre:"Narrative Puzzle", platform:"Mobile", stage:"wireframe", progress:100, build:null, repo:null, decision:null, risk:"LOW", visual:"Rainy last train", screens:9, created:6},
+      {id:"laundry", title:"Tiny Dungeon Laundromat", desc:"모험가의 장비를 세탁하며 묻어온 흔적으로 이야기를 추리한다.", genre:"Cozy Puzzle", platform:"Mobile", stage:"concept", progress:78, build:null, repo:null, decision:null, risk:"LOW", visual:"Tiny medieval laundromat", conceptCount:6, created:7},
+      {id:"dragon", title:"Dragon Rental Desk", desc:"모험가에게 목적과 실력에 맞는 용을 배정하는 서비스 데스크 게임.", genre:"Management", platform:"Mobile", stage:"greenlight", progress:0, build:null, repo:null, decision:null, risk:"MED", visual:"Bright guild counter", scores:{hook:88, feasibility:91, replay:74, visual:84}, created:8},
+      {id:"elevator", title:"Elevator to Floor 0", desc:"존재하지 않는 0층으로 가는 승객들의 규칙을 관리하는 미스터리.", genre:"Mystery", platform:"PC · Mobile", stage:"idea", progress:0, build:null, repo:null, decision:null, risk:"MED", visual:"Limnal elevator", scores:{hook:92, feasibility:80, replay:68, visual:90}, created:9},
+      {id:"potion", title:"Potion Return Center", desc:"실패한 포션 반품서를 검사해 제조 문제와 거짓 신고를 가려낸다.", genre:"Management", platform:"Mobile", stage:"idea", progress:0, build:null, repo:null, decision:null, risk:"LOW", visual:"Fantasy return desk", scores:{hook:82, feasibility:94, replay:83, visual:76}, created:10}
+    ],
+    activity: [
+      {t:"18:41", text:"Ghost Dating Agency prototype v0.2.0이 플레이테스트실에 도착했습니다."},
+      {t:"18:34", text:"Tiny Dungeon Laundromat 컨셉 후보 6장 중 대표 방향을 선택했습니다."},
+      {t:"18:20", text:"Last Train Florist의 9개 화면 Interaction Wireframe이 완료되었습니다."},
+      {t:"18:02", text:"Dream Pawn Shop Build v0.0.7 진행률 62%."},
+      {t:"17:44", text:"Dragon Rental Desk가 Greenlight 심사 대상으로 승격되었습니다."}
+    ]
+  }
+}
+let state = load();
+let current = (location.hash || "#dashboard").slice(1);
+function load(){ try{ return JSON.parse(localStorage.getItem("danbiGameOfficeV1")) || seedState(); }catch(e){ return seedState(); } }
+function save(){ localStorage.setItem("danbiGameOfficeV1", JSON.stringify(state)); }
+function addLog(text){ const d=new Date(); state.activity.unshift({t:d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hour12:false}), text}); state.activity=state.activity.slice(0,80); save(); }
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function toast(msg){ const e=document.getElementById("toast"); e.textContent=msg; e.classList.add("show"); clearTimeout(window._toast); window._toast=setTimeout(()=>e.classList.remove("show"),1800); }
+function navRender(){
+  document.getElementById("nav").innerHTML = NAV.map(([group,items])=>`
+    <div class="nav-group"><div class="nav-label">${group}</div>
+    ${items.map(([id,ic,label])=>`<button class="nav-item ${current===id?"active":""}" onclick="go('${id}')"><span class="nav-icon">${ic}</span>${label}${id==="review"&&count("playtest")?`<span style="margin-left:auto;font-size:9px;background:#325d98;color:#dceaff;padding:3px 6px;border-radius:999px">${count("playtest")}</span>`:""}</button>`).join("")}
+    </div>`).join("");
+}
+function go(id){ current=id; location.hash=id; render(); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
+function count(stage){ return state.projects.filter(p=>p.stage===stage).length; }
+function titleInfo(){
+  const map={
+    dashboard:["대표 대시보드","회사 전체 제작 라인을 한눈에 확인합니다."],
+    ideas:["아이디어 연구소","아이디어가 계속 생성되고 후보군으로 축적됩니다."],
+    greenlight:["그린라이트 심사실","제작 비용을 쓰기 전에 AI Producer가 후보를 걸러냅니다."],
+    concept:["컨셉 스튜디오","기획안과 컨셉 방향을 만들고 대표 비주얼을 선정합니다."],
+    wireframe:["프리프로덕션","대표 컨셉을 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
+    build:["빌드 팜","Wireframe-ready 프로젝트를 Godot playable greybox로 만듭니다."],
+    review:["플레이테스트실","여기서부터 단비가 게임을 직접 만지고 KEEP / MAYBE / KILL을 결정합니다."],
+    directed:["디렉팅 개발실","살아남은 게임만 대표의 지시를 받아 제품 수준으로 발전시킵니다."],
+    archive:["프로젝트 보관소","KILL 또는 보류된 프로젝트를 기록하고 필요할 때 되살립니다."],
+    activity:["제작 활동 로그","자율 제작 라인에서 일어난 일을 시간순으로 확인합니다."],
+    settings:["스튜디오 설정","어디까지 AI가 자율적으로 진행할지 제작 정책을 정합니다."]
+  }; return map[current]||map.dashboard;
+}
+function metricData(){
+  return [
+    ["Ideas", count("idea"), "+ auto"],
+    ["Greenlit", count("greenlight"), "Producer"],
+    ["Concepts", count("concept"), "Art Director"],
+    ["Wireframes", count("wireframe"), "Spec ready"],
+    ["Building", count("build"), "Godot"],
+    ["Playable", count("playtest"), "Ready"],
+    ["Waiting for Danbi", count("playtest"), "Human gate"],
+    ["Directed", count("directed"), "Human-led"]
+  ];
+}
+function dashboard(){
+  const stages=["idea","greenlight","concept","wireframe","build","playtest","directed"];
+  return `
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">Autonomous game studio · cycle ${state.cycle}</div>
+      <h1>단비가 없는 동안에도<br>앞단 제작은 계속 돌아갑니다.</h1>
+      <p>아이디어 생성부터 컨셉·와이어프레임·플레이 가능한 초기 빌드까지 AI 제작본부가 병렬로 진행합니다. 대표는 Review Room에 도착한 게임부터 직접 판단하고, 살아남은 게임만 밀착 디렉팅합니다.</p>
+      <div class="hero-actions">
+        <button class="btn primary" onclick="runStudioCycle()">▶ Studio Cycle 실행</button>
+        <button class="btn" onclick="go('review')">플레이테스트 ${count("playtest")}개 확인</button>
+        <button class="btn ghost" onclick="go('activity')">활동 로그 보기</button>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="eyebrow">Automation policy</div>
+      <div class="hero-side-title">현재 제작 자율도</div>
+      <div class="automation-meter">
+        <div class="meter-row"><span>Pre-production</span><b>74%</b></div><div class="meter"><i></i></div>
+      </div>
+      <div class="gate-note"><b style="color:#d8e6fb">Human Gate</b><br>PLAYTEST 이전은 높은 자동화. KEEP 이후에는 AI가 임의로 핵심 게임 디자인을 바꾸지 않습니다.</div>
+      <div class="human-gate">대표 업무: <b>어떤 게임을 계속 만들 가치가 있는지 판단</b> → 디렉팅 → 승인.</div>
+    </div>
+  </section>
+  <div class="stats">${metricData().map(([l,n,d])=>`<div class="stat"><div class="n">${n}</div><div class="label">${l}</div><div class="delta">${d}</div></div>`).join("")}</div>
+
+  <div class="section-head"><div><h2>Production Pipeline</h2><p>수십 개 후보가 서로 다른 부서에서 동시에 흐릅니다.</p></div></div>
+  <div class="panel"><div class="pipeline">${stages.map(s=>`<div class="stage ${s==="playtest"?"current":""}"><div class="stage-name">${STAGE_LABEL[s]}</div><div class="stage-count">${count(s)}</div><div class="stage-auto">${s==="playtest"||s==="directed"?"HUMAN GATE":"AUTO FLOW"}</div></div>`).join("")}</div></div>
+
+  <div class="dashboard-grid" style="margin-top:18px">
+    <div class="panel">
+      <div class="panel-title"><strong>Ready for Danbi</strong><span>${count("playtest")} playable prototypes</span></div>
+      <div class="cards" style="grid-template-columns:repeat(2,minmax(0,1fr))">${state.projects.filter(p=>p.stage==="playtest").map(p=>reviewCard(p,true)).join("") || `<div class="empty">현재 기다리는 플레이테스트가 없습니다.</div>`}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><strong>Recent AI Activity</strong><span>live queue</span></div>
+      ${activityList(8)}
+    </div>
+  </div>`;
+}
+function activityList(limit=50){ return `<div class="activity">${state.activity.slice(0,limit).map(a=>`<div class="activity-item"><div class="activity-time">${a.t}</div><div class="activity-text"><span class="log-dot"></span>${esc(a.text)}</div></div>`).join("")}</div>`; }
+
+function genericHeader(title,desc,action=""){ return `<div class="section-head" style="margin-top:0"><div><h2>${title}</h2><p>${desc}</p></div>${action}</div>`; }
+
+function ideaCard(p){
+  const s=p.scores||{hook:76,feasibility:80,replay:72,visual:79};
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Candidate #${esc(p.id.slice(-4))}</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">IDEA</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span><span>Risk ${esc(p.risk)}</span></div>
+    <div class="score"><div><b>${s.hook}</b><span>HOOK</span></div><div><b>${s.feasibility}</b><span>FEAS.</span></div><div><b>${s.replay}</b><span>REPLAY</span></div><div><b>${s.visual}</b><span>VISUAL</span></div></div>
+    <div class="card-actions"><button class="btn" onclick="promote('${p.id}','greenlight')">심사실로 보내기</button><button class="btn ghost" onclick="showProject('${p.id}')">상세</button></div>
+  </div>`;
+}
+function ideasPage(){
+  const ps=state.projects.filter(p=>p.stage==="idea");
+  return genericHeader("Idea Pool","아이디어를 많이 만들고, 아직 제작 비용은 거의 쓰지 않는 단계입니다.",`<button class="btn primary" onclick="generateIdeas(3)">＋ 3개 생성</button>`) +
+    `<div class="cards">${ps.map(ideaCard).join("")}</div>`;
+}
+function greenCard(p){
+  const s=p.scores||{hook:83,feasibility:86,replay:75,visual:81};
+  const avg=Math.round((s.hook+s.feasibility+s.replay+s.visual)/4);
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Producer review</div><div class="card-title">${esc(p.title)}</div></div><span class="badge amber">${avg} / 100</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="score"><div><b>${s.hook}</b><span>HOOK</span></div><div><b>${s.feasibility}</b><span>FEAS.</span></div><div><b>${s.replay}</b><span>REPLAY</span></div><div><b>${s.visual}</b><span>VISUAL</span></div></div>
+    <div class="detail-box" style="margin-top:12px"><h3>AI Producer note</h3><p>${avg>84?"핵심 판타지가 명확하고 초기 프로토타입 비용이 낮습니다. 컨셉 제작 진행 가치가 있습니다.":"가능성은 있으나 차별화와 플레이 반복성을 한 번 더 검토합니다."}</p></div>
+    <div class="card-actions"><button class="btn good" onclick="promote('${p.id}','concept')">PASS → Concept</button><button class="btn warn" onclick="hold('${p.id}')">HOLD</button><button class="btn bad" onclick="kill('${p.id}')">REJECT</button></div>
+  </div>`;
+}
+function greenlightPage(){
+  const ps=state.projects.filter(p=>p.stage==="greenlight");
+  return genericHeader("Greenlight Queue","아이디어를 낸 역할과 통과시키는 역할을 분리합니다.")+`<div class="cards">${ps.map(greenCard).join("") || `<div class="empty">심사 대기 후보가 없습니다. Studio Cycle을 실행하면 새 후보가 들어옵니다.</div>`}</div>`;
+}
+function conceptCard(p){
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Concept pack</div><div class="card-title">${esc(p.title)}</div></div><span class="badge purple">${p.progress}%</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="detail-box"><h3>Visual Direction</h3><p>${esc(p.visual||"Visual direction pending")}</p></div>
+    <div class="meta"><span>${p.conceptCount||4} concept candidates</span><span>AI Art Director review</span></div>
+    <div class="progress"><i style="width:${p.progress}%"></i></div><div class="progress-row"><span>brief → candidates → select</span><b>${p.progress}%</b></div>
+    <div class="card-actions"><button class="btn" onclick="advanceProgress('${p.id}',25,'wireframe')">컨셉 작업 진행</button><button class="btn ghost" onclick="showProject('${p.id}')">기획 보기</button></div>
+  </div>`;
+}
+function conceptPage(){ const ps=state.projects.filter(p=>p.stage==="concept"); return genericHeader("Concept Studio","기획안과 여러 컨셉 후보를 만들고 AI Art Director가 대표 방향을 선택합니다.")+`<div class="cards">${ps.map(conceptCard).join("") || `<div class="empty">현재 컨셉 제작 중인 프로젝트가 없습니다.</div>`}</div>`; }
+function wireCard(p){
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Implementation-ready</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">WIREFRAME</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="detail-box"><h3>${p.screens||8} Screens</h3><p>Layout · Components · Interaction · State · Transition · Game Rules</p></div>
+    <div class="progress"><i style="width:${p.progress}%"></i></div><div class="progress-row"><span>Pre-production package</span><b>${p.progress}%</b></div>
+    <div class="card-actions"><button class="btn primary" onclick="promote('${p.id}','build')">Build Farm으로 보내기</button><button class="btn ghost" onclick="showProject('${p.id}')">설계서</button></div>
+  </div>`;
+}
+function wirePage(){ const ps=state.projects.filter(p=>p.stage==="wireframe"); return genericHeader("Wireframe Department","예쁜 이미지를 실제 구현 구조와 상태·인터랙션으로 번역합니다.")+`<div class="cards">${ps.map(wireCard).join("") || `<div class="empty">Wireframe-ready 프로젝트가 없습니다.</div>`}</div>`; }
+function buildCard(p){
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Godot build farm</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">${p.build||"v0.0.1"}</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="meta"><span>Godot</span><span>${esc(p.repo||"repo pending")}</span><span>Greybox</span></div>
+    <div class="progress"><i style="width:${p.progress}%"></i></div><div class="progress-row"><span>Playable prototype</span><b>${p.progress}%</b></div>
+    <div class="card-actions"><button class="btn" onclick="advanceProgress('${p.id}',25,'playtest')">빌드 진행 +25%</button><button class="btn ghost" onclick="showProject('${p.id}')">상세</button></div>
+  </div>`;
+}
+function buildPage(){ const ps=state.projects.filter(p=>p.stage==="build"); return genericHeader("Build Farm","완성품이 아니라 '재미를 판단할 수 있는 플레이어블'을 빠르게 만듭니다.")+`<div class="cards">${ps.map(buildCard).join("") || `<div class="empty">현재 Build Farm이 비어 있습니다.</div>`}</div>`; }
+function reviewCard(p,compact=false){
+  return `<div class="game-card review-card">
+    <div class="card-top"><div><div class="kicker">Ready for playtest</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">${esc(p.build||"prototype")}</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="meta"><span>${esc(p.genre)}</span><span>Godot</span><span>${esc(p.repo||"repo pending")}</span></div>
+    ${p.changes?`<div class="detail-box"><h3>최근 변경사항</h3><p>${esc(p.changes)}</p></div>`:""}
+    <div class="decision">
+      <button class="btn good" onclick="decide('${p.id}','KEEP')">♥ KEEP</button>
+      <button class="btn warn" onclick="decide('${p.id}','MAYBE')">? MAYBE</button>
+      <button class="btn bad" onclick="decide('${p.id}','KILL')">× KILL</button>
+    </div>
+    <div class="card-actions"><button class="btn" onclick="copyRepo('${p.id}')">Repo 주소 복사</button><button class="btn ghost" onclick="showProject('${p.id}')">상세</button></div>
+  </div>`;
+}
+function reviewPage(){ const ps=state.projects.filter(p=>p.stage==="playtest"); return genericHeader("Ready for Playtest","대표가 가장 자주 들어오는 방입니다. 이 단계부터 자동화가 급격히 줄어듭니다.")+`<div class="cards">${ps.map(p=>reviewCard(p)).join("") || `<div class="empty">🎉 현재 대표 승인 대기 게임이 없습니다.</div>`}</div>`; }
+function directedCard(p){
+  return `<div class="game-card">
+    <div class="card-top"><div><div class="kicker">Human-directed</div><div class="card-title">${esc(p.title)}</div></div><span class="badge purple">${esc(p.decision||"KEEP")}</span></div>
+    <div class="card-desc">${esc(p.desc)}</div>
+    <div class="automation-meter"><div class="meter-row"><span>Automation level</span><b>20%</b></div><div class="meter"><i style="width:20%;background:linear-gradient(90deg,#9f83df,#6b79d0)"></i></div></div>
+    <div class="detail-box"><h3>Danbi Direction</h3><p>${esc(p.note||"아직 대표 지시가 없습니다.")}</p></div>
+    <div class="card-actions"><button class="btn primary" onclick="editDirection('${p.id}')">디렉팅 메모</button><button class="btn" onclick="showProject('${p.id}')">프로젝트 룸</button></div>
+  </div>`;
+}
+function directedPage(){ const ps=state.projects.filter(p=>p.stage==="directed"); return genericHeader("Directed Development","이 단계에서는 AI가 핵심 방향을 임의로 바꾸지 않습니다.")+`<div class="cards">${ps.map(directedCard).join("")}</div>`; }
+function archivePage(){ const ps=state.projects.filter(p=>p.stage==="archive"); return genericHeader("Archive","버린 아이디어도 기록은 남습니다. 실패를 싸게 만드는 것이 이 공장의 장점입니다.")+`<div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-title">${esc(p.title)}</div><div class="card-desc">${esc(p.desc)}</div><div class="meta"><span>${esc(p.decision||"ARCHIVED")}</span><span>${esc(p.genre)}</span></div><div class="card-actions"><button class="btn" onclick="promote('${p.id}','idea')">Idea Pool로 복구</button></div></div>`).join("") || `<div class="empty">Archive가 비어 있습니다.</div>`}</div>`; }
+function activityPage(){ return genericHeader("Studio Activity","자동 생성·승격·빌드와 대표 결정이 모두 기록됩니다.",`<button class="btn bad" onclick="clearLog()">로그 비우기</button>`)+`<div class="panel">${activityList(80)}</div>`; }
+function settingsPage(){
+  const rows=[
+    ["autoIdeas","아이디어 자동 생성","Studio Cycle마다 새로운 후보군을 생성합니다."],
+    ["autoGreenlight","자동 Greenlight","Producer 기준을 통과한 후보를 다음 단계로 보냅니다."],
+    ["autoConcept","Concept 자동 제작","기획안과 컨셉 후보군을 생성합니다."],
+    ["autoWireframe","Wireframe 자동 제작","선정된 컨셉을 구현용 화면 설계도로 번역합니다."],
+    ["autoBuild","Godot Build 자동화","Wireframe-ready 프로젝트를 greybox prototype으로 보냅니다."],
+    ["humanGate","Playtest 이후 Human Gate","KEEP 이후 핵심 방향 변경은 대표 승인 없이는 진행하지 않습니다."]
+  ];
+  return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
+  <div class="two-col">
+    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>saved locally</span></div>
+      ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
+    </div>
+    <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
+      <div class="detail-box"><h3>Human-directed, AI-produced</h3><p>AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
+      <div class="human-gate" style="margin-top:12px">핵심 KPI: <b>“일주일에 대표가 플레이할 가치가 있는 게임이 몇 개 Review Room에 도착하는가.”</b></div>
+      <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">샘플 데이터로 초기화</button></div>
+    </div>
+  </div>`;
+}
+function render(){
+  if(!["dashboard","ideas","greenlight","concept","wireframe","build","review","directed","archive","activity","settings"].includes(current)) current="dashboard";
+  navRender();
+  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; document.getElementById("pageSubtitle").textContent=s;
+  const pages={dashboard,ideas:ideasPage,greenlight:greenlightPage,concept:conceptPage,wireframe:wirePage,build:buildPage,review:reviewPage,directed:directedPage,archive:archivePage,activity:activityPage,settings:settingsPage};
+  document.getElementById("content").innerHTML = pages[current]();
+}
+function getP(id){ return state.projects.find(p=>p.id===id); }
+function promote(id,stage){
+  const p=getP(id); if(!p)return;
+  p.stage=stage; p.progress=stage==="concept"?20:stage==="wireframe"?100:stage==="build"?15:p.progress;
+  if(stage==="build"){ p.repo=p.repo||`danbi-lab/${slugify(p.title)}`; p.build=p.build||"v0.0.1"; }
+  addLog(`${p.title} → ${STAGE_LABEL[stage]} 단계로 이동했습니다.`); save(); render(); toast(`${STAGE_LABEL[stage]}로 이동`);
+}
+function hold(id){ const p=getP(id); if(!p)return; addLog(`${p.title} Greenlight 심사를 HOLD했습니다.`); toast("HOLD 기록됨"); }
+function kill(id){ const p=getP(id); if(!p)return; p.stage="archive"; p.decision="REJECT"; addLog(`${p.title}를 Greenlight에서 REJECT하고 Archive로 보냈습니다.`); save(); render(); }
+function advanceProgress(id,amount,nextStage){
+  const p=getP(id); if(!p)return; p.progress=Math.min(100,(p.progress||0)+amount);
+  addLog(`${p.title} ${STAGE_LABEL[p.stage]} 진행률 ${p.progress}%.`);
+  if(p.progress>=100 && nextStage){
+    p.stage=nextStage;
+    if(nextStage==="wireframe"){p.progress=100;p.screens=p.screens||8;}
+    if(nextStage==="playtest"){p.progress=100;p.build=p.build||"v0.1.0";p.changes="자동 제작된 핵심 루프가 플레이 가능한 상태입니다.";}
+    addLog(`${p.title} → ${STAGE_LABEL[nextStage]} 완료.`);
+  }
+  save(); render();
+}
+function decide(id,d){
+  const p=getP(id); if(!p)return; p.decision=d;
+  if(d==="KEEP"){ p.stage="directed"; p.note=p.note||"첫 플레이테스트 완료. 대표 디렉팅 대기."; addLog(`${p.title}: KEEP. Directed Development로 전환했습니다.`); }
+  else if(d==="MAYBE"){ addLog(`${p.title}: MAYBE. Review Room에 보류했습니다.`); }
+  else { p.stage="archive"; addLog(`${p.title}: KILL. Archive로 이동했습니다.`); }
+  save(); render(); toast(`${p.title} · ${d}`);
+}
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9가-힣]+/g,"-").replace(/^-|-$/g,""); }
+function generateIdeas(n=3){
+  const existing=new Set(state.projects.map(p=>p.title));
+  let made=0;
+  for(let i=0;i<IDEA_POOL.length && made<n;i++){
+    const idx=(state.cycle+i*3)%IDEA_POOL.length; const x=IDEA_POOL[idx];
+    let title=x[0]; if(existing.has(title)) title=`${x[0]} ${state.cycle+made}`;
+    const id="i"+Date.now().toString(36)+made;
+    const base=74+((state.cycle+made*7)%18);
+    state.projects.push({id,title,desc:x[1],genre:x[2],platform:x[3],stage:"idea",progress:0,risk:(made%3===0?"LOW":"MED"),visual:"Direction pending",scores:{hook:Math.min(97,base+4),feasibility:Math.min(97,base+9),replay:Math.min(96,base-2),visual:Math.min(98,base+6)},created:Date.now()+made});
+    existing.add(title); made++;
+  }
+  addLog(`Idea Lab이 새로운 게임 아이디어 ${made}개를 생성했습니다.`); save(); render(); toast(`${made}개 아이디어 생성`);
+}
+function runStudioCycle(){
+  state.cycle++;
+  let actions=[];
+  if(state.settings.autoIdeas){ generateIdeasSilent(4); actions.push("아이디어 4개 생성"); }
+  if(state.settings.autoGreenlight){
+    const ideas=state.projects.filter(p=>p.stage==="idea").sort((a,b)=>(avgScore(b)-avgScore(a)));
+    if(ideas[0]){ideas[0].stage="greenlight"; actions.push(`${ideas[0].title} Greenlight 후보`);}
+  }
+  if(state.settings.autoConcept){
+    const g=state.projects.find(p=>p.stage==="greenlight");
+    if(g && avgScore(g)>=80){g.stage="concept";g.progress=25;g.conceptCount=4;actions.push(`${g.title} Concept 시작`);}
+  }
+  if(state.settings.autoWireframe){
+    const c=state.projects.find(p=>p.stage==="concept");
+    if(c){c.progress=Math.min(100,(c.progress||0)+25);if(c.progress>=100){c.stage="wireframe";c.screens=c.screens||8;actions.push(`${c.title} Wireframe 완료`);}}
+  }
+  if(state.settings.autoBuild){
+    const w=state.projects.find(p=>p.stage==="wireframe");
+    if(w){w.stage="build";w.progress=20;w.repo=w.repo||`danbi-lab/${slugify(w.title)}`;w.build="v0.0.1";actions.push(`${w.title} Build Farm 진입`);}
+    const b=state.projects.find(p=>p.stage==="build");
+    if(b){b.progress=Math.min(100,(b.progress||0)+22);if(b.progress>=100){b.stage="playtest";b.build="v0.1.0";b.changes="AI 제작본부가 핵심 루프의 playable greybox를 완성했습니다.";actions.push(`${b.title} Playtest ready`);}}
+  }
+  const summary=`Studio Cycle #${state.cycle}: ${actions.join(" · ") || "자동화된 작업 없음"}`;
+  addLog(summary); save(); render(); toast(`Cycle #${state.cycle} 완료`);
+}
+function generateIdeasSilent(n){
+  const existing=new Set(state.projects.map(p=>p.title)); let made=0;
+  for(let i=0;i<IDEA_POOL.length && made<n;i++){
+    const idx=(state.cycle+i*2)%IDEA_POOL.length, x=IDEA_POOL[idx];
+    let title=x[0]; if(existing.has(title)) title=`${x[0]} · ${state.cycle}`;
+    const base=72+((state.cycle+made*5)%20), id="auto"+Date.now().toString(36)+made;
+    state.projects.push({id,title,desc:x[1],genre:x[2],platform:x[3],stage:"idea",progress:0,risk:made%2?"MED":"LOW",visual:"Direction pending",scores:{hook:Math.min(98,base+6),feasibility:Math.min(97,base+8),replay:Math.min(95,base),visual:Math.min(98,base+5)},created:Date.now()+made}); existing.add(title); made++;
+  }
+}
+function avgScore(p){ const s=p.scores||{hook:80,feasibility:80,replay:80,visual:80}; return (s.hook+s.feasibility+s.replay+s.visual)/4; }
+function showProject(id){
+  const p=getP(id); if(!p)return;
+  modal(`<div class="modal-head"><div><div class="kicker">${STAGE_LABEL[p.stage]}</div><h2>${esc(p.title)}</h2></div><button class="close" onclick="closeModal()">×</button></div>
+  <div class="two-col"><div class="detail-box"><h3>Game Brief</h3><p>${esc(p.desc)}</p><p><b>Genre</b> · ${esc(p.genre)}<br><b>Platform</b> · ${esc(p.platform)}<br><b>Risk</b> · ${esc(p.risk)}<br><b>Visual</b> · ${esc(p.visual||"-")}</p></div>
+  <div class="detail-box"><h3>Production State</h3><p><b>Stage</b> · ${STAGE_LABEL[p.stage]}<br><b>Progress</b> · ${p.progress||0}%<br><b>Build</b> · ${esc(p.build||"not built")}<br><b>Repo</b> · ${esc(p.repo||"not assigned")}</p></div></div>
+  ${p.note?`<div class="detail-box" style="margin-top:12px"><h3>Danbi Direction</h3><p>${esc(p.note)}</p></div>`:""}
+  <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">닫기</button></div>`);
+}
+function editDirection(id){
+  const p=getP(id); if(!p)return;
+  modal(`<div class="modal-head"><div><div class="kicker">Directed Development</div><h2>${esc(p.title)}</h2></div><button class="close" onclick="closeModal()">×</button></div>
+    <label>단비 디렉팅 메모</label><textarea id="directionText">${esc(p.note||"")}</textarea>
+    <div class="human-gate">이 메모가 저장된 이후 AI는 이 방향을 기준으로 제안·구현해야 하며 핵심 게임 디자인을 임의 변경하지 않습니다.</div>
+    <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="saveDirection('${p.id}')">저장</button></div>`);
+}
+function saveDirection(id){ const p=getP(id); p.note=document.getElementById("directionText").value.trim(); addLog(`${p.title}에 대표 디렉팅 메모가 업데이트되었습니다.`); save(); closeModal(); render(); toast("디렉팅 메모 저장"); }
+function openQuickIdea(){
+  modal(`<div class="modal-head"><div><div class="kicker">Manual input</div><h2>아이디어 직접 투입</h2></div><button class="close" onclick="closeModal()">×</button></div>
+  <div class="form-row"><div><label>게임 이름</label><input id="qiTitle" placeholder="예: Goblin Library Night Shift"></div><div><label>장르</label><input id="qiGenre" placeholder="Management / Puzzle"></div></div>
+  <label>핵심 한 줄</label><textarea id="qiDesc" placeholder="플레이어가 무엇을 하며 무엇이 재밌는지 한두 문장으로."></textarea>
+  <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="saveQuickIdea()">Idea Pool에 넣기</button></div>`);
+}
+function saveQuickIdea(){
+  const title=document.getElementById("qiTitle").value.trim(), desc=document.getElementById("qiDesc").value.trim(), genre=document.getElementById("qiGenre").value.trim()||"Unclassified";
+  if(!title||!desc){toast("이름과 한 줄 설명을 입력해줘");return}
+  state.projects.push({id:"manual"+Date.now(),title,desc,genre,platform:"Mobile",stage:"idea",progress:0,risk:"MED",visual:"Direction pending",scores:{hook:80,feasibility:80,replay:75,visual:80},created:Date.now()});
+  addLog(`대표가 ${title} 아이디어를 Idea Pool에 직접 투입했습니다.`); save(); closeModal(); render(); toast("Idea Pool에 추가");
+}
+function copyRepo(id){ const p=getP(id); if(!p||!p.repo){toast("Repo가 아직 없습니다.");return;} navigator.clipboard?.writeText("https://github.com/"+p.repo).then(()=>toast("Repo 주소 복사됨")).catch(()=>toast(p.repo)); }
+function modal(inner){ document.getElementById("modal").innerHTML=inner; document.getElementById("modalBackdrop").classList.add("show"); }
+function closeModal(){ document.getElementById("modalBackdrop").classList.remove("show"); }
+function backdropClose(e){ if(e.target.id==="modalBackdrop")closeModal(); }
+function toggleSetting(k){ state.settings[k]=!state.settings[k]; addLog(`Studio Policy: ${k} = ${state.settings[k]?"ON":"OFF"}`); save(); render(); }
+function clearLog(){ if(confirm("활동 로그를 비울까요?")){state.activity=[];save();render();} }
+function resetStudio(){ if(confirm("로컬 데이터를 초기 샘플 상태로 되돌릴까요?")){state=seedState();save();render();toast("초기화 완료");} }
+function toggleMenu(){ document.getElementById("sidebar").classList.toggle("open"); }
+window.addEventListener("hashchange",()=>{current=(location.hash||"#dashboard").slice(1);render();});
+render();
+</script>
+</body>
+</html>
