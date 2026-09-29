@@ -65,7 +65,7 @@ _component_types(
     'TextureRect', 'absolute_control_v1', ('explicit_script_v1',)
 )
 _component_types(
-    'canvas card_list cards chip chip_group chips list list_buttons grid grid_buttons '
+    'canvas card_list cards chip chip_group chips cue_strip list list_buttons grid grid_buttons timeline '
     'metric_grid tags tray part_tray tool_tray horizontal_strip stack resource route_cards '
     'goal_overlays reach_overlay world',
     'Control', 'absolute_control_v1', ('explicit_script_v1',)
@@ -377,6 +377,10 @@ def validate(b, project=None, claims=None, commit=None):
         target_paths.extend(v.get('related_nodes',[]) if isinstance(v.get('related_nodes'),list) else [])
         if v.get('source_target') != src.get('target'):
             error('INPUT_TARGET',primary_path,'source_target must preserve the Wireframe interaction target text exactly')
+        primary_component=nodes.get(primary_path,{})
+        if len(target_paths)==1 and primary_component and v.get('source_target') not in (primary_component.get('component_id'), primary_component.get('label')):
+            if not v.get('target_selector'):
+                error('INPUT_TARGET',primary_path,'Semantic sub-target needs explicit target_selector when source target is not the component itself')
         if v.get('input')!=src.get('trigger',src.get('input')):
             error('INPUT_MODALITY',primary_path,'Gesture differs from source')
         if not target_paths:
