@@ -828,8 +828,8 @@ function metricData(){
     ["Game Design", gameDesigns.length, "실제 대기"],
     ["Pre-production", wireframePacks.length, "실제 대기"],
     ["Implementation", implementationContracts.length, "실제 계약"],
-    ["Build Farm", buildJobs.length, "실제 작업"],
-    ["Fidelity Gate", fidelityReviews.length, "실제 검수"]
+    ["Build Farm", buildJobs.filter(b=>!isHistoricalBuild(b)).length, "현재 작업"],
+    ["Fidelity Gate", fidelityReviews.filter(r=>!isSupersededReview(r)).length, "현재 검수"]
   ];
 }
 
@@ -868,7 +868,7 @@ function dashboard(){
       <div class="panel-title"><strong>AI 제작본부</strong><span>현재 확정 범위</span></div>
       <div class="detail-box">
         <h3>3단계 제작 라인</h3>
-        <p>Implementation Contract <b>${implementationContracts.length}</b> · Build Job <b>${buildJobs.length}</b> · Fidelity Review <b>${fidelityReviews.length}</b></p>
+        <p>Implementation Contract <b>${implementationContracts.length}</b> · Build Job <b>${buildJobs.filter(b=>!isHistoricalBuild(b)).length}</b> · Fidelity Review <b>${fidelityReviews.filter(r=>!isSupersededReview(r)).length}</b></p>
       </div>
       <div class="card-actions"><button class="btn" onclick="go('implementation')">구현 설계실</button><button class="btn" onclick="go('build')">빌드 팜</button><button class="btn" onclick="go('fidelity')">설계 검수실</button></div>
     </div>
@@ -1485,45 +1485,66 @@ function implementationPage(){
     '<div class="cards">'+(implementationContracts.map(implementationContractCard).join("") || '<div class="empty">아직 Implementation Contract가 없습니다.<br>35분 예약 작업이 Wireframe Pack을 시공 계약으로 변환합니다.</div>')+'</div>';
 }
 
+function isSupersededReview(r){
+  return r?.verification_scope==="superseded_reset" || String(r?.review_summary||"").startsWith("SOFT_RESET:");
+}
+function isHistoricalBuild(b){
+  return b?.status==="archived" || String(b?.build_summary||"").startsWith("SOFT_RESET:");
+}
+
 function fidelityName(buildId){
   const b=buildJobs.find(x=>x.id===buildId);
   return b?b.title:"Build "+String(buildId||"").slice(0,8);
 }
 function fidelityReviewCard(r){
+  const superseded=isSupersededReview(r);
   const bad=Number(r.partial_count||0)+Number(r.missing_count||0)+Number(r.conflict_count||0)+Number(r.broken_count||0);
-  const cls=r.verdict==="pass"?"green":r.verdict==="fail"?"red":"blue";
-  return '<div class="game-card"><div class="card-top"><div><div class="kicker">FIDELITY REVIEW · ROUND '+Number(r.review_round||1)+'</div><div class="card-title">'+esc(fidelityName(r.build_job_id))+'</div></div><span class="badge '+cls+'">'+esc((r.verdict||r.status||"pending").toUpperCase())+'</span></div>'+
+  const cls=superseded?"amber":r.verdict==="pass"?"green":r.verdict==="fail"?"red":"blue";
+  const badge=superseded?"SUPERSEDED":String(r.verdict||r.status||"pending").toUpperCase();
+  const kicker=superseded?"SUPERSEDED HISTORY · ROUND ":"FIDELITY REVIEW · ROUND ";
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+Number(r.review_round||1)+'</div><div class="card-title">'+esc(fidelityName(r.build_job_id))+'</div></div><span class="badge '+cls+'">'+esc(badge)+'</span></div>'+
     '<div class="meta"><span>VERIFIED '+Number(r.verified_count||0)+'</span><span>ISSUES '+bad+'</span>'+(r.reviewed_commit?'<span>'+esc(String(r.reviewed_commit).slice(0,8))+'</span>':'')+'</div>'+
-    (r.review_summary?'<div class="detail-box" style="margin-top:12px"><h3>Independent Review</h3><p>'+esc(r.review_summary)+'</p></div>':'')+'</div>';
+    (superseded?'<div class="human-gate" style="margin-top:12px"><b>과거 검수 기록</b><br>Pre-production reset 이전 결과입니다. 현재 Blueprint 승인·Build·Repair 판단에는 사용하지 않습니다.</div>':'')+
+    (r.review_summary?'<div class="detail-box" style="margin-top:12px"><h3>'+(superseded?'Historical Review':'Independent Review')+'</h3><p>'+esc(r.review_summary)+'</p></div>':'')+'</div>';
 }
 function fidelityPendingCard(b){
   const tickets=repairTickets.filter(x=>x.build_job_id===b.id && x.status==="open");
   return '<div class="game-card"><div class="card-top"><div><div class="kicker">FIDELITY GATE QUEUE</div><div class="card-title">'+esc(b.title)+'</div></div><span class="badge blue">'+esc((b.fidelity_status||"pending").toUpperCase())+'</span></div>'+
-    '<div class="card-desc">Implementation complete. Wireframe + Contract + actual repository code must be independently compared before QA Ready.</div>'+
+    '<div class="card-desc">Implementation complete. Wireframe + Contract + actual repository code must be independently compared before PLAYTEST READY.</div>'+
     (tickets.length?'<div class="human-gate"><b>Open repair tickets · '+tickets.length+'</b><br>'+tickets.slice(0,6).map(x=>esc(x.requirement_id)+' · '+esc(x.verdict)+' · '+esc(x.title)).join("<br>")+'</div>':'')+'</div>';
 }
 function fidelityPage(){
   const pending=buildJobs.filter(b=>b.status==="fidelity_pending" || b.status==="repair");
-  return genericHeader("Fidelity Gate","빌더의 자기평가를 믿지 않고 Wireframe + Implementation Contract + 실제 코드를 독립적으로 대조합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
-    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Fidelity Gate Hourly</strong><span>independent verifier</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 50분</b></span><span>VERIFIED / PARTIAL / MISSING / CONFLICT / BROKEN</span><span>FAIL → Repair → Build Farm</span><span>ALL VERIFIED → QA Ready</span></div></div>'+
-    (pending.length?'<div class="section-head"><div><h2>검수 대기 / Repair</h2><p>QA Ready 이전의 실제 제작 후보</p></div></div><div class="cards">'+pending.map(fidelityPendingCard).join("")+'</div>':'')+
-    '<div class="section-head"><div><h2>Review History</h2><p>독립 검수 결과</p></div></div><div class="cards">'+(fidelityReviews.map(fidelityReviewCard).join("") || '<div class="empty">아직 Fidelity Review 기록이 없습니다.</div>')+'</div>';
+  const currentReviews=fidelityReviews.filter(r=>!isSupersededReview(r));
+  const supersededReviews=fidelityReviews.filter(r=>isSupersededReview(r));
+  return genericHeader("Static Fidelity Gate","빌더의 자기평가를 믿지 않고 Wireframe + Implementation Contract + 실제 코드를 독립적으로 대조합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
+    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Static Fidelity Gate Hourly</strong><span>independent verifier</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 50분</b></span><span>VERIFIED / PARTIAL / MISSING / CONFLICT / BROKEN</span><span>FAIL → Repair → Build Farm</span><span>ALL VERIFIED → PLAYTEST READY</span></div></div>'+
+    (pending.length?'<div class="section-head"><div><h2>검수 대기 / Repair</h2><p>PLAYTEST READY 이전의 실제 제작 후보</p></div></div><div class="cards">'+pending.map(fidelityPendingCard).join("")+'</div>':'')+
+    '<div class="section-head"><div><h2>Current Review History</h2><p>현재 Blueprint/Build에 유효한 독립 검수 결과</p></div></div><div class="cards">'+(currentReviews.map(fidelityReviewCard).join("") || '<div class="empty">현재 유효한 Fidelity Review 기록이 없습니다.</div>')+'</div>'+
+    (supersededReviews.length?'<div class="section-head"><div><h2>Superseded History</h2><p>reset 이전 이력 · 현재 승인/Repair 판단에 사용하지 않음</p></div></div><div class="cards">'+supersededReviews.map(fidelityReviewCard).join("")+'</div>':'');
 }
 
 function buildCard(p){
   const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"Implementation Complete"};
   const blockers=Array.isArray(p.blockers)?p.blockers:[];
-  return '<div class="game-card"><div class="card-top"><div><div class="kicker">GODOT BUILD JOB</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge blue">'+esc(p.status)+'</span></div>'+
-  '<div class="meta"><span>'+esc(p.build_version)+'</span><span>'+esc(labels[p.current_stage]||p.current_stage)+'</span><span>Godot 4.x</span></div>'+
+  const historical=isHistoricalBuild(p);
+  const softReset=String(p.build_summary||"").startsWith("SOFT_RESET:");
+  const kicker=historical?"HISTORICAL BUILD · DO NOT REUSE":"GODOT BUILD JOB";
+  const badge=softReset?"SUPERSEDED":p.status;
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+(historical?'amber':'blue')+'">'+esc(badge)+'</span></div>'+
+  '<div class="meta"><span>'+esc(p.build_version||"-")+'</span><span>'+esc(labels[p.current_stage]||p.current_stage||"-")+'</span><span>Godot 4.x</span></div>'+
   '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>Contract implementation</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
-  (p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>Current Work</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
-  '<div class="meta"><span>'+esc(p.project_path||"-")+'</span>'+(p.last_commit?'<span>'+esc(String(p.last_commit).slice(0,8))+'</span>':'')+'</div>'+
-  (blockers.length?'<div class="human-gate"><b>Blocker</b><br>'+blockers.map(x=>esc(typeof x==="string"?x:JSON.stringify(x))).join("<br>")+'</div>':'')+'</div>';
+  (softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>Current Work</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
+  '<div class="meta"><span>'+esc(p.project_path||"-")+'</span>'+(!historical&&p.last_commit?'<span>'+esc(String(p.last_commit).slice(0,8))+'</span>':'')+'</div>'+
+  (blockers.length&&!historical?'<div class="human-gate"><b>Blocker</b><br>'+blockers.map(x=>esc(typeof x==="string"?x:JSON.stringify(x))).join("<br>")+'</div>':'')+'</div>';
 }
 function buildPage(){
+  const activeBuilds=buildJobs.filter(b=>!isHistoricalBuild(b));
+  const historicalBuilds=buildJobs.filter(b=>isHistoricalBuild(b));
   return genericHeader("Build Farm","Implementation Contract의 모든 requirement를 실제 Godot playable로 구현합니다. Builder는 스스로 VERIFIED 판정을 내리지 않습니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
-  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → Contract Intake</span><span>Implementation Complete → Fidelity Gate</span></div></div>'+
-  '<div class="cards">'+(buildJobs.map(buildCard).join("") || '<div class="empty">현재 실제 Build Job이 없습니다.<br>40분 예약 작업이 첫 Wireframe Pack을 입고하면 여기에 나타납니다.</div>')+'</div>';
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → Contract Intake</span><span>Implementation Complete → Static Fidelity Gate</span></div></div>'+
+  '<div class="cards">'+(activeBuilds.map(buildCard).join("") || '<div class="empty">현재 실제 Build Job이 없습니다.<br>새 Blueprint가 승인되면 Build Farm이 재입고합니다.</div>')+'</div>'+
+  (historicalBuilds.length?'<div class="section-head"><div><h2>Historical / Superseded Builds</h2><p>이력 보존 전용 · 새 Blueprint 구현에 재사용하지 않음</p></div></div><div class="cards">'+historicalBuilds.map(buildCard).join("")+'</div>':'');
 }
 
 function reviewCard(p,compact=false){
@@ -1569,7 +1590,7 @@ function settingsPage(){
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. 설계 검수 통과 전에는 QA Ready로 보내지 않습니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. Static Fidelity 통과 후에만 PLAYTEST READY로 보냅니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
