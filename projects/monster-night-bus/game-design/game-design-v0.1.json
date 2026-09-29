@@ -1,0 +1,327 @@
+{
+    "title": "Monster Night Bus",
+    "source": "chat_automation",
+    "economy": "Not required. Score는 결과 평가용이며 구매나 업그레이드에 소비되지 않는다.",
+    "idea_id": "33810b99-e8e6-4c1d-bf65-2faf54c32e0d",
+    "version": "v0.1",
+    "one_line": "괴물 심야버스의 승객을 직접 좌석·입석 구역에 배치하고, 탑승객 목적지를 보존하는 분기 노선을 선택하며, 운행 중 좌석 갈등을 즉시 재배치로 해결하는 모바일 노선 운영 게임.",
+    "core_loop": "정류장 도착 후 하차 자동 처리 → 대기 승객을 직접 태우거나 남김 → 승객 목적지를 보존하는 다음 정류장 분기를 선택 → 6–12초 운행 중 금지 인접 조합이 경고되면 재배치 → 다음 정류장 도착. 이 흐름을 5개 이동 구간 반복해 Terminal에 도달한다.",
+    "mvp_scope": "단일 Night Route 1개. Route graph는 8개 고유 정류장, 실제 한 run에서 6개 정류장 방문/5개 Travel segment. 버스는 seat 6 + standing 2. Trait는 Large/Wet/Spark/Howler/Sleeper 5종. Authored waiting passenger 14명 중 경로에 따라 11명 조우. Comfort 3, WetResidue, 두 forbidden adjacency 조합, sequential 2.0s Travel Warning, route reachability constraint, boarding/unboarding before departure, score/result/retry를 구현한다.",
+    "game_rules": {
+        "bus": {
+            "seat_slots": 6,
+            "standing_slots": 2
+        },
+        "pause": "Pause freezes travel clock, warning deadline, animation and all passenger interaction. Resume continues exact remaining times.",
+        "retry": "Reset route to Depot, all passengers to authored origin queues, Comfort=3, Score=0, WetResidue=0 and all conflict history cleared.",
+        "score": {
+            "terminal_success": 500,
+            "comfort_remaining": 200,
+            "delivered_passenger": 100,
+            "left_behind_penalty": 50
+        },
+        "traits": {
+            "Wet": "May use seat or standing. When a Wet passenger disembarks from a seat, that seat gains WetResidue=1 segment.",
+            "Large": "Must occupy a seat, never standing. When seated, the seat directly beside it is reserved and cannot hold another passenger until Large disembarks. Placement is invalid if that adjacent seat is occupied.",
+            "Spark": "May use seat or standing. Spark placement into a seat with WetResidue>0 is invalid. Spark seated adjacent to an onboard Wet passenger forms a forbidden conflict pair.",
+            "Howler": "May use seat or standing. Howler seated adjacent to Sleeper forms a forbidden conflict pair.",
+            "Sleeper": "Must occupy a seat. Sleeper seated adjacent to Howler forms a forbidden conflict pair."
+        },
+        "travel": "Travel lasts at least 6 seconds and pauses its arrival until all departure conflict warnings have resolved or expired. If no conflicts exist, arrival occurs at 6 seconds.",
+        "failure": "Comfort reaches 0 during Travel.",
+        "residue": "WetResidue created at disembark remains through the next Travel segment and is decremented by 1 after that segment ends; at 0 it clears.",
+        "session": {
+            "comfort_min": 0,
+            "comfort_start": 3,
+            "warning_seconds": 2,
+            "base_travel_seconds": 6,
+            "segments_to_terminal": 5
+        },
+        "success": "Reach Terminal with Comfort>=1.",
+        "conflict": {
+            "result": "If the pair is no longer adjacent before deadline, no penalty. If still conflicting at deadline, Comfort decreases by 1 and that pair is marked spent for the segment.",
+            "trigger": "At route confirm, scan seated adjacency pairs for Spark-Wet and Howler-Sleeper forbidden pairs. Each such pair enters the segment warning queue once.",
+            "judgment": "Warnings resolve sequentially. Each active pair receives 2.0 seconds. During that window either passenger may be moved to a valid empty slot. A Travel re-seat target is invalid if it creates any new forbidden adjacency, violates Large reservation, or violates Spark WetResidue.",
+            "recovery": "After a missed warning, Travel continues if Comfort>0. The pair may still be moved but causes no second penalty that segment. Comfort never regenerates during the mission."
+        },
+        "passengers": {
+            "lifecycle": "Authored manifest passengers exist as waiting at their origin stop. They become controllable when that stop is reached. Dragging to a valid slot boards them. Before departure they may be dragged back to the queue. After route confirm they cannot leave the bus until their destination stop, where they auto-disembark. Unboarded passengers remain behind permanently and cannot reappear.",
+            "route_constraint": "A next-stop choice is invalid if any onboard passenger destination is unreachable from that next stop in the remaining directed route graph.",
+            "destination_success": "Each onboard passenger delivered at their destination adds 100 Score."
+        }
+    },
+    "not_in_mvp": [
+        "Persistent economy",
+        "Bus upgrades",
+        "Multiple route missions",
+        "Random passenger generation",
+        "Dialogue choices",
+        "Combat",
+        "Real-time steering/driving",
+        "More than five passenger traits"
+    ],
+    "known_risks": [
+        "Portrait 화면에서 인접 좌석 관계가 작게 보일 위험",
+        "Trait 아이콘이 많아지면 승객 판독이 복잡해질 위험",
+        "분기 목적지 제약이 route 선택을 지나치게 자동화할 위험",
+        "Travel Warning이 반복되면 좌석 퍼즐보다 반응 게임처럼 느껴질 위험",
+        "Authored manifest 밸런스가 나쁘면 불가피한 Comfort 손실이 발생할 위험"
+    ],
+    "progression": "MVP에는 영구 성장 시스템이 필요하지 않다. 한 미션의 best Score와 성공 여부만 저장한다. 이후 확장 시 새 노선·버스 형식·승객 trait를 순차 해금할 수 있으나 v0.1 규칙에는 영향을 주지 않는다.",
+    "screen_flow": "Night Route Brief → Bus Route Gameplay/Stop Service ↔ Travel ↔ Travel Warning → 다음 Stop Service 반복 → Terminal 성공 Result. Comfort 0이면 즉시 실패 Result. Stop Service의 route 선택은 confirm 전 취소 가능. Pause는 Gameplay 위 일시 상태이며 Resume로 동일 state/timer에 복귀. Result의 Retry는 전체 세션을 Depot 초기 상태로 재시작한다.",
+    "state_model": [
+        {
+            "exit": "valid next stop confirmed",
+            "next": "Travel",
+            "enter": "session start or Travel arrival",
+            "state": "Stop Service",
+            "variables": [
+                "onboard passengers",
+                "waiting queue",
+                "slot occupancy",
+                "WetResidue",
+                "Score",
+                "route history"
+            ],
+            "allowed_inputs": [
+                "board",
+                "unboard",
+                "re-seat",
+                "choose next stop",
+                "confirm route",
+                "pause"
+            ],
+            "failure_cancel": "Back from a route choice only unlocks next_stop; no world state changes"
+        },
+        {
+            "exit": "6 seconds elapsed and warning queue empty",
+            "next": "Stop Service or Result at Terminal",
+            "enter": "route confirmed",
+            "state": "Travel",
+            "variables": [
+                "travel_elapsed",
+                "warning_queue",
+                "Comfort",
+                "slot occupancy"
+            ],
+            "allowed_inputs": [
+                "re-seat if no active warning",
+                "pause"
+            ],
+            "failure_cancel": "Comfort 0 -> Result failure; pause freezes all timers"
+        },
+        {
+            "exit": "pair separated or 2.0s expires",
+            "next": "Travel or next Travel Warning",
+            "enter": "next queued forbidden pair becomes active",
+            "state": "Travel Warning",
+            "variables": [
+                "active_pair",
+                "warning_remaining",
+                "Comfort"
+            ],
+            "allowed_inputs": [
+                "re-seat either warned passenger",
+                "pause"
+            ],
+            "failure_cancel": "expiry while unresolved -> Comfort -1; if Comfort 0 -> Result"
+        },
+        {
+            "exit": "retry or finish",
+            "next": "Stop Service on retry or session exit",
+            "enter": "Terminal reached with Comfort>=1 or Comfort reaches 0",
+            "state": "Result",
+            "variables": [
+                "final Score",
+                "delivered count",
+                "left behind count",
+                "Comfort"
+            ],
+            "allowed_inputs": [
+                "retry",
+                "finish"
+            ],
+            "failure_cancel": "none"
+        }
+    ],
+    "content_unit": "night-route passenger manifest",
+    "artifact_type": "playable-game-design-spec",
+    "content_model": {
+        "axes": [
+            "origin stop",
+            "destination stop",
+            "trait",
+            "boarding branch pressure",
+            "seat conflict composition"
+        ],
+        "unit": "night-route passenger manifest",
+        "expansion": "New missions reuse the same interaction rules with different route graphs, manifests, trait mixes and bus capacities.",
+        "mvp_route_graph": [
+            "Depot",
+            "Lantern Junction",
+            "Moon Market",
+            "Canal Steps",
+            "Old Square",
+            "Cemetery Gate",
+            "Clock Tower",
+            "Terminal"
+        ],
+        "encountered_per_run": 11,
+        "authored_waiting_counts": {
+            "Depot": 2,
+            "Old Square": 3,
+            "Canal Steps": 2,
+            "Clock Tower": 1,
+            "Moon Market": 2,
+            "Cemetery Gate": 1,
+            "Lantern Junction": 3
+        }
+    },
+    "source_run_at": "2026-09-29T18:30:44.180183+00:00",
+    "player_fantasy": "플레이어는 괴물 도시의 마지막 심야버스 기사 겸 차장이다. 승객의 체형·습성·목적지를 읽고 좁은 차내를 영리하게 운영해 모두를 무사히 내려주는 숙련감과, 한 번의 탑승 결정이 다음 노선 선택까지 바꾸는 책임감을 느껴야 한다.",
+    "schema_version": "game-design-v0.1",
+    "session_length": "5–7분",
+    "test_scenarios": [
+        "첫 플레이어가 승객 drag와 route confirm만으로 Depot에서 첫 Travel을 시작할 수 있다.",
+        "Large, Sleeper, Spark WetResidue hard-invalid 규칙이 모두 잘못된 배치를 막고 state를 변경하지 않는다.",
+        "Howler-Sleeper 또는 Spark-Wet conflict를 의도적으로 출발시켜 2.0초 경고 안 재배치 성공 시 Comfort가 유지된다.",
+        "같은 conflict를 미해결 상태로 만료시키면 정확히 Comfort 1만 감소하고 해당 segment에서 재차 감점되지 않는다.",
+        "목적지가 끊기는 route 선택은 confirm되지 않으며 해당 승객을 하차시키면 즉시 route가 valid가 된다.",
+        "세 번의 unresolved conflict로 Comfort가 3→2→1→0이 되어 실제 failure Result에 도달한다.",
+        "Terminal 성공 후 Retry가 manifest, route, residue, Comfort, Score를 완전히 초기화한다."
+    ],
+    "design_markdown": "# Playable Game Design Spec v0.1 — Monster Night Bus\n\n## 1. Product Definition\n괴물 심야버스의 승객을 직접 배치하고 목적지를 보존하는 분기 노선을 선택하며 운행 중 좌석 갈등을 재배치로 해결하는 portrait mobile route-management / spatial strategy game. 한 세션 5–7분. 목표 감각은 좁은 차내를 읽고 사람과 노선을 동시에 운영하는 숙련감이다. Non-goals: 실시간 운전 시뮬레이션, 대화 선택 RPG, 복잡한 경영/업그레이드.\n\n## 2. Player Fantasy\n플레이어는 괴물 도시의 마지막 심야버스 기사 겸 차장이다. 승객의 체형·습성·목적지를 읽고 누구를 태울지, 어디에 둘지, 어느 분기로 갈지를 연결해 모두를 무사히 내려주는 책임감과 운영 숙련을 느낀다.\n\n## 3. Core Player Verbs\nBoard는 대기 승객을 seat/standing slot으로 drag한다. Unboard는 출발 전 onboard 승객을 정류장 queue로 되돌린다. Choose Route는 연결된 next stop을 선택·확정한다. Re-seat는 Stop Service 또는 Travel Warning 중 승객을 valid empty slot으로 옮긴다. Respond는 경고된 conflict pair를 2.0초 안 분리해 Comfort 손실을 막는다. 각 성공 입력은 passenger lifecycle, occupancy, next_stop 또는 conflict state를 즉시 변경한다.\n\n## 4. Core Loop\n정류장 도착·자동 하차 → 승객 탑승/좌석 배치 → 다음 정류장 분기 선택 → 6–12초 Travel → forbidden pair 경고 시 재배치 → 다음 정류장. 총 5개 Travel segment를 반복한다.\n\n## 5. Round / Session Structure\nComfort 3, Score 0으로 Depot 시작. Depot→Lantern Junction→(Moon Market|Canal Steps)→Old Square→(Cemetery Gate|Clock Tower)→Terminal의 5 segment. Terminal 도착 시 Comfort>=1이면 성공. Travel 중 Comfort 0이면 즉시 실패. Result의 Retry는 전체 세션 state를 초기화한다.\n\n## 6. Game Rules\n버스는 seat 6, standing 2. Passenger는 origin stop에서 waiting으로 존재하고 해당 stop 도착 시 조작 가능하다. Valid slot에 drag하면 onboard, 출발 전 queue로 되돌릴 수 있다. Route confirm 후 목적지까지 하차 불가하며 destination 도착 시 자동 하차한다. 남긴 승객은 그 run에서 사라진다.\n\nTrait 규칙: Large는 seat만 사용하며 옆 seat 하나를 예약하고, 옆 자리가 이미 차 있으면 placement invalid. Wet은 seat/standing 가능하며 seat에서 하차하면 WetResidue 1 segment를 남긴다. Spark는 WetResidue seat에 놓을 수 없고 seated Wet과 인접하면 forbidden pair. Howler와 Sleeper가 seat 인접이면 forbidden pair. Sleeper는 seat만 사용한다. WetResidue는 다음 Travel 종료 후 1 감소해 0에서 제거된다.\n\nRoute는 현재 stop의 directed edge만 선택 가능하며, 선택한 next stop 이후로 onboard passenger 목적지 하나라도 도달 불가능하면 confirm invalid다.\n\n출발 시 seated adjacency를 scan해 Spark-Wet, Howler-Sleeper pair를 warning queue에 넣는다. 경고는 순차 진행되고 pair마다 2.0초다. 경고 중 둘 중 하나를 valid empty slot으로 이동해 adjacency를 끊으면 해결. Travel 중 새 forbidden adjacency를 만드는 이동은 invalid. deadline까지 conflict가 남으면 Comfort -1이며 그 pair는 해당 segment에서 재감점하지 않는다. Comfort는 회복되지 않는다. Travel은 최소 6초이며 모든 warning이 끝나기 전 도착하지 않는다.\n\nScore는 delivered passenger +100, Terminal success +500, 남은 Comfort당 +200, left-behind passenger당 -50. Success=Terminal+Comfort>=1. Failure=Comfort 0.\n\nPause는 Travel clock, warning deadline, animation과 passenger input을 모두 정지한다. Retry는 route, passenger manifest, Comfort=3, Score=0, WetResidue=0, conflict history를 전부 초기화한다.\n\n## 7. State Model\nStop Service: arrival/session start 진입. Board/unboard/re-seat/route select/confirm 가능. Valid route confirm 시 Travel. Route choice cancel은 next_stop lock만 해제한다.\nTravel: route confirmed 진입. travel_elapsed와 queue가 진행된다. Active warning이 없으면 valid re-seat 가능. 6초 경과+queue empty면 arrival. Comfort 0이면 Result failure.\nTravel Warning: queued pair 활성화 시 진입. warned passenger 재배치 가능. pair 분리 또는 2.0초 expiry로 종료. expiry unresolved면 Comfort -1. 다음 warning 또는 Travel로 복귀.\nResult: Terminal success 또는 Comfort 0 진입. Retry/finish. Retry는 Stop Service/Depot 초기 state로 간다.\n\n## 8. Interaction Spec\nPassenger drag의 valid 기준은 empty slot+trait hard rules다. Stop Service에서는 forbidden adjacency 자체는 허용하되 conflict로 표시한다. Invalid release는 source로 복귀하고 state 값은 변하지 않는다. Route select는 edge+destination reachability를 모두 만족해야 confirm된다. Travel re-seat는 hard rules에 더해 new forbidden adjacency 생성도 금지한다. Drag 중 해당 pointer가 우선이며 다른 passenger 입력은 받지 않는다. Pause 성공 입력은 simulation clocks를 정지한다.\n\n## 9. Content Model\n반복 단위는 night-route passenger manifest. MVP graph는 8개 stop이고 authored waiting count는 Depot2/Junction3/Market2/Canal2/Old Square3/Cemetery1/Tower1=14명이다. 한 run에서는 두 branch 중 하나씩 방문해 11명을 조우한다. 확장 축은 origin, destination, trait, branch pressure, seat-conflict composition, bus capacity다.\n\n## 10. Difficulty / Variation\n초반은 단일 특성과 넉넉한 공간. 중반은 destination이 branch를 제한하고 Large가 공간을 잠근다. 후반은 WetResidue+Spark, Howler-Sleeper가 겹쳐 현재 좌석과 다음 하차를 함께 계산하게 한다. 속도만 높이지 않는다.\n\n## 11. Progression\nMVP에는 영구 성장 불필요. best Score와 success만 저장. 이후 mission/버스/trait 해금은 확장 가능하나 v0.1 규칙과 분리한다.\n\n## 12. Economy\nNot required. Score는 결과 평가 전용이며 소비되지 않는다.\n\n## 13. Screen Inventory\nNight Route Brief, Bus Route Gameplay, Run Result.\n\n## 14. Screen Flow\nBrief → Gameplay/Stop Service ↔ Travel ↔ Travel Warning → 다음 Stop Service 반복 → Terminal success Result. Comfort 0→failure Result. Route confirm 전 cancel 가능. Pause는 Gameplay overlay state이며 동일 timer/state로 Resume. Retry는 Depot부터 전 reset.\n\n## 15. Feedback System\nBoarding은 eligibility/snap/occupancy feedback. Invalid는 reject+no state change. Route invalid는 stranded destination을 식별. Conflict Warning은 정확한 pair와 2.0초 window를 알린다. Resolve는 Comfort 유지, expiry는 Comfort -1. Arrival은 자동 하차와 WetResidue 생성을 알려준다.\n\n## 16. Visual Direction Brief\nPortrait mobile. 길게 읽히는 버스 내부 cutaway가 중심이며 passenger silhouette, seat occupancy, adjacency가 즉시 판독되어야 한다. Route 정보는 current/next/destination 관계를 명확히 전달하되 gameplay를 가리지 않는다. 야간 네온과 실내등, 체형 중심 괴물 디자인. UI 좌표/패널 배치는 Wireframe 책임이다.\n\n## 17. MVP Scope\nNight Route 1개, 8 unique stops, run당 6 stop 방문/5 Travel. seat6+standing2. Large/Wet/Spark/Howler/Sleeper 5 traits. Authored passengers 14명, run당 11명 조우. Comfort 3, WetResidue, 2 forbidden adjacency types, 2.0초 sequential warning, reachability route constraint, boarding/unboarding, scoring, Result/Retry 포함. NOT IN MVP: persistent economy, upgrades, multiple missions, random generation, dialogue choices, combat, steering, extra traits.\n\n## 18. Test Scenarios\n첫 Travel 시작 가능성, hard-invalid 3종, warning resolve/no penalty, warning expiry/Comfort-1, route reachability invalid, Comfort 3→0 reachable failure, Terminal success 후 complete Retry reset을 검증한다.\n\n## 19. Known Risks\n작은 adjacency 판독, trait icon overload, destination constraint가 선택을 자동화할 위험, warning이 반응게임처럼 느껴질 위험, authored manifest가 unavoidable loss를 만들 위험.\n\n## 20. Wireframe Handoff\n3 screens, Stop Service/Travel/Travel Warning/Pause, seat6+standing2 occupancy, Large reservation, WetResidue, forbidden pair, passenger drag/unboard, route select/confirm/cancel, reachability invalid reason, 2.0초 warning/resolution/expiry, Comfort transition, arrival auto-disembark, Terminal success, Retry reset을 모두 표현한다. 새 게임 규칙 결정은 남기지 않는다.",
+    "feedback_system": {
+        "arrival": {
+            "audio": "stop arrival cue",
+            "state": "Stop Service begins",
+            "haptic": "none",
+            "visual": "destination passengers leave and any WetResidue is created"
+        },
+        "invalid": {
+            "audio": "short reject cue",
+            "state": "no value changes",
+            "haptic": "single reject tick",
+            "visual": "target rejects and source remains"
+        },
+        "boarding": {
+            "audio": "boarding/snap cue",
+            "state": "passenger becomes onboard",
+            "haptic": "light snap",
+            "visual": "slot eligibility and occupied/reserved state change"
+        },
+        "route_invalid": {
+            "audio": "soft warning",
+            "state": "next_stop not locked",
+            "haptic": "none",
+            "visual": "route remains unconfirmed and affected onboard destination is identified"
+        },
+        "conflict_missed": {
+            "audio": "complaint/impact cue",
+            "state": "Comfort -1",
+            "haptic": "medium error",
+            "visual": "Comfort state visibly decreases"
+        },
+        "conflict_warning": {
+            "audio": "warning cue",
+            "state": "2.0 second resolution window starts",
+            "haptic": "warning pulse",
+            "visual": "the exact forbidden pair enters warning state"
+        },
+        "conflict_resolved": {
+            "audio": "short resolve cue",
+            "state": "no Comfort loss",
+            "haptic": "light success",
+            "visual": "warning clears"
+        }
+    },
+    "round_structure": "세션은 Depot에서 Comfort 3, Score 0으로 시작한다. 플레이어는 Depot→Lantern Junction→(Moon Market 또는 Canal Steps)→Old Square→(Cemetery Gate 또는 Clock Tower)→Terminal의 총 5개 이동 구간을 운행한다. 각 정류장에서 Stop Service 후 next stop을 확정하면 Travel로 이동한다. Terminal 도착 시 Comfort가 1 이상이면 성공 Result, Travel 중 Comfort가 0이 되면 즉시 실패 Result. 성공/실패 Result에서 Retry는 전체 manifest·route·seat residue·Comfort·Score를 초기화한다. 평균 5–7분.",
+    "interaction_spec": {
+        "pause": {
+            "input": "pause action",
+            "success_change": "simulation clock and warning clock stop; Resume restores them"
+        },
+        "route": {
+            "input": "tap next stop and confirm",
+            "valid": "edge exists from current stop and every onboard destination remains reachable",
+            "cancel": "select a different connected stop before confirm",
+            "invalid": "non-edge or would strand at least one onboard destination",
+            "success_change": "next_stop locks and state becomes Travel"
+        },
+        "boarding": {
+            "input": "drag passenger to slot",
+            "valid": "slot empty and all hard eligibility rules satisfied; forbidden adjacency is allowed at Stop Service but marked as conflict",
+            "cancel": "release outside valid slot returns passenger to prior location",
+            "invalid": "occupied slot, Large/standing mismatch, Large reserved adjacency violation, Sleeper standing, Spark on WetResidue",
+            "priority": "dragged passenger owns pointer until release",
+            "success_change": "waiting/onboard status and occupancy update"
+        },
+        "travel_reseat": {
+            "input": "drag onboard passenger to empty valid slot",
+            "valid": "all hard eligibility rules plus move may not create a new forbidden adjacency",
+            "cancel": "invalid release snaps passenger to source slot",
+            "invalid": "any hard violation or new forbidden adjacency",
+            "priority": "active warning pair remains highlighted but other passenger movement is disabled while one passenger is being dragged",
+            "success_change": "occupancy updates and active conflict may resolve"
+        }
+    },
+    "screen_inventory": [
+        "Night Route Brief",
+        "Bus Route Gameplay",
+        "Run Result"
+    ],
+    "core_player_verbs": [
+        {
+            "verb": "Board",
+            "input": "drag waiting passenger",
+            "target": "seat or standing slot",
+            "feedback": "slot validity preview, snap, passenger status change",
+            "condition": "Stop Service state",
+            "state_change": "passenger changes from waiting to onboard and slot occupancy updates"
+        },
+        {
+            "verb": "Unboard before departure",
+            "input": "drag onboard passenger back to curb queue",
+            "target": "current stop queue",
+            "feedback": "fare preview decreases, route options recalculate",
+            "condition": "Stop Service before route confirm",
+            "state_change": "passenger returns to waiting and slot frees"
+        },
+        {
+            "verb": "Choose route",
+            "input": "tap connected next stop then confirm",
+            "target": "route edge",
+            "feedback": "valid route highlights; invalid route explains stranded onboard destination",
+            "condition": "Stop Service",
+            "state_change": "next_stop locks and Travel begins"
+        },
+        {
+            "verb": "Re-seat",
+            "input": "drag onboard passenger",
+            "target": "another valid empty seat/standing slot",
+            "feedback": "snap or invalid return; conflict marker clears when separated",
+            "condition": "Stop Service or Travel Warning",
+            "state_change": "occupancy and active conflict resolution update"
+        },
+        {
+            "verb": "Respond to warning",
+            "input": "re-seat either member of warned pair before deadline",
+            "target": "active conflict pair",
+            "feedback": "warning clears, success chime/haptic",
+            "condition": "Travel Warning active",
+            "state_change": "warning becomes resolved with no Comfort loss"
+        }
+    ],
+    "wireframe_handoff": [
+        "Night Route Brief, Bus Route Gameplay, Run Result의 3개 화면을 표현한다.",
+        "Gameplay에서 Stop Service, Travel, Travel Warning, Pause 상태를 구분해 표현한다.",
+        "seat 6/standing 2의 점유, Large 예약, WetResidue, forbidden pair를 시각적으로 구분해야 한다.",
+        "boarding/unboarding drag, route choose/confirm/cancel, travel re-seat의 valid/invalid 피드백을 표현한다.",
+        "route reachability invalid 이유와 어느 onboard destination이 막히는지 표현한다.",
+        "2.0초 conflict warning, resolve, expiry→Comfort -1, Comfort 0→failure 전환을 표현한다.",
+        "도착 시 auto-disembark 및 WetResidue 생성, Terminal success, Result Retry reset을 표현한다."
+    ],
+    "primary_interaction": "승객 drag 좌석 배치·재배치 + 탑승객 목적지를 보존하는 분기 노선 선택",
+    "difficulty_variation": "초반 정류장은 Ordinary/단일 특성 승객과 넉넉한 좌석으로 규칙을 익힌다. 중반 분기에서는 특정 목적지 승객을 태우면 다음 노선 선택이 제한되고 Large가 공간을 잠근다. 후반에는 WetResidue와 Spark, Howler-Sleeper가 동시에 나타나 좌석의 현재 상태와 다음 정류장 하차까지 함께 계산하게 한다. 난도는 속도 증가보다 목적지 제약·공간 점유·상태 잔류·상충 특성의 조합으로 상승한다.",
+    "visual_direction_brief": "Portrait mobile. 버스 내부를 길게 읽을 수 있는 고정 또는 약한 3/4 cutaway 시점이 중심이며 승객 실루엣, 좌석 점유, 인접 관계가 한눈에 판독되어야 한다. 노선 정보는 gameplay를 가리지 않고 현재 정류장·도달 가능한 다음 정류장·탑승객 목적지 관계를 명확히 전달한다. 괴물은 체형과 행동 특성으로 즉시 구분되며 야간 도시의 네온·실내등 분위기를 사용한다. 구체 UI 좌표나 패널 배치는 Wireframe에서 결정한다."
+}
