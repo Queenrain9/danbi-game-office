@@ -1,0 +1,1049 @@
+{
+  "id": "6a8608cf-6df3-4ed1-a754-be4f659e80e3",
+  "design_id": "0798b6f0-7f9b-4fb9-966c-6f5db6f002b2",
+  "idea_id": "201b2137-fd0d-4acd-9daf-ea1559ba5553",
+  "title": "Tiny Stagehand",
+  "version": "v0.2",
+  "target_device": "Mobile",
+  "orientation": "portrait",
+  "interaction_principles": [
+    "무대 결과는 항상 상단에서 보임",
+    "컨트롤은 중단, cue 선읽기는 하단 고정",
+    "active prop drag가 다른 drag보다 우선",
+    "incident는 별도 미니게임이 아니라 동일 화면 overlay"
+  ],
+  "global_ui_rules": {
+    "persistent": [
+      "continuity",
+      "time",
+      "cue strip"
+    ],
+    "safe_margin_percent": 4,
+    "modal_blocks_background": true,
+    "min_touch_target_percent": 8
+  },
+  "screen_flow": {
+    "guards": [
+      "result on timeline end or continuity 0",
+      "help/pause freeze timeline"
+    ],
+    "normal": [
+      "lobby",
+      "briefing",
+      "countdown",
+      "live",
+      "result",
+      "lobby|briefing"
+    ],
+    "branches": [
+      "live→pause→live",
+      "live→cue_help→live",
+      "incident is live variant"
+    ]
+  },
+  "screens": [
+    {
+      "id": "lobby",
+      "name": "Backstage Lobby / Scene Select",
+      "order": 1,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "lobby",
+          "ui": "scene card",
+          "exit": "briefing",
+          "enter": "app/result",
+          "allowed_input": "select"
+        }
+      ],
+      "purpose": "Scene 선택",
+      "feedback": [],
+      "components": [
+        {
+          "id": "scene_card",
+          "box": {
+            "h": 38,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "card",
+          "label": "Scene 01",
+          "state_binding": "lobby"
+        },
+        {
+          "id": "grade",
+          "box": {
+            "h": 7,
+            "w": 30,
+            "x": 10,
+            "y": 59
+          },
+          "type": "status",
+          "label": "Best Grade",
+          "state_binding": "lobby"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 76
+          },
+          "type": "button",
+          "label": "SELECT",
+          "state_binding": "lobby"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "briefing",
+          "from": "lobby",
+          "trigger": "select",
+          "animation": "fade",
+          "condition": "scene unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "open briefing",
+          "target": "select",
+          "feedback": "press",
+          "state_change": "briefing",
+          "invalid_input": "locked scene disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "briefing",
+      "name": "Scene Briefing",
+      "order": 2,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "briefing",
+          "ui": "goal/cues",
+          "exit": "countdown",
+          "enter": "scene selected",
+          "allowed_input": "start"
+        },
+        {
+          "id": "countdown",
+          "ui": "3..2..1 overlay",
+          "exit": "3 sec",
+          "enter": "start",
+          "allowed_input": "none"
+        }
+      ],
+      "purpose": "장면 목표와 cue 종류 확인",
+      "feedback": [],
+      "components": [
+        {
+          "id": "scene_title",
+          "box": {
+            "h": 8,
+            "w": 84,
+            "x": 8,
+            "y": 8
+          },
+          "type": "header",
+          "label": "Scene Title",
+          "state_binding": "briefing"
+        },
+        {
+          "id": "goal",
+          "box": {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "card",
+          "label": "Goal",
+          "state_binding": "briefing"
+        },
+        {
+          "id": "cue_types",
+          "box": {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 42
+          },
+          "type": "card",
+          "label": "Cue Types",
+          "state_binding": "briefing"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 78
+          },
+          "type": "button",
+          "label": "START",
+          "state_binding": "briefing"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "live",
+          "from": "briefing",
+          "trigger": "countdown=0",
+          "animation": "curtain reveal",
+          "condition": "scene loaded"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "start countdown",
+          "target": "start",
+          "feedback": "press + countdown",
+          "precondition": "scene loaded",
+          "state_change": "countdown",
+          "invalid_input": "disabled loading"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "countdown",
+          "name": "COUNTDOWN",
+          "notes": "all controls locked",
+          "condition": "start tapped",
+          "components": [
+            {
+              "id": "count",
+              "box": {
+                "h": 18,
+                "w": 30,
+                "x": 35,
+                "y": 38
+              },
+              "type": "overlay_text",
+              "label": "3",
+              "state_binding": "countdown"
+            }
+          ],
+          "hide_components": [
+            "start"
+          ]
+        }
+      ],
+      "implementation_notes": []
+    },
+    {
+      "id": "live",
+      "name": "Live Performance",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 34,
+            "w": 94,
+            "x": 3,
+            "y": 11,
+            "id": "stage",
+            "role": "result preview",
+            "label": "Stage Preview"
+          },
+          {
+            "h": 29,
+            "w": 94,
+            "x": 3,
+            "y": 47,
+            "id": "controls",
+            "role": "primary input",
+            "label": "Backstage Controls"
+          },
+          {
+            "h": 15,
+            "w": 94,
+            "x": 3,
+            "y": 78,
+            "id": "cues",
+            "role": "lookahead",
+            "label": "Cue Strip"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "performance",
+          "ui": "stage+controls+cue strip",
+          "exit": "timeline end/continuity 0",
+          "enter": "countdown 0",
+          "allowed_input": "fader/rope/prop/incident/pause/help"
+        },
+        {
+          "id": "incident_focus",
+          "ui": "incident marker",
+          "exit": "resolved/expired",
+          "enter": "incident spawn",
+          "allowed_input": "normal + incident"
+        }
+      ],
+      "purpose": "큐를 선읽기하며 조명·커튼·소품·사고를 동시에 운영",
+      "feedback": [
+        "cue tick",
+        "fader detent",
+        "prop snap",
+        "incident alert"
+      ],
+      "components": [
+        {
+          "id": "continuity",
+          "box": {
+            "h": 6,
+            "w": 30,
+            "x": 4,
+            "y": 4
+          },
+          "type": "meter",
+          "label": "Continuity 100",
+          "state_binding": "performance"
+        },
+        {
+          "id": "time",
+          "box": {
+            "h": 6,
+            "w": 16,
+            "x": 42,
+            "y": 4
+          },
+          "type": "status",
+          "label": "00:42",
+          "state_binding": "performance"
+        },
+        {
+          "id": "pause_btn",
+          "box": {
+            "h": 6,
+            "w": 8,
+            "x": 88,
+            "y": 4
+          },
+          "type": "button",
+          "label": "II",
+          "state_binding": "performance"
+        },
+        {
+          "id": "stage_preview",
+          "box": {
+            "h": 32,
+            "w": 92,
+            "x": 4,
+            "y": 12
+          },
+          "type": "preview",
+          "label": "Stage Preview",
+          "state_binding": "performance"
+        },
+        {
+          "id": "actor",
+          "box": {
+            "h": 12,
+            "w": 14,
+            "x": 43,
+            "y": 26
+          },
+          "type": "world_object",
+          "label": "Actor",
+          "state_binding": "performance"
+        },
+        {
+          "id": "prop_mark",
+          "box": {
+            "h": 8,
+            "w": 14,
+            "x": 65,
+            "y": 31
+          },
+          "type": "drop_target",
+          "label": "Prop Mark",
+          "enabled_when": "mark_open",
+          "state_binding": "performance",
+          "interaction_role": "mark_open"
+        },
+        {
+          "id": "light_a",
+          "box": {
+            "h": 24,
+            "w": 12,
+            "x": 8,
+            "y": 49
+          },
+          "type": "fader",
+          "label": "LIGHT A",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!paused"
+        },
+        {
+          "id": "light_b",
+          "box": {
+            "h": 24,
+            "w": 12,
+            "x": 24,
+            "y": 49
+          },
+          "type": "fader",
+          "label": "LIGHT B",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!paused"
+        },
+        {
+          "id": "curtain_rope",
+          "box": {
+            "h": 24,
+            "w": 12,
+            "x": 42,
+            "y": 49
+          },
+          "type": "rope",
+          "label": "CURTAIN",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!paused"
+        },
+        {
+          "id": "prop_1",
+          "box": {
+            "h": 10,
+            "w": 10,
+            "x": 60,
+            "y": 52
+          },
+          "type": "draggable",
+          "label": "PROP A",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!prop_drag"
+        },
+        {
+          "id": "prop_2",
+          "box": {
+            "h": 10,
+            "w": 10,
+            "x": 72,
+            "y": 52
+          },
+          "type": "draggable",
+          "label": "PROP B",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!prop_drag"
+        },
+        {
+          "id": "prop_3",
+          "box": {
+            "h": 10,
+            "w": 10,
+            "x": 84,
+            "y": 52
+          },
+          "type": "draggable",
+          "label": "PROP C",
+          "enabled_when": null,
+          "state_binding": "performance",
+          "interaction_role": "!prop_drag"
+        },
+        {
+          "id": "cue_now",
+          "box": {
+            "h": 12,
+            "w": 20,
+            "x": 4,
+            "y": 79
+          },
+          "type": "cue",
+          "label": "NOW",
+          "state_binding": "performance"
+        },
+        {
+          "id": "cue_next",
+          "box": {
+            "h": 12,
+            "w": 20,
+            "x": 26,
+            "y": 79
+          },
+          "type": "cue",
+          "label": "NEXT",
+          "state_binding": "performance"
+        },
+        {
+          "id": "cue_future",
+          "box": {
+            "h": 12,
+            "w": 48,
+            "x": 48,
+            "y": 79
+          },
+          "type": "cue_strip",
+          "label": "UPCOMING",
+          "state_binding": "performance"
+        },
+        {
+          "id": "help",
+          "box": {
+            "h": 5,
+            "w": 18,
+            "x": 78,
+            "y": 72
+          },
+          "type": "button",
+          "label": "? CUES",
+          "state_binding": "performance"
+        }
+      ],
+      "edge_cases": [
+        "max 2 active cues + 1 incident",
+        "same wrong input twice -> control label pulse"
+      ],
+      "transitions": [
+        {
+          "to": "result",
+          "from": "performance",
+          "trigger": "timeline end or continuity=0",
+          "animation": "stage dim",
+          "condition": "always"
+        },
+        {
+          "to": "pause",
+          "from": "performance",
+          "trigger": "pause_btn",
+          "animation": "overlay",
+          "condition": "performance"
+        },
+        {
+          "to": "cue_help",
+          "from": "performance",
+          "trigger": "help",
+          "animation": "overlay",
+          "condition": "performance"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "vertical drag",
+          "action": "set intensity 0..100",
+          "target": "light_a/light_b",
+          "feedback": "stage brightness + detent haptic",
+          "precondition": "performance",
+          "state_change": "light value",
+          "invalid_input": "other controls do not capture active fader pointer"
+        },
+        {
+          "input": "vertical drag",
+          "action": "set curtain 0..100",
+          "target": "curtain_rope",
+          "feedback": "direct curtain + rope sound",
+          "precondition": "performance",
+          "state_change": "curtain position",
+          "invalid_input": "prop drag has priority"
+        },
+        {
+          "input": "80ms hold then drag",
+          "action": "stage prop",
+          "target": "prop_1/2/3 → prop_mark",
+          "feedback": "ghost glow + snap haptic",
+          "precondition": "mark_open",
+          "state_change": "prop staged",
+          "invalid_input": "invalid release -> tray return"
+        },
+        {
+          "input": "tap/short drag",
+          "action": "resolve one-step incident",
+          "target": "incident hotspot",
+          "feedback": "marker clear + two-note resolve",
+          "precondition": "incident active",
+          "state_change": "resolved",
+          "invalid_input": "outside hotspot passes to normal control"
+        },
+        {
+          "input": "tap",
+          "action": "open cue help",
+          "target": "help",
+          "feedback": "modal",
+          "precondition": "performance",
+          "state_change": "paused/help",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "cue_window",
+          "name": "CUE WINDOW",
+          "notes": "perfect ±0.35s",
+          "condition": "cue within ±0.9s",
+          "component_overrides": {
+            "cue_now": {
+              "label": "NOW · ACTIVE"
+            },
+            "cue_next": {
+              "label": "NEXT · ghost"
+            }
+          }
+        },
+        {
+          "id": "prop_drag",
+          "name": "PROP DRAG",
+          "notes": "prop drag > curtain > fader > cue tap",
+          "condition": "prop pointer held >80ms",
+          "component_overrides": {
+            "prop_1": {
+              "label": "PROP · dragging"
+            },
+            "prop_mark": {
+              "label": "VALID MARK · glow"
+            }
+          }
+        },
+        {
+          "id": "incident",
+          "name": "INCIDENT",
+          "notes": "normal performance continues; hotspot intercepts only its area",
+          "condition": "incident active",
+          "components": [
+            {
+              "id": "incident_hotspot",
+              "box": {
+                "h": 12,
+                "w": 18,
+                "x": 70,
+                "y": 18
+              },
+              "type": "hotspot",
+              "label": "INCIDENT",
+              "enabled_when": null,
+              "state_binding": "incident_focus",
+              "interaction_role": "incident"
+            }
+          ]
+        },
+        {
+          "id": "miss",
+          "name": "MISS FEEDBACK",
+          "notes": "affected control outline pulses",
+          "condition": "cue missed",
+          "components": [
+            {
+              "id": "miss_tag",
+              "box": {
+                "h": 7,
+                "w": 28,
+                "x": 36,
+                "y": 14
+              },
+              "type": "feedback",
+              "label": "MISS · -15",
+              "state_binding": "performance"
+            }
+          ]
+        }
+      ],
+      "implementation_notes": [
+        "single pointer owns selected control until release",
+        "incident hotspot intercept only within bounds"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "paused",
+          "ui": "timeline frozen",
+          "exit": "resume/quit",
+          "enter": "pause",
+          "allowed_input": "resume/quit"
+        }
+      ],
+      "purpose": "공연 정지/재개",
+      "feedback": [],
+      "components": [
+        {
+          "id": "scrim",
+          "box": {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "overlay",
+          "label": "Paused",
+          "state_binding": "paused"
+        },
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 40
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 54
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "live",
+          "from": "paused",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume",
+          "target": "resume",
+          "feedback": "fade",
+          "state_change": "performance",
+          "invalid_input": "background blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "result",
+      "name": "Performance Result",
+      "order": 5,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "result",
+          "ui": "grade/timeline",
+          "exit": "briefing/lobby",
+          "enter": "scene end",
+          "allowed_input": "retry/next"
+        }
+      ],
+      "purpose": "cue별 결과와 Retry/Next 제공",
+      "feedback": [],
+      "components": [
+        {
+          "id": "grade",
+          "box": {
+            "h": 16,
+            "w": 30,
+            "x": 35,
+            "y": 8
+          },
+          "type": "grade",
+          "label": "GRADE",
+          "state_binding": "result"
+        },
+        {
+          "id": "continuity_final",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 8,
+            "y": 28
+          },
+          "type": "metric",
+          "label": "Continuity",
+          "state_binding": "result"
+        },
+        {
+          "id": "accuracy",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 37,
+            "y": 28
+          },
+          "type": "metric",
+          "label": "Cue Accuracy",
+          "state_binding": "result"
+        },
+        {
+          "id": "timeline",
+          "box": {
+            "h": 24,
+            "w": 84,
+            "x": 8,
+            "y": 43
+          },
+          "type": "timeline",
+          "label": "Cue-by-cue Timeline",
+          "state_binding": "result"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 78
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "result"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 78
+          },
+          "type": "button",
+          "label": "NEXT",
+          "state_binding": "result"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "briefing",
+          "from": "result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "always"
+        },
+        {
+          "to": "lobby",
+          "from": "result",
+          "trigger": "next",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reload scene",
+          "target": "retry",
+          "feedback": "press",
+          "state_change": "briefing",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "advance",
+          "target": "next",
+          "feedback": "press",
+          "state_change": "lobby",
+          "invalid_input": "locked next -> lobby"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "cue_help",
+      "name": "Cue Help Overlay",
+      "order": 6,
+      "layout": {
+        "regions": []
+      },
+      "states": [
+        {
+          "id": "help",
+          "ui": "timeline frozen",
+          "exit": "close",
+          "enter": "help tap",
+          "allowed_input": "close"
+        }
+      ],
+      "purpose": "큐 아이콘과 대응 컨트롤 빠른 확인",
+      "feedback": [],
+      "components": [
+        {
+          "id": "scrim",
+          "box": {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "overlay",
+          "label": "Help",
+          "state_binding": "help"
+        },
+        {
+          "id": "help_panel",
+          "box": {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 16
+          },
+          "type": "modal",
+          "label": "Cue → Control",
+          "state_binding": "help"
+        },
+        {
+          "id": "close",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 68,
+            "y": 72
+          },
+          "type": "button",
+          "label": "CLOSE",
+          "state_binding": "help"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "live",
+          "from": "help",
+          "trigger": "close",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "dismiss and resume",
+          "target": "close",
+          "feedback": "fade",
+          "state_change": "performance",
+          "invalid_input": "background blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "global_states": [
+    {
+      "id": "paused",
+      "rule": "freeze timeline and controls"
+    },
+    {
+      "id": "input_lock",
+      "rule": "countdown/result transition"
+    }
+  ],
+  "input_map": [
+    {
+      "use": "prop",
+      "input": "80ms hold+drag",
+      "priority": 5
+    },
+    {
+      "use": "curtain",
+      "input": "vertical drag",
+      "priority": 4
+    },
+    {
+      "use": "light",
+      "input": "vertical drag",
+      "priority": 3
+    },
+    {
+      "use": "incident",
+      "input": "tap/short drag in hotspot",
+      "priority": 4
+    }
+  ],
+  "edge_cases": [
+    {
+      "case": "invalid prop drop",
+      "recovery": "return tray"
+    },
+    {
+      "case": "continuity 0",
+      "recovery": "immediate result"
+    }
+  ],
+  "developer_handoff": {
+    "persistence": "best grade/unlock only",
+    "required_data": [
+      "SceneCard",
+      "CueEvent",
+      "IncidentDefinition"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "SceneController",
+      "StagePreview",
+      "BackstageControls",
+      "CueStrip",
+      "OverlayLayer"
+    ],
+    "state_ownership": "SceneController owns timeline/continuity; each control owns pointer gesture",
+    "reusable_components": [
+      "CueChip",
+      "Fader",
+      "CurtainRope",
+      "PropToken",
+      "StageMark",
+      "IncidentHotspot",
+      "ContinuityMeter"
+    ],
+    "implementation_order": [
+      "timeline/state",
+      "cue strip",
+      "faders",
+      "curtain",
+      "prop snap",
+      "incident",
+      "scoring/result"
+    ]
+  },
+  "acceptance_criteria": [
+    "6개 inventory 화면/overlay가 모두 이동 가능",
+    "Live 한 화면에서 stage/controls/cues가 동시에 보임",
+    "fader/rope/prop gesture가 우선순위대로 충돌 없이 작동",
+    "invalid prop drop은 tray로 복귀",
+    "incident 중 normal controls 유지",
+    "Pause/Cue Help에서 timeline 정지",
+    "continuity 0 또는 timeline end에서 Result 이동"
+  ],
+  "primary_interaction": "cue 선읽기 + fader/rope drag + prop snap + incident 대응",
+  "core_screen": "Live Performance",
+  "screen_count": 6,
+  "state_count": 13,
+  "pack_markdown": "# Tiny Stagehand — Interaction Wireframe Pack v0.2\n\n## Pack Overview\nMobile portrait. Core Screen: Live Performance\n\n## Interaction Principles\n- 무대 결과는 항상 상단에서 보임\n- 컨트롤은 중단, cue 선읽기는 하단 고정\n- active prop drag가 다른 drag보다 우선\n- incident는 별도 미니게임이 아니라 동일 화면 overlay\n\n## Screen Flow\n{\n  \"normal\": [\n    \"lobby\",\n    \"briefing\",\n    \"countdown\",\n    \"live\",\n    \"result\",\n    \"lobby|briefing\"\n  ],\n  \"branches\": [\n    \"live→pause→live\",\n    \"live→cue_help→live\",\n    \"incident is live variant\"\n  ],\n  \"guards\": [\n    \"result on timeline end or continuity 0\",\n    \"help/pause freeze timeline\"\n  ]\n}\n\n## Screens\n### 1. Backstage Lobby / Scene Select\nPurpose: Scene 선택\nComponents: scene_card, grade, select\nStates: lobby\nVariants: None\nInteractions: tap → select\n\n### 2. Scene Briefing\nPurpose: 장면 목표와 cue 종류 확인\nComponents: scene_title, goal, cue_types, start\nStates: briefing, countdown\nVariants: COUNTDOWN\nInteractions: tap → start\n\n### 3. Live Performance\nPurpose: 큐를 선읽기하며 조명·커튼·소품·사고를 동시에 운영\nComponents: continuity, time, pause_btn, stage_preview, actor, prop_mark, light_a, light_b, curtain_rope, prop_1, prop_2, prop_3, cue_now, cue_next, cue_future, help\nStates: performance, incident_focus\nVariants: CUE WINDOW, PROP DRAG, INCIDENT, MISS FEEDBACK\nInteractions: vertical drag → light_a/light_b; vertical drag → curtain_rope; 80ms hold then drag → prop_1/2/3 → prop_mark; tap/short drag → incident hotspot; tap → help\n\n### 4. Pause Overlay\nPurpose: 공연 정지/재개\nComponents: scrim, resume, quit\nStates: paused\nVariants: None\nInteractions: tap → resume\n\n### 5. Performance Result\nPurpose: cue별 결과와 Retry/Next 제공\nComponents: grade, continuity_final, accuracy, timeline, retry, next\nStates: result\nVariants: None\nInteractions: tap → retry; tap → next\n\n### 6. Cue Help Overlay\nPurpose: 큐 아이콘과 대응 컨트롤 빠른 확인\nComponents: scrim, help_panel, close\nStates: help\nVariants: None\nInteractions: tap → close\n\n## Global States\n[\n  {\n    \"id\": \"paused\",\n    \"rule\": \"freeze timeline and controls\"\n  },\n  {\n    \"id\": \"input_lock\",\n    \"rule\": \"countdown/result transition\"\n  }\n]\n\n## Input Map\n[\n  {\n    \"use\": \"prop\",\n    \"input\": \"80ms hold+drag\",\n    \"priority\": 5\n  },\n  {\n    \"use\": \"curtain\",\n    \"input\": \"vertical drag\",\n    \"priority\": 4\n  },\n  {\n    \"use\": \"light\",\n    \"input\": \"vertical drag\",\n    \"priority\": 3\n  },\n  {\n    \"use\": \"incident\",\n    \"input\": \"tap/short drag in hotspot\",\n    \"priority\": 4\n  }\n]\n\n## Edge Cases\n[\n  {\n    \"case\": \"invalid prop drop\",\n    \"recovery\": \"return tray\"\n  },\n  {\n    \"case\": \"continuity 0\",\n    \"recovery\": \"immediate result\"\n  }\n]\n\n## Developer Handoff\n{\n  \"scene_hierarchy\": [\n    \"AppRoot\",\n    \"SceneController\",\n    \"StagePreview\",\n    \"BackstageControls\",\n    \"CueStrip\",\n    \"OverlayLayer\"\n  ],\n  \"reusable_components\": [\n    \"CueChip\",\n    \"Fader\",\n    \"CurtainRope\",\n    \"PropToken\",\n    \"StageMark\",\n    \"IncidentHotspot\",\n    \"ContinuityMeter\"\n  ],\n  \"required_data\": [\n    \"SceneCard\",\n    \"CueEvent\",\n    \"IncidentDefinition\"\n  ],\n  \"state_ownership\": \"SceneController owns timeline/continuity; each control owns pointer gesture\",\n  \"persistence\": \"best grade/unlock only\",\n  \"implementation_order\": [\n    \"timeline/state\",\n    \"cue strip\",\n    \"faders\",\n    \"curtain\",\n    \"prop snap\",\n    \"incident\",\n    \"scoring/result\"\n  ]\n}\n\n## Acceptance Criteria\n- 6개 inventory 화면/overlay가 모두 이동 가능\n- Live 한 화면에서 stage/controls/cues가 동시에 보임\n- fader/rope/prop gesture가 우선순위대로 충돌 없이 작동\n- invalid prop drop은 tray로 복귀\n- incident 중 normal controls 유지\n- Pause/Cue Help에서 timeline 정지\n- continuity 0 또는 timeline end에서 Result 이동",
+  "source": "chat_automation",
+  "source_run_at": "2026-09-29T12:28:27.920391+00:00",
+  "status": "build",
+  "created_at": "2026-09-29T12:28:27.920391+00:00",
+  "updated_at": "2026-09-29T14:38:49.599632+00:00"
+}
