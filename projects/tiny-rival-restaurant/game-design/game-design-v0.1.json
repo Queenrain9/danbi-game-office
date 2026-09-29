@@ -1,0 +1,41 @@
+{
+  "schema_version": "game-design-v0.1",
+  "artifact_type": "playable-game-design-spec",
+  "idea_id": "dda6a9f1-af8f-45cb-98a9-ebbc4b3c8ac3",
+  "title": "Tiny Rival Restaurant",
+  "version": "v0.1",
+  "one_line": "공유 골목의 손님을 메뉴·냄새·대기열·좌석 회전으로 경쟁하는 모바일 식당 운영 게임.",
+  "primary_interaction": "손님 흐름 관찰 + 드래그 착석 + 아로마 재배치",
+  "session_length": "4–6분/하루",
+  "content_unit": "4-wave 식당 영업일",
+  "game_rules": {
+    "cash_start": 60,
+    "tables": 4,
+    "menu_slots": 3,
+    "waves": 4,
+    "wave_seconds": 45,
+    "patience_seconds": 18,
+    "clean_seconds": 3,
+    "aroma_zones": 3,
+    "aroma_cooldown": 5,
+    "party_choice": "taste+price tolerance+aroma-queue penalty; chosen queue final",
+    "meal": "8–16 sec then cash += price and table dirty",
+    "failure": "cash<0",
+    "pause": "all timers freeze"
+  },
+  "screen_inventory": [
+    "Day Select",
+    "Restaurant Gameplay",
+    "Wave Result Overlay",
+    "Day Result",
+    "Pause"
+  ],
+  "mvp_scope": "3 days, street1, player/rival1 each, tables4, dishes5, menu slots3, archetypes4, 4 waves/day, aroma zones3",
+  "known_risks": [
+    "선택식 불투명성",
+    "작은 화면 조작 과부하",
+    "scripted rival 반복성",
+    "가격 지배 전략"
+  ],
+  "source": "chat_automation"
+}
