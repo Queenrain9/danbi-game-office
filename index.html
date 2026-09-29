@@ -98,15 +98,19 @@
     .activity-time { color:#60748f; font-variant-numeric:tabular-nums; }
     .activity-text { color:#bdcce0; line-height:1.45; }
     .cards { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:14px; }
-.idea-cards { grid-template-columns: repeat(auto-fit,minmax(390px,1fr)); align-items:start; }
-.idea-card .idea-detail { display:none; margin-top:12px; }
-.idea-card.expanded .idea-detail { display:block; }
-.idea-card .idea-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:12px; }
-.idea-card .idea-summary > div { background:rgba(0,0,0,.12); border-radius:10px; padding:8px; }
-.idea-card .idea-summary b { display:block; font-size:13px; }
-.idea-card .idea-summary span { font-size:9px; color:#6e86a3; }
-.idea-card .idea-next { margin-top:12px; }
-.idea-card .idea-toggle { margin-top:12px; width:100%; }
+.idea-cards { grid-template-columns: repeat(auto-fit,minmax(360px,1fr)); align-items:start; }
+.idea-card.priority { border-color:rgba(243,200,106,.38); box-shadow:inset 0 0 0 1px rgba(243,200,106,.06); }
+.idea-concept-label { color:#6f87a3; font-size:9px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; margin-bottom:6px; }
+.idea-concept { color:#dce8f8; font-size:13px; line-height:1.62; margin:0; }
+.idea-flow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; }
+.idea-flow-step { font-size:10px; color:#b7cae1; background:rgba(116,167,255,.08); border:1px solid rgba(116,167,255,.11); border-radius:9px; padding:6px 8px; line-height:1.3; }
+.idea-flow-arrow { color:#58799d; font-size:10px; }
+.idea-card .card-actions { align-items:center; }
+.idea-priority-note { font-size:10px; color:#d8bb72; margin-top:9px; line-height:1.5; }
+.idea-detail-score { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+.idea-detail-score > div { background:rgba(0,0,0,.12); border-radius:10px; padding:9px; }
+.idea-detail-score b { display:block; font-size:14px; }
+.idea-detail-score span { font-size:9px; color:#6e86a3; }
     .game-card { border:1px solid rgba(255,255,255,.06); background:linear-gradient(145deg,#102039,#0b1728); border-radius:18px; padding:17px; position:relative; overflow:hidden; }
     .game-card:hover { border-color:rgba(116,167,255,.18); }
     .card-top { display:flex; justify-content:space-between; gap:12px; align-items:start; }
@@ -391,6 +395,31 @@ async function loadPromotedIdeas(showToast=false){
   }catch(err){
     console.error("Idea Lab load failed",err);
     if(showToast) toast("Idea Lab 불러오기 실패");
+  }
+}
+
+async function setIdeaPriority(id, priority){
+  const p=promotedIdeas.find(x=>x.id===id);
+  if(!p) return;
+  const previous=!!p.human_priority;
+  p.human_priority=!!priority;
+  p.human_priority_at=priority?new Date().toISOString():null;
+  if(current==="ideas") render();
+  try{
+    const result=await cloudRequest("POST",{action:"set_idea_priority",idea_id:id,priority:!!priority});
+    if(result?.idea){
+      p.human_priority=!!result.idea.human_priority;
+      p.human_priority_at=result.idea.human_priority_at||null;
+    }
+    closeModal();
+    render();
+    toast(priority?"Game Design 우선순위로 지정":"Game Design 우선순위 해제");
+  }catch(err){
+    p.human_priority=previous;
+    p.human_priority_at=previous?p.human_priority_at:null;
+    render();
+    console.error("Idea priority update failed",err);
+    toast("우선순위 저장 실패");
   }
 }
 
@@ -691,14 +720,51 @@ function genericHeader(title,desc,action=""){ return `<div class="section-head" 
 function ideaCard(p){
   const promotedAt=p.source_run_at||p.created_at;
   const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
+  const flow=String(p.core_action||"")
+    .split(/→|->/)
+    .map(x=>x.trim())
+    .filter(Boolean)
+    .slice(0,5);
+  const priority=!!p.human_priority;
+  return `<div class="game-card idea-card ${priority?"priority":""}" id="idea-${esc(p.id)}">
+    <div class="card-top">
+      <div>
+        <div class="kicker">입고 ${esc(when)}</div>
+        <div class="card-title">${esc(p.title)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+        ${priority?'<span class="badge amber">★ PRIORITY</span>':""}
+        <span class="badge green">IDEA LAB</span>
+      </div>
+    </div>
+
+    <div class="detail-box" style="margin-top:12px">
+      <div class="idea-concept-label">어떤 게임?</div>
+      <p class="idea-concept">${esc(p.one_line)}</p>
+    </div>
+
+    <div style="margin-top:13px">
+      <div class="idea-concept-label">대표 플레이</div>
+      <div class="idea-flow">${flow.length?flow.map((step,i)=>`${i?'<span class="idea-flow-arrow">→</span>':""}<span class="idea-flow-step">${esc(step)}</span>`).join(""):`<span class="idea-flow-step">${esc(p.core_action||"-")}</span>`}</div>
+    </div>
+
+    <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span></div>
+    ${priority?'<div class="idea-priority-note">대표 우선 선택 · 다음 Game Design 작업에서 일반 후보보다 먼저 처리됩니다.</div>':""}
+
+    <div class="card-actions">
+      <button class="btn ${priority?"good":"ghost"}" onclick="setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★ 우선 지정됨":"☆ 우선 설계"}</button>
+      <button class="btn primary" onclick="showIdeaDetail('${p.id}')">자세히 보기</button>
+    </div>
+  </div>`;
+}
+
+function showIdeaDetail(id){
+  const p=promotedIdeas.find(x=>x.id===id);
+  if(!p) return;
+  const promotedAt=p.source_run_at||p.created_at;
+  const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
   const reasons=Array.isArray(p.why_promoted)?p.why_promoted:[];
-  const keyScores=[
-    ["HOOK",p.hook_score],
-    ["LOOP",p.core_loop_score],
-    ["PROTO",p.prototype_score],
-    ["VISUAL",p.visual_score]
-  ].filter(x=>x[1]!==null && x[1]!==undefined);
-  const allScores=[
+  const scores=[
     ["HOOK",p.hook_score],
     ["LOOP",p.core_loop_score],
     ["MOBILE",p.mobile_fit_score],
@@ -707,59 +773,61 @@ function ideaCard(p){
     ["VISUAL",p.visual_score],
     ["GROWTH",p.growth_score]
   ].filter(x=>x[1]!==null && x[1]!==undefined);
-  return `<div class="game-card idea-card" id="idea-${esc(p.id)}">
-    <div class="card-top">
-      <div>
-        <div class="kicker">입고 ${esc(when)}</div>
-        <div class="card-title">${esc(p.title)}</div>
-      </div>
-      <span class="badge green">IDEA LAB</span>
+  const priority=!!p.human_priority;
+  modal(`
+    <div class="modal-head">
+      <div><div class="kicker">IDEA LAB · ${esc(when)}</div><h2>${esc(p.title)}</h2></div>
+      <button class="close" onclick="closeModal()">×</button>
     </div>
 
-    <div class="card-desc">${esc(p.one_line)}</div>
-    <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span><span>Scheduled Chat</span></div>
-
     <div class="detail-box">
-      <h3>핵심 플레이 행동</h3>
+      <h3>게임 한눈에 보기</h3>
+      <p style="font-size:14px;color:#dce8f8">${esc(p.one_line)}</p>
+      <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span></div>
+    </div>
+
+    <div class="detail-box" style="margin-top:12px">
+      <h3>플레이어가 실제로 하는 일</h3>
       <p>${esc(p.core_action)}</p>
     </div>
 
-    ${keyScores.length?`<div class="idea-summary">${keyScores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div>`:""}
+    ${reasons.length?`<div class="detail-box" style="margin-top:12px"><h3>왜 Idea Lab을 통과했나</h3><p>${reasons.map(x=>"• "+esc(x)).join("<br>")}</p></div>`:""}
 
-    <button class="btn ghost idea-toggle" onclick="toggleIdeaDetail('${p.id}',this)">전체 평가 보기</button>
+    ${scores.length?`<div class="detail-box" style="margin-top:12px"><h3>내부 심사 점수</h3><div class="idea-detail-score">${scores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div></div>`:""}
 
-    <div class="idea-detail">
-      ${allScores.length?`<div class="score" style="grid-template-columns:repeat(4,1fr)">${allScores.map(([k,v])=>`<div><b>${esc(v)}</b><span>${k}</span></div>`).join("")}</div>`:""}
-      ${reasons.length?`<div class="detail-box" style="margin-top:12px"><h3>왜 회사에 올렸나</h3><p>${reasons.map(x=>"• "+esc(x)).join("<br>")}</p></div>`:""}
+    ${p.next_test?`<div class="human-gate" style="margin-top:12px"><b>다음 검증 포인트</b><br>${esc(p.next_test)}</div>`:""}
+
+    <div class="card-actions" style="justify-content:flex-end">
+      <button class="btn" onclick="closeModal()">닫기</button>
+      <button class="btn ${priority?"good":"primary"}" onclick="setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★ 우선순위 해제":"☆ Game Design 우선"}</button>
     </div>
-  </div>`;
+  `);
 }
 
-function toggleIdeaDetail(id,btn){
-  const card=document.getElementById("idea-"+id);
-  if(!card) return;
-  const open=card.classList.toggle("expanded");
-  btn.textContent=open?"접기":"전체 평가 보기";
-}
 function ideasPage(){
-  const ps=promotedIdeas;
+  const ps=[...promotedIdeas].sort((a,b)=>{
+    const pa=a.human_priority?1:0, pb=b.human_priority?1:0;
+    if(pa!==pb) return pb-pa;
+    return new Date(b.created_at||0)-new Date(a.created_at||0);
+  });
+  const priorityCount=ps.filter(x=>x.human_priority).length;
   return genericHeader(
     "Idea Lab · Scheduled Intake",
-    "ChatGPT 예약 작업이 내부 생성·비평·Producer 심사를 끝낸 뒤 Supabase에 실제 입고한 후보만 표시합니다. 샘플·수동·브라우저 생성 아이디어는 표시하지 않습니다.",
+    "카드에서는 게임이 무엇인지와 대표 플레이를 빠르게 보고, 자세히 보기에서 내부 심사 근거를 확인합니다. 마음에 드는 후보는 우선 설계로 체크할 수 있습니다.",
     `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
   ) +
   `<div class="panel" style="margin-bottom:14px">
-    <div class="panel-title"><strong>Hourly Gate</strong><span>raw ideas are not stored</span></div>
+    <div class="panel-title"><strong>Idea → Game Design Queue</strong><span>우선 선택 ${priorityCount}개</span></div>
     <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
-      <span><b style="color:#eaf3ff">매시간 00분</b> 내부 탐색</span>
-      <span>Creator → Critic → Producer</span>
-      <span><b style="color:#8de4c7">승격 0~4개</b></span>
-      <span>기준 미달이면 아무 것도 입고하지 않음</span>
+      <span>☆ 우선 설계 체크 → <b style="color:#f3c86a">Game Design 최우선</b></span>
+      <span>우선 후보끼리는 오래된 순</span>
+      <span>그 다음 일반 후보를 오래된 순으로 최대 2개 처리</span>
       <span>Game Design 완료 시 Idea Lab에서 자동 이동</span>
     </div>
   </div>
-  <div class="cards idea-cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.<br>다음 정각 실행에서 기준을 넘는 후보가 있을 때만 여기에 나타납니다.</div>`}</div>`;
+  <div class="cards idea-cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.</div>`}</div>`;
 }
+
 function designCard(p){
   const madeAt=p.source_run_at||p.created_at;
   const when=madeAt ? new Date(madeAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
@@ -797,7 +865,8 @@ function designPage(){
     <div class="panel-title"><strong>Scheduled Game Design</strong><span>final specs only</span></div>
     <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
       <span><b style="color:#eaf3ff">매시간 05분</b> 실행</span>
-      <span>미처리 Idea Lab 후보 <b style="color:#8de4c7">최대 2개</b></span>
+      <span><b style="color:#f3c86a">대표 우선 후보 먼저</b> → 일반 후보 오래된 순</span>
+      <span>한 회차 최대 <b style="color:#8de4c7">2개</b></span>
       <span>내부 설계안 비교 → Critic → 최종 Spec</span>
       <span>중간안은 저장하지 않음</span>
     </div>
