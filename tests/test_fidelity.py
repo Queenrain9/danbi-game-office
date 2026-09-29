@@ -29,7 +29,9 @@ class FidelityTests(unittest.TestCase):
                  'connections': [{'from': '/root/AppRoot/home/start', 'signal': 'pressed', 'to': '/root/AppRoot', 'method': 'start_game'}],
                  'implementations': {'R1': [{'file': 'res://main.tscn', 'node_path': '/root/AppRoot/home/start'}, {'file': 'res://main.gd', 'symbol': 'start_game', 'kind': 'func'}]},
                  'symbols': [{'file': 'res://main.gd', 'symbol': 'ready_to_start', 'kind': 'var'}],
-                 'tests': [{'id': 'T1', 'kind': 'static', 'stage': 'input', 'requirement_ids': ['R1'], 'checks': [{'kind': 'symbol', 'file': 'res://main.gd', 'symbol': 'start_game', 'symbol_kind': 'func'}]}, {'id': 'M1', 'kind': 'runtime', 'requirement_ids': ['R1']} ]}}
+                 'tests': [{'id': 'T1', 'kind': 'static', 'stage': 'input', 'requirement_ids': ['R1'], 'checks': [{'kind': 'symbol', 'file': 'res://main.gd', 'symbol': 'start_game', 'symbol_kind': 'func'}]},
+                           *[{'id': 'T:'+stage, 'kind': 'static', 'stage': stage, 'requirement_ids': ['R1'], 'checks': [{'kind': 'file', 'file': 'res://main.tscn'}]} for stage in ('skeleton','geometry','state','presentation','integration')],
+                           {'id': 'M1', 'kind': 'runtime', 'requirement_ids': ['R1']} ]}}
         return m.seal(b)
 
     def project(self, b, folder):
@@ -95,6 +97,62 @@ class FidelityTests(unittest.TestCase):
     def test_unsupported_static_check_fails_closed(self):
         b=self.fixture(); b['bindings']['tests'][0]['checks']=[{'kind':'looks_good'}]; b=m.seal(b)
         self.assertIn('TEST_CHECK',self.codes(b))
+
+    def test_every_stage_needs_static_test(self):
+        b=self.fixture(); b['bindings']['tests']=[t for t in b['bindings']['tests'] if t.get('stage')!='geometry']; b=m.seal(b)
+        self.assertIn('STAGE_COVERAGE',self.codes(b))
+
+    def test_static_checks_actually_run(self):
+        with tempfile.TemporaryDirectory() as d:
+            b=self.fixture(); b['bindings']['tests'][0]['checks']=[{'kind':'file','file':'res://missing.gd'}]; b=m.seal(b)
+            self.assertIn('MISSING_FILE',self.codes(b,self.project(b,d)))
+            b=self.fixture(); b['bindings']['tests'][0]['checks']=[{'kind':'resources','file':'res://missing.gd'}]; b=m.seal(b)
+            self.assertIn('MISSING_FILE',self.codes(b,self.project(b,d)))
+
+    def test_unexpected_scene_node_and_missing_reusable_use_site(self):
+        with tempfile.TemporaryDirectory() as d:
+            b=self.fixture(); p=self.project(b,d)
+            (p/'main.tscn').write_text((p/'main.tscn').read_text()+'\n[node name="Surprise" type="Button" parent="."]\n')
+            self.assertIn('UNDECLARED_NODE',self.codes(b,p))
+        b=self.fixture(); b['bindings']['reusable_components']={'NeverUsed':{'script_path':'res://reusable.gd','godot_type':'Control'}}; b=m.seal(b)
+        self.assertIn('REUSABLE',self.codes(b))
+
+    def test_state_binding_must_have_actual_owner_and_symbol(self):
+        b=self.fixture(); node=b['bindings']['components'][0]; node['enabled_when']='ready'; node['enabled_when_ref']={'file':'res://missing.gd','symbol':'ready','kind':'var'}; b=m.seal(b)
+        with tempfile.TemporaryDirectory() as d: self.assertIn('MISSING_FILE',self.codes(b,self.project(b,d)))
+
+    def test_invalid_manual_scope_cannot_launder_runtime_as_static(self):
+        b=self.fixture(); b['bindings']['tests'][-1]['verification_scope']='static'; b['bindings']['tests'][-1]['checks']=[{'kind':'file','file':'res://main.gd'}]; b=m.seal(b)
+        self.assertIn('TEST_SCOPE',self.codes(b))
+
+    def test_states_transitions_and_rules_need_implementation_location(self):
+        b=self.fixture(); b['bindings']['states']=[{'id':'ready','screen_id':'home'}]; b=m.seal(b)
+        self.assertIn('BINDING_REF',self.codes(b))
+        b=self.fixture(); b['screens'][0]['transitions']=[{'from':'ready','to':'game','trigger':'tap start'}]
+        b['bindings']['transitions']=[{'screen_id':'home','from':'ready','to':'game','trigger':'tap start','implementation_ref':{'file':'res://main.gd','symbol':'start_game','kind':'func'}}]; b=m.seal(b)
+        with tempfile.TemporaryDirectory() as d: self.assertNotIn('BINDING_REF',self.codes(b,self.project(b,d)))
+
+    def test_requirement_static_test_must_check_its_implementation(self):
+        b=self.fixture()
+        for t in b['bindings']['tests']:
+            if t['kind']=='static': t['checks']=[{'kind':'file','file':'res://unrelated.gd'}]
+        b=m.seal(b)
+        self.assertIn('TEST_TRACE',self.codes(b))
+
+    def test_existing_binary_resource_does_not_fail_text_decoding(self):
+        with tempfile.TemporaryDirectory() as d:
+            b=self.fixture(); b['bindings']['tests'][0]['checks']=[{'kind':'file','file':'res://image.png'}]; b=m.seal(b)
+            project=self.project(b,d)
+            (project/'image.png').write_bytes(b'\x89PNG\r\n\x1a\n\xff')
+            self.assertNotIn('MISSING_FILE',self.codes(b,project))
+
+    def test_missing_source_state_transition_and_variant_mapping(self):
+        b=self.fixture(); b['screens'][0]['states']=['ready']; b=m.seal(b)
+        self.assertIn('STATE_COVERAGE',self.codes(b))
+        b=self.fixture(); b['screens'][0]['transitions']=[{'from':'ready','to':'game','trigger':'tap start'}]; b=m.seal(b)
+        self.assertIn('TRANSITION_COVERAGE',self.codes(b))
+        b=self.fixture(); b['screens'][0]['state_variants']=[{'id':'disabled'}]; b=m.seal(b)
+        self.assertIn('VARIANT_COVERAGE',self.codes(b))
 
     def test_path_traversal_nan_and_duplicate_nodes(self):
         with self.assertRaises(ValueError): m.geometry({'x':float('nan'),'y':0,'w':1,'h':1},{'width':390,'height':844})

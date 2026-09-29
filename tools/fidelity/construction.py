@@ -9,7 +9,7 @@ import copy
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import subprocess
 import sys
@@ -240,11 +240,26 @@ def validate(b, project=None, claims=None, commit=None):
         for key in ('state_binding','enabled_when'):
             if n.get(key) and not n.get(key+'_ref'): error('STATE_BINDING',path,'Explicit file/symbol binding required for '+key)
     source_components={(s['id'],c['id']):c for s in b.get('screens',[]) for c in s.get('components',[])}
+    source_states={(s['id'],v.get('id') if isinstance(v,dict) else v) for s in b.get('screens',[]) for v in s.get('states',[])}
+    bound_states={(v.get('screen_id'),v.get('id')) for v in bindings.get('states',[])}
+    if source_states != bound_states or len(bindings.get('states',[])) != len(bound_states):
+        error('STATE_COVERAGE','','Every screen state needs one concrete binding')
+    source_variants={(s['id'],v.get('id') if isinstance(v,dict) else v) for s in b.get('screens',[]) for v in s.get('state_variants',s.get('variants',[]))}
+    bound_variants={(v.get('screen_id'),v.get('id')) for v in bindings.get('variants',[])}
+    if source_variants != bound_variants or len(bindings.get('variants',[])) != len(bound_variants):
+        error('VARIANT_COVERAGE','','Every source variant needs one concrete binding')
+    source_transitions=[(s['id'],v.get('from'),v.get('to'),v.get('trigger')) for s in b.get('screens',[]) for v in s.get('transitions',[])]
+    bound_transitions=[(v.get('screen_id'),v.get('from'),v.get('to'),v.get('trigger')) for v in bindings.get('transitions',[])]
+    if sorted(map(str,source_transitions)) != sorted(map(str,bound_transitions)):
+        error('TRANSITION_COVERAGE','','Transition screen/from/to/trigger must preserve source exactly')
     component_keys=[(n.get('screen_id'),n.get('component_id')) for n in bindings.get('components',[])]
     if set(component_keys)!=set(source_components) or len(set(component_keys))!=len(component_keys): error('COMPONENT_COVERAGE','','Exact wireframe component mapping required')
     for n in bindings.get('components',[]):
         src=source_components.get((n.get('screen_id'),n.get('component_id')), {})
         if src.get('box')!=n.get('source_box'): error('GEOMETRY',n.get('node_path'),'Component box differs from source')
+    for name, spec in bindings.get('reusable_components', {}).items():
+        if not any(n.get('reusable_component') == name and n.get('script_path') == spec.get('script_path') for n in ns):
+            error('REUSABLE', name, 'Declared reusable component has no compatible use site')
     conns=bindings.get('connections',[])
     for c in conns:
         if c.get('from') not in nodes or c.get('to') not in nodes or not NAME.fullmatch(c.get('method','')) or not NAME.fullmatch(c.get('signal','')): error('CONNECTION','','Invalid node/signal/method binding')
@@ -270,6 +285,17 @@ def validate(b, project=None, claims=None, commit=None):
     refs.extend(bindings.get('symbols',[]))
     for n in ns:
         refs.extend(n[k] for k in ('state_binding_ref','enabled_when_ref') if isinstance(n.get(k),dict))
+    for key in ('states','variants','transitions'):
+        for entry in bindings.get(key,[]):
+            ref = entry.get('implementation_ref')
+            if not isinstance(ref,dict) or not ref.get('file') or not (ref.get('node_path') or ref.get('symbol')):
+                error('BINDING_REF',key,'Every state/variant/transition needs a concrete implementation location')
+            else: refs.append(ref)
+    for rule_id, entry in bindings.get('rules',{}).items():
+        ref = entry.get('implementation_ref') if isinstance(entry,dict) else None
+        if not isinstance(ref,dict) or not ref.get('file') or not (ref.get('node_path') or ref.get('symbol')):
+            error('BINDING_REF',rule_id,'Every rule needs a concrete implementation location')
+        else: refs.append(ref)
     for v in ints:
         if v.get('action_script'): refs.append({'file':v['action_script'],'symbol':v.get('action_symbol'),'kind':'func'})
         if v.get('input_handler'): refs.append({'file':nodes.get(v.get('target_node'),{}).get('script_path'),'symbol':v['input_handler'],'kind':'func'})
@@ -281,10 +307,24 @@ def validate(b, project=None, claims=None, commit=None):
     if not tids or any(not t for t in tids) or len(set(tids))!=len(tids): error('TEST_IDS','','Unique test IDs required')
     for rid in ids:
         if not any(is_static(t) and rid in t.get('requirement_ids',[]) for t in tests): error('STATIC_COVERAGE',rid,'Static implementation test required; manual playtests are additional')
+        locations = impl.get(rid,[])
+        if isinstance(locations,list) and locations and not any(
+            is_static(t) and rid in t.get('requirement_ids',[]) and any(
+                check.get('file') == ref.get('file') and
+                (not ref.get('node_path') or check.get('node_path') == ref['node_path'] or check.get('kind') in ('file','resources')) and
+                (not ref.get('symbol') or check.get('symbol') == ref['symbol'] or check.get('kind') in ('file','resources'))
+                for ref in locations for check in t.get('checks',[])) for t in tests):
+            error('TEST_TRACE',rid,'Static test must inspect a declared implementation location')
     for t in tests:
         if any(r not in ids for r in t.get('requirement_ids',[])): error('TEST_REQUIREMENT',t.get('id'),'Unknown requirement')
+        if t.get('kind') == 'runtime' and is_static(t):
+            error('TEST_SCOPE',t.get('id'),'Runtime test cannot be recorded as static; add a separate structural test')
         if is_static(t):
             if not t.get('checks') or any(c.get('kind') not in CHECKS for c in t['checks']): error('TEST_CHECK',t.get('id'),'Nonempty deterministic checks required; unknown checks cannot pass')
+            if t.get('stage') not in STAGES: error('TEST_STAGE',t.get('id'),'Explicit known construction stage required')
+    for stage in STAGES:
+        if not any(is_static(t) and t.get('stage') == stage for t in tests):
+            error('STAGE_COVERAGE',stage,'Every DB construction stage needs a concrete static test')
     if claims is not None:
         cids=[c.get('requirement_id') for c in claims]
         if set(cids)!=set(ids) or len(cids)!=len(ids): error('CLAIM_COVERAGE','','Exact unique claims required')
@@ -307,7 +347,12 @@ def validate_project(b, project, refs, error):
         try:
             relative=resource_path(res); p=(project/relative).resolve()
             if not p.is_relative_to(project.resolve()): raise ValueError('Resource escaped project')
-            if res not in cache: cache[res]=p.read_text()
+            if res not in cache:
+                if p.suffix.lower() in ('.gd','.tscn','.tres','.godot','.json','.cfg','.txt'):
+                    cache[res]=p.read_text()
+                else:
+                    p.read_bytes()  # Existence/readability for binary assets; never decode as text.
+                    cache[res]=''
             return cache[res]
         except (ValueError,OSError,UnicodeError) as exc: error('MISSING_FILE',res,str(exc)); return ''
     def symbol(ref):
@@ -328,6 +373,8 @@ def validate_project(b, project, refs, error):
             same=abs(av-v)<0.000001 if isinstance(av,(int,float)) and isinstance(v,(int,float)) else av==v
             if not same: error('GEOMETRY' if k.startswith(('anchor','offset','layout')) else 'PROPERTY',path,k+' differs from canonical construction')
         if n.get('script_path'): read(n['script_path'])
+    for path in set(actual)-set(expected):
+        error('UNDECLARED_NODE',path,'Scene contains a node absent from approved blueprint')
     for c in bindings.get('connections',[]):
         relative=lambda p: p[len(root)+1:] or '.'
         wanted={'from':relative(c['from']),'to':relative(c['to']),'signal':c['signal'],'method':c['method']}
@@ -355,6 +402,9 @@ def validate_project(b, project, refs, error):
             elif kind in ('node','geometry'):
                 if check.get('node_path') not in expected or check.get('node_path') not in actual: error('NODE_PATH',check.get('node_path'),'Test target unresolved')
             elif kind=='connection' and check.get('binding') not in bindings.get('connections',[]): error('CONNECTION',t['id'],'Test connection unresolved')
+            elif kind=='resources':
+                text=read(check.get('file'))
+                for res in re.findall(r'["\x27](res://[^"\x27\n]+)["\x27]',text): read(res)
     try: config=(project/'project.godot').read_text()
     except OSError: config='';error('MISSING_FILE','project.godot','Missing Godot project')
     main=re.search(r'^run/main_scene="([^"]+)"',config,re.M)
@@ -382,7 +432,8 @@ def verify_commit(project, commit):
     repo=Path(git('rev-parse','--show-toplevel')); rel=project.relative_to(repo).as_posix()
     if git('status','--porcelain','--untracked-files=all','--',str(project)): raise ValueError('Project has uncommitted files')
     if git('diff',commit,'--',str(project)): raise ValueError('Project differs from reviewed commit')
-    if not git('ls-tree',commit,'--',rel+'/project.godot'): raise ValueError('project.godot absent at commit')
+    if not subprocess.check_output(['git','-C',str(repo),'ls-tree','-r',commit,'--',rel+'/project.godot'],stderr=subprocess.PIPE).strip():
+        raise ValueError('project.godot absent at commit')
 
 
 def main():
