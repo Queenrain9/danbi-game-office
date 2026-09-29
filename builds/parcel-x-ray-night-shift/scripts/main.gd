@@ -345,7 +345,7 @@ func _finish_classification() -> void:
   return
  input_locked = true
  var lane:Control=lanes[selected_lane]
- var target:=play_area.to_local(lane.global_position + lane.size*0.5 - parcel.size*0.5)
+ var target:=lane.global_position - play_area.global_position + lane.size*0.5 - parcel.size*0.5
  var snap:=create_tween()
  snap.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
  snap.tween_property(parcel,"position",target,0.12)
@@ -357,7 +357,11 @@ func expected_lane(data: Dictionary) -> String:
 func _evaluate(choice: String) -> void:
  var data: Dictionary = shift.current_case()
  var expected := expected_lane(data)
- var result: Dictionary = shift.record(choice, expected, scan_reversals)
+ var false_pins:=0
+ for pin in pins:
+  var kind:=String(data.objects[int(pin.object_index)][0])
+  if kind in ["foam","decoy"]: false_pins += 1
+ var result: Dictionary = shift.record(choice, expected, scan_reversals, false_pins)
  show_result(choice, expected, int(result.delta))
 
 func show_result(choice: String, expected: String, delta: int) -> void:
