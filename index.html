@@ -280,8 +280,9 @@ function seedState() {
 const CLOUD_URL = "https://hmblaasagxyntyfrfztg.supabase.co/functions/v1/danbi-game-office-sync";
 let cloudReady = false;
 let cloudTimer = null;
-let ideaPollTimer = null;
+let pipelinePollTimer = null;
 let promotedIdeas = [];
+let gameDesigns = [];
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
 
@@ -350,9 +351,35 @@ async function loadPromotedIdeas(showToast=false){
   }
 }
 
-function startIdeaPolling(){
-  clearInterval(ideaPollTimer);
-  ideaPollTimer=setInterval(()=>loadPromotedIdeas(false),60000);
+async function loadGameDesigns(showToast=false){
+  const key=getCloudKey();
+  if(!key) return;
+  try{
+    const res=await fetch(CLOUD_URL+"?view=designs&limit=50",{
+      method:"GET",
+      headers:{"Content-Type":"application/json","X-Office-Key":key},
+      cache:"no-store"
+    });
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    gameDesigns=Array.isArray(payload.designs)?payload.designs:[];
+    if(current==="design" || current==="dashboard") render();
+    if(showToast) toast(`Game Design 새로고침 · ${gameDesigns.length}개`);
+  }catch(err){
+    console.error("Game Design load failed",err);
+    if(showToast) toast("Game Design 불러오기 실패");
+  }
+}
+
+function startPipelinePolling(){
+  clearInterval(pipelinePollTimer);
+  pipelinePollTimer=setInterval(()=>{
+    loadPromotedIdeas(false);
+    loadGameDesigns(false);
+  },60000);
 }
 
 async function initCloud(){
@@ -373,8 +400,8 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await loadPromotedIdeas(false);
-    startIdeaPolling();
+    await Promise.all([loadPromotedIdeas(false),loadGameDesigns(false)]);
+    startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
   }catch(err){
@@ -412,6 +439,7 @@ function navRender(){
 function go(id){ current=id; location.hash=id; render(); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
 function count(stage){
   if(stage==="idea") return promotedIdeas.length;
+  if(stage==="design") return gameDesigns.length;
   return state.projects.filter(p=>p.stage===stage).length;
 }
 function titleInfo(){
@@ -553,35 +581,109 @@ function ideasPage(){
       <span>Creator → Critic → Producer</span>
       <span><b style="color:#8de4c7">승격 0~4개</b></span>
       <span>기준 미달이면 아무 것도 입고하지 않음</span>
+      <span>Game Design 완료 시 Idea Lab에서 자동 이동</span>
     </div>
   </div>
   <div class="cards idea-cards">${ps.map(ideaCard).join("") || `<div class="empty">아직 내부 심사를 통과해 입고된 아이디어가 없습니다.<br>다음 정각 실행에서 기준을 넘는 후보가 있을 때만 여기에 나타납니다.</div>`}</div>`;
 }
 function designCard(p){
+  const madeAt=p.source_run_at||p.created_at;
+  const when=madeAt ? new Date(madeAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
+  const screens=Array.isArray(p.screen_inventory)?p.screen_inventory:[];
+  const risks=Array.isArray(p.known_risks)?p.known_risks:[];
   return `<div class="game-card">
-    <div class="card-top"><div><div class="kicker">Playable Concept Brief</div><div class="card-title">${esc(p.title)}</div></div><span class="badge blue">GAME DESIGN</span></div>
-    <div class="card-desc">${esc(p.desc||"게임 규칙 정의 대기")}</div>
-    <div class="detail-box"><h3>이 부서의 산출물</h3><p>Player Fantasy · Core Loop · Primary Interaction · Round Structure · Success/Failure · Progression · MVP Scope · Screen Inventory · Text Visual Direction Brief</p></div>
-    <div class="meta"><span>규칙 정의</span><span>MVP 축소</span><span>화면 목록</span></div>
-    <div class="progress"><i style="width:${p.progress||0}%"></i></div><div class="progress-row"><span>Idea → Playable Concept Brief</span><b>${p.progress||0}%</b></div>
+    <div class="card-top">
+      <div><div class="kicker">설계 완료 ${esc(when)}</div><div class="card-title">${esc(p.title)}</div></div>
+      <span class="badge blue">${esc(p.version||"v0.1")}</span>
+    </div>
+    <div class="card-desc">${esc(p.one_line)}</div>
+    <div class="detail-box"><h3>Player Fantasy</h3><p>${esc(p.player_fantasy)}</p></div>
+    <div class="detail-box" style="margin-top:10px"><h3>Core Loop</h3><p>${esc(p.core_loop)}</p></div>
+    <div class="meta">
+      <span>${esc(p.primary_interaction)}</span>
+      ${p.session_length?`<span>${esc(p.session_length)}</span>`:""}
+      ${screens.length?`<span>${screens.length} screens</span>`:""}
+    </div>
+    <div class="detail-box"><h3>MVP Scope</h3><p>${esc(p.mvp_scope)}</p></div>
+    ${risks.length?`<div class="human-gate"><b>Main Risk</b><br>${esc(risks[0])}</div>`:""}
+    <div class="card-actions">
+      <button class="btn primary" onclick="showDesignSpec('${p.id}')">전체 Game Design Spec 보기</button>
+    </div>
   </div>`;
 }
+
 function designPage(){
-  const ps=state.projects.filter(p=>p.stage==="design");
+  const ps=gameDesigns;
   return genericHeader(
     "Game Design Room",
-    "좋은 아이디어를 실제로 구현·플레이할 수 있는 게임 규칙으로 바꾸는 부서입니다. 이미지 생성은 하지 않습니다."
+    "Idea Lab 후보를 실제 반복 플레이가 가능한 규칙·상태·조작·MVP로 정의한 최종 설계만 보관합니다.",
+    `<button class="btn" onclick="loadGameDesigns(true)">↻ 새로고침</button>`
   )+`
   <div class="panel" style="margin-bottom:14px">
-    <div class="panel-title"><strong>Required handoff</strong><span>to Pre-production</span></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <span class="badge">Player Fantasy</span><span class="badge">Core Loop</span><span class="badge">Primary Interaction</span>
-      <span class="badge">Round Structure</span><span class="badge">Success / Failure</span><span class="badge">Progression</span>
-      <span class="badge">MVP Scope</span><span class="badge">Screen Inventory</span><span class="badge">Visual Direction Brief</span>
+    <div class="panel-title"><strong>Scheduled Game Design</strong><span>final specs only</span></div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd">
+      <span><b style="color:#eaf3ff">매시간 15분</b> 실행</span>
+      <span>미처리 Idea Lab 후보 <b style="color:#8de4c7">최대 2개</b></span>
+      <span>내부 설계안 비교 → Critic → 최종 Spec</span>
+      <span>중간안은 저장하지 않음</span>
     </div>
   </div>
-  <div class="cards">${ps.map(designCard).join("") || `<div class="empty">아직 Game Design 예약 작업과 연결되지 않았습니다.<br>다음 단계에서 Idea Lab의 실제 후보가 이 방으로 들어오게 연결합니다.</div>`}</div>`;
+  <div class="cards">${ps.map(designCard).join("") || `<div class="empty">아직 완성된 Game Design Spec이 없습니다.<br>예약 작업이 Idea Lab의 미처리 후보를 설계하면 여기에 나타납니다.</div>`}</div>`;
 }
+
+function showDesignSpec(id){
+  const p=gameDesigns.find(x=>x.id===id);
+  if(!p) return;
+  const list=(arr)=>Array.isArray(arr)&&arr.length ? `<ul>${arr.map(x=>`<li>${esc(typeof x==="string"?x:JSON.stringify(x))}</li>`).join("")}</ul>` : "<p>-</p>";
+  const jsonBlock=(value)=>{
+    if(value===null||value===undefined||value===""||(Array.isArray(value)&&!value.length)) return "<p>-</p>";
+    const text=typeof value==="string"?value:JSON.stringify(value,null,2);
+    return `<pre style="white-space:pre-wrap;word-break:break-word;color:#9fb3cb;font-size:11px;line-height:1.6;margin:0">${esc(text)}</pre>`;
+  };
+  modal(`
+    <div class="modal-head">
+      <div><div class="kicker">Playable Game Design Spec · ${esc(p.version||"v0.1")}</div><h2>${esc(p.title)}</h2></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="detail-box"><h3>1. Product Definition</h3><p>${esc(p.one_line)}</p><p><b>Session</b> · ${esc(p.session_length||"-")}<br><b>Content Unit</b> · ${esc(p.content_unit||"-")}</p></div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>2. Player Fantasy</h3><p>${esc(p.player_fantasy)}</p></div>
+      <div class="detail-box"><h3>3. Core Player Verbs</h3>${jsonBlock(p.core_player_verbs)}</div>
+    </div>
+    <div class="detail-box" style="margin-top:12px"><h3>4. Core Loop</h3><p>${esc(p.core_loop)}</p></div>
+    <div class="detail-box" style="margin-top:12px"><h3>5. Round / Session Structure</h3><p>${esc(p.round_structure)}</p></div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>6. Game Rules</h3>${jsonBlock(p.game_rules)}</div>
+      <div class="detail-box"><h3>7. State Model</h3>${jsonBlock(p.state_model)}</div>
+    </div>
+    <div class="detail-box" style="margin-top:12px"><h3>8. Interaction Spec</h3>${jsonBlock(p.interaction_spec)}</div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>9. Content Model</h3>${jsonBlock(p.content_model)}</div>
+      <div class="detail-box"><h3>10. Difficulty / Variation</h3><p>${esc(p.difficulty_variation||"-")}</p></div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>11. Progression</h3><p>${esc(p.progression||"-")}</p></div>
+      <div class="detail-box"><h3>12. Economy</h3><p>${esc(p.economy||"Not required")}</p></div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>13. Screen Inventory</h3>${list(p.screen_inventory)}</div>
+      <div class="detail-box"><h3>14. Screen Flow</h3><p>${esc(p.screen_flow)}</p></div>
+    </div>
+    <div class="detail-box" style="margin-top:12px"><h3>15. Feedback System</h3>${jsonBlock(p.feedback_system)}</div>
+    <div class="detail-box" style="margin-top:12px"><h3>16. Visual Direction Brief</h3><p>${esc(p.visual_direction_brief||"-")}</p></div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>17. MVP Scope</h3><p>${esc(p.mvp_scope)}</p><h3 style="margin-top:12px">NOT IN MVP</h3>${list(p.not_in_mvp)}</div>
+      <div class="detail-box"><h3>18. Test Scenarios</h3>${list(p.test_scenarios)}</div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="detail-box"><h3>19. Known Risks</h3>${list(p.known_risks)}</div>
+      <div class="detail-box"><h3>20. Wireframe Handoff</h3>${list(p.wireframe_handoff)}</div>
+    </div>
+    <div class="detail-box" style="margin-top:12px"><h3>Stored Design Markdown</h3><pre style="white-space:pre-wrap;word-break:break-word;color:#9fb3cb;font-size:11px;line-height:1.65;margin:0">${esc(p.design_markdown||"")}</pre></div>
+    <div class="card-actions" style="justify-content:flex-end"><button class="btn" onclick="closeModal()">닫기</button></div>
+  `);
+}
+
 function wireCard(p){
   return `<div class="game-card">
     <div class="card-top"><div><div class="kicker">Implementation-ready</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">WIREFRAME</span></div>
@@ -645,7 +747,7 @@ function settingsPage(){
   return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
   <div class="two-col">
     <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + local</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab은 연결 완료. Game Design과 Pre-production은 다음 예약 작업에서 순서대로 연결합니다. 브라우저 자체의 가짜 아이디어·컨셉 생성은 사용하지 않습니다.</p></div>
+      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab과 Game Design은 실제 예약 작업 + Supabase 데이터로 연결됩니다. Pre-production은 다음 단계에서 연결합니다. 브라우저 자체의 가짜 아이디어·컨셉 생성은 사용하지 않습니다.</p></div>
       ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
     </div>
     <div class="panel"><div class="panel-title"><strong>Studio Principle</strong><span>v0.1</span></div>
