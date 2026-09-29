@@ -126,6 +126,21 @@ class FidelityTests(unittest.TestCase):
         for name in ('animation','button','canvas','card','chip','chip_group','comparison','drop_target','dropzone','grade','hold_button','hotspots','indicator','interactive_object','label','list','manipulable','metric','modal','object','overlay','panel','portrait','preview','result_stamp','slider','status','text_card','tray'):
             self.assertIn(name,m.SOURCE_COMPONENT_TYPES)
 
+    def test_semantic_target_resolver_handles_subtarget_plural_and_named_owner(self):
+        screen={'components':[
+            {'id':'object','type':'manipulable','label':'Lost Item'},
+            {'id':'review_btn','type':'button','label':'Review'},
+        ]}
+        self.assertEqual(m.resolve_interaction_target(screen,'hotspot'), {'component_ids':['object'],'selector':'hotspot'})
+        screen={'components':[
+            {'id':'rotate_left','type':'button','label':'-15°'},
+            {'id':'rotate_right','type':'button','label':'+15°'},
+        ]}
+        resolved=m.resolve_interaction_target(screen,'rotate buttons')
+        self.assertEqual(set(resolved['component_ids']), {'rotate_left','rotate_right'})
+        screen={'components':[{'id':'xray_box','type':'interactive_object','label':'Parcel / X-ray'}]}
+        self.assertEqual(m.resolve_interaction_target(screen,'visible internal shape in xray_box')['component_ids'], ['xray_box'])
+
     def test_reusable_mapping_requires_real_script(self):
         b=self.fixture(); b['bindings']['components'][0]['reusable_component']='ShadowPiece'; b=m.seal(b)
         self.assertIn('REUSABLE', self.codes(b))
