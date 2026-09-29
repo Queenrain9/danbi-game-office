@@ -20,7 +20,7 @@ class FidelityTests(unittest.TestCase):
         screens = [{'id': 'home', 'components': [{'id': 'start', 'box': box}], 'interactions': [{'trigger': 'tap', 'target': 'start'}]}]
         b = {'schema_version': 'fidelity-v1', 'hash_algorithm': 'sha256-canonical-json-v1',
              'contract_id': 'contract', 'wireframe_pack_id': 'pack', 'screens': screens, 'requirements': req,
-             'source': {'pack': {'id': 'pack', 'design_id': 'design', 'screens': screens}, 'design': {'id': 'design'}, 'requirements': req},
+             'source': {'pack': {'id': 'pack', 'design_id': 'design', 'reference_size': {'width': 390, 'height': 844}, 'screens': screens}, 'design': {'id': 'design'}, 'requirements': req},
              'bindings': {'scene_path': 'res://main.tscn', 'reference_size': {'width': 390, 'height': 844}, 'coordinate_space': 'screen_percent', 'stretch_mode': 'canvas_items',
                  'nodes': [{'node_path': '/root/AppRoot', 'godot_type': 'Control', 'full_rect': True, 'script_path': 'res://main.gd'},
                            {'node_path': '/root/AppRoot/home', 'godot_type': 'Control', 'full_rect': True}],
@@ -43,6 +43,13 @@ class FidelityTests(unittest.TestCase):
 
     def codes(self, b, p=None, claims=None):
         return {e['code'] for e in m.validate(b, p, claims=claims)['errors']}
+
+    def test_canonical_reference_size_prefers_source_then_orientation_fallback(self):
+        self.assertEqual(m.canonical_reference_size({'orientation':'portrait','reference_size':{'width':390,'height':844}}), {'width':390,'height':844})
+        self.assertEqual(m.canonical_reference_size({'orientation':'portrait'}), {'width':540,'height':960})
+        self.assertEqual(m.canonical_reference_size({'orientation':'landscape'}), {'width':960,'height':540})
+        with self.assertRaises(ValueError):
+            m.canonical_reference_size({'orientation':'square'})
 
     def test_exact_geometry_and_parent_relative_offset(self):
         r = m.geometry({'x': 18, 'y': 83, 'w': 64, 'h': 9}, {'width': 390, 'height': 844})
