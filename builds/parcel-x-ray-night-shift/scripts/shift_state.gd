@@ -1,4 +1,3 @@
-class_name ShiftState
 extends RefCounted
 
 const SHIFT_SIZE := 8
@@ -19,7 +18,7 @@ func begin_shift(all_cases: Array) -> void:
 func current_case() -> Dictionary:
  return shift_cases[case_index]
 
-func record(choice:String, expected:String, scan_reversals:int) -> Dictionary:
+func record(choice:String, expected:String, scan_reversals:int, false_pins:int=0) -> Dictionary:
  var ok := choice == expected
  var delta := 150 if ok and expected=="ISOLATE" else (100 if ok else (-180 if choice=="PASS" and expected=="ISOLATE" else -80))
  if ok:
@@ -29,6 +28,7 @@ func record(choice:String, expected:String, scan_reversals:int) -> Dictionary:
   streak = 0
   if choice=="PASS" and expected=="ISOLATE": critical += 1
  if scan_reversals <= 3: delta += 20
+ delta -= false_pins * 5
  total_scan_reversals += scan_reversals; score += delta
  return {"correct":ok,"delta":delta}
 
