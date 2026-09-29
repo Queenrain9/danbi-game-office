@@ -673,7 +673,7 @@ async function loadBuildJobs(showToast=false){
     const payload=await res.json();
     buildJobs=Array.isArray(payload.builds)?payload.builds:[];
     if(current==="build" || current==="fidelity" || current==="dashboard") render();
-    if(showToast) toast("Build Farm 새로고침 · "+buildJobs.length+"개");
+    if(showToast) toast("Build Farm 새로고침 · "+buildJobs.filter(b=>!isHistoricalBuild(b)).length+"개 active");
   }catch(err){
     console.error("Build Farm load failed",err);
     if(showToast) toast("Build Farm 불러오기 실패");
@@ -705,7 +705,7 @@ async function loadFidelityReviews(showToast=false){
     const payload=await res.json();
     fidelityReviews=Array.isArray(payload.fidelity)?payload.fidelity:[];
     if(current==="fidelity" || current==="dashboard") render();
-    if(showToast) toast("Fidelity Gate 새로고침 · "+fidelityReviews.length+"개");
+    if(showToast) toast("Fidelity Gate 새로고침 · "+fidelityReviews.filter(r=>!isSupersededReview(r)).length+"개 current");
   }catch(err){
     console.error("Fidelity review load failed",err);
     if(showToast) toast("Fidelity Gate 불러오기 실패");
@@ -721,7 +721,7 @@ async function loadRepairTickets(showToast=false){
     const payload=await res.json();
     repairTickets=Array.isArray(payload.repairs)?payload.repairs:[];
     if(current==="fidelity" || current==="build") render();
-    if(showToast) toast("Repair Ticket 새로고침 · "+repairTickets.length+"개");
+    if(showToast) toast("Repair Ticket 새로고침 · "+repairTickets.filter(x=>x.status==="open").length+"개 open");
   }catch(err){
     console.error("Repair ticket load failed",err);
     if(showToast) toast("Repair Ticket 불러오기 실패");
@@ -801,7 +801,8 @@ function count(stage){
   if(stage==="idea") return promotedIdeas.length;
   if(stage==="design") return gameDesigns.length;
   if(stage==="wireframe") return wireframePacks.length;
-  if(stage==="build") return buildJobs.length;
+  if(stage==="build") return buildJobs.filter(b=>!isHistoricalBuild(b)).length;
+  if(stage==="fidelity") return fidelityReviews.filter(r=>!isSupersededReview(r)).length;
   return state.projects.filter(p=>p.stage===stage).length;
 }
 function titleInfo(){
