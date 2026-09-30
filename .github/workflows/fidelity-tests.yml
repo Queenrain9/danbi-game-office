@@ -8,6 +8,7 @@ on:
       - "tests/test_fidelity.py"
       - "tests/test_production.py"
       - "tests/test_interaction_adapters.py"
+      - "production/godot/interaction_runtime/**"
       - ".github/workflows/fidelity-tests.yml"
   workflow_dispatch:
 
@@ -17,6 +18,7 @@ permissions:
 jobs:
   python-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,3 +26,20 @@ jobs:
           python-version: "3.12"
       - name: Run fidelity unit tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
+
+  interaction-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Godot 4.7.2
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.2
+          use-dotnet: false
+      - name: Verify Godot
+        run: godot --version
+      - name: Run shared interaction runtime suite
+        run: godot --headless --path production/godot/interaction_runtime --script res://headless_tests.gd
+      - name: Run Borrowed Shadow compatibility probe
+        run: godot --headless --path production/godot/interaction_runtime --script res://borrowed_shadow_probe.gd
