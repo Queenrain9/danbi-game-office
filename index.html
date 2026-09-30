@@ -852,7 +852,7 @@ async function loadBuildJobs(showToast=false){
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     buildJobs=Array.isArray(payload.builds)?payload.builds:[];
-    if(current==="build" || current==="fidelity" || current==="dashboard") render();
+    if(current==="build" || current==="fidelity" || current==="implementation" || current==="dashboard") render();
     if(showToast) toast("Build Farm 새로고침 · "+buildJobs.filter(b=>!isHistoricalBuild(b)).length+"개 active");
   }catch(err){
     console.error("Build Farm load failed",err);
@@ -1949,10 +1949,23 @@ function implementationContractCard(p){
     (raw?'<div style="margin-top:12px;font-size:10px;color:#5f7794">'+esc(raw)+'</div>':'')+
   '</div>';
 }
+function implementationHasDownstreamBuild(p){
+  return buildJobs.some(b=>b.contract_id===p.id && !isHistoricalBuild(b) && b.status!=="archived");
+}
+function implementationIsCurrent(p){
+  const status=String(p?.status||"").toLowerCase();
+  if(["fidelity_pending","repair","qa_ready","playtest_ready"].includes(status)) return false;
+  if(implementationHasDownstreamBuild(p)) return false;
+  return true;
+}
 function implementationPage(){
-  return genericHeader("Implementation Contract","Wireframe Pack의 component / interaction / state / transition / rule을 1:1 시공 체크리스트로 컴파일합니다.",'<button class="btn" onclick="loadImplementationContracts(true)">↻ 새로고침</button>')+
+  const currentContracts=implementationContracts.filter(implementationIsCurrent);
+  const completedContracts=implementationContracts.filter(p=>!implementationIsCurrent(p));
+  return genericHeader("Implementation Contract","Wireframe Pack의 component / interaction / state / transition / rule을 1:1 시공 체크리스트로 컴파일합니다.",'<button class="btn" onclick="Promise.all([loadImplementationContracts(false),loadBuildJobs(false),loadGameDesigns(false)]).then(()=>toast(\'구현 설계실 새로고침\'))">↻ 새로고침</button>')+
     '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Implementation Contract Hourly</strong><span>translation only</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 35분</b></span><span>Wireframe → Atomic Requirements</span><span>기획 변경 금지</span></div><div style="margin-top:12px;font-size:11px;color:#7f95af">Builder는 구현 증거를 남기고, 최종 VERIFIED 판정은 설계 검수실에서 합니다.</div></div>'+
-    '<div class="cards">'+(implementationContracts.map(implementationContractCard).join("") || '<div class="empty">아직 Implementation Contract가 없습니다.<br>35분 예약 작업이 Wireframe Pack을 시공 계약으로 변환합니다.</div>')+'</div>';
+    '<div class="section-head"><div><h2>현재 구현 설계 작업</h2><p>이 방에서 아직 처리 중이거나 Build Farm으로 넘기기 직전인 게임만 표시합니다.</p></div></div>'+
+    '<div class="cards">'+(currentContracts.map(implementationContractCard).join("") || '<div class="empty">현재 구현 설계실에서 처리할 게임이 없습니다.<br>새 Wireframe Pack이 들어오면 여기에 나타납니다.</div>')+'</div>'+
+    (completedContracts.length?'<details class="panel" style="margin-top:18px"><summary style="cursor:pointer;color:#9fb3cb;font-size:12px;font-weight:700">완료된 설계 / 전체 기록 · '+completedContracts.length+'개</summary><div style="margin-top:14px"><div class="cards">'+completedContracts.map(implementationContractCard).join("")+'</div></div></details>':'');
 }
 
 function isSupersededReview(r){
