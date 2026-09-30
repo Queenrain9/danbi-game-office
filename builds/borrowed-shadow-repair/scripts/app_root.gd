@@ -147,7 +147,9 @@ func start_order(index: int) -> void:
     _refresh_components()
 
 func _build_pieces() -> void:
-    for n in piece_nodes: if is_instance_valid(n): n.queue_free()
+    for n in piece_nodes:
+        if is_instance_valid(n):
+            n.queue_free()
     piece_nodes.clear(); piece_positions.clear(); piece_angles.clear(); piece_snapped.clear()
     var tray:Control=$Screens/shadow_workbench/piece_tray
     for i in range(required_pieces):
@@ -186,7 +188,9 @@ func diagnose_at(local_position: Vector2) -> void:
     var area:Control=$Screens/customer_intake/symptom_targets
     var hotspots=[Vector2(area.size.x*.22,area.size.y*.5),Vector2(area.size.x*.52,area.size.y*.5),Vector2(area.size.x*.78,area.size.y*.5)]
     var hit=false
-    for h in hotspots: if local_position.distance_to(h)<=24.0: hit=true
+    for h in hotspots:
+        if local_position.distance_to(h)<=24.0:
+            hit=true
     if not hit: return
     diagnosed = true
     score = 20
