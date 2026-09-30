@@ -494,6 +494,68 @@
   .ceo-event{grid-template-columns:64px 48px minmax(0,1fr)}
 }
 
+
+/* Playtest Showroom v0.1 */
+.pt-shell{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start}
+.pt-sidebar,.pt-stage{background:linear-gradient(180deg,rgba(16,25,38,.96),rgba(11,18,29,.96));border:1px solid rgba(124,163,210,.13);border-radius:18px;box-shadow:0 20px 70px rgba(0,0,0,.16)}
+.pt-sidebar{position:sticky;top:88px;overflow:hidden}
+.pt-side-head{padding:18px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pt-side-head strong{display:block;font-size:13px;color:#eef5ff}
+.pt-side-head span{display:block;margin-top:5px;font-size:10px;color:#6f89a6;line-height:1.5}
+.pt-queue{display:flex;flex-direction:column}
+.pt-queue button{appearance:none;border:0;border-bottom:1px solid rgba(255,255,255,.045);background:transparent;color:inherit;text-align:left;padding:14px 16px;cursor:pointer}
+.pt-queue button:hover{background:rgba(87,128,183,.08)}
+.pt-queue button.active{background:linear-gradient(90deg,rgba(69,117,181,.17),rgba(69,117,181,.035));box-shadow:inset 3px 0 0 #6e9ee2}
+.pt-queue-title{font-size:12px;font-weight:700;color:#dfeafa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-queue-meta{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:9px;color:#6e839b}
+.pt-dot{width:7px;height:7px;border-radius:999px;background:#7b8ea4;box-shadow:0 0 0 3px rgba(123,142,164,.08)}
+.pt-dot.ready{background:#66d2a5;box-shadow:0 0 0 3px rgba(102,210,165,.09)}
+.pt-dot.preparing{background:#e4b45f;box-shadow:0 0 0 3px rgba(228,180,95,.09)}
+.pt-dot.error{background:#e77a7a;box-shadow:0 0 0 3px rgba(231,122,122,.09)}
+.pt-stage{padding:20px}
+.pt-hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pt-hero-main{min-width:0}
+.pt-eyebrow{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#7fa6d8}
+.pt-title{font-size:24px;line-height:1.15;margin:6px 0 7px;color:#f0f6ff}
+.pt-oneline{font-size:12px;line-height:1.7;color:#94a8be;max-width:760px}
+.pt-status{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.pt-pill{font-size:9px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);padding:5px 8px;border-radius:999px;color:#8da5be}
+.pt-pill.good{border-color:rgba(96,211,165,.25);background:rgba(96,211,165,.08);color:#88dfbd}
+.pt-pill.warn{border-color:rgba(228,180,95,.28);background:rgba(228,180,95,.08);color:#ebc77f}
+.pt-pill.bad{border-color:rgba(231,122,122,.28);background:rgba(231,122,122,.08);color:#ef9b9b}
+.pt-build-box{margin-top:18px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:12px}
+.pt-build-card,.pt-note-card{border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.022);border-radius:14px;padding:14px}
+.pt-build-card h3,.pt-note-card h3{font-size:10px;color:#d8e6f7;margin:0 0 10px}
+.pt-ident{display:grid;grid-template-columns:110px minmax(0,1fr);gap:7px 10px;font-size:10px;line-height:1.45}
+.pt-ident span{color:#688099}
+.pt-ident b{color:#afc2d7;font-weight:600;overflow-wrap:anywhere}
+.pt-build-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.pt-note-card p{font-size:10px;line-height:1.65;color:#8399b0;margin:0}
+.pt-error{margin-top:12px;border:1px solid rgba(231,122,122,.2);background:rgba(128,49,49,.12);border-radius:12px;padding:11px 12px;color:#eca0a0;font-size:10px;line-height:1.55}
+.pt-art-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-top:22px;margin-bottom:11px}
+.pt-art-head h2{margin:0;font-size:15px;color:#e8f1fc}
+.pt-art-head p{margin:4px 0 0;font-size:10px;color:#6e849d}
+.pt-art-count{font-size:9px;color:#7f97b1}
+.pt-art-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pt-art-card{border:1px solid rgba(255,255,255,.065);background:rgba(255,255,255,.022);border-radius:15px;overflow:hidden;min-width:0}
+.pt-art-visual{aspect-ratio:4/5;background:radial-gradient(circle at 50% 32%,rgba(78,117,164,.12),rgba(17,26,39,.35) 52%,rgba(8,13,21,.8));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.pt-art-visual img{width:100%;height:100%;object-fit:cover;display:block}
+.pt-art-empty{display:flex;flex-direction:column;align-items:center;gap:8px;color:#6b8199;font-size:10px;text-align:center;padding:20px}
+.pt-art-empty i{width:24px;height:24px;border-radius:999px;border:2px solid rgba(130,159,194,.22);border-top-color:#779ac8;animation:ptspin 1.2s linear infinite}
+@keyframes ptspin{to{transform:rotate(360deg)}}
+.pt-art-copy{padding:13px}
+.pt-art-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pt-art-letter{font-size:9px;font-weight:800;letter-spacing:.14em;color:#7fa6d8}
+.pt-art-title{font-size:12px;font-weight:700;color:#dce8f7;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-art-summary{margin-top:7px;font-size:10px;line-height:1.55;color:#8197ad;min-height:46px}
+.pt-art-path{margin-top:9px;font-size:8px;color:#516a82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-empty{padding:58px 24px;text-align:center;border:1px dashed rgba(119,154,198,.14);border-radius:16px;color:#6e849d}
+.pt-empty strong{display:block;font-size:14px;color:#aebfd2;margin-bottom:7px}
+.pt-empty span{font-size:10px;line-height:1.6}
+@media(max-width:1050px){.pt-shell{grid-template-columns:1fr}.pt-sidebar{position:static}.pt-queue{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.pt-queue button{border-right:1px solid rgba(255,255,255,.045)}}
+@media(max-width:800px){.pt-build-box{grid-template-columns:1fr}.pt-art-grid{grid-template-columns:1fr}.pt-art-visual{aspect-ratio:16/10}.pt-hero{flex-direction:column}.pt-stage{padding:15px}}
+@media(max-width:560px){.pt-queue{grid-template-columns:1fr}.pt-title{font-size:20px}.pt-ident{grid-template-columns:86px minmax(0,1fr)}}
+
 </style>
 </head>
 <body>
@@ -588,6 +650,9 @@ let implementationContracts = [];
 let buildJobs = [];
 let fidelityReviews = [];
 let repairTickets = [];
+let playtestShowcases = [];
+let playtestReadyBuilds = [];
+let playtestFocusId = null;
 let ceoDashboardSnapshot = null;
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
@@ -902,6 +967,114 @@ async function loadRepairTickets(showToast=false){
   }
 }
 
+
+async function loadPlaytestShowcase(showToast=false){
+  try{
+    const res=await fetch(CLOUD_URL+"?view=playtest_showcase&limit=100",{method:"GET",headers:publicHeaders(),cache:"no-store"});
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    playtestShowcases=Array.isArray(payload.showcases)?payload.showcases:[];
+    playtestReadyBuilds=Array.isArray(payload.ready_builds)?payload.ready_builds:[];
+    const rows=playtestRows();
+    if(rows.length && !rows.some(x=>x.build_job_id===playtestFocusId)) playtestFocusId=rows[0].build_job_id;
+    if(current==="review" || current==="dashboard") render();
+    if(showToast) toast("플레이테스트실 새로고침 · "+rows.length+"개");
+  }catch(err){
+    console.error("Playtest showroom load failed",err);
+    if(showToast) toast("플레이테스트실 불러오기 실패");
+  }
+}
+
+function playtestRows(){
+  const byBuild=new Map();
+  for(const b of playtestReadyBuilds){
+    byBuild.set(b.id,{
+      build_job_id:b.id,
+      contract_id:b.contract_id,
+      design_id:b.design_id,
+      idea_id:b.idea_id,
+      title:b.title,
+      one_line:b.build_summary||"",
+      project_path:b.project_path,
+      repo_full_name:b.repo_full_name||"Queenrain9/danbi-game-office",
+      repo_branch:b.repo_branch||"main",
+      final_commit:b.last_commit,
+      blueprint_hash:b.blueprint_hash,
+      art_options:[],
+      status:"awaiting_intake",
+      generation_note:"Static Fidelity PASS · Playtest Intake 입고 대기",
+      last_error:null,
+      updated_at:b.updated_at||b.created_at,
+      build:b
+    });
+  }
+  for(const s of playtestShowcases){
+    const prior=byBuild.get(s.build_job_id)||{};
+    byBuild.set(s.build_job_id,{...prior,...s,build:prior.build||null});
+  }
+  return [...byBuild.values()].sort((a,b)=>{
+    const rank=x=>x.status==="ready"?0:x.status==="preparing"?1:x.status==="awaiting_intake"?2:3;
+    const d=rank(a)-rank(b);
+    if(d) return d;
+    return new Date(b.updated_at||0)-new Date(a.updated_at||0);
+  });
+}
+
+function playtestOptions(row){
+  const raw=row?.art_options;
+  let arr=[];
+  if(Array.isArray(raw)) arr=raw;
+  else if(raw && typeof raw==="object") arr=Object.entries(raw).map(([k,v])=>({id:k,...(v||{})}));
+  const map=new Map(arr.map(x=>[String(x.id||"").toUpperCase(),x]));
+  return ["A","B","C"].map(id=>map.get(id)||{id});
+}
+
+function playtestStatusMeta(row){
+  if(row?.last_error) return {label:"운영 장애",cls:"bad",dot:"error"};
+  if(row?.status==="ready") return {label:"SHOWROOM READY",cls:"good",dot:"ready"};
+  if(row?.status==="preparing") return {label:"ART PREPARING",cls:"warn",dot:"preparing"};
+  return {label:"INTAKE WAITING",cls:"warn",dot:"preparing"};
+}
+
+function playtestArtUrl(row,opt){
+  if(!opt) return "";
+  if(opt.site_url) return opt.site_url;
+  if(opt.raw_url) return opt.raw_url;
+  if(opt.repo_path){
+    const repo=row.repo_full_name||"Queenrain9/danbi-game-office";
+    const branch=row.repo_branch||"main";
+    return "https://raw.githubusercontent.com/"+repo+"/"+branch+"/"+String(opt.repo_path).replace(/^\/+/, "");
+  }
+  return "";
+}
+
+function playtestBuildUrl(row){
+  const repo=row.repo_full_name||"Queenrain9/danbi-game-office";
+  const ref=row.final_commit||row.repo_branch||"main";
+  const path=(row.build?.project_path||row.project_path||"").replace(/^\/+/, "");
+  return "https://github.com/"+repo+"/tree/"+encodeURIComponent(ref)+(path?"/"+path.split("/").map(encodeURIComponent).join("/"):"");
+}
+
+function setPlaytestFocus(id){
+  playtestFocusId=id;
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function copyPlaytestPath(id){
+  const row=playtestRows().find(x=>x.build_job_id===id);
+  if(!row) return;
+  const text=(row.repo_full_name||"Queenrain9/danbi-game-office")+" · "+(row.build?.project_path||row.project_path||"-");
+  navigator.clipboard?.writeText(text).then(()=>toast("Godot 프로젝트 경로 복사됨")).catch(()=>toast(text));
+}
+
+function shortHash(v,n=8){
+  return v?String(v).slice(0,n):"-";
+}
+
 function startPipelinePolling(){
   clearInterval(pipelinePollTimer);
   pipelinePollTimer=setInterval(()=>{
@@ -913,6 +1086,7 @@ function startPipelinePolling(){
     loadBuildJobs(false);
     loadFidelityReviews(false);
     loadRepairTickets(false);
+    loadPlaytestShowcase(false);
     loadCeoDashboard(false);
   },60000);
 }
@@ -928,7 +1102,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadCeoDashboard(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadPlaytestShowcase(false),loadCeoDashboard(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -964,13 +1138,14 @@ function navRender(){
     ${items.map(([id,ic,label])=>`<button class="nav-item ${current===id?"active":""}" onclick="go('${id}')"><span class="nav-icon">${ic}</span>${label}${id==="review"&&count("playtest")?`<span style="margin-left:auto;font-size:9px;background:#325d98;color:#dceaff;padding:3px 6px;border-radius:999px">${count("playtest")}</span>`:""}</button>`).join("")}
     </div>`).join("");
 }
-function go(id){ current=id; location.hash=id; render(); if(id==="dashboard") loadCeoDashboard(false); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
+function go(id){ current=id; location.hash=id; render(); if(id==="dashboard") loadCeoDashboard(false); if(id==="review") loadPlaytestShowcase(false); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
 function count(stage){
   if(stage==="idea") return promotedIdeas.length;
   if(stage==="design") return gameDesigns.length;
   if(stage==="wireframe") return wireframePacks.length;
   if(stage==="build") return buildJobs.filter(b=>!isHistoricalBuild(b)).length;
   if(stage==="fidelity") return fidelityReviews.filter(r=>!isSupersededReview(r)).length;
+  if(stage==="playtest") return playtestRows().length;
   return state.projects.filter(p=>p.stage===stage).length;
 }
 function titleInfo(){
@@ -983,7 +1158,7 @@ function titleInfo(){
     implementation:["구현 설계실","Wireframe을 구현 설계도로 컴파일하고, 독립 검수를 통과한 설계만 Build Farm으로 넘깁니다."],
     build:["빌드 팜","Implementation Contract를 실제 Godot playable로 구현합니다."],
     fidelity:["설계 검수실","Wireframe + Contract와 실제 코드를 독립적으로 대조하고 실패하면 Build Farm으로 반송합니다."],
-    review:["플레이테스트실","여기서부터 단비가 게임을 직접 만지고 KEEP / MAYBE / KILL을 결정합니다."],
+    review:["플레이테스트실","설계 검수를 통과한 Graybox와 GPT 아트 3안을 한 화면에서 비교합니다."],
     directed:["디렉팅 개발실","살아남은 게임만 대표의 지시를 받아 제품 수준으로 발전시킵니다."],
     visual:["비주얼 개발실","KEEP 이후 살아남은 게임에만 실제 비주얼·에셋 제작 비용을 사용합니다."],
     archive:["프로젝트 보관소","KILL 또는 보류된 프로젝트를 기록하고 필요할 때 되살립니다."],
@@ -2055,21 +2230,45 @@ function buildPage(){
   '<div class="cards">'+(buildOutputs.map(buildCard).join("") || '<div class="empty">현재 Build Farm에 Godot Build가 없습니다.<br>새 Blueprint가 승인되면 이곳에서 제작됩니다.</div>')+'</div>';
 }
 
-function reviewCard(p,compact=false){
-  return `<div class="game-card review-card">
-    <div class="card-top"><div><div class="kicker">Ready for playtest</div><div class="card-title">${esc(p.title)}</div></div><span class="badge green">${esc(p.build||"prototype")}</span></div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="meta"><span>${esc(p.genre)}</span><span>Godot</span><span>${esc(p.repo||"repo pending")}</span></div>
-    ${p.changes?`<div class="detail-box"><h3>최근 변경사항</h3><p>${esc(p.changes)}</p></div>`:""}
-    <div class="decision">
-      <button class="btn good" onclick="decide('${p.id}','KEEP')">♥ KEEP</button>
-      <button class="btn warn" onclick="decide('${p.id}','MAYBE')">? MAYBE</button>
-      <button class="btn bad" onclick="decide('${p.id}','KILL')">× KILL</button>
-    </div>
-    <div class="card-actions"><button class="btn" onclick="copyRepo('${p.id}')">Repo 주소 복사</button><button class="btn ghost" onclick="showProject('${p.id}')">상세</button></div>
-  </div>`;
+function reviewPage(){
+  const rows=playtestRows();
+  if(!rows.length){
+    return genericHeader("Playtest Showroom","Static Fidelity PASS 이후 Graybox playable과 GPT 아트 3안이 이곳에 입고됩니다.")+
+      '<div class="pt-empty"><strong>아직 플레이테스트 입고물이 없습니다.</strong><span>설계 검수실에서 PLAYTEST READY가 나오면 Playtest Intake가 Graybox + 아트 3안을 준비해 여기에 표시합니다.</span></div>';
+  }
+  const focus=rows.find(x=>x.build_job_id===playtestFocusId)||rows[0];
+  playtestFocusId=focus.build_job_id;
+  const status=playtestStatusMeta(focus);
+  const opts=playtestOptions(focus);
+  const completed=opts.filter(x=>playtestArtUrl(focus,x)).length;
+  const repo=focus.repo_full_name||"Queenrain9/danbi-game-office";
+  const projectPath=focus.build?.project_path||focus.project_path||"-";
+  const buildUrl=playtestBuildUrl(focus);
+
+  const queue='<aside class="pt-sidebar"><div class="pt-side-head"><strong>플레이테스트 대기열</strong><span>설계 검수를 통과한 실제 Godot 빌드 기준</span></div><div class="pt-queue">'+rows.map(r=>{
+    const m=playtestStatusMeta(r);
+    const n=playtestOptions(r).filter(x=>playtestArtUrl(r,x)).length;
+    return '<button class="'+(r.build_job_id===focus.build_job_id?'active':'')+'" onclick="setPlaytestFocus(\''+esc(r.build_job_id)+'\')"><div class="pt-queue-title">'+esc(r.title)+'</div><div class="pt-queue-meta"><span class="pt-dot '+m.dot+'"></span><span>'+esc(m.label)+'</span><span>·</span><span>ART '+n+'/3</span></div></button>';
+  }).join("")+'</div></aside>';
+
+  const art='<div class="pt-art-head"><div><h2>Visual Direction A / B / C</h2><p>같은 게임 · 같은 핵심 플레이 상황을 서로 다른 Visual DNA로 비교합니다.</p></div><div class="pt-art-count">'+completed+'/3 READY</div></div>'+
+    '<div class="pt-art-grid">'+opts.map(o=>{
+      const url=playtestArtUrl(focus,o);
+      const title=o.title||("Art "+o.id);
+      const summary=o.direction_summary||(url?"Visual direction preview":"Playtest Intake가 이 방향을 생성 중입니다.");
+      return '<article class="pt-art-card"><div class="pt-art-visual">'+
+        (url?'<img src="'+esc(url)+'" alt="'+esc(title)+'" loading="lazy">':'<div class="pt-art-empty"><i></i><span>'+esc(focus.status==="awaiting_intake"?"입고 대기":"이미지 생성 중")+'</span></div>')+
+        '</div><div class="pt-art-copy"><div class="pt-art-row"><span class="pt-art-letter">OPTION '+esc(o.id)+'</span>'+(url?'<span class="pt-pill good">READY</span>':'<span class="pt-pill warn">PENDING</span>')+'</div><div class="pt-art-title">'+esc(title)+'</div><div class="pt-art-summary">'+esc(summary)+'</div>'+(o.repo_path?'<div class="pt-art-path">'+esc(o.repo_path)+'</div>':'')+'</div></article>';
+    }).join("")+'</div>';
+
+  const stage='<section class="pt-stage"><div class="pt-hero"><div class="pt-hero-main"><div class="pt-eyebrow">PLAYTEST SHOWROOM</div><div class="pt-title">'+esc(focus.title)+'</div><div class="pt-oneline">'+esc(focus.one_line||focus.build?.build_summary||"설계 검수를 통과한 Graybox playable입니다.")+'</div><div class="pt-status"><span class="pt-pill good">GRAYBOX PLAYABLE</span><span class="pt-pill good">FIDELITY PASS</span><span class="pt-pill '+status.cls+'">'+esc(status.label)+'</span></div></div></div>'+
+    '<div class="pt-build-box"><div class="pt-build-card"><h3>실제 플레이 빌드</h3><div class="pt-ident"><span>Repository</span><b>'+esc(repo)+'</b><span>Godot path</span><b>'+esc(projectPath)+'</b><span>Final commit</span><b>'+esc(shortHash(focus.final_commit,12))+'</b><span>Blueprint</span><b>'+esc(shortHash(focus.blueprint_hash,12))+'</b></div><div class="pt-build-actions"><button class="btn primary" onclick="window.open(\''+esc(buildUrl)+'\',\'_blank\')">GitHub 빌드 열기 ↗</button><button class="btn ghost" onclick="copyPlaytestPath(\''+esc(focus.build_job_id)+'\')">프로젝트 경로 복사</button></div></div>'+
+    '<div class="pt-note-card"><h3>입고 상태</h3><p>'+esc(focus.generation_note||"Graybox playable + 3 GPT concept previews; no art applied to build.")+'</p>'+(focus.last_error?'<div class="pt-error">'+esc(focus.last_error)+'</div>':'')+'</div></div>'+art+'</section>';
+
+  return genericHeader("Playtest Showroom","Graybox를 직접 플레이하고, 완성 모습을 상상하기 위한 아트 3안을 옆에서 비교하는 대표 검수실입니다.")+
+    '<div class="pt-shell">'+queue+stage+'</div>';
 }
-function reviewPage(){ const ps=state.projects.filter(p=>p.stage==="playtest"); return genericHeader("Ready for Playtest","대표가 가장 자주 들어오는 방입니다. 이 단계부터 자동화가 급격히 줄어듭니다.")+`<div class="cards">${ps.map(p=>reviewCard(p)).join("") || `<div class="empty">🎉 현재 대표 승인 대기 게임이 없습니다.</div>`}</div>`; }
+
 function directedCard(p){
   return `<div class="game-card">
     <div class="card-top"><div><div class="kicker">Human-directed</div><div class="card-title">${esc(p.title)}</div></div><span class="badge purple">${esc(p.decision||"KEEP")}</span></div>
@@ -2112,7 +2311,7 @@ function settingsPage(){
 function render(){
   if(!["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
   navRender();
-  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; const sub=document.getElementById("pageSubtitle"); sub.textContent=s; sub.style.display=s?"":"none"; const topActions=document.querySelector(".top-actions"); topActions.innerHTML=current==="ideas"?`<button class="btn ghost" title="아이디어는 매시간 자동 생성됩니다. 사이트 직접 실행은 아직 연결 전입니다." onclick="ideaRunUnavailable()">지금 생성</button><button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>`:"";
+  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; const sub=document.getElementById("pageSubtitle"); sub.textContent=s; sub.style.display=s?"":"none"; const topActions=document.querySelector(".top-actions"); topActions.innerHTML=current==="ideas"?`<button class="btn ghost" title="아이디어는 매시간 자동 생성됩니다. 사이트 직접 실행은 아직 연결 전입니다." onclick="ideaRunUnavailable()">지금 생성</button><button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>`:current==="review"?`<button class="btn ghost" onclick="loadPlaytestShowcase(true)">↻ 새로고침</button>`:"";
   const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,implementation:implementationPage,build:buildPage,fidelity:fidelityPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
   document.getElementById("content").innerHTML = pages[current]();
 }
