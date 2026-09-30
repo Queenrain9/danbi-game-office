@@ -30,6 +30,16 @@ class InteractionAdapterTests(unittest.TestCase):
         }
         self.assertEqual(m.select_production_adapter("drag",fake)["adapter_id"],"a_v2")
 
+    def test_production_entry_is_frozen_but_may_deprecate(self):
+        previous={"adapters":{"drag_v1":{"adapter_id":"drag_v1","semantic_kind":"drag","status":"production","sha256":"a"*64,"source_path":"a.gd","script_path":"res://a.gd","class_name":"DanbiDragV1","entry_symbol":"handle_event","required_params":[],"validated_godot":["4.7.2"],"ci_run":"1","superseded_by":None}}}
+        same={"adapters":{"drag_v1":dict(previous["adapters"]["drag_v1"])}}
+        same["adapters"]["drag_v1"]["status"]="deprecated"
+        same["adapters"]["drag_v1"]["superseded_by"]="drag_v2"
+        self.assertEqual(m.registry_transition_issues(previous,same),[])
+        changed={"adapters":{"drag_v1":dict(previous["adapters"]["drag_v1"])}}
+        changed["adapters"]["drag_v1"]["sha256"]="b"*64
+        self.assertTrue(any(x["code"]=="ADAPTER_FROZEN" for x in m.registry_transition_issues(previous,changed)))
+
     def test_drag_snap_compilation_pins_immutable_adapter_metadata(self):
         src={"interaction_semantics":{"kind":"drag","target_component_id":"piece","cancel":"return_origin","completion":{"kind":"snap","target_component_id":"slot","tolerance_px":24}}}
         plan=m.compile_interaction_adapters(src)
