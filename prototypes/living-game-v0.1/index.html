@@ -207,7 +207,7 @@ function materialize(i){
   schema_version:"0.1",game_id:uid(),template_id:c.id,title:c.title,created_at:new Date().toISOString(),
   origin:"self",genres:c.genres,synopsis:c.synopsis,need_vector:normalize(state.scores),
   diagnostic_evidence:state.evidence,kernels:Object.entries(c.weights).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,w])=>({id:k,weight:w})),
-  world_seed:Math.floor(Math.random()*1e9),actions:c.actions,progress:{level:1,xp:0,visits:1,actions:0},event_log:["게임이 만들어졌습니다."]
+  world_seed:Math.floor(Math.random()*1e9),actions:c.actions,progress:{level:1,xp:0,visits:0,actions:0},event_log:["게임이 만들어졌습니다."]
  };
  const games=pack();games.unshift(genome);savePack(games);openGame(genome.game_id);
 }
