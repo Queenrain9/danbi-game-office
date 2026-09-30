@@ -1,0 +1,23 @@
+{
+  "contract_id": "1fd3e174-ac15-4183-aa67-71c0a61c0970",
+  "blueprint_hash": "9f4b2e1cc5d37cf36d253821a9f1d6de424c745bc7c1a9c5142ecec4795ecdb3",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "reviewed_at": "2026-09-30T17:56:00Z",
+  "independent_semantic_review": {
+    "passed": true,
+    "principle": "semantic_fidelity_over_textual_purity",
+    "requirement_count": 149,
+    "source_pointer_failures": 0,
+    "source_value_mismatches": 0,
+    "missing_implementations": 0,
+    "missing_static_tests": 0,
+    "rule_value_mismatches": 0,
+    "static_stage_coverage": ["skeleton", "geometry", "state", "input", "presentation", "integration"],
+    "legacy_adapter_binding": true,
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true,
+    "manual_test_count": 37
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "role": "gate",
+  "reviewed_at": "2026-09-30T17:58:36.090489+00:00",
+  "evidence_path": "production/contracts/1fd3e174-ac15-4183-aa67-71c0a61c0970/blueprint-review-9f4b2e1cc5d37cf36d253821a9f1d6de424c745bc7c1a9c5142ecec4795ecdb3.json",
+  "blueprint_hash": "9f4b2e1cc5d37cf36d253821a9f1d6de424c745bc7c1a9c5142ecec4795ecdb3",
+  "source_checked": "true",
+  "validator_passed": "true",
+  "verification_scope": "construction_blueprint_static"
+}

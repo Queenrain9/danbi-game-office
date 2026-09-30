@@ -1,0 +1,1592 @@
+{
+  "id": "fe893c5d-386c-490c-952d-556ffccfe6f1",
+  "title": "Tiny Stagehand",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "201b2137-fd0d-4acd-9daf-ea1559ba5553",
+  "version": "v1.2",
+  "design_id": "0798b6f0-7f9b-4fb9-966c-6f5db6f002b2",
+  "created_at": "2026-09-30T17:49:52.094948+00:00",
+  "updated_at": "2026-09-30T18:06:42.847773+00:00",
+  "requirements": [
+    {
+      "id": "REQ-SCREEN-LOBBY",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/0",
+      "requirement": "Implement the complete Backstage Lobby / Scene Select screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Backstage Lobby / Scene Select screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LOBBY-SCENE_CARD",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/0",
+      "requirement": "Implement component scene_card (card) on lobby at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/0/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component scene_card (card) on lobby at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LOBBY-GRADE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/1",
+      "requirement": "Implement component grade (status) on lobby at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/0/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component grade (status) on lobby at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LOBBY-SELECT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/2",
+      "requirement": "Implement component select (button) on lobby at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/0/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component select (button) on lobby at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LOBBY-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/0",
+      "requirement": "Preserve tap on select including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/0/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on select including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-LOBBY-LOBBY",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/0",
+      "requirement": "Implement state lobby on lobby with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/0/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state lobby on lobby with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-LOBBY-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/0/transitions/0",
+      "requirement": "Implement transition lobby -> briefing on trigger select with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/0/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition lobby -> briefing on trigger select with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-BRIEFING",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/1",
+      "requirement": "Implement the complete Scene Briefing screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Scene Briefing screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-BRIEFING-SCENE_TITLE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/0",
+      "requirement": "Implement component scene_title (header) on briefing at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/1/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component scene_title (header) on briefing at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-BRIEFING-GOAL",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/1",
+      "requirement": "Implement component goal (card) on briefing at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/1/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component goal (card) on briefing at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-BRIEFING-CUE_TYPES",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/2",
+      "requirement": "Implement component cue_types (card) on briefing at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/1/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component cue_types (card) on briefing at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-BRIEFING-START",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/3",
+      "requirement": "Implement component start (button) on briefing at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/1/components/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component start (button) on briefing at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-BRIEFING-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/0",
+      "requirement": "Preserve tap on start including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/1/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on start including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-BRIEFING-BRIEFING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/0",
+      "requirement": "Implement state briefing on briefing with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/1/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state briefing on briefing with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-BRIEFING-COUNTDOWN",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/1",
+      "requirement": "Implement state countdown on briefing with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/1/states/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state countdown on briefing with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VAR-BRIEFING-COUNTDOWN",
+      "category": "variant",
+      "source_ref": "/source/pack/screens/1/state_variants/0",
+      "requirement": "Implement variant countdown on briefing under its declared condition.",
+      "source_refs": [
+        "/source/pack/screens/1/state_variants/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement variant countdown on briefing under its declared condition."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-BRIEFING-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/0",
+      "requirement": "Implement transition briefing -> live on trigger countdown=0 with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/1/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition briefing -> live on trigger countdown=0 with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-LIVE",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/2",
+      "requirement": "Implement the complete Live Performance screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Live Performance screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-CONTINUITY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/0",
+      "requirement": "Implement component continuity (meter) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component continuity (meter) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-TIME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/1",
+      "requirement": "Implement component time (status) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component time (status) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-PAUSE_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/2",
+      "requirement": "Implement component pause_btn (button) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component pause_btn (button) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-STAGE_PREVIEW",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/3",
+      "requirement": "Implement component stage_preview (preview) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component stage_preview (preview) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-ACTOR",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/4",
+      "requirement": "Implement component actor (world_object) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/4"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component actor (world_object) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-PROP_MARK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/5",
+      "requirement": "Implement component prop_mark (drop_target) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/5"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component prop_mark (drop_target) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-LIGHT_A",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/6",
+      "requirement": "Implement component light_a (fader) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/6"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component light_a (fader) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-LIGHT_B",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/7",
+      "requirement": "Implement component light_b (fader) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/7"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component light_b (fader) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-CURTAIN_ROPE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/8",
+      "requirement": "Implement component curtain_rope (rope) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/8"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component curtain_rope (rope) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-PROP_1",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/9",
+      "requirement": "Implement component prop_1 (draggable) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/9"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component prop_1 (draggable) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-PROP_2",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/10",
+      "requirement": "Implement component prop_2 (draggable) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/10"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component prop_2 (draggable) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-PROP_3",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/11",
+      "requirement": "Implement component prop_3 (draggable) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/11"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component prop_3 (draggable) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-CUE_NOW",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/12",
+      "requirement": "Implement component cue_now (cue) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/12"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component cue_now (cue) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-CUE_NEXT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/13",
+      "requirement": "Implement component cue_next (cue) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/13"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component cue_next (cue) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-CUE_FUTURE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/14",
+      "requirement": "Implement component cue_future (cue_strip) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/14"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component cue_future (cue_strip) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-LIVE-HELP",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/15",
+      "requirement": "Implement component help (button) on live at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/2/components/15"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component help (button) on live at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LIVE-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/0",
+      "requirement": "Preserve vertical drag on light_a/light_b including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve vertical drag on light_a/light_b including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LIVE-02",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/1",
+      "requirement": "Preserve vertical drag on curtain_rope including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/interactions/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve vertical drag on curtain_rope including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LIVE-03",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/2",
+      "requirement": "Preserve 80ms hold then drag on prop_1/2/3 → prop_mark including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/interactions/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve 80ms hold then drag on prop_1/2/3 → prop_mark including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LIVE-04",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/3",
+      "requirement": "Preserve tap/short drag on incident hotspot including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/interactions/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap/short drag on incident hotspot including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-LIVE-05",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/4",
+      "requirement": "Preserve tap on help including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/interactions/4"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on help including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-LIVE-PERFORMANCE",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/0",
+      "requirement": "Implement state performance on live with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state performance on live with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-LIVE-INCIDENT_FOCUS",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/1",
+      "requirement": "Implement state incident_focus on live with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/2/states/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state incident_focus on live with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VAR-LIVE-CUE_WINDOW",
+      "category": "variant",
+      "source_ref": "/source/pack/screens/2/state_variants/0",
+      "requirement": "Implement variant cue_window on live under its declared condition.",
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement variant cue_window on live under its declared condition."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VAR-LIVE-PROP_DRAG",
+      "category": "variant",
+      "source_ref": "/source/pack/screens/2/state_variants/1",
+      "requirement": "Implement variant prop_drag on live under its declared condition.",
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement variant prop_drag on live under its declared condition."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VAR-LIVE-INCIDENT",
+      "category": "variant",
+      "source_ref": "/source/pack/screens/2/state_variants/2",
+      "requirement": "Implement variant incident on live under its declared condition.",
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement variant incident on live under its declared condition."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VAR-LIVE-MISS",
+      "category": "variant",
+      "source_ref": "/source/pack/screens/2/state_variants/3",
+      "requirement": "Implement variant miss on live under its declared condition.",
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement variant miss on live under its declared condition."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-LIVE-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/0",
+      "requirement": "Implement transition performance -> result on trigger timeline end or continuity=0 with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/2/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition performance -> result on trigger timeline end or continuity=0 with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-LIVE-02",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/1",
+      "requirement": "Implement transition performance -> pause on trigger pause_btn with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/2/transitions/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition performance -> pause on trigger pause_btn with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-LIVE-03",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/2",
+      "requirement": "Implement transition performance -> cue_help on trigger help with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/2/transitions/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition performance -> cue_help on trigger help with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PAUSE",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/3",
+      "requirement": "Implement the complete Pause Overlay screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Pause Overlay screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-PAUSE-SCRIM",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/0",
+      "requirement": "Implement component scrim (overlay) on pause at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/3/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component scrim (overlay) on pause at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-PAUSE-RESUME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/1",
+      "requirement": "Implement component resume (button) on pause at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/3/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component resume (button) on pause at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-PAUSE-QUIT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/2",
+      "requirement": "Implement component quit (button) on pause at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/3/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component quit (button) on pause at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-PAUSE-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/0",
+      "requirement": "Preserve tap on resume including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/3/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on resume including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-PAUSE-PAUSED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/0",
+      "requirement": "Implement state paused on pause with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/3/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state paused on pause with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-PAUSE-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/0",
+      "requirement": "Implement transition paused -> live on trigger resume with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/3/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition paused -> live on trigger resume with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-RESULT",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/4",
+      "requirement": "Implement the complete Performance Result screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/4"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Performance Result screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-GRADE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/0",
+      "requirement": "Implement component grade (grade) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component grade (grade) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-CONTINUITY_FINAL",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/1",
+      "requirement": "Implement component continuity_final (metric) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component continuity_final (metric) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-ACCURACY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/2",
+      "requirement": "Implement component accuracy (metric) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component accuracy (metric) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-TIMELINE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/3",
+      "requirement": "Implement component timeline (timeline) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component timeline (timeline) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-RETRY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/4",
+      "requirement": "Implement component retry (button) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/4"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component retry (button) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-RESULT-NEXT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/5",
+      "requirement": "Implement component next (button) on result at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/4/components/5"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component next (button) on result at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-RESULT-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/0",
+      "requirement": "Preserve tap on retry including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/4/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on retry including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-RESULT-02",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/1",
+      "requirement": "Preserve tap on next including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/4/interactions/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on next including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-RESULT-RESULT",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/0",
+      "requirement": "Implement state result on result with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/4/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state result on result with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-RESULT-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/0",
+      "requirement": "Implement transition result -> briefing on trigger retry with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/4/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition result -> briefing on trigger retry with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-RESULT-02",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/1",
+      "requirement": "Implement transition result -> lobby on trigger next with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/4/transitions/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition result -> lobby on trigger next with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-CUE_HELP",
+      "category": "screen",
+      "source_ref": "/source/pack/screens/5",
+      "requirement": "Implement the complete Cue Help Overlay screen/overlay with its declared components, states, interactions, and transitions.",
+      "source_refs": [
+        "/source/pack/screens/5"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the complete Cue Help Overlay screen/overlay with its declared components, states, interactions, and transitions."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-CUE_HELP-SCRIM",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/0",
+      "requirement": "Implement component scrim (overlay) on cue_help at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/5/components/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component scrim (overlay) on cue_help at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-CUE_HELP-HELP_PANEL",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/1",
+      "requirement": "Implement component help_panel (modal) on cue_help at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/5/components/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component help_panel (modal) on cue_help at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMP-CUE_HELP-CLOSE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/2",
+      "requirement": "Implement component close (button) on cue_help at its exact screen-percent box.",
+      "source_refs": [
+        "/source/pack/screens/5/components/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement component close (button) on cue_help at its exact screen-percent box."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INT-CUE_HELP-01",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/0",
+      "requirement": "Preserve tap on close including precondition, state change, feedback, and invalid-input behavior.",
+      "source_refs": [
+        "/source/pack/screens/5/interactions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve tap on close including precondition, state change, feedback, and invalid-input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CUE_HELP-HELP",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/0",
+      "requirement": "Implement state help on cue_help with its declared visible/input behavior.",
+      "source_refs": [
+        "/source/pack/screens/5/states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement state help on cue_help with its declared visible/input behavior."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRN-CUE_HELP-01",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/0",
+      "requirement": "Implement transition help -> live on trigger close with its guard/presentation.",
+      "source_refs": [
+        "/source/pack/screens/5/transitions/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement transition help -> live on trigger close with its guard/presentation."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL-PAUSED",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/0",
+      "requirement": "Implement global state paused and its rule.",
+      "source_refs": [
+        "/source/pack/global_states/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement global state paused and its rule."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL-INPUT_LOCK",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/1",
+      "requirement": "Implement global state input_lock and its rule.",
+      "source_refs": [
+        "/source/pack/global_states/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement global state input_lock and its rule."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-01",
+      "category": "input",
+      "source_ref": "/source/pack/input_map/0",
+      "requirement": "Preserve input priority/mapping for prop: 80ms hold+drag.",
+      "source_refs": [
+        "/source/pack/input_map/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve input priority/mapping for prop: 80ms hold+drag."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-02",
+      "category": "input",
+      "source_ref": "/source/pack/input_map/1",
+      "requirement": "Preserve input priority/mapping for curtain: vertical drag.",
+      "source_refs": [
+        "/source/pack/input_map/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve input priority/mapping for curtain: vertical drag."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-03",
+      "category": "input",
+      "source_ref": "/source/pack/input_map/2",
+      "requirement": "Preserve input priority/mapping for light: vertical drag.",
+      "source_refs": [
+        "/source/pack/input_map/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve input priority/mapping for light: vertical drag."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-04",
+      "category": "input",
+      "source_ref": "/source/pack/input_map/3",
+      "requirement": "Preserve input priority/mapping for incident: tap/short drag in hotspot.",
+      "source_refs": [
+        "/source/pack/input_map/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve input priority/mapping for incident: tap/short drag in hotspot."
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-01",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/0",
+      "requirement": "6개 inventory 화면/overlay가 모두 이동 가능",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/0"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "6개 inventory 화면/overlay가 모두 이동 가능"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-02",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/1",
+      "requirement": "Live 한 화면에서 stage/controls/cues가 동시에 보임",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/1"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Live 한 화면에서 stage/controls/cues가 동시에 보임"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-03",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/2",
+      "requirement": "fader/rope/prop gesture가 우선순위대로 충돌 없이 작동",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/2"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "fader/rope/prop gesture가 우선순위대로 충돌 없이 작동"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-04",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/3",
+      "requirement": "invalid prop drop은 tray로 복귀",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/3"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "invalid prop drop은 tray로 복귀"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-05",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/4",
+      "requirement": "incident 중 normal controls 유지",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/4"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "incident 중 normal controls 유지"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-06",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/5",
+      "requirement": "Pause/Cue Help에서 timeline 정지",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/5"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Pause/Cue Help에서 timeline 정지"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPT-07",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/6",
+      "requirement": "continuity 0 또는 timeline end에서 Result 이동",
+      "source_refs": [
+        "/source/pack/acceptance_criteria/6"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "continuity 0 또는 timeline end에서 Result 이동"
+      },
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-SCORES",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/scores",
+      "requirement": "Implement Game Design rule 'scores' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/scores"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'scores' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-FAILURE",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/failure",
+      "requirement": "Implement Game Design rule 'failure' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/failure"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'failure' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-PRESTAGE",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/prestage",
+      "requirement": "Implement Game Design rule 'prestage' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/prestage"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'prestage' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-CONTINUITY",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/continuity",
+      "requirement": "Implement Game Design rule 'continuity' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/continuity"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'continuity' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-CUE_WINDOW",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/cue_window",
+      "requirement": "Implement Game Design rule 'cue_window' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/cue_window"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'cue_window' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-NUMBERS_ARE",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/numbers_are",
+      "requirement": "Implement Game Design rule 'numbers_are' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/numbers_are"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'numbers_are' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-MULTITASK_RULE",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/multitask_rule",
+      "requirement": "Implement Game Design rule 'multitask_rule' exactly as specified.",
+      "source_refs": [
+        "/source/design/game_rules/multitask_rule"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement Game Design rule 'multitask_rule' exactly as specified."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-MVP-SCOPE",
+      "category": "content",
+      "source_ref": "/source/design/mvp_scope",
+      "requirement": "무대 1개와 60초 Scene 3개. cue timeline, 조명 fader 2개, curtain rope 1개, prop 3종 drag/snap, actor cue 결과, 사고 2종, continuity/점수, Result/Retry를 실제로 플레이 가능하게 구현.",
+      "source_refs": [
+        "/source/design/mvp_scope"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "무대 1개와 60초 Scene 3개. cue timeline, 조명 fader 2개, curtain rope 1개, prop 3종 drag/snap, actor cue 결과, 사고 2종, continuity/점수, Result/Retry를 실제로 플레이 가능하게 구현."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-MODEL",
+      "category": "content",
+      "source_ref": "/source/design/content_model",
+      "requirement": "Implement the declared MVP content model, quantities, and variation axes.",
+      "source_refs": [
+        "/source/design/content_model"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Implement the declared MVP content model, quantities, and variation axes."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-PROP",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/prop",
+      "requirement": "Preserve Game Design interaction contract 'prop'.",
+      "source_refs": [
+        "/source/design/interaction_spec/prop"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'prop'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-LIGHT",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/light",
+      "requirement": "Preserve Game Design interaction contract 'light'.",
+      "source_refs": [
+        "/source/design/interaction_spec/light"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'light'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-ZONES",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/zones",
+      "requirement": "Preserve Game Design interaction contract 'zones'.",
+      "source_refs": [
+        "/source/design/interaction_spec/zones"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'zones'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-CURTAIN",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/curtain",
+      "requirement": "Preserve Game Design interaction contract 'curtain'.",
+      "source_refs": [
+        "/source/design/interaction_spec/curtain"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'curtain'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-INCIDENT",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/incident",
+      "requirement": "Preserve Game Design interaction contract 'incident'.",
+      "source_refs": [
+        "/source/design/interaction_spec/incident"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'incident'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-PRIORITY",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/priority",
+      "requirement": "Preserve Game Design interaction contract 'priority'.",
+      "source_refs": [
+        "/source/design/interaction_spec/priority"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'priority'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN-INTERACTION-WRONG_INPUT",
+      "category": "interaction_rule",
+      "source_ref": "/source/design/interaction_spec/wrong_input",
+      "requirement": "Preserve Game Design interaction contract 'wrong_input'.",
+      "source_refs": [
+        "/source/design/interaction_spec/wrong_input"
+      ],
+      "verification": {
+        "kind": "static",
+        "expected": "Preserve Game Design interaction contract 'wrong_input'."
+      },
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": "2026-09-30T17:49:52.094948+00:00",
+  "blueprint_hash": "504a2c8f4ec38b9919866be08c1c4d14d26e76b375e0f61cc47e28e8f4e4ce2e",
+  "category_counts": {
+    "rule": 7,
+    "input": 4,
+    "state": 8,
+    "screen": 6,
+    "content": 2,
+    "variant": 5,
+    "component": 35,
+    "acceptance": 7,
+    "transition": 9,
+    "interaction": 11,
+    "global_state": 2,
+    "interaction_rule": 7
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "note": "Independent static blueprint review: exact frozen DB source matched, canonical validator passed, runtime QA not claimed.",
+    "role": "gate",
+    "reviewed_at": "2026-09-30T18:04:18.33291+00:00",
+    "evidence_path": "GitHub Actions run 36755562052 / Tiny Stagehand fidelity-v1 bridge",
+    "blueprint_hash": "504a2c8f4ec38b9919866be08c1c4d14d26e76b375e0f61cc47e28e8f4e4ce2e",
+    "source_checked": "true",
+    "validated_commit": "d60fcd9b0b14ef1046760afcb3987eee2ca43692",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Tiny Stagehand Implementation Contract v1.2\n\nLegacy QA-ready build rebaselined to the current fidelity pipeline without changing Game Design or Wireframe semantics.\n\nAtomic requirements: 103.\n",
+  "requirement_count": 103,
+  "wireframe_pack_id": "6a8608cf-6df3-4ed1-a754-be4f659e80e3"
+}
