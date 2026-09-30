@@ -23,14 +23,152 @@ PATTERNS = {
     'adapter_host_v1': {'types': ['Control', 'Button', 'Panel', 'ColorRect', 'TextureRect'], 'mouse_filter': 0, 'script_required': True},
 }
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ADAPTER_REGISTRY_PATH = REPO_ROOT / 'production/godot/interaction_runtime/registry.json'
+ADAPTER_LIFECYCLE = ('candidate', 'production', 'deprecated')
+FROZEN_ADAPTER_STATUSES = {'production', 'deprecated'}
+ADAPTER_IMMUTABLE_FIELDS = (
+    'adapter_id', 'semantic_kind', 'source_path', 'script_path', 'sha256',
+    'class_name', 'entry_symbol', 'required_params', 'ci_run'
+)
+
+
+def _lf_bytes(data):
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+    if not isinstance(data, (bytes, bytearray)):
+        raise TypeError('Adapter content must be bytes or text')
+    return bytes(data).replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+
+
+def adapter_content_sha256(data):
+    """Stable SHA-256 of Git-normalized LF text bytes."""
+    return hashlib.sha256(_lf_bytes(data)).hexdigest()
+
+
+def load_adapter_registry(path=None):
+    target = Path(path) if path is not None else ADAPTER_REGISTRY_PATH
+    data = json.loads(target.read_text(encoding='utf-8'))
+    if data.get('schema_version') != 'interaction-runtime-registry-v1':
+        raise ValueError('Unsupported interaction runtime registry schema')
+    if data.get('hash_algorithm') != 'sha256-lf-bytes-v1':
+        raise ValueError('Unsupported interaction runtime hash algorithm')
+    adapters = data.get('adapters')
+    if not isinstance(adapters, dict):
+        raise ValueError('Interaction runtime registry requires adapters object')
+    return data
+
+
+ADAPTER_REGISTRY = load_adapter_registry()
+ADAPTER_CATALOG = ADAPTER_REGISTRY['adapters']
 INTERACTION_ADAPTERS = {
-    'drag_v1': {'semantic_kind':'drag','source_path':'production/godot/interaction_runtime/drag_v1.gd','script_path':'res://runtime/interaction/drag_v1.gd','entry_symbol':'handle_event','required_params':[]},
-    'snap_v1': {'semantic_kind':'snap','source_path':'production/godot/interaction_runtime/snap_v1.gd','script_path':'res://runtime/interaction/snap_v1.gd','entry_symbol':'evaluate_transform','required_params':['tolerance_px']},
-    'hold_v1': {'semantic_kind':'hold','source_path':'production/godot/interaction_runtime/hold_v1.gd','script_path':'res://runtime/interaction/hold_v1.gd','entry_symbol':'update','required_params':['hold_ms']},
-    'swipe_v1': {'semantic_kind':'swipe','source_path':'production/godot/interaction_runtime/swipe_v1.gd','script_path':'res://runtime/interaction/swipe_v1.gd','entry_symbol':'release','required_params':['min_distance_px']},
-    'trace_v1': {'semantic_kind':'trace','source_path':'production/godot/interaction_runtime/trace_v1.gd','script_path':'res://runtime/interaction/trace_v1.gd','entry_symbol':'append_point','required_params':['tolerance_px']},
-    'pinch_v1': {'semantic_kind':'pinch','source_path':'production/godot/interaction_runtime/pinch_v1.gd','script_path':'res://runtime/interaction/pinch_v1.gd','entry_symbol':'drag','required_params':[]},
+    adapter_id: dict(entry)
+    for adapter_id, entry in ADAPTER_CATALOG.items()
+    if entry.get('status') == 'production'
 }
+
+
+def select_production_adapter(semantic_kind, adapters=None):
+    catalog = ADAPTER_CATALOG if adapters is None else adapters
+    matches = [
+        entry for entry in catalog.values()
+        if entry.get('status') == 'production'
+        and entry.get('semantic_kind') == semantic_kind
+    ]
+    if len(matches) != 1:
+        raise ValueError('Expected exactly one production adapter for semantic kind: ' + str(semantic_kind))
+    return dict(matches[0])
+
+
+def registry_transition_issues(previous, current):
+    """Enforce immutability after the first production promotion."""
+    issues = []
+    before = (previous or {}).get('adapters', {})
+    after = (current or {}).get('adapters', {})
+    for adapter_id, old in before.items():
+        if old.get('status') not in FROZEN_ADAPTER_STATUSES:
+            continue
+        new = after.get(adapter_id)
+        if not new:
+            issues.append({'code':'ADAPTER_FROZEN','path':adapter_id,'message':'Frozen adapter cannot be removed'})
+            continue
+        allowed = {'production','deprecated'} if old.get('status') == 'production' else {'deprecated'}
+        if new.get('status') not in allowed:
+            issues.append({'code':'ADAPTER_FROZEN','path':adapter_id,'message':'Frozen adapter lifecycle cannot move backward'})
+        for field in ADAPTER_IMMUTABLE_FIELDS:
+            if old.get(field) != new.get(field):
+                issues.append({'code':'ADAPTER_FROZEN','path':adapter_id+'.'+field,'message':'Frozen adapter field changed'})
+        old_versions = set(old.get('validated_godot') or [])
+        new_versions = set(new.get('validated_godot') or [])
+        if not old_versions.issubset(new_versions):
+            issues.append({'code':'ADAPTER_FROZEN','path':adapter_id+'.validated_godot','message':'Validated Godot versions cannot be removed'})
+        if new.get('status') == 'production' and new.get('superseded_by') not in (None, old.get('superseded_by')):
+            issues.append({'code':'ADAPTER_FROZEN','path':adapter_id+'.superseded_by','message':'superseded_by is only set when deprecating'})
+    return issues
+
+
+def verify_adapter_registry(repo_root=None, baseline_registry=None):
+    root = Path(repo_root) if repo_root is not None else REPO_ROOT
+    registry = load_adapter_registry(root / 'production/godot/interaction_runtime/registry.json')
+    issues = []
+    production_by_kind = {}
+    adapters = registry['adapters']
+    for adapter_id, entry in adapters.items():
+        path = adapter_id
+        if entry.get('adapter_id') != adapter_id:
+            issues.append({'code':'ADAPTER_REGISTRY','path':path,'message':'Registry key and adapter_id differ'})
+        if not re.fullmatch(r'[a-z][a-z0-9_]*_v[1-9][0-9]*', adapter_id or ''):
+            issues.append({'code':'ADAPTER_VERSION','path':path,'message':'Adapter id must end in an explicit _vN version'})
+        status = entry.get('status')
+        if status not in ADAPTER_LIFECYCLE:
+            issues.append({'code':'ADAPTER_LIFECYCLE','path':path,'message':'Unknown adapter lifecycle status'})
+        expected_source = 'production/godot/interaction_runtime/' + adapter_id + '.gd'
+        expected_script = 'res://runtime/interaction/' + adapter_id + '.gd'
+        if entry.get('source_path') != expected_source:
+            issues.append({'code':'ADAPTER_PATH','path':path,'message':'source_path must be versioned by adapter_id'})
+        if entry.get('script_path') != expected_script:
+            issues.append({'code':'ADAPTER_PATH','path':path,'message':'script_path must be versioned by adapter_id'})
+        source = root / str(entry.get('source_path') or '')
+        try:
+            raw = source.read_bytes()
+        except OSError:
+            issues.append({'code':'ADAPTER_SOURCE','path':path,'message':'Adapter source file missing'})
+            raw = b''
+        actual_hash = adapter_content_sha256(raw) if raw else None
+        recorded_hash = entry.get('sha256')
+        if status in FROZEN_ADAPTER_STATUSES:
+            if not isinstance(recorded_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', recorded_hash):
+                issues.append({'code':'ADAPTER_HASH','path':path,'message':'Frozen adapter requires SHA-256'})
+            elif actual_hash != recorded_hash:
+                issues.append({'code':'ADAPTER_HASH','path':path,'message':'Frozen adapter source differs from registered SHA-256'})
+            if not entry.get('ci_run') or not entry.get('validated_godot'):
+                issues.append({'code':'ADAPTER_PROMOTION','path':path,'message':'Frozen adapter requires CI run and validated Godot version'})
+        elif recorded_hash is not None and (not isinstance(recorded_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', recorded_hash)):
+            issues.append({'code':'ADAPTER_HASH','path':path,'message':'Candidate hash must be null or SHA-256'})
+        if raw:
+            try:
+                source_text = _lf_bytes(raw).decode('utf-8')
+            except UnicodeDecodeError:
+                source_text = ''
+            match = re.search(r'^class_name\s+([A-Za-z_][A-Za-z0-9_]*)\s*$', source_text, re.M)
+            if not match or match.group(1) != entry.get('class_name'):
+                issues.append({'code':'ADAPTER_CLASS','path':path,'message':'Registered class_name differs from Godot source'})
+        if status == 'production':
+            kind = entry.get('semantic_kind')
+            production_by_kind.setdefault(kind, []).append(adapter_id)
+            if entry.get('superseded_by') is not None:
+                issues.append({'code':'ADAPTER_LIFECYCLE','path':path,'message':'Production adapter cannot be superseded until deprecated'})
+        if status == 'deprecated' and entry.get('superseded_by'):
+            if entry['superseded_by'] not in adapters:
+                issues.append({'code':'ADAPTER_LIFECYCLE','path':path,'message':'superseded_by target is absent from registry'})
+    for kind, ids in production_by_kind.items():
+        if kind and len(ids) != 1:
+            issues.append({'code':'ADAPTER_PRODUCTION','path':str(kind),'message':'Exactly one production adapter is allowed per semantic kind'})
+    if baseline_registry is not None:
+        issues.extend(registry_transition_issues(baseline_registry, registry))
+    return issues
+
+
 CHECKS = {'file', 'node', 'symbol', 'geometry', 'connection', 'resources'}
 NAME = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 
@@ -186,27 +324,73 @@ def interaction_semantics(interaction):
     return value if isinstance(value, dict) else None
 
 
-def compile_interaction_adapters(interaction):
+def interaction_adapter_roles(interaction):
+    """Translate Wireframe semantics to implementation-neutral adapter roles."""
     sem = interaction_semantics(interaction)
     if not sem:
-        return {'adapter_bindings': [], 'fallback_reason': 'legacy_unstructured_interaction'}
+        return {'roles': [], 'fallback_reason': 'legacy_unstructured_interaction'}
     kind = str(sem.get('kind') or '').strip().lower()
-    kind_to_adapter = {v['semantic_kind']: k for k, v in INTERACTION_ADAPTERS.items()}
-    adapter_id = kind_to_adapter.get(kind)
-    if not adapter_id or kind == 'snap':
-        return {'adapter_bindings': [], 'fallback_reason': 'unsupported_semantic_kind:' + (kind or 'missing')}
+    supported = {'drag','hold','swipe','trace','pinch'}
+    if kind not in supported:
+        return {'roles': [], 'fallback_reason': 'unsupported_semantic_kind:' + (kind or 'missing')}
     params = {}
     for key in ('axis','cancel','min_distance_px','max_duration_ms','hold_ms','movement_tolerance_px','tolerance_px','min_coverage','min_value','max_value'):
         if key in sem:
             params[key] = sem[key]
-    plan = [{'adapter_id': adapter_id, 'script_path': INTERACTION_ADAPTERS[adapter_id]['script_path'], 'target_component_id': sem.get('target_component_id'), 'params': params}]
+    roles = [{
+        'semantic_kind': kind,
+        'target_component_id': sem.get('target_component_id'),
+        'params': params,
+    }]
     completion = sem.get('completion')
     if isinstance(completion, dict) and str(completion.get('kind') or '').lower() == 'snap':
         snap_params = {k: completion[k] for k in ('tolerance_px','rotation_tolerance_deg') if k in completion}
         if 'tolerance_px' not in snap_params:
-            return {'adapter_bindings': [], 'fallback_reason': 'snap_requires_tolerance_px'}
-        plan.append({'adapter_id': 'snap_v1', 'script_path': INTERACTION_ADAPTERS['snap_v1']['script_path'], 'target_component_id': sem.get('target_component_id'), 'snap_target_component_id': completion.get('target_component_id'), 'params': snap_params})
-    return {'adapter_bindings': plan, 'fallback_reason': None}
+            return {'roles': [], 'fallback_reason': 'snap_requires_tolerance_px'}
+        roles.append({
+            'semantic_kind': 'snap',
+            'target_component_id': sem.get('target_component_id'),
+            'snap_target_component_id': completion.get('target_component_id'),
+            'params': snap_params,
+        })
+    return {'roles': roles, 'fallback_reason': None}
+
+
+def _pinned_adapter_binding(entry, role):
+    result = {
+        'adapter_id': entry['adapter_id'],
+        'adapter_status': 'production',
+        'adapter_sha256': entry['sha256'],
+        'adapter_class_name': entry['class_name'],
+        'source_path': entry['source_path'],
+        'script_path': entry['script_path'],
+        'target_component_id': role.get('target_component_id'),
+        'params': copy.deepcopy(role.get('params') or {}),
+    }
+    if role.get('snap_target_component_id') is not None:
+        result['snap_target_component_id'] = role['snap_target_component_id']
+    return result
+
+
+def compile_interaction_adapters(interaction):
+    role_plan = interaction_adapter_roles(interaction)
+    if role_plan.get('fallback_reason'):
+        return {'adapter_bindings': [], 'fallback_reason': role_plan['fallback_reason']}
+    bindings = []
+    for role in role_plan['roles']:
+        entry = select_production_adapter(role['semantic_kind'])
+        bindings.append(_pinned_adapter_binding(entry, role))
+    return {'adapter_bindings': bindings, 'fallback_reason': None}
+
+
+def blueprint_adapter_pins(blueprint):
+    pins = {}
+    for interaction in (blueprint.get('bindings') or {}).get('interactions', []):
+        for adapter in interaction.get('adapter_bindings', []) if isinstance(interaction.get('adapter_bindings'), list) else []:
+            adapter_id = adapter.get('adapter_id')
+            if adapter_id:
+                pins[adapter_id] = adapter.get('adapter_sha256')
+    return [{'adapter_id': k, 'sha256': pins[k]} for k in sorted(pins)]
 
 
 def canonical_reference_size(pack):
@@ -540,31 +724,44 @@ def validate(b, project=None, claims=None, commit=None):
                 related_ids = {nodes.get(p,{}).get('component_id') for p in target_paths}
                 if completion.get('target_component_id') not in related_ids:
                     error('SEMANTIC_TARGET', primary_path, 'completion target_component_id must resolve through target_node/related_nodes')
-            plan = compile_interaction_adapters(src)
-            expected_adapters = plan.get('adapter_bindings', [])
-            if plan.get('fallback_reason'):
+            role_plan = interaction_adapter_roles(src)
+            roles = role_plan.get('roles', [])
+            if role_plan.get('fallback_reason'):
                 if not fallback_reason:
                     error('ADAPTER_FALLBACK', primary_path, 'Unsupported semantic interaction requires explicit fallback_reason')
             else:
                 if fallback_reason:
                     error('ADAPTER_FALLBACK', primary_path, 'Known semantic interaction must use standard adapters instead of fallback')
-                if [x.get('adapter_id') for x in adapters] != [x.get('adapter_id') for x in expected_adapters]:
-                    error('ADAPTER_MAPPING', primary_path, 'Adapter ids differ from canonical semantic mapping')
-                for a, expected in zip(adapters, expected_adapters):
-                    spec = INTERACTION_ADAPTERS.get(a.get('adapter_id'))
+                if len(adapters) != len(roles):
+                    error('ADAPTER_MAPPING', primary_path, 'Adapter count differs from semantic interaction roles')
+                for a, role in zip(adapters, roles):
+                    adapter_id = a.get('adapter_id')
+                    spec = ADAPTER_CATALOG.get(adapter_id)
                     if not spec:
-                        error('ADAPTER_MAPPING', primary_path, 'Unknown interaction adapter')
+                        error('ADAPTER_MAPPING', primary_path, 'Pinned interaction adapter is absent from registry')
                         continue
-                    if a.get('script_path') != spec['script_path']:
-                        error('ADAPTER_PATH', primary_path, 'Adapter script path differs from canonical runtime path')
+                    if spec.get('status') not in FROZEN_ADAPTER_STATUSES:
+                        error('ADAPTER_LIFECYCLE', primary_path, 'Blueprint cannot rely on a candidate adapter')
+                    if a.get('adapter_status') != 'production':
+                        error('ADAPTER_LIFECYCLE', primary_path, 'Blueprint must pin adapter as production at compile time')
+                    if spec.get('semantic_kind') != role.get('semantic_kind'):
+                        error('ADAPTER_MAPPING', primary_path, 'Pinned adapter semantic kind differs from Wireframe semantics')
+                    for field, expected in (
+                        ('adapter_sha256', spec.get('sha256')),
+                        ('adapter_class_name', spec.get('class_name')),
+                        ('source_path', spec.get('source_path')),
+                        ('script_path', spec.get('script_path')),
+                    ):
+                        if a.get(field) != expected:
+                            error('ADAPTER_PIN', primary_path, field+' differs from immutable registry entry')
                     for target_key in ('target_component_id','snap_target_component_id'):
-                        if expected.get(target_key) != a.get(target_key):
+                        if role.get(target_key) != a.get(target_key):
                             error('ADAPTER_TARGET', primary_path, 'Adapter '+target_key+' differs from Wireframe semantics')
                     params = a.get('params') if isinstance(a.get('params'), dict) else {}
                     for key in spec.get('required_params', []):
                         if key not in params:
                             error('ADAPTER_PARAMS', primary_path, 'Missing required adapter parameter ' + key)
-                    for key, value in expected.get('params', {}).items():
+                    for key, value in role.get('params', {}).items():
                         if params.get(key) != value:
                             error('ADAPTER_PARAMS', primary_path, 'Adapter parameter '+key+' differs from Wireframe semantics')
                 if primary.get('construction_pattern') != 'adapter_host_v1':
@@ -594,7 +791,7 @@ def validate(b, project=None, claims=None, commit=None):
         if v.get('input_handler') and nodes.get(v.get('target_node'),{}).get('script_path'):
             refs.append({'file':nodes.get(v.get('target_node'),{}).get('script_path'),'symbol':v['input_handler'],'kind':'func'})
         for a in v.get('adapter_bindings',[]) if isinstance(v.get('adapter_bindings'),list) else []:
-            spec = INTERACTION_ADAPTERS.get(a.get('adapter_id'), {})
+            spec = ADAPTER_CATALOG.get(a.get('adapter_id'), {})
             if a.get('script_path'):
                 refs.append({'file':a['script_path'],'symbol':spec.get('entry_symbol'),'kind':'func'})
     for ref in refs:
@@ -635,6 +832,7 @@ def validate(b, project=None, claims=None, commit=None):
             'status':'failed' if errors else 'passed','errors':errors,
             'manual_test_ids':[t.get('id') for t in tests if not is_static(t)],
             'blueprint_hash':b.get('blueprint_hash'),'commit':commit,
+            'adapter_pins':blueprint_adapter_pins(b),
             'results':[{'test_id':t.get('id'),'status':'failed' if errors else 'passed'} for t in tests if is_static(t)],
             'limitation':'Structural checks only; independent code/source review must verify game-specific semantics. Not runtime QA.'}
 
@@ -691,30 +889,31 @@ def validate_project(b, project, refs, error):
             try: rn,_,_=parse_scene(read(ref['file']))
             except (KeyError,ValueError): rn={}
             if ref['node_path'] not in rn: error('NODE_PATH',ref['node_path'],'Implementation node missing from referenced scene')
-    # Standard interaction adapters are immutable library copies. In a repository
-    # checkout, compare the game-local res:// copy with the canonical production source.
-    repo_root=project.resolve()
-    while repo_root.parent!=repo_root and not (repo_root/'.git').exists():
-        repo_root=repo_root.parent
+    # Standard adapter validation is historical and reproducible: the reviewed
+    # final game copy is compared to the SHA-256 pinned inside the Blueprint.
+    # Current main's runtime source is intentionally not the comparison target.
     seen_adapters=set()
     for interaction in bindings.get('interactions',[]):
         for adapter in interaction.get('adapter_bindings',[]) if isinstance(interaction.get('adapter_bindings'),list) else []:
             aid=adapter.get('adapter_id')
             if not aid or aid in seen_adapters: continue
             seen_adapters.add(aid)
-            spec=INTERACTION_ADAPTERS.get(aid)
+            spec=ADAPTER_CATALOG.get(aid)
             if not spec:
-                error('ADAPTER_MAPPING',aid,'Unknown interaction adapter in project validation')
+                error('ADAPTER_MAPPING',aid,'Pinned interaction adapter is absent from registry')
+                continue
+            pinned=adapter.get('adapter_sha256')
+            if not isinstance(pinned,str) or not re.fullmatch(r'[0-9a-f]{64}',pinned):
+                error('ADAPTER_PIN',aid,'Blueprint adapter SHA-256 is missing or invalid')
                 continue
             try:
                 local=(project/resource_path(adapter.get('script_path'))).resolve()
-                canonical=(repo_root/spec['source_path']).resolve()
-                if not canonical.is_file():
-                    error('ADAPTER_SOURCE',aid,'Canonical interaction runtime source missing from repository checkout')
-                elif not local.is_file():
+                if not local.is_file():
                     error('ADAPTER_COPY',adapter.get('script_path'),'Game-local interaction adapter copy is missing')
-                elif local.read_bytes()!=canonical.read_bytes():
-                    error('ADAPTER_COPY',adapter.get('script_path'),'Game-local interaction adapter differs from canonical runtime source')
+                else:
+                    actual=adapter_content_sha256(local.read_bytes())
+                    if actual!=pinned:
+                        error('ADAPTER_COPY',adapter.get('script_path'),'Game-local adapter SHA-256 differs from Blueprint pin')
             except (ValueError,OSError) as exc:
                 error('ADAPTER_COPY',adapter.get('script_path'),str(exc))
     for t in bindings.get('tests',[]):
@@ -762,12 +961,31 @@ def verify_commit(project, commit):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['validate','construct','seal','registry','adapter-registry'])
+    parser.add_argument('command',choices=['validate','construct','seal','registry','adapter-registry','verify-adapter-registry'])
     parser.add_argument('--blueprint');parser.add_argument('--project');parser.add_argument('--claims');parser.add_argument('--commit');parser.add_argument('--output')
+    parser.add_argument('--baseline-ref')
     args=parser.parse_args()
-    if args.command=='registry': result=json.dumps(PATTERNS,indent=2)
-    elif args.command=='adapter-registry': result=json.dumps(INTERACTION_ADAPTERS,indent=2)
+    if args.command=='registry':
+        result=json.dumps(PATTERNS,indent=2)
+    elif args.command=='adapter-registry':
+        result=json.dumps(load_adapter_registry(),ensure_ascii=False,indent=2)
+    elif args.command=='verify-adapter-registry':
+        baseline=None
+        if args.baseline_ref:
+            raw=subprocess.check_output(
+                ['git','-C',str(REPO_ROOT),'show',args.baseline_ref+':production/godot/interaction_runtime/registry.json'],
+                stderr=subprocess.PIPE,
+            )
+            baseline=json.loads(raw.decode('utf-8'))
+        errors=verify_adapter_registry(REPO_ROOT,baseline)
+        result=json.dumps({'status':'failed' if errors else 'passed','errors':errors},ensure_ascii=False,indent=2)
+        if errors:
+            if args.output: Path(args.output).write_text(result+'\n')
+            else: print(result)
+            return 1
     else:
+        if not args.blueprint:
+            parser.error('--blueprint is required for '+args.command)
         b=json.loads(Path(args.blueprint).read_text())
         if args.command=='seal': result=json.dumps(seal(b),ensure_ascii=False,indent=2)
         elif args.command=='construct': result=construct(b)
@@ -785,6 +1003,7 @@ def main():
         target.write_text(result+'\n')
     else: print(result)
     return 0
+
 
 if __name__=='__main__':
     try: sys.exit(main())

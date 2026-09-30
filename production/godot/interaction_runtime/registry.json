@@ -1,0 +1,115 @@
+{
+  "schema_version": "interaction-runtime-registry-v1",
+  "hash_algorithm": "sha256-lf-bytes-v1",
+  "lifecycle": [
+    "candidate",
+    "production",
+    "deprecated"
+  ],
+  "adapters": {
+    "drag_v1": {
+      "adapter_id": "drag_v1",
+      "status": "production",
+      "semantic_kind": "drag",
+      "source_path": "production/godot/interaction_runtime/drag_v1.gd",
+      "script_path": "res://runtime/interaction/drag_v1.gd",
+      "sha256": "d5e3c2e9ba90ee084809a35c0947fc38f232b389bafcccaac697fbd7e035a927",
+      "class_name": "DanbiDragV1",
+      "entry_symbol": "handle_event",
+      "required_params": [],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    },
+    "snap_v1": {
+      "adapter_id": "snap_v1",
+      "status": "production",
+      "semantic_kind": "snap",
+      "source_path": "production/godot/interaction_runtime/snap_v1.gd",
+      "script_path": "res://runtime/interaction/snap_v1.gd",
+      "sha256": "a091085195b0093aabdcb4e55c6b6cce8ed1d82c9659edaf1e45d2c1b333185a",
+      "class_name": "DanbiSnapV1",
+      "entry_symbol": "evaluate_transform",
+      "required_params": [
+        "tolerance_px"
+      ],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    },
+    "hold_v1": {
+      "adapter_id": "hold_v1",
+      "status": "production",
+      "semantic_kind": "hold",
+      "source_path": "production/godot/interaction_runtime/hold_v1.gd",
+      "script_path": "res://runtime/interaction/hold_v1.gd",
+      "sha256": "fc5302afe8f961ccaf32f99773764de15bdff3612f35f2dc7f596323c8029011",
+      "class_name": "DanbiHoldV1",
+      "entry_symbol": "update",
+      "required_params": [
+        "hold_ms"
+      ],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    },
+    "swipe_v1": {
+      "adapter_id": "swipe_v1",
+      "status": "production",
+      "semantic_kind": "swipe",
+      "source_path": "production/godot/interaction_runtime/swipe_v1.gd",
+      "script_path": "res://runtime/interaction/swipe_v1.gd",
+      "sha256": "67cb12d7cc31f1221abb4c74b51524cba57b23a62f0ac9741758945b89a24323",
+      "class_name": "DanbiSwipeV1",
+      "entry_symbol": "release",
+      "required_params": [
+        "min_distance_px"
+      ],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    },
+    "trace_v1": {
+      "adapter_id": "trace_v1",
+      "status": "production",
+      "semantic_kind": "trace",
+      "source_path": "production/godot/interaction_runtime/trace_v1.gd",
+      "script_path": "res://runtime/interaction/trace_v1.gd",
+      "sha256": "307e66ebca3477003e6e1fd5a5c49df65b88b5daee0362e6fcc44b2125c6c8a9",
+      "class_name": "DanbiTraceV1",
+      "entry_symbol": "append_point",
+      "required_params": [
+        "tolerance_px"
+      ],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    },
+    "pinch_v1": {
+      "adapter_id": "pinch_v1",
+      "status": "production",
+      "semantic_kind": "pinch",
+      "source_path": "production/godot/interaction_runtime/pinch_v1.gd",
+      "script_path": "res://runtime/interaction/pinch_v1.gd",
+      "sha256": "3c7f69b1d2a43e71b03f5b76fe9a63532378daef8dbbf148cd71eab1e21e20f6",
+      "class_name": "DanbiPinchV1",
+      "entry_symbol": "drag",
+      "required_params": [],
+      "validated_godot": [
+        "4.7.2"
+      ],
+      "ci_run": "36742934104",
+      "superseded_by": null
+    }
+  }
+}

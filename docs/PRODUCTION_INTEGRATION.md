@@ -72,7 +72,7 @@ For interactions, preserve the original Wireframe target text in `bindings.inter
 - `target_selector`: required when the Wireframe names a semantic child/sub-target inside one component (for example `shadow_piece`, `hotspot`, `visible internal shape in xray_box`). The selector preserves what inside the component receives the interaction without inventing another top-level Wireframe component.
 - A normal Button tap uses `button_tap_v1` and a `pressed` connection.
 - A tap on a hotspot, card, object region, or internal shape uses `explicit_script_v1` plus an explicit `input_handler`; it must not be converted to a Button.
-- Non-tap gestures (drag/swipe/hold/pinch/trace/release/etc.) use `explicit_script_v1` on the primary target with an explicit reviewed handler.
+- Structured standard gestures (drag/swipe/hold/pinch/trace and drag→snap completion) compile to a pinned production adapter plus `adapter_host_v1`. Legacy or genuinely game-specific gestures may still use `explicit_script_v1` with a recorded fallback reason.
 - Natural-language targets such as “rotate buttons”, “symptom target”, or “visible internal shape in xray_box” are not specification failures when they can be bound explicitly to one or more existing Wireframe components while `source_target` remains unchanged.
 
 This binding layer preserves the source meaning while allowing the Godot implementation to use concrete node paths.
@@ -129,7 +129,7 @@ Fetch the **original game commit** and DB rows again in a clean checkout. Run `c
 ## Explicit boundaries
 
 - The tool parses declarative `.tscn` nodes, script references, simple scalar properties, symbols and resource paths. Dynamic scene creation, instanced/inherited scenes and complex GDScript semantics are not automatically verified. Block for explicit review or extend the parser when needed.
-- `modal_scrim_v1` blocks Control mouse input only; `_input` touch handling needs an explicit reviewed lock path. No general drag/swipe/hold/snap/state adapter is claimed yet.
+- `modal_scrim_v1` blocks Control mouse input only; `_input` touch handling needs an explicit reviewed lock path. Standard drag/snap/hold/swipe/trace/pinch primitives are supplied by the immutable Interaction Runtime Registry; game-specific state semantics still require reviewed host/action code.
 - `check-build` verifies a real Git commit and clean project bytes. The artifact lives in a later separate commit to avoid self-referential hashes.
 - The CLI only prepares validation output and RPC payloads. It cannot grant independent approval or write a DB status by itself.
 - Both live Blueprints at handoff remain blocked. They require correction, independent approval, a full Godot build and a fresh Gate review before any actual game can be declared PLAYTEST READY.
@@ -172,3 +172,54 @@ When Godot CLI is available, run:
 The shared runtime test proves adapter behavior only. Game-specific critical paths can add small headless tests under `builds/<slug>/tests/`. Runtime evidence is additive; never fabricate it when Godot is unavailable.
 
 Legacy Wireframes without `interaction_semantics` and already-approved Blueprints remain valid through `explicit_script_v1`. New structured interactions should compile to `adapter_host_v1` + `adapter_bindings` whenever supported.
+
+
+## Immutable Interaction Runtime Registry
+
+Reusable Godot interaction code follows the same freeze/hash/reapproval model as Fidelity Blueprints.
+
+Lifecycle:
+
+`candidate → production → deprecated`
+
+- **candidate**: implementation may change while being developed and tested. The Blueprint Compiler never selects it.
+- **production**: eligible for new Blueprints and immutable. Promotion requires static/Python tests, the Godot headless suite, a registered SHA-256, validated Godot version, and CI run.
+- **deprecated**: cannot be selected for a new Blueprint, but every already-approved Blueprint that pinned it remains valid. A production adapter may only move to deprecated without changing its code/hash.
+
+Frozen code is never patched in place. A bug fix to `drag_v1.gd / DanbiDragV1` becomes a new candidate such as `drag_v2.gd / DanbiDragV2`. Existing games never auto-upgrade; migration means Blueprint recompilation, a changed Blueprint hash, independent reapproval, and a rebuild.
+
+The canonical registry is `production/godot/interaction_runtime/registry.json`. Each frozen entry records at least:
+
+- adapter_id and semantic_kind
+- lifecycle status
+- versioned source_path and game script_path
+- SHA-256
+- versioned Godot class_name
+- validated_godot versions
+- promotion ci_run
+- superseded_by
+
+### Hash rule and cross-PC stability
+
+`.gitattributes` fixes Godot/compiler text files to LF. Adapter SHA-256 uses UTF-8 content with CRLF/CR normalized to LF (`sha256-lf-bytes-v1`), matching the bytes Git stores for these text files. This prevents Windows checkout line endings from changing the production identity.
+
+CI runs `construction.py verify-adapter-registry`. It checks the current frozen file bytes against the registered hash and, on push, compares the registry against the previous commit. Once an entry has reached production, immutable fields and SHA-256 cannot change; production may only become deprecated. Updating the file and registry hash together does not bypass the freeze check.
+
+### Blueprint pinning
+
+The Compiler selects only the current `production` adapter for a semantic kind. Every `adapter_bindings[]` entry pins:
+
+- adapter_id
+- `adapter_status: production` at compilation time
+- adapter_sha256
+- adapter_class_name
+- source_path and script_path
+- semantic targets and parameters
+
+These fields are inside the Blueprint JSON before `sha256-canonical-json-v1` sealing, so changing an adapter/version/hash changes the Blueprint hash and requires independent reapproval.
+
+A later deprecation does not invalidate an approved historical Blueprint: validation accepts its frozen pinned adapter as production-at-compile-time while the registry retains the same immutable hash.
+
+### Historical build verification
+
+`check-build` does **not** compare a game-local adapter to whatever file happens to be current on main. It hashes the adapter copy in the reviewed final game checkout and compares it to the SHA-256 pinned in that Blueprint. This makes old game verification reproducible even after newer adapter versions become production.

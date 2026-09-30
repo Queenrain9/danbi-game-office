@@ -9,6 +9,7 @@ on:
       - "tests/test_production.py"
       - "tests/test_interaction_adapters.py"
       - "production/godot/interaction_runtime/**"
+      - ".gitattributes"
       - ".github/workflows/fidelity-tests.yml"
   workflow_dispatch:
 
@@ -21,9 +22,19 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Verify frozen interaction adapter registry
+        shell: bash
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            python tools/fidelity/construction.py verify-adapter-registry --baseline-ref "${{ github.event.before }}"
+          else
+            python tools/fidelity/construction.py verify-adapter-registry
+          fi
       - name: Run fidelity unit tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
 
