@@ -1,0 +1,1286 @@
+{
+  "id": "6da9fbeb-2528-4e1f-8a15-a1d4c2ac952e",
+  "title": "Backseat Alibi",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "3b9c6327-a9e7-40c7-b178-c14c579b33dd",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Case Select / Briefing",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "case_cards",
+            "box": {
+              "h": 48,
+              "w": 90,
+              "x": 5,
+              "y": 10
+            }
+          },
+          {
+            "id": "start_case",
+            "box": {
+              "h": 7,
+              "w": 40,
+              "x": 55,
+              "y": 90
+            }
+          }
+        ]
+      },
+      "states": [
+        "selectable",
+        "locked",
+        "selected"
+      ],
+      "purpose": "Select an unlocked case and read objective/starting state.",
+      "feedback": [
+        "selection/lock state"
+      ],
+      "components": [
+        {
+          "id": "case_cards",
+          "box": {
+            "h": 48,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          }
+        },
+        {
+          "id": "start_case",
+          "box": {
+            "h": 7,
+            "w": 40,
+            "x": 55,
+            "y": 90
+          }
+        }
+      ],
+      "edge_cases": [
+        "locked tier"
+      ],
+      "transitions": [
+        "S2"
+      ],
+      "interactions": [
+        {
+          "id": "select_case",
+          "input": "tap",
+          "target": "case_cards",
+          "feedback": "briefing refreshes",
+          "source_refs": [
+            "progression",
+            "screen_inventory"
+          ],
+          "precondition": "case unlocked",
+          "state_change": "selected case changes",
+          "invalid_input": "locked feedback",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start_case",
+          "feedback": "map enters at start node",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "case selected",
+          "state_change": "briefing→driving",
+          "decision_note": "closes entry UX without changing case rules",
+          "invalid_input": "disabled without selection",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "success alone unlocks next case"
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Driving + Companion Interrogation",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "route_map",
+            "box": {
+              "h": 55,
+              "w": 100,
+              "x": 0,
+              "y": 10
+            }
+          },
+          {
+            "id": "road_targets",
+            "box": {
+              "h": 42,
+              "w": 90,
+              "x": 5,
+              "y": 18
+            }
+          },
+          {
+            "id": "fuel_meter",
+            "box": {
+              "h": 6,
+              "w": 25,
+              "x": 4,
+              "y": 2
+            }
+          },
+          {
+            "id": "pursuit_meter",
+            "box": {
+              "h": 6,
+              "w": 31,
+              "x": 34,
+              "y": 2
+            }
+          },
+          {
+            "id": "branch_timer",
+            "box": {
+              "h": 6,
+              "w": 16,
+              "x": 70,
+              "y": 2
+            }
+          },
+          {
+            "id": "pause_button",
+            "box": {
+              "h": 6,
+              "w": 8,
+              "x": 89,
+              "y": 2
+            }
+          },
+          {
+            "id": "seat_1",
+            "box": {
+              "h": 14,
+              "w": 29,
+              "x": 3,
+              "y": 68
+            }
+          },
+          {
+            "id": "seat_2",
+            "box": {
+              "h": 14,
+              "w": 29,
+              "x": 35,
+              "y": 68
+            }
+          },
+          {
+            "id": "seat_3",
+            "box": {
+              "h": 14,
+              "w": 29,
+              "x": 67,
+              "y": 68
+            }
+          },
+          {
+            "id": "topic_tray",
+            "box": {
+              "h": 8,
+              "w": 92,
+              "x": 4,
+              "y": 83
+            }
+          },
+          {
+            "id": "board_button",
+            "box": {
+              "h": 6,
+              "w": 44,
+              "x": 4,
+              "y": 93
+            }
+          }
+        ]
+      },
+      "states": [
+        "cruising",
+        "branch_choice",
+        "companion_selected",
+        "pursuit_warning",
+        "auto_route",
+        "checkpoint_arrival"
+      ],
+      "purpose": "Choose roads while gathering memories under live fuel, pursuit, branch and cooldown pressure.",
+      "feedback": [
+        "ETA/risk",
+        "pursuit delta",
+        "memory arrival",
+        "cooldown"
+      ],
+      "components": [
+        {
+          "id": "route_map",
+          "box": {
+            "h": 55,
+            "w": 100,
+            "x": 0,
+            "y": 10
+          }
+        },
+        {
+          "id": "road_targets",
+          "box": {
+            "h": 42,
+            "w": 90,
+            "x": 5,
+            "y": 18
+          }
+        },
+        {
+          "id": "fuel_meter",
+          "box": {
+            "h": 6,
+            "w": 25,
+            "x": 4,
+            "y": 2
+          }
+        },
+        {
+          "id": "pursuit_meter",
+          "box": {
+            "h": 6,
+            "w": 31,
+            "x": 34,
+            "y": 2
+          }
+        },
+        {
+          "id": "branch_timer",
+          "box": {
+            "h": 6,
+            "w": 16,
+            "x": 70,
+            "y": 2
+          }
+        },
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 6,
+            "w": 8,
+            "x": 89,
+            "y": 2
+          }
+        },
+        {
+          "id": "seat_1",
+          "box": {
+            "h": 14,
+            "w": 29,
+            "x": 3,
+            "y": 68
+          }
+        },
+        {
+          "id": "seat_2",
+          "box": {
+            "h": 14,
+            "w": 29,
+            "x": 35,
+            "y": 68
+          }
+        },
+        {
+          "id": "seat_3",
+          "box": {
+            "h": 14,
+            "w": 29,
+            "x": 67,
+            "y": 68
+          }
+        },
+        {
+          "id": "topic_tray",
+          "box": {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 83
+          }
+        },
+        {
+          "id": "board_button",
+          "box": {
+            "h": 6,
+            "w": 44,
+            "x": 4,
+            "y": 93
+          }
+        }
+      ],
+      "edge_cases": [
+        "no affordable exit→S7",
+        "pursuit100→S7",
+        "branch expiry→auto-route"
+      ],
+      "transitions": [
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7"
+      ],
+      "interactions": [
+        {
+          "id": "route_tap",
+          "input": "tap adjacent road",
+          "target": "road_targets",
+          "feedback": "highlight, ETA, fuel cost, risk delta",
+          "source_refs": [
+            "game_rules.movement",
+            "interaction_spec.route"
+          ],
+          "precondition": "connected, unblocked, affordable edge during branch",
+          "state_change": "enter edge; spend fuel 1-3; record node/time; apply defined pursuit delta",
+          "timing_rules": "5s branch window; expiry auto-picks lowest-risk valid edge",
+          "invalid_input": "no commit; show unavailable reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select_seat",
+          "input": "tap seat",
+          "target": "seat_1/seat_2/seat_3",
+          "feedback": "topic tray updates",
+          "source_refs": [
+            "core_player_verbs.question"
+          ],
+          "precondition": "driving",
+          "state_change": "selected companion changes",
+          "decision_note": "only exposes existing question action",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "ask_topic",
+          "input": "tap unrevealed topic",
+          "target": "topic_tray",
+          "feedback": "memory arrival + cooldown",
+          "source_refs": [
+            "game_rules.memory",
+            "interaction_spec.question"
+          ],
+          "precondition": "selected companion cooldown=0 and topic unrevealed",
+          "state_change": "reveal predefined memory; cooldown=20s",
+          "invalid_input": "disabled with reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "open_board",
+          "input": "tap",
+          "target": "board_button",
+          "feedback": "route context remains anchored",
+          "source_refs": [
+            "screen_flow",
+            "known_risks"
+          ],
+          "precondition": "driving",
+          "state_change": "open S3 overlay; driving timers continue",
+          "decision_note": "preserves simultaneous route/alibi pressure",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "round_structure",
+            "interaction_spec.pause"
+          ],
+          "precondition": "active",
+          "state_change": "paused; freeze timers",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V2A",
+          "name": "Branch Choice",
+          "notes": "expiry auto-picks lowest-risk valid edge",
+          "condition": "valid outgoing edges available",
+          "source_refs": [
+            "game_rules.movement"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "road_targets": "ETA/fuel/risk"
+          },
+          "component_overrides": {
+            "branch_timer": "5s countdown",
+            "road_targets": "highlight valid connected affordable edges"
+          },
+          "interaction_overrides": {
+            "route_tap": "last valid choice before branch wins"
+          }
+        },
+        {
+          "id": "V2B",
+          "name": "Pursuit Warning",
+          "notes": "presentation only",
+          "condition": "pursuit>=80",
+          "source_refs": [
+            "feedback_system.pursuit"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "pursuit_meter": "persistent emphasis"
+          },
+          "component_overrides": {
+            "pursuit_meter": "persistent warning"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "visited node/time is authoritative",
+        "board does not pause timers"
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Alibi Board Overlay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "visited_timeline",
+            "box": {
+              "h": 42,
+              "w": 92,
+              "x": 4,
+              "y": 12
+            }
+          },
+          {
+            "id": "memory_cards",
+            "box": {
+              "h": 28,
+              "w": 92,
+              "x": 4,
+              "y": 56
+            }
+          },
+          {
+            "id": "conflict_summary",
+            "box": {
+              "h": 7,
+              "w": 60,
+              "x": 4,
+              "y": 85
+            }
+          },
+          {
+            "id": "close_board",
+            "box": {
+              "h": 7,
+              "w": 18,
+              "x": 78,
+              "y": 85
+            }
+          }
+        ]
+      },
+      "states": [
+        "unlinked",
+        "linked_match",
+        "linked_conflict"
+      ],
+      "purpose": "Link/revise revealed memories against authoritative visited node/time records.",
+      "feedback": [
+        "match/conflict links",
+        "conflict count"
+      ],
+      "components": [
+        {
+          "id": "visited_timeline",
+          "box": {
+            "h": 42,
+            "w": 92,
+            "x": 4,
+            "y": 12
+          }
+        },
+        {
+          "id": "memory_cards",
+          "box": {
+            "h": 28,
+            "w": 92,
+            "x": 4,
+            "y": 56
+          }
+        },
+        {
+          "id": "conflict_summary",
+          "box": {
+            "h": 7,
+            "w": 60,
+            "x": 4,
+            "y": 85
+          }
+        },
+        {
+          "id": "close_board",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 78,
+            "y": 85
+          }
+        }
+      ],
+      "edge_cases": [
+        "unrevealed absent",
+        "relink free"
+      ],
+      "transitions": [
+        "S2",
+        "S5"
+      ],
+      "interactions": [
+        {
+          "id": "link_memory",
+          "input": "drag memory card to visited node/time",
+          "target": "memory_cards",
+          "feedback": "snap and match/conflict relation",
+          "source_refs": [
+            "interaction_spec.board",
+            "game_rules.consistency"
+          ],
+          "precondition": "memory revealed",
+          "state_change": "set/revise link; recompute conflicts",
+          "invalid_input": "invalid drop returns to prior/origin without change",
+          "cancel_behavior": "return_origin",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "return_origin",
+            "completion": {
+              "kind": "snap",
+              "target_component_id": "visited_timeline"
+            },
+            "target_component_id": "memory_cards",
+            "related_component_ids": [
+              "visited_timeline"
+            ]
+          }
+        },
+        {
+          "id": "unlink_memory",
+          "input": "drag linked card away",
+          "target": "memory_cards",
+          "feedback": "link disappears; count refreshes",
+          "source_refs": [
+            "interaction_spec.board"
+          ],
+          "precondition": "linked and checkpoint not committed",
+          "state_change": "remove link; recompute conflicts",
+          "invalid_input": "none",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "keep",
+            "target_component_id": "memory_cards",
+            "related_component_ids": [
+              "visited_timeline"
+            ]
+          }
+        },
+        {
+          "id": "close_board_action",
+          "input": "tap",
+          "target": "close_board",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "board open",
+          "state_change": "return S2 preserving links",
+          "decision_note": "navigation completion only",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V3A",
+          "name": "Conflict Present",
+          "notes": "shows consistency, not truth declaration",
+          "condition": "one or more linked memories violate place/time/order or mutual exclusion",
+          "source_refs": [
+            "game_rules.consistency",
+            "known_risks"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "memory_cards": "conflicting links marked"
+          },
+          "component_overrides": {
+            "conflict_summary": "count + implicated links"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "do not infer truth beyond defined constraints"
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Checkpoint Interrogation",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "question_stack",
+            "box": {
+              "h": 40,
+              "w": 92,
+              "x": 4,
+              "y": 12
+            }
+          },
+          {
+            "id": "evidence_picker",
+            "box": {
+              "h": 28,
+              "w": 92,
+              "x": 4,
+              "y": 54
+            }
+          },
+          {
+            "id": "commit_answers",
+            "box": {
+              "h": 8,
+              "w": 41,
+              "x": 55,
+              "y": 87
+            }
+          },
+          {
+            "id": "checkpoint_result",
+            "box": {
+              "h": 11,
+              "w": 48,
+              "x": 4,
+              "y": 84
+            }
+          },
+          {
+            "id": "pause_checkpoint",
+            "box": {
+              "h": 7,
+              "w": 8,
+              "x": 88,
+              "y": 2
+            }
+          }
+        ]
+      },
+      "states": [
+        "answering",
+        "ready_to_commit",
+        "resolved_pass",
+        "resolved_partial_fail"
+      ],
+      "purpose": "Answer 2-3 questions with shared route/memory evidence, then irreversibly commit.",
+      "feedback": [
+        "evidence comparison",
+        "pursuit delta"
+      ],
+      "components": [
+        {
+          "id": "question_stack",
+          "box": {
+            "h": 40,
+            "w": 92,
+            "x": 4,
+            "y": 12
+          }
+        },
+        {
+          "id": "evidence_picker",
+          "box": {
+            "h": 28,
+            "w": 92,
+            "x": 4,
+            "y": 54
+          }
+        },
+        {
+          "id": "commit_answers",
+          "box": {
+            "h": 8,
+            "w": 41,
+            "x": 55,
+            "y": 87
+          }
+        },
+        {
+          "id": "checkpoint_result",
+          "box": {
+            "h": 11,
+            "w": 48,
+            "x": 4,
+            "y": 84
+          }
+        },
+        {
+          "id": "pause_checkpoint",
+          "box": {
+            "h": 7,
+            "w": 8,
+            "x": 88,
+            "y": 2
+          }
+        }
+      ],
+      "edge_cases": [
+        "commit irreversible",
+        "pursuit100→S7"
+      ],
+      "transitions": [
+        "S2",
+        "S5",
+        "S7"
+      ],
+      "interactions": [
+        {
+          "id": "choose_evidence",
+          "input": "tap evidence",
+          "target": "evidence_picker",
+          "feedback": "pair evidence with question",
+          "source_refs": [
+            "interaction_spec.checkpoint"
+          ],
+          "precondition": "answering",
+          "state_change": "set evidence for question",
+          "invalid_input": "inapplicable evidence disabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "commit_checkpoint",
+          "input": "tap confirm",
+          "target": "commit_answers",
+          "feedback": "question-by-question comparison + pursuit delta",
+          "source_refs": [
+            "game_rules.checkpoint"
+          ],
+          "precondition": "all questions answered",
+          "state_change": "irreversible judgement; all pass -15 pursuit; each failed +25; clamp 0-100",
+          "invalid_input": "disabled until complete",
+          "decision_origin": "game_design",
+          "resource_effects": "exact checkpoint pursuit rule"
+        },
+        {
+          "id": "pause_checkpoint_action",
+          "input": "tap",
+          "target": "pause_checkpoint",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "round_structure"
+          ],
+          "precondition": "checkpoint active",
+          "state_change": "pause with selections preserved",
+          "decision_note": "uses existing pause semantics",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V4A",
+          "name": "Two Questions",
+          "notes": "early content",
+          "condition": "content defines 2",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "question_stack": "2 rows"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V4B",
+          "name": "Three Questions",
+          "notes": "defined maximum",
+          "condition": "content defines 3",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "question_stack": "3 rows"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "reuse S2/S3 evidence identifiers"
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "Pause",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "resume_button",
+            "box": {
+              "h": 9,
+              "w": 50,
+              "x": 25,
+              "y": 45
+            }
+          },
+          {
+            "id": "exit_case",
+            "box": {
+              "h": 9,
+              "w": 50,
+              "x": 25,
+              "y": 58
+            }
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze and preserve exact active state.",
+      "feedback": [
+        "paused"
+      ],
+      "components": [
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 45
+          }
+        },
+        {
+          "id": "exit_case",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 58
+          }
+        }
+      ],
+      "edge_cases": [
+        "cooldown/branch unchanged"
+      ],
+      "transitions": [
+        "prior",
+        "S1"
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "return prior screen",
+          "source_refs": [
+            "test_scenarios.Pause"
+          ],
+          "precondition": "paused",
+          "state_change": "restore prior state and exact timer remainders",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "preserve prior active state"
+      ]
+    },
+    {
+      "id": "S6",
+      "name": "Success Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "id": "result_summary",
+            "box": {
+              "h": 65,
+              "w": 90,
+              "x": 5,
+              "y": 10
+            }
+          },
+          {
+            "id": "retry_success",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 5,
+              "y": 82
+            }
+          },
+          {
+            "id": "case_select_success",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 53,
+              "y": 82
+            }
+          }
+        ]
+      },
+      "states": [
+        "success"
+      ],
+      "purpose": "Show successful escape, grade, unlock and causal summary.",
+      "feedback": [
+        "final pursuit/fuel/wrong answers",
+        "route causal summary",
+        "unlock"
+      ],
+      "components": [
+        {
+          "id": "result_summary",
+          "box": {
+            "h": 65,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          }
+        },
+        {
+          "id": "retry_success",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 5,
+            "y": 82
+          }
+        },
+        {
+          "id": "case_select_success",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 53,
+            "y": 82
+          }
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        "S1",
+        "S2"
+      ],
+      "interactions": [
+        {
+          "id": "retry_success_action",
+          "input": "tap",
+          "target": "retry_success",
+          "feedback": "transition",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "success",
+          "state_change": "reset same case",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "unlock only on success; grade does not gate"
+      ]
+    },
+    {
+      "id": "S7",
+      "name": "Failure Result",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "id": "failure_summary",
+            "box": {
+              "h": 60,
+              "w": 90,
+              "x": 5,
+              "y": 12
+            }
+          },
+          {
+            "id": "retry_failure",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 5,
+              "y": 82
+            }
+          },
+          {
+            "id": "case_select_failure",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 53,
+              "y": 82
+            }
+          }
+        ]
+      },
+      "states": [
+        "pursuit_failure",
+        "fuel_no_exit_failure"
+      ],
+      "purpose": "Show exact failure cause and retry/case select.",
+      "feedback": [
+        "failure cause",
+        "last causal delta/edge"
+      ],
+      "components": [
+        {
+          "id": "failure_summary",
+          "box": {
+            "h": 60,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          }
+        },
+        {
+          "id": "retry_failure",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 5,
+            "y": 82
+          }
+        },
+        {
+          "id": "case_select_failure",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 53,
+            "y": 82
+          }
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        "S1",
+        "S2"
+      ],
+      "interactions": [
+        {
+          "id": "retry_failure_action",
+          "input": "tap",
+          "target": "retry_failure",
+          "feedback": "transition",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "failure",
+          "state_change": "reset same case",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "distinguish pursuit100 from no affordable exit"
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "659da5aa-9046-4e1a-bd54-f7d48547d24e",
+  "input_map": {
+    "tap": "roads/seats/topics/evidence/buttons",
+    "drag": "S3 memory linking only",
+    "cancel": {
+      "memory_drag": "return_origin on invalid drop"
+    },
+    "priority": [
+      "pause/modal",
+      "checkpoint",
+      "board overlay",
+      "driving map"
+    ],
+    "conflicts": [
+      "board drag suppresses underlying map taps",
+      "checkpoint commit prevents post-commit edits"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ]
+  },
+  "created_at": "2026-09-30T18:29:07.386079+00:00",
+  "edge_cases": {
+    "cases": [
+      "branch expiry auto-picks lowest-risk valid edge",
+      "invalid/unaffordable road never commits",
+      "cooldown topic disabled",
+      "board relink free before commit",
+      "checkpoint commit irreversible",
+      "pursuit clamps 0-100 and 100 fails",
+      "no affordable valid exit fails",
+      "pause preserves branch/cooldown remainder"
+    ],
+    "source_refs": [
+      "game_rules",
+      "test_scenarios"
+    ]
+  },
+  "updated_at": "2026-09-30T18:29:07.386079+00:00",
+  "core_screen": "S2",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      {
+        "to": "S4",
+        "from": "S2",
+        "when": "checkpoint reached"
+      },
+      {
+        "to": "S2",
+        "from": "S4",
+        "when": "resolved and pursuit<100"
+      },
+      {
+        "to": "S6",
+        "from": "S2",
+        "when": "escape reached after third checkpoint"
+      },
+      {
+        "to": "S7",
+        "from": "S2/S4",
+        "when": "pursuit=100"
+      },
+      {
+        "to": "S7",
+        "from": "S2",
+        "when": "no affordable valid exit"
+      },
+      {
+        "to": "S5",
+        "from": "S2/S3/S4",
+        "when": "pause"
+      },
+      {
+        "to": "prior",
+        "from": "S5",
+        "when": "resume"
+      }
+    ],
+    "sequence": "S1→S2↔S3→S4→S2 repeated for 3 checkpoints; after third checkpoint S2→escape→S6",
+    "source_refs": [
+      "screen_flow",
+      "state_model",
+      "round_structure"
+    ]
+  },
+  "state_count": 6,
+  "screen_count": 7,
+  "global_states": {
+    "states": [
+      "briefing",
+      "driving",
+      "checkpoint",
+      "paused",
+      "success",
+      "failure"
+    ],
+    "pause_rule": "freeze timers and restore exact prior state",
+    "source_refs": [
+      "state_model",
+      "round_structure"
+    ],
+    "failure_guards": [
+      "pursuit=100",
+      "no affordable valid exit"
+    ]
+  },
+  "pack_markdown": "# Backseat Alibi — Interaction Wireframe Pack v0.3\nFun promise: 달리는 경로 자체가 알리바이 증거가 되어 경로 판단과 증언 정리가 서로 압박한다.\nCoverage: Briefing → Driving ↔ Alibi Board → Checkpoint ×3 → Escape → Success, with pursuit/fuel Failure, Pause, Retry and Case Select.\nCore: S2 Driving, S3 Alibi Board, S4 Checkpoint. Board uses drag semantics from memory_cards to visited_timeline; other actions retain explicit human-readable contracts. Five case tiers vary branching/risk, memory errors, compound constraints, 2→3 questions and fuel margin without new core rules.",
+  "source_run_at": "2026-09-30T18:29:07.386079+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "boxes": "0-100 screen-percent",
+    "safe_area": true,
+    "source_refs": [
+      "visual_direction_brief",
+      "feedback_system"
+    ],
+    "persistent_hud": [
+      "fuel",
+      "pursuit",
+      "elapsed/segment"
+    ],
+    "decision_origin": "wireframe_layout",
+    "pursuit_warning_threshold": 80
+  },
+  "developer_handoff": {
+    "fun_promise": "달리는 경로 자체가 알리바이의 증거가 되어 경로 판단과 동료 증언 정리가 서로 압박하는 8분 도주 추리.",
+    "source_refs": [
+      "content_model",
+      "difficulty_variation",
+      "wireframe_handoff"
+    ],
+    "upstream_issues": [],
+    "content_variation": {
+      "case": "road graph + truth timeline + 3 companions + 3 checkpoints + start/escape",
+      "road": "fuel_cost/risk_delta/blocked",
+      "memory": "speaker/topic/place/time/order/truth_relation",
+      "variation": "branching/risk, memory errors, compound constraints, 2-3 questions, fuel margin"
+    },
+    "responsibility_boundary": "UX semantics/state visibility/component identities fixed here; Godot architecture belongs to Implementation Blueprint."
+  },
+  "acceptance_criteria": [
+    "7 required screen types exist as S1-S7",
+    "Driving implements route choice, 5s fallback, fuel, route recording, pursuit, 3 companions and 20s cooldown",
+    "Board supports free link/unlink/relink and conflict recomputation",
+    "Checkpoint supports 2-3 questions, irreversible complete commit, -15 all-pass or +25 each failure",
+    "pursuit>=80 warns and pursuit100 fails immediately",
+    "no affordable valid exit fails",
+    "Pause preserves exact realtime timer remainders",
+    "third checkpoint still requires escape node before success",
+    "success unlocks next case; grade does not gate unlock",
+    "all semantic component references resolve within their screen"
+  ],
+  "primary_interaction": "실시간 경로 선택 + 좌석별 증언 수집·알리바이 연결",
+  "interaction_principles": [
+    "shared route/evidence language",
+    "live driving pressure while questioning",
+    "direct memory-to-route manipulation",
+    "explicit irreversible checkpoint commit",
+    "pause freezes realtime timers"
+  ]
+}

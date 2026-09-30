@@ -1,197 +1,202 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "565b94b4-9106-46dc-b7b3-d4f5af4f56df",
-    "title": "Night Signal Operator",
-    "source": "chat_automation",
-    "economy": "Not required.",
-    "idea_id": "87a317e3-340f-47ad-a95f-7b643d20ace1",
-    "version": "v0.1",
-    "one_line": "안개 낀 해안 신호소에서 렌즈·색 필터·셔터를 직접 조작해 선박별 빛 패턴을 만들어 송신하는 모바일 관제 퍼즐.",
-    "core_loop": "요청 읽기→배 선택→렌즈 방향과 색 설정→셔터 press/release로 2~4 펄스 작성→송신→배 항로 변화 관찰→다음 요청.",
-    "mvp_scope": "5-ship shift, 3 signal rules, 8 requests, 실제 lens rotation/filter slide/timed shutter, pulse timeline, evaluation, deadline/strikes/streak, vessel path response, full flow.",
-    "game_rules": {
-      "score": "first-send accuracy + time bonus + streak",
-      "colors": [
-        "white",
-        "red",
-        "green"
-      ],
-      "pulses": "1-4",
-      "strikes": 3,
-      "vessels": 5,
-      "directions": 8,
-      "long_seconds": "0.8-1.5",
-      "short_seconds": "0.25-0.65",
-      "deadline_seconds": "25-45"
+  "id": "565b94b4-9106-46dc-b7b3-d4f5af4f56df",
+  "title": "Night Signal Operator",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required.",
+  "idea_id": "87a317e3-340f-47ad-a95f-7b643d20ace1",
+  "version": "v0.1",
+  "one_line": "안개 낀 해안 신호소에서 렌즈·색 필터·셔터를 직접 조작해 선박별 빛 패턴을 만들어 송신하는 모바일 관제 퍼즐.",
+  "core_loop": "요청 읽기→배 선택→렌즈 방향과 색 설정→셔터 press/release로 2~4 펄스 작성→송신→배 항로 변화 관찰→다음 요청.",
+  "mvp_scope": "5-ship shift, 3 signal rules, 8 requests, 실제 lens rotation/filter slide/timed shutter, pulse timeline, evaluation, deadline/strikes/streak, vessel path response, full flow.",
+  "created_at": "2026-09-29T14:04:17.325464+00:00",
+  "game_rules": {
+    "score": "first-send accuracy + time bonus + streak",
+    "colors": [
+      "white",
+      "red",
+      "green"
+    ],
+    "pulses": "1-4",
+    "strikes": 3,
+    "vessels": 5,
+    "directions": 8,
+    "long_seconds": "0.8-1.5",
+    "short_seconds": "0.25-0.65",
+    "deadline_seconds": "25-45"
+  },
+  "not_in_mvp": [
+    "final art/audio",
+    "freeform Morse",
+    "procedural traffic",
+    "economy",
+    "story campaign",
+    "leaderboard"
+  ],
+  "updated_at": "2026-09-29T14:04:17.325464+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "기기별 timing threshold 공정성",
+    "어두운 화면 판독성",
+    "패턴 암기 노동화",
+    "동시 deadline 과부하"
+  ],
+  "progression": "기본 규칙 3개를 순차 소개한 뒤 Mixed Shift 해금. 영구 업그레이드는 없다.",
+  "screen_flow": "Shift Select→Rule Brief→Signal Station(compose↔transmit→evaluating)→Result. Wrong send는 strike 후 계속, deadline miss는 fail.",
+  "state_model": [
+    {
+      "state": "brief",
+      "inputs": "start"
     },
-    "not_in_mvp": [
-      "final art/audio",
-      "freeform Morse",
-      "procedural traffic",
-      "economy",
-      "story campaign",
-      "leaderboard"
-    ],
-    "known_risks": [
-      "기기별 timing threshold 공정성",
-      "어두운 화면 판독성",
-      "패턴 암기 노동화",
-      "동시 deadline 과부하"
-    ],
-    "progression": "기본 규칙 3개를 순차 소개한 뒤 Mixed Shift 해금. 영구 업그레이드는 없다.",
-    "screen_flow": "Shift Select→Rule Brief→Signal Station(compose↔transmit→evaluating)→Result. Wrong send는 strike 후 계속, deadline miss는 fail.",
-    "state_model": [
-      {
-        "state": "brief",
-        "inputs": "start"
-      },
-      {
-        "state": "compose",
-        "inputs": "select, rotate, filter, shutter, pause"
-      },
-      {
-        "state": "transmit",
-        "inputs": "press/release, clear, send"
-      },
-      {
-        "state": "evaluating",
-        "inputs": "locked"
-      },
-      {
-        "state": "warning",
-        "inputs": "compose controls"
-      },
-      {
-        "state": "result",
-        "inputs": "retry,next"
-      }
-    ],
-    "content_unit": "vessel request: sector + color + pulse code + deadline",
-    "content_model": {
-      "axes": [
-        "vessel type",
-        "sector",
-        "color",
-        "pulse code",
-        "deadline",
-        "queue",
-        "visibility"
-      ],
-      "unit": "vessel signal request",
-      "mvp_requests": 8
+    {
+      "state": "compose",
+      "inputs": "select, rotate, filter, shutter, pause"
     },
-    "source_run_at": "2026-09-29T14:04:17.325464+00:00",
-    "player_fantasy": "플레이어는 밤바다 신호소 운영자로서 빛 규칙과 장치를 숙련해 여러 배를 안전 항로로 이끄는 통제감과 긴장 해소를 느낀다.",
-    "session_length": "4~6분 / 5 vessels",
-    "test_scenarios": [
-      "렌즈 drag가 실제 beam을 8방향으로 바꾼다.",
-      "셔터 press duration이 short/long으로 판정되고 timeline에 반영된다.",
-      "잘못된 color/direction은 strike다.",
-      "정답 송신은 실제 배 항로를 바꾼다.",
-      "동시 2척에서 target/deadline 우선순위가 작동한다."
+    {
+      "state": "transmit",
+      "inputs": "press/release, clear, send"
+    },
+    {
+      "state": "evaluating",
+      "inputs": "locked"
+    },
+    {
+      "state": "warning",
+      "inputs": "compose controls"
+    },
+    {
+      "state": "result",
+      "inputs": "retry,next"
+    }
+  ],
+  "archive_path": "projects/night-signal-operator/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "vessel request: sector + color + pulse code + deadline",
+  "content_model": {
+    "axes": [
+      "vessel type",
+      "sector",
+      "color",
+      "pulse code",
+      "deadline",
+      "queue",
+      "visibility"
     ],
-    "feedback_system": [
-      {
-        "event": "lens",
-        "haptic": "selection",
-        "visual": "beam sector snap"
-      },
-      {
-        "event": "filter",
-        "haptic": "light",
-        "visual": "beam color"
-      },
-      {
-        "event": "shutter",
-        "haptic": "tick",
-        "visual": "live pulse timeline"
-      },
-      {
-        "event": "correct",
-        "haptic": "medium",
-        "visual": "answer lamp and safe path bend"
-      },
-      {
-        "event": "wrong",
-        "haptic": "double light",
-        "visual": "reject flash"
-      }
-    ],
-    "round_structure": "Shift 4~6분, 5척. 각 배에 deadline. 3 strikes 또는 deadline miss면 실패, 5척 안전 유도 시 성공.",
-    "interaction_spec": [
-      {
-        "cancel": "snap nearest 45 degrees",
-        "target": "lens ring",
-        "gesture": "circular drag",
-        "invalid": "locked during evaluation"
-      },
-      {
-        "cancel": "snap nearest filter",
-        "target": "filter rack",
-        "gesture": "horizontal drag",
-        "invalid": "edge clamp"
-      },
-      {
-        "cancel": "discard unfinished pulse",
-        "target": "shutter",
-        "gesture": "press/release",
-        "invalid": "max 4 pulses"
-      },
-      {
-        "target": "send",
-        "gesture": "tap",
-        "invalid": "disabled",
-        "condition": "1-4 complete pulses"
-      }
-    ],
-    "screen_inventory": [
-      "Shift Select",
-      "Rule Brief",
-      "Signal Station",
-      "Pause Overlay",
-      "Shift Result"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "aim",
-        "input": "circular drag",
-        "change": "beam sector rotates",
-        "target": "lens wheel",
-        "feedback": "beam cone moves"
-      },
-      {
-        "verb": "filter",
-        "input": "horizontal drag",
-        "change": "beam color changes",
-        "target": "filter rack",
-        "feedback": "detent"
-      },
-      {
-        "verb": "shutter",
-        "input": "press/release",
-        "change": "pulse duration recorded",
-        "target": "shutter",
-        "feedback": "beam pulse/timeline"
-      },
-      {
-        "verb": "send",
-        "input": "tap",
-        "change": "signal evaluated",
-        "target": "send",
-        "feedback": "vessel acknowledgement/path change"
-      }
-    ],
-    "wireframe_handoff": [
-      "5개 화면 표현",
-      "no-target/selected/composing/shutter-held/pattern-ready/evaluating/ack/reject/warning variants",
-      "lens/filter/shutter gesture와 Send disabled 규칙 표시",
-      "timeline,target switching,deadline,strike,path transition 표시"
-    ],
-    "primary_interaction": "렌즈 circular drag + filter slide + shutter press/release duration으로 실제 빛 패턴 작성·송신.",
-    "difficulty_variation": "단일 배와 2펄스에서 시작해 방향 결합, 동시 2척 큐, 3~4펄스와 시야 제약으로 확장한다. 단순 속도 증가 대신 정보 결합과 우선순위를 높인다.",
-    "visual_direction_brief": "Portrait. 상단 55~60%는 바다와 선박, 하단은 큰 렌즈/필터/셔터 장치. 어두운 안개 분위기지만 실루엣·요청·beam 판독을 최우선."
-  }
+    "unit": "vessel signal request",
+    "mvp_requests": 8
+  },
+  "source_run_at": "2026-09-29T14:04:17.325464+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 밤바다 신호소 운영자로서 빛 규칙과 장치를 숙련해 여러 배를 안전 항로로 이끄는 통제감과 긴장 해소를 느낀다.",
+  "session_length": "4~6분 / 5 vessels",
+  "test_scenarios": [
+    "렌즈 drag가 실제 beam을 8방향으로 바꾼다.",
+    "셔터 press duration이 short/long으로 판정되고 timeline에 반영된다.",
+    "잘못된 color/direction은 strike다.",
+    "정답 송신은 실제 배 항로를 바꾼다.",
+    "동시 2척에서 target/deadline 우선순위가 작동한다."
+  ],
+  "design_markdown": "# Night Signal Operator — Playable Game Design Spec v0.1\n## 1. Product Definition\nPortrait mobile signal puzzle, 4–6분. 렌즈·필터·셔터 직접 조작. 사실적 항해·경영은 Non-goal.\n## 2. Player Fantasy\n빛만으로 배를 안전하게 이끄는 신호소 운영자.\n## 3. Core Player Verbs\nLens rotate, filter slide, shutter press/release, vessel select, send.\n## 4. Core Loop\n요청→선택→방향/색→펄스→송신→항로 반응.\n## 5. Round / Session Structure\n5척, 4–6분, 3 strikes/deadline miss 실패.\n## 6. Game Rules\n8방향, 3색, short/long timing, 1–4 pulses, deadlines, streak.\n## 7. State Model\nbrief→compose↔transmit→evaluating→warning/result.\n## 8. Interaction Spec\nCircular drag snap, filter snap, shutter press/release, Send precondition.\n## 9. Content Model\nVessel/sector/color/code/deadline/queue/visibility.\n## 10. Difficulty / Variation\n단일 2펄스→방향 결합→동시 큐/3–4펄스/시야 제약.\n## 11. Progression\n3 기본 규칙 후 Mixed Shift.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nShift Select, Rule Brief, Signal Station, Pause, Result.\n## 14. Screen Flow\nSelect→Brief→Station loop→Result.\n## 15. Feedback System\nBeam, color, timeline, detents, answer lamp/path, warning haptic.\n## 16. Visual Direction Brief\n상단 바다, 하단 큰 장치, 높은 기능 대비.\n## 17. MVP Scope\n5 ships, 3 rules, 8 requests, actual gestures/timing/evaluation/path response. Final art/economy 제외.\n## 18. Test Scenarios\n8방향, duration 판정, wrong reject, path response, 동시 2척.\n## 19. Known Risks\nTiming fairness, readability, rote memory, overload.\n## 20. Wireframe Handoff\n모든 screen/state variant와 wheel/filter/shutter/send/target/deadline feedback을 표현.",
+  "feedback_system": [
+    {
+      "event": "lens",
+      "haptic": "selection",
+      "visual": "beam sector snap"
+    },
+    {
+      "event": "filter",
+      "haptic": "light",
+      "visual": "beam color"
+    },
+    {
+      "event": "shutter",
+      "haptic": "tick",
+      "visual": "live pulse timeline"
+    },
+    {
+      "event": "correct",
+      "haptic": "medium",
+      "visual": "answer lamp and safe path bend"
+    },
+    {
+      "event": "wrong",
+      "haptic": "double light",
+      "visual": "reject flash"
+    }
+  ],
+  "round_structure": "Shift 4~6분, 5척. 각 배에 deadline. 3 strikes 또는 deadline miss면 실패, 5척 안전 유도 시 성공.",
+  "interaction_spec": [
+    {
+      "cancel": "snap nearest 45 degrees",
+      "target": "lens ring",
+      "gesture": "circular drag",
+      "invalid": "locked during evaluation"
+    },
+    {
+      "cancel": "snap nearest filter",
+      "target": "filter rack",
+      "gesture": "horizontal drag",
+      "invalid": "edge clamp"
+    },
+    {
+      "cancel": "discard unfinished pulse",
+      "target": "shutter",
+      "gesture": "press/release",
+      "invalid": "max 4 pulses"
+    },
+    {
+      "target": "send",
+      "gesture": "tap",
+      "invalid": "disabled",
+      "condition": "1-4 complete pulses"
+    }
+  ],
+  "screen_inventory": [
+    "Shift Select",
+    "Rule Brief",
+    "Signal Station",
+    "Pause Overlay",
+    "Shift Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "aim",
+      "input": "circular drag",
+      "change": "beam sector rotates",
+      "target": "lens wheel",
+      "feedback": "beam cone moves"
+    },
+    {
+      "verb": "filter",
+      "input": "horizontal drag",
+      "change": "beam color changes",
+      "target": "filter rack",
+      "feedback": "detent"
+    },
+    {
+      "verb": "shutter",
+      "input": "press/release",
+      "change": "pulse duration recorded",
+      "target": "shutter",
+      "feedback": "beam pulse/timeline"
+    },
+    {
+      "verb": "send",
+      "input": "tap",
+      "change": "signal evaluated",
+      "target": "send",
+      "feedback": "vessel acknowledgement/path change"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "5개 화면 표현",
+    "no-target/selected/composing/shutter-held/pattern-ready/evaluating/ack/reject/warning variants",
+    "lens/filter/shutter gesture와 Send disabled 규칙 표시",
+    "timeline,target switching,deadline,strike,path transition 표시"
+  ],
+  "primary_interaction": "렌즈 circular drag + filter slide + shutter press/release duration으로 실제 빛 패턴 작성·송신.",
+  "difficulty_variation": "단일 배와 2펄스에서 시작해 방향 결합, 동시 2척 큐, 3~4펄스와 시야 제약으로 확장한다. 단순 속도 증가 대신 정보 결합과 우선순위를 높인다.",
+  "visual_direction_brief": "Portrait. 상단 55~60%는 바다와 선박, 하단은 큰 렌즈/필터/셔터 장치. 어두운 안개 분위기지만 실루엣·요청·beam 판독을 최우선."
 }

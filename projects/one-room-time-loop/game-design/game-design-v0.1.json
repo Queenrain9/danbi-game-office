@@ -1,0 +1,258 @@
+{
+  "id": "e59e61e0-5f8b-421a-b39a-1fec306a0072",
+  "title": "One Room Time Loop",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Loop budget is level-local.",
+  "idea_id": "97f1c1f8-400d-4cfe-b298-dcb91577614f",
+  "version": "v0.1",
+  "one_line": "같은 60초가 반복되는 원룸에서 이전 루프의 내 행동을 유령처럼 재생해 현재의 나와 협동시키며 동시에 여러 조건을 완성하는 시간 협동 퍼즐.",
+  "core_loop": "Observe goal → act for up to 60s → Commit immutable track → room resets → replay all prior ghosts from t=0 while current self performs next role → satisfy simultaneous goal → Result.",
+  "mvp_scope": "10 authored rooms; 60s loop; budget2–4; up to 3 committed ghosts; 20Hz deterministic tracks; Move/Interact/Carry/Commit/Reset; plates, toggles, timed buttons, doors, carryables, sockets, goal zones; five content classes; pause/retry; unlock/stars.",
+  "created_at": "2026-09-30T07:03:13.732972+00:00",
+  "game_rules": {
+    "goal": "authored boolean expression over object states and/or current-self goal-zone occupancy; first true tick freezes immediate success",
+    "clock": {
+      "pause": "freezes clock, ghosts, timers and recording",
+      "record_hz": 20,
+      "loop_seconds": 60,
+      "fixed_step_seconds": 0.05
+    },
+    "ghost": {
+      "action": "re-check target precondition at recorded timestamp; failed precondition gives no effect and miss marker",
+      "movement": "exact recorded transforms; no actor/ghost collision"
+    },
+    "reset": "between loops world returns authored initial state but committed tracks persist; Retry clears tracks too",
+    "space": {
+      "room": "authored 2D walkable/solid polygons",
+      "distance": "Euclidean room-units",
+      "move_speed": 2.4,
+      "interaction_range": 0.8
+    },
+    "failure": "final allowed loop reaches 60s with goal false; End Loop on final loop also immediate failure",
+    "objects": {
+      "door": "walkable for current self while linked condition true; if closing overlaps current self, stays open until current exits; ghosts ignore collision",
+      "socket": "matching carryable dropped within 0.6 of anchor snaps and socket_filled=true until valid pickup",
+      "toggle": "each valid Interact flips linked boolean exactly once",
+      "carryable": "one owner; pickup needs hands-free, unowned, in range; drop at actor center; ghost pickup uses same replay-time preconditions",
+      "hold_plate": "true while at least one actor center lies inside authored plate circle",
+      "timed_button": "valid Interact sets output true for authored 3–8s; another valid press restarts duration"
+    },
+    "recording": {
+      "actions": "timestamped discrete events",
+      "movement": "transform sample every 0.05s",
+      "committed": "immutable",
+      "early_end": "idle pose/no actions padded through 60s"
+    },
+    "targeting": "eligible anchor within 0.8; smallest distance, tie lowest authored priority integer, then stable id",
+    "tick_order": [
+      "advance clock",
+      "apply movement samples",
+      "resolve ghost actions track_id ascending",
+      "resolve current action",
+      "update plates",
+      "update timers/doors/sockets",
+      "evaluate goal"
+    ]
+  },
+  "not_in_mvp": [
+    "Editable timeline",
+    "Live rewind",
+    "More than 3 committed ghosts",
+    "Physics-heavy objects",
+    "Combat",
+    "Procedural levels",
+    "Economy/shop",
+    "Online ghost sharing",
+    "Multi-room levels"
+  ],
+  "updated_at": "2026-09-30T10:35:09.671388+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "Three ghosts may clutter mobile view",
+    "Replay must remain deterministic across devices",
+    "Ghost action misses may obscure causality",
+    "Door grace vs ghost no-collision needs clear feedback",
+    "Composite dependencies can become trial-and-error"
+  ],
+  "progression": "10 levels unlock linearly on success. Store best loops_used. Stars: 1=success, 2=at/below authored par_loops, 3=par_loops with zero ghost action misses. Stars do not change rules.",
+  "screen_flow": "Entry→Select→Brief→Live Loop. Nonfinal Commit/60s→Loop Reset→next Live Loop. Goal true→success Result. Final loop false→failure Result. Pause exact-resume; Retry clears tracks.",
+  "state_model": [
+    {
+      "next": "Brief",
+      "state": "Select"
+    },
+    {
+      "next": "Live Loop/Select",
+      "state": "Brief",
+      "inputs": [
+        "Start",
+        "Back"
+      ]
+    },
+    {
+      "exit": "goal true, commit, 60s, pause, reset",
+      "next": "Result/Loop Reset/Pause/Live Loop",
+      "state": "Live Loop",
+      "inputs": [
+        "Move",
+        "Interact",
+        "End Loop",
+        "Pause",
+        "Reset"
+      ]
+    },
+    {
+      "next": "Live Loop t=0",
+      "state": "Loop Reset",
+      "inputs": []
+    },
+    {
+      "next": "exact return/Live Loop/Select",
+      "state": "Pause",
+      "inputs": [
+        "Resume",
+        "Retry",
+        "Select"
+      ]
+    },
+    {
+      "next": "Brief/Live Loop/Select",
+      "state": "Result",
+      "inputs": [
+        "Next if success",
+        "Retry",
+        "Select"
+      ]
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "authored one-room time-cooperation level",
+  "content_model": {
+    "unit": "authored one-room time-cooperation level",
+    "count": 10,
+    "classes": [
+      {
+        "rule": "2–3 continuous plate/output conditions overlap",
+        "type": "Simultaneous Hold"
+      },
+      {
+        "rule": "one track maintains access while another traverses",
+        "type": "Door Relay"
+      },
+      {
+        "rule": "carry ownership timing across tracks; replay pickup may miss",
+        "type": "Object Handoff"
+      },
+      {
+        "rule": "3–8s outputs overlap",
+        "type": "Timed Overlap"
+      },
+      {
+        "rule": "combines prior rules without new interaction",
+        "type": "Composite Chain"
+      }
+    ],
+    "topology": "walkable/solid polygons, interaction anchors, goal zones, explicit control-output directed links; every level has validated solution",
+    "variation": [
+      "loop budget 2–4",
+      "dependency depth",
+      "travel distance",
+      "timed duration",
+      "carry/socket",
+      "simultaneous predicate count"
+    ]
+  },
+  "source_run_at": "2026-09-30T07:03:13.732972+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "혼자지만 매 루프마다 과거의 자신을 동료로 남겨 스위치 유지, 문 통과, 물건 운반을 시간축에 분업하고 불가능한 동시 조건을 해결한다.",
+  "session_length": "3–7분 / level",
+  "test_scenarios": [
+    "Ghost holds plate t10–30 and current passes linked door at t15.",
+    "Ghost and current toggle same t12 resolves ghost first then current, two flips.",
+    "Ghost pickup misses if object already owned; replay continues.",
+    "Early End t25 pads idle through t60.",
+    "Pause t17.35 freezes all simulation clocks and recording.",
+    "Goal true t41.20 succeeds immediately.",
+    "Final loop t60 goal false fails and Retry clears tracks."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — One Room Time Loop\n\n## 1. Product Definition\n같은 60초가 반복되는 원룸에서 이전 루프의 내 행동을 유령처럼 재생해 현재의 나와 협동시키며 동시에 여러 조건을 완성하는 시간 협동 퍼즐. Landscape mobile, 10 authored rooms, 60-second immutable replay loops. 핵심은 타임라인 편집이 아니라 직접 행동한 과거의 내가 다음 루프의 동료가 되는 경험이다.\n\n## 2. Player Fantasy\n혼자지만 매 루프마다 과거의 자신을 동료로 남겨 스위치 유지, 문 통과, 물건 운반을 시간축에 분업하고 불가능한 동시 조건을 해결한다.\n\n## 3. Core Player Verbs\nMove, Interact, Carry, Commit Loop, Reset Attempt. 입력·조건·state change·feedback은 구조화 Core Player Verbs를 따른다.\n\n## 4. Core Loop\nObserve goal → act for up to 60s → Commit immutable track → room resets → replay all prior ghosts from t=0 while current self performs next role → satisfy simultaneous goal → Result.\n\n## 5. Round / Session Structure\nEach level has 60.0s loops and budget 2–4. Nonfinal Commit/60s stores track and resets world. Goal checked each 0.05s tick. Final loop ending false fails. Retry clears all tracks. Average 3–7 min.\n\n## 6. Game Rules\nFixed step 0.05s, 20Hz recording, move speed 2.4 room-units/sec, interaction range 0.8. Ghosts replay exact transforms without collision and recorded actions re-check world preconditions. Tick order is movement → ghost actions by track id → current action → plates → timers/doors/sockets → goal. Hold plates, toggles, 3–8s timed buttons, linked doors, single-owner carryables and 0.6-range sockets follow the structured Game Rules. Goal is an authored boolean expression evaluated every tick. Success freezes immediately; final loop false at 60s fails. Pause freezes all simulation; Retry clears tracks.\n\n## 7. State Model\nSelect → Brief → Live Loop ↔ Loop Reset, with Pause overlay and terminal Result. No state lacks an outgoing path.\n\n## 8. Interaction Spec\nInteract uses nearest eligible anchor within 0.8; ties use authored priority then stable id. Invalid Interact changes nothing. End Loop commits on nonfinal loops and fails immediately on the final loop. Pause overrides gameplay input.\n\n## 9. Content Model\n10 rooms: Simultaneous Hold, Door Relay, Object Handoff, Timed Overlap, Composite Chain. Rooms define walkable/solid polygons, anchors, goal zones and explicit control-output links. Every authored level must have a validated solution.\n\n## 10. Difficulty / Variation\n1–2 simultaneous plates; 3–4 door relay; 5–6 carry/socket; 7–8 timed overlap; 9–10 combine 3–4 tracks. Difficulty grows through temporal dependency depth, not shorter loops.\n\n## 11. Progression\n10 levels unlock linearly on success. Store best loops_used. Stars: 1=success, 2=at/below authored par_loops, 3=par_loops with zero ghost action misses. Stars do not change rules.\n\n## 12. Economy\nNot required. Loop budget is level-local.\n\n## 13. Screen Inventory\nLevel Select; Level Brief; Time-Loop Gameplay; Level Result.\n\n## 14. Screen Flow\nEntry→Select→Brief→Live Loop. Nonfinal Commit/60s→Loop Reset→next Live Loop. Goal true→success Result. Final loop false→failure Result. Pause exact-resume; Retry clears tracks.\n\n## 15. Feedback System\n0–60s timeline with per-track lanes/action markers; stable ghost tint/index; success pulse versus missed-action pulse; exact linked-state response; rewind on Commit; causal freeze on success; false goal predicates on failure without revealing solution.\n\n## 16. Visual Direction Brief\nLandscape mobile fixed top-down/three-quarter single room; whole rule-relevant room visible without scrolling. Current self dominant; up to 3 ghosts use stable tint/index and restrained trails. Timeline supports causality, not programming. UI coordinates are Wireframe responsibility.\n\n## 17. MVP Scope + NOT IN MVP\n10 authored rooms; 60s loop; budget2–4; up to 3 committed ghosts; 20Hz deterministic tracks; Move/Interact/Carry/Commit/Reset; plates, toggles, timed buttons, doors, carryables, sockets, goal zones; five content classes; pause/retry; unlock/stars.\nNOT IN MVP: editable timeline, live rewind, >3 committed ghosts, physics-heavy objects, combat, procedural levels, economy/shop, online sharing, multi-room levels.\n\n## 18. Test Scenarios\nGhost plate t10–30 enables current door crossing t15. Same-tick ghost/current toggle resolves ghost first. Owned carryable makes ghost pickup miss without stopping replay. Early End pads idle. Pause freezes all clocks. Goal true succeeds immediately. Final-loop false fails; Retry clears tracks.\n\n## 19. Known Risks\nThree-ghost readability, cross-device deterministic replay, missed-action causality, door grace readability, composite trial-and-error.\n\n## 20. Wireframe Handoff\nfun_promise: 직접 했던 immutable 과거 행동과 협동하는 것이 핵심이며 editable automation처럼 보이면 안 된다.\nMVP 전체에서 four screens, Live/Reset/Pause/Result states, current+3 ghosts, timeline/action markers, all object states, five content classes, validity/miss/ownership/timers, Commit/60s reset, early-end padding, final failure, Retry and immediate success freeze를 표현한다.",
+  "feedback_system": {
+    "ghost": "stable tint/index; success pulse vs miss pulse",
+    "commit": "rewind plus new ghost",
+    "failure": "show false predicates without solution",
+    "success": "freeze causal moment and satisfied predicates",
+    "timeline": "0–60s cursor, track lanes, action markers",
+    "causality": "linked state changes readable at exact tick"
+  },
+  "round_structure": "Each level has 60.0s loops and budget 2–4. Nonfinal Commit/60s stores track and resets world. Goal checked each 0.05s tick. Final loop ending false fails. Retry clears all tracks. Average 3–7 min.",
+  "interaction_spec": {
+    "move": "Live Loop only; release stops; may coexist with one Interact in same tick",
+    "pause": "overrides gameplay input and freezes simulation",
+    "reset": "clears tracks, world, loop index; meta progression unchanged",
+    "end_loop": "nonfinal commits and resets; final loop early end fails immediately",
+    "interact": "nearest eligible target by fixed targeting rule; no eligible target means no event/state change"
+  },
+  "screen_inventory": [
+    "Level Select",
+    "Level Brief",
+    "Time-Loop Gameplay",
+    "Level Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Move",
+      "input": "virtual stick drag",
+      "target": "current self",
+      "feedback": "movement plus timeline cursor",
+      "condition": "Live Loop",
+      "state_change": "position changes at 2.4 room-units/sec and records at 20Hz"
+    },
+    {
+      "verb": "Interact",
+      "input": "action tap",
+      "target": "nearest eligible anchor within 0.8 room-unit",
+      "feedback": "object response plus timeline marker",
+      "condition": "Live Loop",
+      "state_change": "deterministic object action resolves and timestamp event records"
+    },
+    {
+      "verb": "Carry",
+      "input": "Interact pickup/drop",
+      "target": "carryable",
+      "feedback": "object follows or drops",
+      "condition": "hands free or carrying",
+      "state_change": "ownership/position changes"
+    },
+    {
+      "verb": "Commit Loop",
+      "input": "End Loop tap or automatic at 60s",
+      "target": "current track",
+      "feedback": "rewind plus ghost appears",
+      "condition": "goal false",
+      "state_change": "track becomes immutable ghost; world resets; next loop starts if budget remains"
+    },
+    {
+      "verb": "Reset Attempt",
+      "input": "Reset",
+      "target": "level attempt",
+      "feedback": "room resets",
+      "condition": "Live/Pause",
+      "state_change": "all tracks removed and loop1 restored"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 직접 했던 immutable 과거 행동과 협동하는 것이 핵심이며 editable automation처럼 보이면 안 된다.",
+    "Represent Select/Brief/Gameplay/Result and Live Loop/Loop Reset/Pause/success/failure.",
+    "Represent current self plus up to 3 ghosts, 0–60s timeline, action markers and stable identity.",
+    "Represent plate/toggle/timed button/door/carry/socket/goal states and five content classes.",
+    "Show target validity, ownership, ghost success/miss, door grace, timers and tick causality.",
+    "Show commit/60s reset, early-end padding, budget2–4, final failure, Retry clear and immediate success freeze."
+  ],
+  "primary_interaction": "현재 루프 행동을 기록하고 Commit 후 과거 유령과 타이밍을 맞춰 동시 조건 완성",
+  "difficulty_variation": "1–2 simultaneous plates; 3–4 door relay; 5–6 carry/socket; 7–8 timed overlap; 9–10 combine 3–4 tracks. Difficulty grows through temporal dependency depth, not shorter loops.",
+  "visual_direction_brief": "Landscape mobile fixed top-down/three-quarter single room; whole rule-relevant room visible without scrolling. Current self dominant; up to 3 ghosts use stable tint/index and restrained trails. Timeline supports causality, not programming. UI coordinates are Wireframe responsibility."
+}

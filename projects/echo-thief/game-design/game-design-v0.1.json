@@ -1,0 +1,217 @@
+{
+  "id": "bfca4c5d-f895-4762-bdd2-59b2bcb0cdec",
+  "title": "Echo Thief",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Sound tokens are mission-local tactical resources, not currency.",
+  "idea_id": "5927f1aa-1576-4e06-a076-c53c6ce0d679",
+  "version": "v0.1",
+  "one_line": "경비가 소리를 따라 움직이는 박물관에서 직접 소리를 녹음해 다른 위치에 던져 재생하며 경비 동선을 조작하는 잠입 게임.",
+  "core_loop": "Observe patrol/source → record sound → throw lure → move through redirected route → repeat → steal target → lure/reposition → escape.",
+  "mvp_scope": "8 authored missions; one target; 1–3 guards; 2–4 reusable sources; 2-token inventory; deterministic sound lure/pathing; sight detection; steal/escape; pause/retry; linear unlock.",
+  "created_at": "2026-09-30T15:05:48.465518+00:00",
+  "game_rules": {
+    "grid": "Rooms use a walkable tile graph. Movement and guard pathfinding use orthogonal adjacency. Walls block movement, vision, throw line, and sound propagation unless a doorway edge connects rooms.",
+    "sound": "A thrown token creates a sound event at target tile for 2 seconds. Sound propagates by shortest connected walkable path up to lure_strength tiles. A guard hearing it abandons patrol and paths to the event tile. If multiple sounds are audible, choose highest lure_strength; ties choose newest.",
+    "steal": "Target exhibit can be stolen only from adjacent tile while player is not currently visible. Steal takes 0.6s stationary; visibility during hold cancels without failure unless exposure reaches detection threshold.",
+    "success": "After theft, entering authored exit tile ends mission successfully. Exiting without target does nothing except objective feedback.",
+    "softlock": "Every mission must author at least one reusable environmental source reachable before theft and a valid route from start to target to exit. If token inventory is empty, environmental sources remain recordable; tokens are never required to open locked geometry.",
+    "throwing": "Throw target must be a walkable tile within Manhattan distance 6 and unobstructed straight segment against wall collision. Invalid release returns token unchanged.",
+    "detection": "Caught triggers when vision exposure reaches 0.75s or player enters same tile as guard. Result is mission failure. Recovery is Retry from mission start; no meta progress is lost.",
+    "recording": "Record requires player within 1.5 tile path distance of authored source and uninterrupted 1.0 second hold. Moving, entering guard vision, or releasing early cancels with no token. Inventory capacity is 2 tokens; recording with 2 tokens is blocked until one is thrown.",
+    "pause_retry": "Pause freezes all actors, timers, sound events and holds. Resume restores exact state. Retry resets mission-local player, guards, tokens, target and sounds to authored start.",
+    "guard_vision": "Each guard sees up to 5 tiles along its facing cone; walls block sight. If player occupies visible tile for 0.75 continuous seconds, detection becomes Caught.",
+    "investigation": "On reaching sound tile, guard investigates for 2 seconds, then returns by shortest path to the patrol node it left and resumes patrol. A new audible sound during investigate/return replaces current investigation."
+  },
+  "not_in_mvp": [
+    "combat",
+    "weapons",
+    "guard takedowns",
+    "procedural maps",
+    "free-roam hub",
+    "inventory upgrades",
+    "currency/shop",
+    "online leaderboard",
+    "microphone recording",
+    "player-authored sounds",
+    "multiple theft targets per mission"
+  ],
+  "updated_at": "2026-09-30T15:29:27.807749+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "sound propagation may be hard to predict without clear visualization",
+    "guard rerouting can feel arbitrary if tie-break feedback is weak",
+    "tap movement plus token dragging can conflict on small screens",
+    "mission layouts may accidentally permit trivial lure-and-run solutions",
+    "multiple guards can create unavoidable vision overlap unless authored reachability is checked"
+  ],
+  "progression": "Mission 1 starts unlocked; each success unlocks exactly the next mission; best completion stored; no upgrades or loss of unlocks.",
+  "screen_flow": "Mission Select → Brief → Planning/Infiltration → Caught or Success → Result → Retry/Next/Select; Pause overlays active play and resumes exact state.",
+  "state_model": {
+    "guard": [
+      "Patrol",
+      "InvestigateSound",
+      "ReturnToPatrol"
+    ],
+    "player": [
+      "Free",
+      "Recording",
+      "Moving",
+      "Stealing",
+      "CarryingTarget"
+    ],
+    "mission": [
+      "Brief",
+      "Planning",
+      "Infiltration",
+      "Caught",
+      "Success",
+      "Result",
+      "Paused"
+    ],
+    "transitions": [
+      "Brief→Planning on Start",
+      "Planning→Infiltration on first move/record/throw",
+      "Infiltration→Caught on detection",
+      "Infiltration→Success on exit with target",
+      "Caught/Success→Result",
+      "active state↔Paused"
+    ]
+  },
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "One authored museum heist mission",
+  "content_model": {
+    "schema": "Mission = walkable graph + start + exit + one target + 1–3 guards with cyclic patrol nodes + 2–4 sound sources. No content type may introduce a new state or rule outside this spec.",
+    "classes": {
+      "guards": [
+        "Patroller: standard patrol/vision",
+        "LongRoute: longer authored patrol using same rules"
+      ],
+      "room_features": [
+        "walls",
+        "doorways",
+        "exhibit target",
+        "exit",
+        "walkable floor"
+      ],
+      "sound_sources": [
+        "Clock: strength 4",
+        "Radio: strength 6",
+        "Squeaky cart: strength 5",
+        "Bell: strength 7"
+      ]
+    },
+    "mvp_missions": 8,
+    "variation_axes": [
+      "room graph topology",
+      "guard count 1–3",
+      "patrol overlap",
+      "source placement",
+      "source lure strength",
+      "target/exit separation"
+    ]
+  },
+  "source_run_at": "2026-09-30T15:05:48.465518+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "플레이어는 소리를 훔쳐 미끼처럼 저장하고 재배치해 경비의 청각을 속이는 침입자다. 총이나 전투 대신 ‘무엇을 어디서 녹음해 어디에 울릴지’로 순찰 동선을 바꾸고 전시품을 훔쳐 빠져나가는 것이 핵심 판타지다.",
+  "session_length": "3–7 minutes per mission",
+  "test_scenarios": [
+    "Success dry run: start with empty inventory; record Radio strength6; throw behind guard; guard InvestigateSound; move behind guard; steal target during unseen 0.6s; record/throw another source if needed; enter exit with target → Success/Result.",
+    "Failure dry run: remain inside guard vision continuously 0.75s before theft → Caught → Result → Retry restores authored mission start.",
+    "Invalid throw beyond 6 tiles or through wall leaves token unchanged and guard state unchanged.",
+    "Two audible sounds: stronger wins; equal strength newest wins; guard replans deterministically.",
+    "Recording with two stored tokens is blocked; throwing one frees slot; environmental source remains recordable.",
+    "Pause during investigation freezes its 2s timer and resumes exact remaining time.",
+    "All 8 missions use same guard/player state machines while topology, patrol overlap, source placement and guard count vary."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Echo Thief\n\n## 1. Product Definition\nPortrait mobile top-down stealth puzzle. In compact museum missions, the player records environmental sounds, stores up to two as tokens, throws them onto floor positions to redirect sound-driven guards, steals one target exhibit, and escapes. Sessions are 3–7 minutes. The Original Fun Promise is that sound itself is understandable ammunition: capture it, place it, watch patrol logic bend.\n\n## 2. Player Fantasy\n플레이어는 소리를 훔쳐 미끼처럼 저장하고 재배치해 경비의 청각을 속이는 침입자다. 총이나 전투 대신 ‘무엇을 어디서 녹음해 어디에 울릴지’로 순찰 동선을 바꾸고 전시품을 훔쳐 빠져나가는 것이 핵심 판타지다.\n\n## 3. Core Player Verbs\nObserve — inspect patrols and recordable sources. Record — hold 1.0s within 1.5 tiles to store a sound token. Throw — drag a token to a valid floor tile within 6 tiles to create a lure. Move — tap a reachable tile to path there. Steal — hold 0.6s adjacent to the target while unseen. Escape — enter the exit while carrying the target.\n\n## 4. Core Loop\nRead room topology and patrols → record useful sound → throw it where its propagation will pull a guard → move through the opened route → repeat with new/reused sources as needed → steal target → reconstruct route with lures → reach exit.\n\n## 5. Round / Session Structure\nMission Brief → Planning → Infiltration → Success or Caught → Result. Each mission has one target and one exit, 1–3 guards, 2–4 reusable sound sources, and no global timer. Success unlocks the next mission; failure offers Retry. Expected 3–7 minutes.\n\n## 6. Game Rules\nRooms are orthogonally connected walkable tile graphs. Walls block movement, sight, throw line, and sound unless a doorway edge connects space. Guard vision extends 5 tiles in facing cone; 0.75s continuous exposure or sharing a tile causes Caught. A thrown sound lasts 2s and propagates by shortest walkable path up to its lure strength. Hearing guards choose strongest audible event, newest on ties, path to it, investigate 2s, then return to the patrol node they left. A new audible event replaces their investigation.\nRecord requires 1.0s uninterrupted hold within 1.5 path-distance tiles; cancel costs nothing. Inventory capacity is 2. Throw consumes one token only on valid release to a walkable tile within Manhattan distance 6 with unobstructed throw segment; invalid release changes nothing. Steal requires adjacency and 0.6s stationary hold while not visible; visibility cancels the hold, while 0.75s exposure still causes Caught. Exit succeeds only while carrying target. Pause freezes actors/timers/events; Retry resets all mission-local state. Every mission must retain at least one reachable reusable source and a start→target→exit walkable route so depletion cannot soft-lock play.\n\n## 7. State Model\nMission: Brief, Planning, Infiltration, Caught, Success, Result, Paused. Player: Free, Recording, Moving, Stealing, CarryingTarget. Guard: Patrol, InvestigateSound, ReturnToPatrol. Detection overrides holds; Pause preserves exact active state except timers are frozen.\n\n## 8. Interaction Spec\nTop-down fixed gameplay view. Tap floor to move, hold a source to record, drag a stored token to throw, hold target to steal, tap guards/sources to inspect. Active token drag suppresses move taps; Record/Steal holds lock movement until complete/cancel. Invalid actions never mutate state and always return immediate feedback.\n\n## 9. Content Model\nMVP: 8 authored missions. Mission schema = walkable room graph + player start + one target + one exit + 1–3 guards with cyclic patrol nodes + 2–4 sources. Sound classes: Clock strength4, Squeaky Cart5, Radio6, Bell7. Guard content varies patrol length but uses one rule set. Variation axes: topology, guard count, patrol overlap, source placement/strength, target/exit separation. No content type adds a new mechanic.\n\n## 10. Difficulty / Variation\nMissions 1–2 teach one-guard lure and recovery; 3–4 add longer routes and weaker/stronger source choices; 5–6 add two guards and overlapping hearing zones; 7–8 use 2–3 guards, tighter topology, and overlapping patrol/vision. Difficulty comes from composing the same sound-placement rule, not extra systems.\n\n## 11. Progression\nMission 1 unlocked initially. Successful mission unlocks exactly the next mission. Best completion is stored per mission; failure never removes unlocks. No mechanical upgrades.\n\n## 12. Economy\nNot required. Sound tokens are mission-local tactical resources and not currency.\n\n## 13. Screen Inventory\nMission Select; Mission Brief; Museum Gameplay; Pause Overlay; Mission Result.\n\n## 14. Screen Flow\nSelect → Brief → Planning → Infiltration. Detection → Caught → failure Result → Retry/Select. Exit with target → Success → Result → Next/Retry/Select. Pause can overlay Planning/Infiltration and resumes exact state.\n\n## 15. Feedback System\nGuard vision cone plus exposure meter; sound propagation ring/path and attention cue on hearing; record fill and token waveform; valid throw preview and invalid rejection; investigation marker; target pickup changes objective to exit; Result names caught/success cause. Exposure clears after 0.5s fully unseen.\n\n## 16. Visual Direction Brief\nReadable top-down museum diorama, compact rooms, high contrast between walkable space/walls/doorways, guard vision, sound propagation, player and objective. UI should support the world simulation rather than obscure it. Camera framing must keep tactical relationships legible; exact coordinates/layout belong to Wireframe.\n\n## 17. MVP Scope + NOT IN MVP\n8 authored missions, 1 target each, 1–3 guards, 2–4 sources, four source strengths, two-token inventory, deterministic sound priority/pathing, patrol/investigate/return, sight detection, steal/escape, pause/retry, linear unlock. NOT IN MVP: combat, takedowns, procedural maps, hub, upgrades, currency/shop, online play, microphone/player-authored sounds, multi-target missions.\n\n## 18. Test Scenarios\n1) Record Radio6 → throw behind guard → guard investigates → pass behind → steal unseen → lure again if needed → exit with target → Success. 2) Stay in vision 0.75s → Caught → Retry → exact authored reset. 3) Invalid throw through wall/beyond 6 keeps token. 4) Two audible sounds resolve strongest then newest. 5) Full two-token inventory blocks record until one is thrown. 6) Pause freezes investigation timer. 7) Later multi-guard missions use identical rules without new interactions.\n\n## 19. Known Risks\nSound reach may be hard to predict; rerouting may feel arbitrary without priority feedback; tap movement and token drag may conflict; layouts may permit trivial lure-and-run solutions; overlapping guards can create accidental impossibility.\n\n## 20. Wireframe Handoff\nfun_promise: 소리를 탄약처럼 녹음·저장·던져 경비 동선을 직접 재구성하는 잠입 놀이를 가장 선명하게 보여준다.\nCover all five screens and Brief/Planning/Infiltration/Caught/Success/Paused states. Show topology, guards/patrol/vision, sources, two-token inventory, record hold, throw validity and propagation, investigate/return, detection exposure, steal hold/cancel, carried-target exit objective, failure retry, success progression, pause/resume. Include basic one-guard and later overlapping multi-guard variations without inventing new rules.",
+  "feedback_system": {
+    "sound": "expanding ring shows effective propagation radius/path; guards that hear it show immediate attention cue",
+    "throw": "valid arc/target preview; invalid target rejection",
+    "record": "source pulse + 1s fill + token waveform/icon",
+    "result": "success/failure cause and retry/next mission",
+    "stealth": "vision cone and exposure meter communicate detection; exposure clears after 0.5s fully unseen",
+    "objective": "target stolen changes objective to exit"
+  },
+  "round_structure": "Mission Brief → Planning → Infiltration → Success/Caught → Result; 1 target, 1 exit, 1–3 guards, 2–4 sources; 3–7 minutes.",
+  "interaction_spec": {
+    "camera": "single-room/compact-floor top-down fixed gameplay camera; no free camera required",
+    "invalid": "invalid throw, full inventory record, unreachable move, premature exit produce feedback and no state mutation",
+    "planning": "guard route and currently known sound sources can be inspected before committing actions",
+    "priority": [
+      "Caught overrides active holds",
+      "Steal/Record hold locks movement until complete/cancel",
+      "Dragging sound token suppresses move tap"
+    ]
+  },
+  "screen_inventory": [
+    "Mission Select",
+    "Mission Brief",
+    "Museum Gameplay",
+    "Pause Overlay",
+    "Mission Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Observe",
+      "input": "tap/hold guard or sound source",
+      "target": "guard patrol / audible source",
+      "feedback": "route preview / source pulse",
+      "condition": "planning or active infiltration",
+      "state_change": "reveals patrol route or source recordability"
+    },
+    {
+      "verb": "Record",
+      "input": "hold record on source for 1.0s",
+      "target": "active sound source",
+      "feedback": "meter fill + waveform token",
+      "condition": "within record radius 1.5 tiles, inventory has slot",
+      "state_change": "stores one sound token with lure_strength"
+    },
+    {
+      "verb": "Throw",
+      "input": "drag stored token to reachable floor tile and release",
+      "target": "floor tile within 6 tiles and line-of-throw",
+      "feedback": "arc preview + sound ring",
+      "condition": "not caught; token available",
+      "state_change": "token consumed; sound event created"
+    },
+    {
+      "verb": "Move",
+      "input": "tap reachable floor tile",
+      "target": "walkable tile",
+      "feedback": "path preview + footsteps",
+      "condition": "not in caught/result state",
+      "state_change": "player follows shortest walkable path"
+    },
+    {
+      "verb": "Steal",
+      "input": "tap exhibit",
+      "target": "mission target exhibit",
+      "feedback": "pickup cue + exit objective",
+      "condition": "adjacent and guard not currently seeing player",
+      "state_change": "target becomes carried"
+    },
+    {
+      "verb": "Escape",
+      "input": "enter exit tile",
+      "target": "exit",
+      "feedback": "escape transition + result",
+      "condition": "target carried",
+      "state_change": "mission success"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 소리를 탄약처럼 녹음·저장·던져 경비 동선을 직접 재구성하는 단순하고 선명한 잠입 놀이를 보존한다.",
+    "Represent all five screen types plus Brief/Planning/Infiltration/Caught/Success/Paused states.",
+    "Gameplay must expose walkable topology, walls/doorways, player, target, exit, 1–3 guards, patrol/vision, 2–4 sound sources, two-token inventory, record hold, drag throw, sound propagation, investigation/return and detection exposure.",
+    "Wireframes must distinguish valid/invalid throw, full inventory, recording cancel, steal hold/cancel, target-carried objective, caught retry, success next/retry, and pause/resume.",
+    "Variation frames must prove one-guard basic lure and later multi-guard/overlapping-patrol layouts without inventing new rules."
+  ],
+  "primary_interaction": "Record environmental sounds and drag stored sound tokens onto floor positions to deterministically redirect guards, then move/steal/escape.",
+  "difficulty_variation": "8 missions escalate from one guard/basic lure to 2–3 guards, overlapping patrol/hearing, tighter topology, and source-strength choices; no new mechanic.",
+  "visual_direction_brief": "Readable top-down museum diorama with compact rooms; clear walkable topology, walls/doors, guard vision, sound propagation, player and objective. Fixed tactical framing; exact UI geometry belongs to Wireframe."
+}

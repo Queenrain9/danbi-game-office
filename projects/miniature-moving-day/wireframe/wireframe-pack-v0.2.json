@@ -1,0 +1,795 @@
+{
+  "id": "49a208fa-840c-4b97-8ab2-12deb493076f",
+  "title": "Miniature Moving Day",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "ebbc5cc4-2ae3-4f9e-8a94-fb2927d02e3e",
+  "screens": [
+    {
+      "id": "stage_select",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 72,
+            "w": 88,
+            "x": 6,
+            "y": 16,
+            "id": "grid",
+            "role": "content",
+            "label": "Stages"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "base",
+          "condition": "open"
+        }
+      ],
+      "purpose": "choose stage",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stage_cards",
+          "box": {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "grid_buttons",
+          "label": "6 stage cards",
+          "enabled_when": "unlocked",
+          "state_binding": "unlocks",
+          "interaction_role": "select"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "Stage Brief",
+          "from": "Stage Select",
+          "trigger": "tap",
+          "animation": "push",
+          "condition": "unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select",
+          "target": "stage_cards",
+          "feedback": "selection",
+          "precondition": "unlocked",
+          "state_change": "brief",
+          "invalid_input": "disabled pulse"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "locked",
+          "name": "Locked",
+          "notes": "no navigation",
+          "condition": "locked",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "stage_cards": {
+              "state_binding": "disabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "data-backed"
+      ]
+    },
+    {
+      "id": "stage_brief",
+      "name": "Stage Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 60,
+            "w": 88,
+            "x": 6,
+            "y": 8,
+            "id": "preview",
+            "role": "preview",
+            "label": "Preview"
+          },
+          {
+            "h": 12,
+            "w": 84,
+            "x": 8,
+            "y": 80,
+            "id": "actions",
+            "role": "controls",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "condition": "selected"
+        }
+      ],
+      "purpose": "show goal",
+      "feedback": [],
+      "components": [
+        {
+          "id": "preview",
+          "box": {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "preview",
+          "label": "room+goals",
+          "state_binding": "stage"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 52,
+            "y": 81
+          },
+          "type": "button",
+          "label": "START",
+          "enabled_when": "ready",
+          "state_binding": "stage",
+          "interaction_role": "start"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 10,
+            "w": 30,
+            "x": 8,
+            "y": 81
+          },
+          "type": "button",
+          "label": "BACK",
+          "state_binding": "none",
+          "interaction_role": "back"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "Moving Room",
+          "from": "Stage Brief",
+          "trigger": "start",
+          "animation": "fade",
+          "condition": "ready"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "instantiate",
+          "target": "start",
+          "feedback": "fade",
+          "precondition": "ready",
+          "state_change": "idle",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "preview/runtime same data"
+      ]
+    },
+    {
+      "id": "moving_room",
+      "name": "Moving Room",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 9,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "HUD"
+          },
+          {
+            "h": 68,
+            "w": 92,
+            "x": 4,
+            "y": 15,
+            "id": "room",
+            "role": "play",
+            "label": "Room"
+          },
+          {
+            "h": 11,
+            "w": 92,
+            "x": 4,
+            "y": 85,
+            "id": "tools",
+            "role": "controls",
+            "label": "Tools"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "idle",
+          "condition": "none held"
+        },
+        {
+          "id": "held",
+          "condition": "captured"
+        },
+        {
+          "id": "invalid_pose",
+          "condition": "overlap"
+        },
+        {
+          "id": "complete",
+          "condition": "all goals"
+        }
+      ],
+      "purpose": "spatial puzzle",
+      "feedback": [
+        "grab haptic",
+        "collision impact",
+        "goal snap",
+        "rollback spring"
+      ],
+      "components": [
+        {
+          "id": "room",
+          "box": {
+            "h": 68,
+            "w": 92,
+            "x": 4,
+            "y": 15
+          },
+          "type": "world",
+          "label": "collision room",
+          "state_binding": "room"
+        },
+        {
+          "id": "furniture",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "draggable_objects",
+          "label": "furniture",
+          "enabled_when": "not paused",
+          "state_binding": "transforms",
+          "interaction_role": "object hit polygons"
+        },
+        {
+          "id": "goals",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "goal_overlays",
+          "label": "goals",
+          "state_binding": "goals"
+        },
+        {
+          "id": "moves",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 5,
+            "y": 5
+          },
+          "type": "label",
+          "label": "Moves/Par",
+          "state_binding": "moves"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 9,
+            "w": 12,
+            "x": 84,
+            "y": 4
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "paused",
+          "interaction_role": "pause"
+        },
+        {
+          "id": "undo",
+          "box": {
+            "h": 9,
+            "w": 26,
+            "x": 5,
+            "y": 86
+          },
+          "type": "button",
+          "label": "UNDO",
+          "enabled_when": "history>0",
+          "state_binding": "history",
+          "interaction_role": "undo"
+        },
+        {
+          "id": "reset",
+          "box": {
+            "h": 9,
+            "w": 26,
+            "x": 69,
+            "y": 86
+          },
+          "type": "button",
+          "label": "RESET",
+          "state_binding": "stage",
+          "interaction_role": "reset"
+        }
+      ],
+      "edge_cases": [
+        "second touch cannot grab another object",
+        "touch cancel restores"
+      ],
+      "transitions": [
+        {
+          "to": "Stage Result",
+          "from": "Moving Room",
+          "trigger": "all goals",
+          "animation": "settle/fade",
+          "condition": "complete"
+        },
+        {
+          "to": "Pause Overlay",
+          "from": "Moving Room",
+          "trigger": "pause",
+          "animation": "modal",
+          "condition": "not complete"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "one-finger drag",
+          "action": "translate and collision-test",
+          "target": "furniture",
+          "feedback": "lift/contact",
+          "precondition": "idle hit",
+          "state_change": "held/invalid_pose",
+          "invalid_input": "clamp last valid"
+        },
+        {
+          "input": "two-finger twist",
+          "action": "actual angle delta around pivot; collision-test",
+          "target": "held furniture",
+          "feedback": "footprint",
+          "precondition": "held",
+          "state_change": "held",
+          "invalid_input": "keep last valid angle"
+        },
+        {
+          "input": "release",
+          "action": "85% overlap + <=12deg snap else rollback pre-grab",
+          "target": "held furniture",
+          "feedback": "snap/spring",
+          "precondition": "held",
+          "state_change": "idle/placed/complete",
+          "invalid_input": "rollback"
+        },
+        {
+          "input": "tap",
+          "action": "restore previous commit",
+          "target": "undo",
+          "feedback": "reverse",
+          "precondition": "history>0",
+          "state_change": "recompute",
+          "invalid_input": "disabled"
+        },
+        {
+          "input": "tap",
+          "action": "confirm reset",
+          "target": "reset",
+          "feedback": "modal",
+          "precondition": "not complete",
+          "state_change": "input_lock",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "held",
+          "name": "Held",
+          "notes": "second touch rotates",
+          "condition": "held",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "furniture": {
+              "state_binding": "active+lift"
+            }
+          }
+        },
+        {
+          "id": "collision",
+          "name": "Collision",
+          "notes": "never commit",
+          "condition": "invalid",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "furniture": {
+              "state_binding": "last valid+outline"
+            }
+          }
+        },
+        {
+          "id": "goal_valid",
+          "name": "Goal Valid",
+          "notes": "release snaps",
+          "condition": "overlap>=.85 angle<=12",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "goals": {
+              "state_binding": "highlight"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "same transform for render/hit/collision/goal",
+        "never replace drag/twist with buttons"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 44,
+            "w": 72,
+            "x": 14,
+            "y": 28,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused",
+          "condition": "open"
+        }
+      ],
+      "purpose": "suspend",
+      "feedback": [
+        "scrim"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 43
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused",
+          "interaction_role": "resume"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 57
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused",
+          "interaction_role": "quit"
+        }
+      ],
+      "edge_cases": [
+        "block room"
+      ],
+      "transitions": [
+        {
+          "to": "Moving Room",
+          "from": "Pause Overlay",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "close",
+          "target": "resume",
+          "feedback": "fade",
+          "precondition": "paused",
+          "state_change": "restore room",
+          "invalid_input": "background blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "preserve transforms/history"
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Stage Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 48,
+            "w": 80,
+            "x": 10,
+            "y": 18,
+            "id": "summary",
+            "role": "summary",
+            "label": "Score"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 74,
+            "id": "actions",
+            "role": "controls",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "complete",
+          "condition": "cleared"
+        }
+      ],
+      "purpose": "summary",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stars",
+          "box": {
+            "h": 34,
+            "w": 68,
+            "x": 16,
+            "y": 24
+          },
+          "type": "summary",
+          "label": "clear/par/no reset",
+          "state_binding": "result"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 77
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "stage",
+          "interaction_role": "retry"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 77
+          },
+          "type": "button",
+          "label": "NEXT",
+          "enabled_when": "next exists",
+          "state_binding": "unlock",
+          "interaction_role": "next"
+        }
+      ],
+      "edge_cases": [
+        "final hides next"
+      ],
+      "transitions": [
+        {
+          "to": "Stage Brief",
+          "from": "Stage Result",
+          "trigger": "retry/next",
+          "animation": "push",
+          "condition": "valid"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reload",
+          "target": "retry",
+          "feedback": "fade",
+          "precondition": "always",
+          "state_change": "brief",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "select next",
+          "target": "next",
+          "feedback": "push",
+          "precondition": "next exists",
+          "state_change": "brief",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "score clear/par/no reset"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "0d5a6236-a2a9-44e9-820a-970ae80b3788",
+  "input_map": {
+    "cancel": [
+      "OS cancel restores"
+    ],
+    "gestures": [
+      {
+        "name": "twist",
+        "priority": 1
+      },
+      {
+        "name": "drag",
+        "priority": 2
+      },
+      {
+        "name": "HUD tap",
+        "priority": 3
+      }
+    ],
+    "conflicts": [
+      "second touch promotes held drag to twist",
+      "HUD never leaks"
+    ],
+    "multitouch": "max two touches owned by held furniture"
+  },
+  "created_at": "2026-09-29T15:36:42.154767+00:00",
+  "edge_cases": [
+    "invalid transform never enters history",
+    "reset requires confirmation",
+    "portrait locked",
+    "modal blocks background"
+  ],
+  "updated_at": "2026-09-29T15:36:42.154767+00:00",
+  "core_screen": "Moving Room",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "Result only all goals satisfied"
+    ],
+    "normal": [
+      "Stage Select",
+      "Stage Brief",
+      "Moving Room",
+      "Stage Result"
+    ],
+    "branches": [
+      "Moving Room→Pause→Moving Room",
+      "Result→Next/Retry"
+    ],
+    "exceptions": [
+      "invalid release→rollback",
+      "Reset→confirm→initial"
+    ]
+  },
+  "state_count": 10,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "paused",
+      "effect": "block room",
+      "condition": "pause"
+    },
+    {
+      "id": "input_lock",
+      "effect": "ignore gestures",
+      "condition": "modal/transition"
+    },
+    {
+      "id": "success",
+      "effect": "result",
+      "condition": "all goals"
+    }
+  ],
+  "pack_markdown": "# Miniature Moving Day — Interaction Wireframe Pack v0.2",
+  "source_run_at": "2026-09-29T15:36:42.154767+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "coordinates": "0-100 portrait",
+    "canonical_transform": "render hit-test collision goal share transform"
+  },
+  "developer_handoff": {
+    "critical": "canonical transform",
+    "persistence": [
+      "unlocked_stage",
+      "best_stars"
+    ],
+    "required_data": [
+      "6 stages",
+      "collision polygons",
+      "start/goal poses",
+      "par"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "ScreenRouter",
+      "StageSelect",
+      "StageBrief",
+      "MovingRoom",
+      "PauseOverlay",
+      "StageResult"
+    ],
+    "state_ownership": {
+      "MovingRoom": "touch ownership",
+      "StageSession": "history/moves",
+      "FurnitureBody": "transform/grab"
+    },
+    "reusable_components": [
+      "FurnitureBody",
+      "GoalZone",
+      "RoomCollision",
+      "ConfirmModal"
+    ],
+    "implementation_order": [
+      "data",
+      "collision",
+      "drag",
+      "twist",
+      "goal/snap",
+      "undo/reset",
+      "flow"
+    ]
+  },
+  "acceptance_criteria": [
+    "All five screens reachable",
+    "Drag changes actual position",
+    "Held two-finger twist changes actual angle",
+    "Collision clamps last valid",
+    "Invalid release rolls back; 85% and 12deg snaps",
+    "Undo/Reset work",
+    "Six stages replay/unlock",
+    "Core gestures not buttons"
+  ],
+  "primary_interaction": "Drag furniture; held two-finger twist; collision clamp; goal snap/rollback.",
+  "interaction_principles": [
+    "Direct manipulation changes actual transform",
+    "Drag translates; second touch twists held furniture",
+    "Collision clamps to last valid transform",
+    "Release snaps valid goal or rolls back"
+  ]
+}

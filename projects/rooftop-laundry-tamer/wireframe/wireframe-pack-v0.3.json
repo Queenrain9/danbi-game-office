@@ -1,0 +1,1096 @@
+{
+  "id": "6ab53f08-acdf-46f5-8df7-e7291e510f5f",
+  "title": "Rooftop Laundry Tamer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "8ca14fe2-bdcd-474f-8b3f-e8cd8e10b128",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Rooftop Home / Mission Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[0]",
+              "progression"
+            ],
+            "decision_note": "Safe-area layout only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Mission Select"
+      ],
+      "purpose": "Select unlocked mission and view medals.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "missions",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "card_grid",
+          "label": "Mission cards",
+          "source_refs": [
+            "screen_inventory[0]",
+            "progression"
+          ],
+          "state_binding": "unlock/best score/medal",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "legend",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 6,
+            "y": 81
+          },
+          "type": "legend",
+          "label": "Medal thresholds",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1 success;2>=1000;3>=1400",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 60,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Open Mission",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected+unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S1",
+          "trigger": "open",
+          "condition": "unlocked",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select",
+          "target": "missions",
+          "feedback": "selection",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected mission",
+          "invalid_input": "locked stays locked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S2",
+      "name": "Mission Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[1]",
+              "wireframe_handoff"
+            ],
+            "decision_note": "Safe-area layout only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Mission Brief"
+      ],
+      "purpose": "Show silhouette, forecast, topology and rule modifiers.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 15,
+            "w": 88,
+            "x": 6,
+            "y": 7
+          },
+          "type": "panel",
+          "label": "Mission summary",
+          "source_refs": [
+            "screen_inventory[1]"
+          ],
+          "state_binding": "mission data",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "silhouette",
+          "box": {
+            "h": 34,
+            "w": 42,
+            "x": 6,
+            "y": 25
+          },
+          "type": "preview",
+          "label": "Target silhouette",
+          "source_refs": [
+            "game_rules.cloth"
+          ],
+          "state_binding": "8 landmark target",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "forecast",
+          "box": {
+            "h": 34,
+            "w": 42,
+            "x": 52,
+            "y": 25
+          },
+          "type": "forecast",
+          "label": "Wind phases",
+          "source_refs": [
+            "game_rules.wind",
+            "content_model.classes[4]"
+          ],
+          "state_binding": "1-3 phases direction/strength",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rules",
+          "box": {
+            "h": 10,
+            "w": 88,
+            "x": 6,
+            "y": 62
+          },
+          "type": "chips",
+          "label": "Mission modifiers",
+          "source_refs": [
+            "content_model.classes"
+          ],
+          "state_binding": "Single/Dual/Fragile/Heavy/Multi",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 6,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Back",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 56,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "enabled when loaded",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "transition": "fade",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "enter Setup",
+          "target": "start",
+          "feedback": "load rooftop",
+          "source_refs": [
+            "screen_flow",
+            "game_rules.reset"
+          ],
+          "precondition": "loaded",
+          "state_change": "mission initial state",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S3",
+      "name": "Laundry Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[2]",
+              "wireframe_handoff"
+            ],
+            "decision_note": "Safe-area layout only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Setup",
+        "Wind Test",
+        "Recovery"
+      ],
+      "purpose": "Pin and shape cloth, test wind, recover failed phases.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "phase",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 4,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Phase / 8s timer",
+          "source_refs": [
+            "round_structure",
+            "game_rules.wind"
+          ],
+          "state_binding": "phase index and Wind Test time",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "clips",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 35,
+            "y": 3
+          },
+          "type": "counter",
+          "label": "Clip inventory",
+          "source_refs": [
+            "game_rules.clips"
+          ],
+          "state_binding": "3..6 mission-local",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "accuracy",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 58,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Shape accuracy",
+          "source_refs": [
+            "game_rules.cloth"
+          ],
+          "state_binding": "0..100; pass>=75",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 86,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cloth",
+          "box": {
+            "h": 46,
+            "w": 92,
+            "x": 4,
+            "y": 13
+          },
+          "type": "simulation_view",
+          "label": "Cloth + anchors",
+          "source_refs": [
+            "game_rules.cloth",
+            "visual_direction_brief"
+          ],
+          "state_binding": "4..8 anchors/landmarks",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "line1",
+          "box": {
+            "h": 6,
+            "w": 86,
+            "x": 7,
+            "y": 61
+          },
+          "type": "slot_line",
+          "label": "Line 1 slots",
+          "source_refs": [
+            "game_rules.lines"
+          ],
+          "state_binding": "9 ordered slots",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "line2",
+          "box": {
+            "h": 6,
+            "w": 86,
+            "x": 7,
+            "y": 69
+          },
+          "type": "slot_line",
+          "label": "Line 2 slots",
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "state_binding": "visible only dual-line",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "tension1",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 4,
+            "y": 78
+          },
+          "type": "drag_control",
+          "label": "Line 1 tension",
+          "source_refs": [
+            "game_rules.lines",
+            "interaction_spec.tension"
+          ],
+          "state_binding": "Loose/Medium/Tight",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "tension2",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 33,
+            "y": 78
+          },
+          "type": "drag_control",
+          "label": "Line 2 tension",
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "state_binding": "dual-line only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "forecast",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 62,
+            "y": 78
+          },
+          "type": "panel",
+          "label": "Forecast/gust cue",
+          "source_refs": [
+            "feedback_system.forecast",
+            "game_rules.wind"
+          ],
+          "state_binding": "direction strength warning/gust",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "dry",
+          "box": {
+            "h": 7,
+            "w": 34,
+            "x": 62,
+            "y": 90
+          },
+          "type": "button",
+          "label": "Dry / Retry Phase",
+          "source_refs": [
+            "interaction_spec.dry",
+            "state_model"
+          ],
+          "state_binding": "Setup Dry guards; Recovery Retry Phase",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "status",
+          "box": {
+            "h": 7,
+            "w": 55,
+            "x": 4,
+            "y": 90
+          },
+          "type": "criteria_panel",
+          "label": "Stress / invalid cue",
+          "source_refs": [
+            "feedback_system.stress",
+            "interaction_spec"
+          ],
+          "state_binding": "load threshold, occupied slot, pin validity",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Wind Test",
+          "from": "Setup",
+          "trigger": "valid Dry",
+          "condition": ">=2 pins and safe static load",
+          "transition": "lock controls",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Recovery",
+          "from": "Wind Test",
+          "trigger": "pin failure or accuracy<75 at phase end",
+          "condition": "not blowaway",
+          "transition": "recover clips/current phase",
+          "source_refs": [
+            "game_rules.pin_failure",
+            "game_rules.stability"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Wind Test",
+          "from": "Recovery",
+          "trigger": "Retry Phase",
+          "condition": "same phase",
+          "transition": "restart phase",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S4",
+          "from": "S3",
+          "trigger": "all phases pass or pinned<=1",
+          "condition": "terminal",
+          "transition": "result",
+          "source_refs": [
+            "game_rules.stability",
+            "game_rules.blowaway"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "Pin",
+          "target": "cloth anchor -> free line slot",
+          "feedback": "snap+haptic+tension",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "interaction_spec.pin"
+          ],
+          "precondition": "Setup/Recovery; clip>0; anchor unpinned",
+          "state_change": "clip-1; anchor pinned",
+          "invalid_input": "anchor returns; no state change",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "long-press .35s + drag",
+          "action": "Unpin",
+          "target": "pinned anchor",
+          "feedback": "release snap",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "interaction_spec.unpin"
+          ],
+          "precondition": "Setup/Recovery",
+          "state_change": "constraint removed; clip+1",
+          "invalid_input": "threshold not met -> remains pinned",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "drag",
+          "action": "Slide Clip",
+          "target": "pinned clip",
+          "feedback": "live tension/shape",
+          "source_refs": [
+            "core_player_verbs[2]",
+            "interaction_spec.slide"
+          ],
+          "precondition": "Setup/Recovery",
+          "state_change": "adjacent free slot snap",
+          "invalid_input": "occupied/crossed slot -> previous slot",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "vertical drag",
+          "action": "Adjust Tension",
+          "target": "tension1/tension2",
+          "feedback": "line sag/cloth response",
+          "source_refs": [
+            "core_player_verbs[3]",
+            "interaction_spec.tension"
+          ],
+          "precondition": "Setup/Recovery",
+          "state_change": "atomic Loose/Medium/Tight on release",
+          "invalid_input": "cancel retains prior state",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "Commit Drying",
+          "target": "dry",
+          "feedback": "forecast locks/test starts",
+          "source_refs": [
+            "core_player_verbs[4]",
+            "interaction_spec.dry"
+          ],
+          "precondition": "Setup; >=2 pins; every static load<=threshold",
+          "state_change": "Wind Test",
+          "invalid_input": "disabled with explicit failed guard",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "Retry Phase",
+          "target": "dry",
+          "feedback": "test restart",
+          "source_refs": [
+            "game_rules.pin_failure",
+            "game_rules.stability"
+          ],
+          "precondition": "Recovery",
+          "state_change": "same phase Wind Test from start",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V1",
+          "name": "Dual Line",
+          "notes": "Same Pin/Slide semantics across either line.",
+          "condition": "mission has 2 lines",
+          "components": [],
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "line2": {
+              "state_binding": "visible"
+            },
+            "tension2": {
+              "state_binding": "enabled Setup/Recovery"
+            }
+          }
+        },
+        {
+          "id": "V2",
+          "name": "Fragile",
+          "notes": "Modifier only; no new gesture.",
+          "condition": "Fragile class",
+          "components": [],
+          "source_refs": [
+            "content_model.classes[2]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "status": {
+              "state_binding": "threshold 2.4 explicitly shown"
+            }
+          }
+        },
+        {
+          "id": "V3",
+          "name": "Heavy",
+          "notes": "Modifier only; no new gesture.",
+          "condition": "Heavy class",
+          "components": [],
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "status": {
+              "state_binding": "exposed factor 1.25 shown"
+            }
+          }
+        },
+        {
+          "id": "V4",
+          "name": "Wind Test Locked",
+          "notes": "No cloth manipulation during test.",
+          "condition": "Wind Test",
+          "components": [],
+          "source_refs": [
+            "state_model[2]",
+            "interaction_spec.priority"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "dry": {
+              "state_binding": "hidden/disabled"
+            },
+            "tension1": {
+              "state_binding": "disabled"
+            },
+            "tension2": {
+              "state_binding": "disabled"
+            }
+          }
+        },
+        {
+          "id": "V5",
+          "name": "Recovery",
+          "notes": "Passed phases persist; current phase restarts.",
+          "condition": "pin failure or accuracy<75",
+          "components": [],
+          "source_refs": [
+            "game_rules.pin_failure",
+            "game_rules.stability"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "dry": {
+              "label": "Retry Phase",
+              "state_binding": "enabled"
+            }
+          }
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S4",
+      "name": "Mission Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[3]",
+              "progression"
+            ],
+            "decision_note": "Safe-area layout only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Show success/failure, score, medal and navigation.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "source_refs": [
+            "game_rules.stability",
+            "game_rules.blowaway"
+          ],
+          "state_binding": "success/blowaway failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 20,
+            "w": 84,
+            "x": 8,
+            "y": 28
+          },
+          "type": "summary",
+          "label": "Score breakdown",
+          "source_refs": [
+            "game_rules.score"
+          ],
+          "state_binding": "accuracy*10+unused clips*100+first try phases*150",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "medal",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 51
+          },
+          "type": "medal",
+          "label": "Medal",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1/2/3",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 68
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 68
+          },
+          "type": "button",
+          "label": "Next",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "success+next exists",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "home",
+          "box": {
+            "h": 10,
+            "w": 84,
+            "x": 8,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Home",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S4",
+          "trigger": "Next",
+          "condition": "success+next",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S3",
+          "from": "S4",
+          "trigger": "Retry",
+          "condition": "always",
+          "transition": "reload",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "full mission reset",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "precondition": "always",
+          "state_change": "Setup initial",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "unlock/open next Brief",
+          "target": "next",
+          "feedback": "unlock",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "success+next",
+          "state_change": "progression",
+          "invalid_input": "hidden/disabled otherwise",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "6569ba3e-8ba3-4660-8692-cd0a78893c95",
+  "input_map": {
+    "cancel": "invalid/cancelled drag restores previous committed state",
+    "conflict": "occupied line slots cannot be crossed/selected during Slide",
+    "priority": [
+      "Pause",
+      "active pointer manipulation",
+      "atomic Dry/Retry"
+    ],
+    "source_refs": [
+      "interaction_spec.priority",
+      "interaction_spec.slide"
+    ],
+    "decision_note": "Explicit cancellation closes local UX without altering state rules.",
+    "single_pointer": true,
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T05:59:08.154081+00:00",
+  "edge_cases": {
+    "items": [
+      "pinned anchors<=1 at any moment -> immediate blowaway Result",
+      "gust overload releases after .5s and Recovery begins after gust ends",
+      "accuracy<75 after 8s repeats same phase",
+      "free line clips from failure recovered on Recovery entry",
+      "passed phases persist"
+    ],
+    "source_refs": [
+      "game_rules.pin_failure",
+      "game_rules.blowaway",
+      "game_rules.stability"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T05:59:08.154081+00:00",
+  "core_screen": "S3 Laundry Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      "Dry >=2 pins and static load safe",
+      "Next success only"
+    ],
+    "normal": [
+      "S1",
+      "S2",
+      "S3 Setup",
+      "S3 Wind Test",
+      "S4"
+    ],
+    "branches": [
+      "Wind Test failure->Recovery->same phase",
+      "blowaway->failure Result",
+      "success Next->next Brief"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 8,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze gust timer and cloth simulation; block Setup/Recovery input; resume exact state",
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InputLock": {
+      "effect": "Wind Test accepts no cloth manipulation",
+      "source_refs": [
+        "interaction_spec.priority"
+      ],
+      "decision_origin": "game_design"
+    },
+    "GustWarning": {
+      "effect": "1s warning before 1.5s gust",
+      "source_refs": [
+        "game_rules.wind",
+        "feedback_system.gust"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Rooftop Laundry Tamer\n\nWhole-MVP pack covering Mission Select, Brief, Laundry Gameplay and Result; Setup/Wind Test/Recovery/Pause; Single-Line, Dual-Line, Fragile, Heavy and Multi-Phase variations. Decision trace is embedded in JSON. Godot architecture remains Implementation Blueprint responsibility.",
+  "source_run_at": "2026-09-30T05:55:00+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coordinates": "0..100 screen-percent",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Hit-area enlargement changes usability only.",
+    "touch_targets": "anchor/slot hit areas may be enlarged without changing logical slot/anchor rules",
+    "decision_origin": "wireframe_layout",
+    "safe_area_percent": 4
+  },
+  "developer_handoff": {
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "12 missions",
+      "1-2 lines x 9 logical slots",
+      "4-8 anchors",
+      "3-6 clips",
+      "target 8 landmarks",
+      "wind phases/gusts",
+      "class modifiers",
+      "best score/medal/unlock"
+    ],
+    "responsibility": "Implementation Blueprint chooses Godot scene/node/script architecture.",
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "mission progression persistent",
+      "anchors/clips/tension/phase/score mission-local"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "Single-Line",
+      "Dual-Line",
+      "Fragile",
+      "Heavy",
+      "Multi-Phase",
+      "combined late mission"
+    ]
+  },
+  "acceptance_criteria": [
+    "All four screen types and Setup/Wind Test/Recovery/Result/Pause are reachable.",
+    "Pin, Unpin, Slide, Tension and Dry implement valid/invalid/cancel behavior.",
+    "Single/Dual line plus Fragile/Heavy/Multi-Phase variants are represented without new gestures.",
+    "1s warning, 1.5s gust, overload release, Recovery and blowaway are observable.",
+    "Accuracy>=75 phase rule and same-phase retry are observable.",
+    "Success unlocks exactly next mission and stores best score/medal; Retry fully resets mission."
+  ],
+  "primary_interaction": "cloth anchor pin/slide + line tension + wind test/recovery",
+  "interaction_principles": [
+    "Preserve deterministic cloth rules while presentation may simplify physics",
+    "One pointer manipulation at a time; Pause overrides",
+    "Expose target silhouette, load/stress and forecast before commitment",
+    "Represent all five content classes through topology/modifier variants"
+  ]
+}

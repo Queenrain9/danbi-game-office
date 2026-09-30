@@ -1,0 +1,1203 @@
+{
+  "id": "5d4f9ba2-e4b9-449b-80ac-0224cbcc6357",
+  "title": "Assembly Line Orchestra",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "3551bec5-a3d6-4800-995d-7cf88375223e",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Contract Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "header",
+            "box": {
+              "h": 12,
+              "w": 100,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": "contracts",
+            "box": {
+              "h": 66,
+              "w": 92,
+              "x": 4,
+              "y": 14
+            }
+          },
+          {
+            "id": "detail",
+            "box": {
+              "h": 14,
+              "w": 92,
+              "x": 4,
+              "y": 82
+            }
+          }
+        ]
+      },
+      "states": [
+        "available",
+        "locked"
+      ],
+      "purpose": "Choose an unlocked contract and inspect its production/rhythm requirements before editing.",
+      "feedback": [
+        "quota, threshold, jam limit, BPM and module set visible"
+      ],
+      "components": [
+        {
+          "id": "contract_list",
+          "box": {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 14
+          },
+          "type": "scroll_list",
+          "label": "Unlocked contracts",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "contract_card",
+          "box": {
+            "h": 18,
+            "w": 88,
+            "x": 6,
+            "y": 17
+          },
+          "type": "selectable_card",
+          "label": "Contract summary",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "start_button",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 58,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Set Up",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "no unlocked normal contracts after tutorials: keep completed tutorials replayable"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "unlocked contract selected",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "choose_contract",
+          "input": "tap",
+          "target": "contract_card",
+          "feedback": "requirements/topology preview updates",
+          "source_refs": [
+            "game_design:content_model"
+          ],
+          "precondition": "card unlocked",
+          "state_change": "selected contract changes",
+          "invalid_input": "locked card does not select",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start_setup",
+          "input": "tap",
+          "target": "start_button",
+          "feedback": "selected card confirms",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "precondition": "unlocked contract selected",
+          "state_change": "enter S2 with contract data",
+          "invalid_input": "disabled if none selected",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "tier_locked",
+          "name": "Locked tier",
+          "notes": "Represents progression gate only.",
+          "condition": "mastery stars below tier requirement",
+          "source_refs": [
+            "game_design:progression"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "start_button": "show unlock requirement"
+          },
+          "component_overrides": {
+            "contract_card": "locked/read-only"
+          },
+          "interaction_overrides": {
+            "start_button": "disabled"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "12 templates/3 tiers are data-driven; no economy UI."
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Factory Setup/Edit",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "status",
+            "box": {
+              "h": 12,
+              "w": 100,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": "factory",
+            "box": {
+              "h": 60,
+              "w": 96,
+              "x": 2,
+              "y": 12
+            }
+          },
+          {
+            "id": "palette",
+            "box": {
+              "h": 14,
+              "w": 96,
+              "x": 2,
+              "y": 73
+            }
+          },
+          {
+            "id": "controls",
+            "box": {
+              "h": 10,
+              "w": 96,
+              "x": 2,
+              "y": 88
+            }
+          }
+        ]
+      },
+      "states": [
+        "setup",
+        "edit_after_stop",
+        "invalid_drop",
+        "ready"
+      ],
+      "purpose": "Build the directed production line and set each module activation phase before running.",
+      "feedback": [
+        "compatible socket highlight",
+        "invalid drop return",
+        "compact 8-beat rail",
+        "route preview"
+      ],
+      "components": [
+        {
+          "id": "factory_canvas",
+          "box": {
+            "h": 60,
+            "w": 96,
+            "x": 2,
+            "y": 12
+          },
+          "type": "interactive_canvas",
+          "label": "Directed topology",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "module_tile",
+          "box": {
+            "h": 10,
+            "w": 20,
+            "x": 4,
+            "y": 75
+          },
+          "type": "draggable_module",
+          "label": "Available module",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "compatible_socket",
+          "box": {
+            "h": 12,
+            "w": 14,
+            "x": 18,
+            "y": 25
+          },
+          "type": "drop_target",
+          "label": "Compatible socket",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "phase_control",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 34,
+            "y": 75
+          },
+          "type": "phase_selector",
+          "label": "Activation beat 1–8",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "run_button",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 72,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Run",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "reset_button",
+          "box": {
+            "h": 10,
+            "w": 22,
+            "x": 2,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Reset layout",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "requirements_panel",
+          "box": {
+            "h": 10,
+            "w": 96,
+            "x": 2,
+            "y": 1
+          },
+          "type": "status_panel",
+          "label": "Contract requirements",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "invalid placement never mutates route",
+        "spatial proximity alone never connects"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "guard": "connected source-to-output",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "place_module",
+          "input": "drag",
+          "target": "module_tile",
+          "feedback": "valid socket previews then snaps",
+          "source_refs": [
+            "game_design:core_player_verbs"
+          ],
+          "precondition": "edit state",
+          "state_change": "module occupies compatible socket; directed route updates",
+          "invalid_input": "invalid drop returns origin",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "return_origin",
+            "completion": {
+              "kind": "snap",
+              "target_component_id": "compatible_socket"
+            },
+            "target_component_id": "module_tile",
+            "related_component_ids": [
+              "compatible_socket"
+            ]
+          }
+        },
+        {
+          "id": "set_phase",
+          "input": "tap",
+          "target": "phase_control",
+          "feedback": "beat marker updates",
+          "source_refs": [
+            "game_design:core_player_verbs"
+          ],
+          "precondition": "module placed",
+          "state_change": "activation beat cycles/selects 1–8",
+          "invalid_input": "ignore if no selected module",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "run_line",
+          "input": "tap",
+          "target": "run_button",
+          "feedback": "line preview locks; playhead begins",
+          "source_refs": [
+            "game_design:core_player_verbs"
+          ],
+          "precondition": "connected source-to-output",
+          "state_change": "enter running; 32-beat run starts",
+          "invalid_input": "disabled when not connected",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "reset_layout",
+          "input": "tap",
+          "target": "reset_button",
+          "feedback": "layout visibly resets",
+          "source_refs": [
+            "game_design:game_rules"
+          ],
+          "precondition": "edit state",
+          "state_change": "restore starter layout",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "branch_route",
+          "name": "Branch route",
+          "notes": "Spatial proximity never creates routes.",
+          "condition": "contract variation=branch-route",
+          "source_refs": [
+            "game_design:content_model"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "factory_canvas": "highlight only configured outgoing edges"
+          },
+          "component_overrides": {
+            "factory_canvas": "show configured directed branch edges"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "syncopated",
+          "name": "Syncopated",
+          "notes": "Same phase rule; visual emphasis only.",
+          "condition": "variation=syncopated",
+          "source_refs": [
+            "game_design:content_model"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "phase_control": "beat rail target markers emphasized"
+          },
+          "component_overrides": {
+            "phase_control": "target masks emphasized"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "Topology is directed graph data; do not infer edges from positions."
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Running Factory",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "hud",
+            "box": {
+              "h": 12,
+              "w": 100,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": "factory",
+            "box": {
+              "h": 66,
+              "w": 96,
+              "x": 2,
+              "y": 12
+            }
+          },
+          {
+            "id": "beatrail",
+            "box": {
+              "h": 9,
+              "w": 92,
+              "x": 4,
+              "y": 79
+            }
+          },
+          {
+            "id": "controls",
+            "box": {
+              "h": 9,
+              "w": 92,
+              "x": 4,
+              "y": 89
+            }
+          }
+        ]
+      },
+      "states": [
+        "running",
+        "edit_queued",
+        "cycle_boundary",
+        "run_complete"
+      ],
+      "purpose": "Observe the 32-beat simulation and diagnose production/rhythm conflicts without direct machine manipulation.",
+      "feedback": [
+        "playhead tick each beat",
+        "activation mechanical motion + role sound + target hit/miss marker",
+        "wait warning then jam/scrap after >2 beats",
+        "good output counter + chord accent"
+      ],
+      "components": [
+        {
+          "id": "running_canvas",
+          "box": {
+            "h": 66,
+            "w": 96,
+            "x": 2,
+            "y": 12
+          },
+          "type": "simulation_view",
+          "label": "Live line",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "beat_rail",
+          "box": {
+            "h": 9,
+            "w": 92,
+            "x": 4,
+            "y": 79
+          },
+          "type": "timeline",
+          "label": "8-beat playhead × 4 cycles",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 9,
+            "w": 24,
+            "x": 4,
+            "y": 89
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "edit_button",
+          "box": {
+            "h": 9,
+            "w": 24,
+            "x": 72,
+            "y": 89
+          },
+          "type": "button",
+          "label": "Edit after cycle",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "run_metrics",
+          "box": {
+            "h": 10,
+            "w": 68,
+            "x": 30,
+            "y": 1
+          },
+          "type": "status_panel",
+          "label": "Output / accuracy / jams",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "queued edit at beat5 stops after beat8",
+        "no direct module manipulation while running"
+      ],
+      "transitions": [
+        {
+          "to": "S4",
+          "guard": "pause requested",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S2",
+          "guard": "edit queued and cycle boundary reached",
+          "source_refs": [
+            "game_design:round_structure"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S5",
+          "guard": "beat 32 resolved",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "pause_run",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay appears",
+          "source_refs": [
+            "game_design:game_rules"
+          ],
+          "precondition": "running or edit_queued",
+          "state_change": "enter paused; beat and item state freeze",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "queue_edit",
+          "input": "tap",
+          "target": "edit_button",
+          "feedback": "button becomes queued-stop indicator",
+          "source_refs": [
+            "game_design:core_player_verbs"
+          ],
+          "precondition": "running",
+          "state_change": "edit queued; simulation continues to current cycle end",
+          "invalid_input": "repeat tap has no additional effect",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "mixed_processor",
+          "name": "Mixed processor",
+          "notes": "Content variation only.",
+          "condition": "variation=mixed-processor",
+          "source_refs": [
+            "game_design:content_model"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "running_canvas": "role-specific activation sound/motion"
+          },
+          "component_overrides": {
+            "running_canvas": "distinct processor role silhouettes/status"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "Pause freezes simulation clock and item state; audio feedback must follow simulation events."
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "overlay",
+            "box": {
+              "h": 50,
+              "w": 76,
+              "x": 12,
+              "y": 25
+            }
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze the simulation without changing run state.",
+      "feedback": [
+        "factory remains visible but frozen"
+      ],
+      "components": [
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 12,
+            "w": 50,
+            "x": 25,
+            "y": 45
+          },
+          "type": "button",
+          "label": "Resume",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "queued edit remains queued across pause"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "guard": "resume",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "game_design:game_rules"
+          ],
+          "precondition": "paused",
+          "state_change": "return to same running state/beat/items",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No hidden beat advancement."
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "Run Result / Diagnostic",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "verdict",
+            "box": {
+              "h": 18,
+              "w": 92,
+              "x": 4,
+              "y": 4
+            }
+          },
+          {
+            "id": "metrics",
+            "box": {
+              "h": 22,
+              "w": 92,
+              "x": 4,
+              "y": 24
+            }
+          },
+          {
+            "id": "timeline",
+            "box": {
+              "h": 30,
+              "w": 92,
+              "x": 4,
+              "y": 48
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 16,
+              "w": 92,
+              "x": 4,
+              "y": 80
+            }
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "Show production, rhythm and jam verdicts plus causal timeline; offer rule-defined recovery.",
+      "feedback": [
+        "good_output/quota",
+        "accuracy/threshold",
+        "jams/limit",
+        "causal 32-beat timeline"
+      ],
+      "components": [
+        {
+          "id": "verdict_panel",
+          "box": {
+            "h": 18,
+            "w": 92,
+            "x": 4,
+            "y": 4
+          },
+          "type": "result_panel",
+          "label": "Success/Failure",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "metric_panel",
+          "box": {
+            "h": 22,
+            "w": 92,
+            "x": 4,
+            "y": 24
+          },
+          "type": "metrics",
+          "label": "Achieved vs required",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "diagnostic_timeline",
+          "box": {
+            "h": 30,
+            "w": 92,
+            "x": 4,
+            "y": 48
+          },
+          "type": "timeline",
+          "label": "32-beat hit/miss/wait/jam/output causes",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "edit_retry_button",
+          "box": {
+            "h": 12,
+            "w": 28,
+            "x": 4,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Edit Retry",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "reset_button_result",
+          "box": {
+            "h": 12,
+            "w": 28,
+            "x": 35,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Reset",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "next_select_button",
+          "box": {
+            "h": 12,
+            "w": 30,
+            "x": 66,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Next / Select",
+          "source_refs": [
+            "game_design:screen_inventory/interaction_spec"
+          ],
+          "decision_note": "Layout only; game meaning unchanged.",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "failure never removes mastery stars"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "failure edit retry/reset",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S1",
+          "guard": "select/next routing",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "edit_retry",
+          "input": "tap",
+          "target": "edit_retry_button",
+          "feedback": "failed timeline remains available until transition",
+          "source_refs": [
+            "game_design:failure_recovery"
+          ],
+          "precondition": "failure",
+          "state_change": "return to S2 preserving current configuration",
+          "invalid_input": "hidden on success",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "reset_retry",
+          "input": "tap",
+          "target": "reset_button_result",
+          "feedback": "reset confirmation feedback",
+          "source_refs": [
+            "game_design:failure_recovery"
+          ],
+          "precondition": "failure",
+          "state_change": "return S2 with starter layout",
+          "invalid_input": "hidden on success",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "advance",
+          "input": "tap",
+          "target": "next_select_button",
+          "feedback": "success confirmation",
+          "source_refs": [
+            "game_design:screen_flow"
+          ],
+          "precondition": "success",
+          "state_change": "next unlocked contract or select/replay",
+          "invalid_input": "failure uses Select only",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "success_result",
+          "name": "Success",
+          "notes": "Mastery/progression applies per Game Design.",
+          "condition": "quota AND accuracy threshold AND jam limit all satisfied",
+          "source_refs": [
+            "game_design:game_rules/progression"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "verdict_panel": "clear achieved conditions"
+          },
+          "component_overrides": {
+            "next_select_button": "Next/Replay/Select choices"
+          },
+          "interaction_overrides": {
+            "edit_retry_button": "hidden"
+          }
+        },
+        {
+          "id": "failure_result",
+          "name": "Failure",
+          "notes": "Recovery preserves progression.",
+          "condition": "one or more success conditions not satisfied",
+          "source_refs": [
+            "game_design:game_rules/failure_recovery"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "verdict_panel": "failed conditions emphasized without progression loss"
+          },
+          "component_overrides": {
+            "edit_retry_button": "visible",
+            "reset_button_result": "visible"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "Diagnostics explain existing events; do not add scoring."
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "2a47f07e-e719-4c64-862f-b0ba3156b4c4",
+  "input_map": {
+    "gestures": [
+      {
+        "use": "module placement only in Edit",
+        "input": "drag",
+        "cancel": "return_origin on invalid drop",
+        "priority": 2
+      },
+      {
+        "use": "selection, phase, run, pause, queued edit, result actions",
+        "input": "tap",
+        "priority": 1
+      }
+    ],
+    "conflicts": [
+      "Running blocks module/phase manipulation; pause/edit buttons remain active."
+    ],
+    "source_refs": [
+      "game_design:interaction_spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T21:32:49.463519+00:00",
+  "edge_cases": {
+    "items": [
+      "invalid drop returns origin",
+      "pause freezes beat/items",
+      "queued edit waits for cycle boundary",
+      "wait >2 beats becomes jam/scrap",
+      "directed configured edges only",
+      "failure has Edit Retry/Reset/Select recovery"
+    ],
+    "source_refs": [
+      "game_design:game_rules/test_scenarios"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T21:32:49.463519+00:00",
+  "core_screen": "S2",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "S1",
+    "paths": [
+      [
+        "S1",
+        "S2",
+        "S3",
+        "S5"
+      ],
+      [
+        "S3",
+        "S4",
+        "S3"
+      ],
+      [
+        "S3",
+        "S2"
+      ],
+      [
+        "S5",
+        "S2"
+      ],
+      [
+        "S5",
+        "S1"
+      ]
+    ],
+    "guards": [
+      {
+        "to": "S3",
+        "from": "S2",
+        "guard": "connected source-to-output"
+      },
+      {
+        "to": "S2",
+        "from": "S3",
+        "guard": "queued edit reaches cycle boundary"
+      },
+      {
+        "to": "S5",
+        "from": "S3",
+        "guard": "32 beats complete"
+      }
+    ],
+    "source_refs": [
+      "game_design:screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 6,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "select",
+      "screen": "S1",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "edit",
+      "screen": "S2",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "running",
+      "screen": "S3",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "paused",
+      "screen": "S4",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "success",
+      "screen": "S5",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "failure",
+      "screen": "S5",
+      "source_refs": [
+        "game_design:state_model"
+      ],
+      "decision_origin": "game_design"
+    }
+  ],
+  "pack_markdown": "# Assembly Line Orchestra — Interaction Wireframe Pack v0.3\n\nMobile landscape. Core screen: Factory Setup/Edit. Five screens cover Select → Edit → Running ↔ Pause → Result with safe-stop recovery. The factory line is the primary visual object; beat timing is embedded in an 8-beat rail and machine motion rather than a separate rhythm lane. Drag placement is constrained to compatible sockets and invalid drops return to origin. Phase is 1–8 per module. Running forbids direct machine edits; Pause freezes simulation and Edit queues a stop at cycle boundary. Result preserves the 32-beat causal timeline and all rule-defined success/failure recovery. Variations: tutorial, single-route, branch-route, syncopated, mixed-processor. Fun promise: production optimization and rhythm composition must conflict and resolve through the same placement/timing decisions.",
+  "source_run_at": "2026-09-30T21:32:49.463519+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "rules": [
+      "Keep full active line readable on one screen.",
+      "Use compact beat rail instead of note highway.",
+      "Status top, factory center, timing/controls bottom.",
+      "Direct manipulation only in Edit; observation + pause/safe-stop in Running."
+    ],
+    "fun_promise": "생산 최적화와 리듬 연주가 같은 배치·타이밍 행동에서 충돌하고 합쳐져야 한다.",
+    "orientation": "landscape",
+    "target_device": "mobile"
+  },
+  "developer_handoff": {
+    "fun_promise": "생산 최적화와 리듬 연주가 같은 배치·타이밍 행동에서 충돌하고 합쳐져야 한다.",
+    "source_refs": [
+      "game_design:wireframe_handoff/content_model"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "content_variations": [
+      "tutorial",
+      "single-route",
+      "branch-route",
+      "syncopated",
+      "mixed-processor"
+    ],
+    "responsibility_boundary": "Wireframe fixes UX meaning, screens, states and semantic interactions; implementation architecture remains Blueprint responsibility."
+  },
+  "acceptance_criteria": [
+    "All 5 Screen Inventory types exist and are reachable.",
+    "Edit supports compatible-socket drag placement with invalid return and 1–8 phase setting.",
+    "Run lasts 32 beats as four 8-beat cycles and exposes playhead, activation, wait/jam/output feedback.",
+    "Queued Edit stops only at cycle boundary; Pause freezes beat and item state.",
+    "Result compares good_output/quota, accuracy/threshold and jams/limit and preserves causal diagnostics.",
+    "Failure exposes Edit Retry, starter Reset and Select without progression loss; success exposes Next/Replay/Select.",
+    "All five content variation classes are representable without adding rules.",
+    "No live rhythm tapping, currency, shop, freeform spatial routing, or new scoring is introduced."
+  ],
+  "primary_interaction": "모듈 배치 + 8-beat activation phase 조율",
+  "interaction_principles": [
+    "Direct manipulation in Edit; observation in Run.",
+    "Factory motion and beat rail jointly communicate rhythm.",
+    "Invalid actions never silently mutate topology.",
+    "Recovery preserves the player's configuration unless Reset is chosen."
+  ]
+}

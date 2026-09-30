@@ -1,0 +1,1096 @@
+{
+  "id": "9d7e4726-231c-48b8-b84a-b3a14047ae7a",
+  "title": "Constellation Crane Operator",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "223050fa-748e-4159-9f23-c33fe82b278a",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Skyyard Home / Contract Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "screen content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[0]",
+              "progression"
+            ],
+            "decision_note": "Safe-area inset only; no game rule changes.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Contract Select"
+      ],
+      "purpose": "Choose unlocked contract and inspect best rating.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "contract_grid",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 16
+          },
+          "type": "selectable_card_grid",
+          "label": "Contract cards",
+          "source_refs": [
+            "screen_inventory[0]",
+            "progression"
+          ],
+          "state_binding": "unlock/best_score/rating",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "home_title",
+          "box": {
+            "h": 7,
+            "w": 60,
+            "x": 6,
+            "y": 6
+          },
+          "type": "label",
+          "label": "Skyyard",
+          "source_refs": [
+            "screen_inventory[0]"
+          ],
+          "decision_note": "Title placement only.",
+          "state_binding": "static",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "rating_legend",
+          "box": {
+            "h": 7,
+            "w": 60,
+            "x": 6,
+            "y": 82
+          },
+          "type": "legend",
+          "label": "Rating thresholds",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1=success,2>=900,3>=1250",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "home_action",
+          "box": {
+            "h": 10,
+            "w": 26,
+            "x": 68,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Selected contract CTA",
+          "source_refs": [
+            "progression",
+            "screen_flow"
+          ],
+          "state_binding": "enabled when unlocked contract selected",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S1",
+          "trigger": "tap selected contract",
+          "condition": "unlocked",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select contract",
+          "target": "contract_grid",
+          "feedback": "card selected",
+          "source_refs": [
+            "progression",
+            "state_model[0]"
+          ],
+          "precondition": "contract unlocked",
+          "state_change": "selected_contract",
+          "invalid_input": "locked card shows locked state only",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S2",
+      "name": "Contract Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "screen content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[1]",
+              "wireframe_handoff"
+            ],
+            "decision_note": "Safe-area inset only; no game rule changes.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Contract Brief"
+      ],
+      "purpose": "Explain authored contract topology/rules before play.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "contract_summary",
+          "box": {
+            "h": 18,
+            "w": 88,
+            "x": 6,
+            "y": 8
+          },
+          "type": "panel",
+          "label": "Contract summary",
+          "source_refs": [
+            "content_model",
+            "screen_inventory[1]"
+          ],
+          "state_binding": "contract data",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rule_chips",
+          "box": {
+            "h": 10,
+            "w": 88,
+            "x": 6,
+            "y": 28
+          },
+          "type": "chip_row",
+          "label": "Rule class chips",
+          "source_refs": [
+            "content_model.classes"
+          ],
+          "state_binding": "Open/Layered/Obstacle/Heat/Sequenced",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "topology_preview",
+          "box": {
+            "h": 34,
+            "w": 88,
+            "x": 6,
+            "y": 40
+          },
+          "type": "diagram",
+          "label": "Node/layer/hazard preview",
+          "source_refs": [
+            "content_model.topology"
+          ],
+          "state_binding": "authored topology",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 42,
+            "x": 52,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 6,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Back",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "transition": "fade",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "enter gameplay",
+          "target": "start",
+          "feedback": "stage loads",
+          "source_refs": [
+            "game_rules.timer",
+            "state_model[1]"
+          ],
+          "precondition": "contract loaded",
+          "state_change": "Rigging; timer armed until first gameplay input",
+          "invalid_input": "disabled while loading",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "return select",
+          "target": "back",
+          "feedback": "back",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "precondition": "always",
+          "state_change": "none",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S3",
+      "name": "Crane Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "screen content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[2]",
+              "wireframe_handoff"
+            ],
+            "decision_note": "Safe-area inset only; no game rule changes.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Rigging",
+        "Hoisting",
+        "Positioning",
+        "Collision Grace"
+      ],
+      "purpose": "Manipulate crane, carry stars, satisfy lock criteria, survive hazards.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "hud_timer",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 4,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "90s Timer",
+          "source_refs": [
+            "game_rules.timer"
+          ],
+          "state_binding": "timer",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "hud_integrity",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 29,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Integrity",
+          "source_refs": [
+            "game_rules.collision",
+            "round_structure"
+          ],
+          "state_binding": "0..3",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 86,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "interaction_spec.priority"
+          ],
+          "state_binding": "always except Result",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "workspace",
+          "box": {
+            "h": 55,
+            "w": 92,
+            "x": 4,
+            "y": 12
+          },
+          "type": "simulation_view",
+          "label": "Crane workspace",
+          "source_refs": [
+            "game_rules.coordinate",
+            "visual_direction_brief"
+          ],
+          "state_binding": "boom/cable/star/node/hazards/layers",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "depth",
+          "box": {
+            "h": 9,
+            "w": 20,
+            "x": 4,
+            "y": 69
+          },
+          "type": "button",
+          "label": "Depth selector",
+          "source_refs": [
+            "game_rules.depth"
+          ],
+          "state_binding": "selected layer; disabled carrying",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "boom",
+          "box": {
+            "h": 9,
+            "w": 28,
+            "x": 27,
+            "y": 69
+          },
+          "type": "drag_pad",
+          "label": "Boom control",
+          "source_refs": [
+            "interaction_spec.boom"
+          ],
+          "state_binding": "boom_angle -65..65",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cable",
+          "box": {
+            "h": 20,
+            "w": 18,
+            "x": 58,
+            "y": 69
+          },
+          "type": "drag_pad",
+          "label": "Cable control",
+          "source_refs": [
+            "interaction_spec.cable"
+          ],
+          "state_binding": "cable_length .15..85",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "hook",
+          "box": {
+            "h": 9,
+            "w": 20,
+            "x": 4,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Hook",
+          "source_refs": [
+            "game_rules.hook",
+            "interaction_spec.hook"
+          ],
+          "state_binding": "valid only empty hook+overlap+speed+layer",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "brake",
+          "box": {
+            "h": 9,
+            "w": 28,
+            "x": 27,
+            "y": 80
+          },
+          "type": "hold_button",
+          "label": "Brake",
+          "source_refs": [
+            "game_rules.brake",
+            "interaction_spec.brake"
+          ],
+          "state_binding": "heat 0..6; disabled 6 until <=3",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "lock",
+          "box": {
+            "h": 20,
+            "w": 17,
+            "x": 79,
+            "y": 69
+          },
+          "type": "button",
+          "label": "Lock",
+          "source_refs": [
+            "game_rules.nodes",
+            "interaction_spec.lock"
+          ],
+          "state_binding": "Positioning; valid distance/speed/swing/layer",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "criteria",
+          "box": {
+            "h": 7,
+            "w": 92,
+            "x": 4,
+            "y": 90
+          },
+          "type": "criteria_panel",
+          "label": "Position criteria",
+          "source_refs": [
+            "game_rules.nodes"
+          ],
+          "state_binding": "distance<=.07 speed<=.18 swing<=8 exact layer",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Hoisting",
+          "from": "Rigging",
+          "trigger": "valid Hook",
+          "condition": "hook validity",
+          "transition": "state",
+          "source_refs": [
+            "state_model[2]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Positioning",
+          "from": "Hoisting",
+          "trigger": "enter snap radius",
+          "condition": "distance<=.07",
+          "transition": "state",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Rigging",
+          "from": "Positioning",
+          "trigger": "valid Lock",
+          "condition": "more nodes remain",
+          "transition": "link light",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S4",
+          "from": "S3",
+          "trigger": "all nodes/timer0/integrity0",
+          "condition": "terminal",
+          "transition": "result",
+          "source_refs": [
+            "game_rules.success",
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S3",
+          "from": "S3",
+          "trigger": "collision",
+          "condition": "integrity remains",
+          "transition": "Collision Grace 1s then Rigging",
+          "source_refs": [
+            "game_rules.collision"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "horizontal drag",
+          "action": "rotate boom",
+          "target": "boom",
+          "feedback": "hook arc updates",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "interaction_spec.priority"
+          ],
+          "precondition": "Rigging/Hoisting/Positioning; no other manipulation",
+          "state_change": "boom_angle clamped",
+          "invalid_input": "ignored while input locked",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "vertical drag",
+          "action": "adjust cable",
+          "target": "cable",
+          "feedback": "hook position updates",
+          "source_refs": [
+            "core_player_verbs[1]"
+          ],
+          "precondition": "same",
+          "state_change": "length clamped",
+          "invalid_input": "ignored while input locked",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "attempt hook",
+          "target": "hook",
+          "feedback": "latch/haptic; invalid no state change",
+          "source_refs": [
+            "core_player_verbs[2]"
+          ],
+          "precondition": "Rigging empty hook",
+          "state_change": "valid -> Hoisting",
+          "invalid_input": "show failed proximity/speed/layer cue",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "hold",
+          "action": "damp swing",
+          "target": "brake",
+          "feedback": "heat/swing update",
+          "source_refs": [
+            "core_player_verbs[3]"
+          ],
+          "precondition": "Hoisting/Positioning and heat rule permits",
+          "state_change": "velocity*.55 per .5s; heat+1",
+          "invalid_input": "overheat disabled until heat<=3",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "attempt lock",
+          "target": "lock",
+          "feedback": "link lights; invalid criteria highlighted",
+          "source_refs": [
+            "core_player_verbs[4]",
+            "game_rules.nodes"
+          ],
+          "precondition": "Positioning",
+          "state_change": "valid -> node filled then Rigging or Result",
+          "invalid_input": "no state change",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "cycle layer",
+          "target": "depth",
+          "feedback": "layer emphasis",
+          "source_refs": [
+            "game_rules.depth"
+          ],
+          "precondition": "hook empty",
+          "state_change": "selected layer",
+          "invalid_input": "disabled carrying",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V1",
+          "name": "Carrying",
+          "notes": "Carried star and swing cues visible.",
+          "condition": "Hoisting",
+          "components": [],
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "hook"
+          ],
+          "component_overrides": {
+            "brake": {
+              "state_binding": "enabled unless overheated"
+            },
+            "depth": {
+              "state_binding": "disabled carrying"
+            }
+          }
+        },
+        {
+          "id": "V2",
+          "name": "Snap Candidate",
+          "notes": "Invalid Lock reports failed criteria without state change.",
+          "condition": "Positioning",
+          "components": [],
+          "source_refs": [
+            "state_model[4]",
+            "interaction_spec.lock"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "lock": {
+              "state_binding": "criteria validity"
+            },
+            "criteria": {
+              "state_binding": "four independent criteria"
+            }
+          }
+        },
+        {
+          "id": "V3",
+          "name": "Collision Grace",
+          "notes": "Gameplay input locked; timer continues.",
+          "condition": "1s after nonterminal collision",
+          "components": [],
+          "source_refs": [
+            "game_rules.collision",
+            "state_model[5]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "boom",
+            "cable",
+            "hook",
+            "brake",
+            "lock",
+            "depth"
+          ],
+          "component_overrides": {}
+        },
+        {
+          "id": "V4",
+          "name": "Sequenced Nodes",
+          "notes": "Inactive node Lock is invalid.",
+          "condition": "contract uses prerequisites",
+          "components": [],
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "workspace": {
+              "state_binding": "nodes inactive/active/filled by prerequisite graph"
+            }
+          }
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "All five content classes bind into workspace variants; no new gestures."
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Contract Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "screen content",
+            "label": "Safe Area",
+            "source_refs": [
+              "screen_inventory[3]",
+              "progression"
+            ],
+            "decision_note": "Safe-area inset only; no game rule changes.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Show success/failure, score/rating and next/retry/home.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "result_state",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "source_refs": [
+            "game_rules.success",
+            "game_rules.failure"
+          ],
+          "state_binding": "success/failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 20,
+            "w": 84,
+            "x": 8,
+            "y": 27
+          },
+          "type": "summary",
+          "label": "Score",
+          "source_refs": [
+            "game_rules.score"
+          ],
+          "state_binding": "score formula / 0 failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rating",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 50
+          },
+          "type": "stars",
+          "label": "Rating",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1/2/3 thresholds",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 68
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 68
+          },
+          "type": "button",
+          "label": "Next",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "success and next exists",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "home",
+          "box": {
+            "h": 10,
+            "w": 84,
+            "x": 8,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Home",
+          "source_refs": [
+            "state_model[6]"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S4",
+          "trigger": "Next",
+          "condition": "success+next",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S3",
+          "from": "S4",
+          "trigger": "Retry",
+          "condition": "always",
+          "transition": "reload",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "full reset",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "precondition": "always",
+          "state_change": "Rigging initial",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "unlock/open next brief",
+          "target": "next",
+          "feedback": "unlock",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "success and next exists",
+          "state_change": "progression",
+          "invalid_input": "hidden/disabled otherwise",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "return select",
+          "target": "home",
+          "feedback": "home",
+          "source_refs": [
+            "state_model[6]"
+          ],
+          "precondition": "always",
+          "state_change": "none",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "6cc940fa-15a8-449a-aaf9-b09531e49ce1",
+  "input_map": {
+    "cancel": "drag cancellation returns to last committed control value; atomic invalid taps make no rule state change",
+    "priority": [
+      "Pause",
+      "Collision resolution",
+      "active drag/hold",
+      "atomic Hook/Lock/Depth"
+    ],
+    "source_refs": [
+      "interaction_spec.priority"
+    ],
+    "decision_note": "Cancellation behavior preserves atomic rule semantics.",
+    "single_pointer": true,
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T05:58:19.659645+00:00",
+  "edge_cases": {
+    "items": [
+      "timer reaches 0 during grace -> failure",
+      "integrity reaches 0 on collision -> immediate failure",
+      "overheated brake remains disabled until heat<=3",
+      "inactive prerequisite node rejects Lock"
+    ],
+    "source_refs": [
+      "game_rules",
+      "content_model.classes"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T05:58:19.659645+00:00",
+  "core_screen": "S3 Crane Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      "locked contracts cannot start",
+      "Next only on success"
+    ],
+    "normal": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "branches": [
+      "collision->Collision Grace->Rigging",
+      "failure->S4",
+      "success Next->S2"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 10,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze timer and physics; resume exact prior gameplay state",
+      "source_refs": [
+        "game_rules.timer",
+        "screen_flow"
+      ],
+      "decision_origin": "game_design"
+    },
+    "Loading": {
+      "effect": "disable Start until contract data ready",
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "decision_note": "Loading presentation closes a local UX gap without changing rules.",
+      "decision_origin": "wireframe_completion"
+    },
+    "InputLock": {
+      "effect": "collision grace blocks gameplay except Pause",
+      "source_refs": [
+        "interaction_spec.priority",
+        "state_model[5]"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Constellation Crane Operator\n\nWhole-MVP pack covering Contract Select, Brief, Crane Gameplay and Result; Rigging/Hoisting/Positioning/Collision Grace/Pause; all five content classes and combined late contracts. Decision trace is embedded in JSON fields. Implementation architecture is intentionally left to the Blueprint stage.",
+  "source_run_at": "2026-09-30T05:55:00+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coordinates": "0..100 screen-percent",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Presentation geometry is separate from normalized gameplay rule geometry.",
+    "touch_targets": "controls use enlarged hit boxes without changing simulation geometry",
+    "decision_origin": "wireframe_layout",
+    "safe_area_percent": 4
+  },
+  "developer_handoff": {
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "10 contract definitions",
+      "node prerequisite graph",
+      "star radius/spawn/layer",
+      "hazard circles",
+      "best score/rating/unlock"
+    ],
+    "responsibility": "Implementation chooses Godot scene/node/script architecture.",
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "contract progression persistent",
+      "timer/integrity/heat/pose contract-local"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "Open-Sky",
+      "Layered",
+      "Obstacle",
+      "Heat",
+      "Sequenced",
+      "combined late contract"
+    ]
+  },
+  "acceptance_criteria": [
+    "All four screen types are reachable in full flow.",
+    "Rigging, Hoisting, Positioning, Collision Grace, Pause, success and failure are observable.",
+    "All five content classes are representable without invented gestures.",
+    "Hook and Lock enforce exact authored thresholds and invalid attempts do not mutate rule state.",
+    "Retry resets all authored contract-local state.",
+    "Success stores rating/best score and unlocks exactly the next contract."
+  ],
+  "primary_interaction": "boom/cable manipulation + hook + swing damping + precision lock",
+  "interaction_principles": [
+    "Preserve normalized crane rules and exact thresholds",
+    "One active manipulation pointer; pause/collision override",
+    "Expose each lock criterion independently",
+    "Represent all five MVP content classes through variants"
+  ]
+}

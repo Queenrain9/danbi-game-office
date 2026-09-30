@@ -1,228 +1,233 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "3f6f7586-c41e-4db6-a746-1009bb523a68",
-    "title": "Elevator Weightmaster",
-    "source": "chat_automation",
-    "economy": "Not required for MVP. 점수/별은 해금 조건이며 구매 경제는 넣지 않는다.",
-    "idea_id": "924b53f0-26b2-4340-840f-dd993c7b919c",
-    "version": "v0.1",
-    "one_line": "괴물 호텔 화물 엘리베이터에서 승객과 짐을 직접 배치해 총하중과 좌우 무게중심을 맞추고 이동 중 흔들림까지 보정하는 세로형 적재 퍼즐.",
-    "core_loop": "대기열을 5~10초 읽고 → 20~40초 동안 승객/짐을 드래그 배치하며 용량·무게중심·목적층을 맞춘다 → 안전 범위가 되면 운행 → 10~25초 이동 중 흔들림 이벤트가 발생하면 제한된 물체를 재배치해 균형을 회복 → 도착 후 하차·점수 정산 → 다음 적재.",
-    "mvp_scope": "엘리베이터 1종, 4~6개 물체, 드래그 배치/충돌/20cm 스냅, 질량 합계와 1축 무게중심 계산, 출발 조건, 3개 고정 manifest, 이동 중 흔들림 이벤트 1종, correction window, 성공/비상정지/점수까지 구현.",
-    "game_rules": {
-      "score": {
-        "delivered": 100,
-        "left_behind": -25,
-        "emergency_stop": -150,
-        "perfect_balance": 50,
-        "unused_capacity_efficiency_max": 30
-      },
-      "rating": {
-        "A": 350,
-        "B": 250,
-        "S": 450
-      },
-      "capacity_kg": 1000,
-      "snap_grid_cm": 20,
-      "load_phase_sec": 40,
-      "base_passengers": 4,
-      "critical_hold_sec": 3,
-      "dispatch_requires": "total_mass <= capacity and abs(center_offset) <= warning_center_offset",
-      "safe_center_offset": 0.18,
-      "warning_center_offset": 0.28,
-      "critical_center_offset": 0.38
+  "id": "3f6f7586-c41e-4db6-a746-1009bb523a68",
+  "title": "Elevator Weightmaster",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required for MVP. 점수/별은 해금 조건이며 구매 경제는 넣지 않는다.",
+  "idea_id": "924b53f0-26b2-4340-840f-dd993c7b919c",
+  "version": "v0.1",
+  "one_line": "괴물 호텔 화물 엘리베이터에서 승객과 짐을 직접 배치해 총하중과 좌우 무게중심을 맞추고 이동 중 흔들림까지 보정하는 세로형 적재 퍼즐.",
+  "core_loop": "대기열을 5~10초 읽고 → 20~40초 동안 승객/짐을 드래그 배치하며 용량·무게중심·목적층을 맞춘다 → 안전 범위가 되면 운행 → 10~25초 이동 중 흔들림 이벤트가 발생하면 제한된 물체를 재배치해 균형을 회복 → 도착 후 하차·점수 정산 → 다음 적재.",
+  "mvp_scope": "엘리베이터 1종, 4~6개 물체, 드래그 배치/충돌/20cm 스냅, 질량 합계와 1축 무게중심 계산, 출발 조건, 3개 고정 manifest, 이동 중 흔들림 이벤트 1종, correction window, 성공/비상정지/점수까지 구현.",
+  "created_at": "2026-09-29T16:46:50.362441+00:00",
+  "game_rules": {
+    "score": {
+      "delivered": 100,
+      "left_behind": -25,
+      "emergency_stop": -150,
+      "perfect_balance": 50,
+      "unused_capacity_efficiency_max": 30
     },
-    "not_in_mvp": [
-      "다층 호텔 메타",
-      "상점",
-      "2축 무게중심",
-      "복잡한 강체 물리",
-      "승객 대화",
-      "절차 생성",
-      "도구 업그레이드",
-      "온라인 랭킹"
-    ],
-    "known_risks": [
-      "무게중심 숫자가 퍼즐보다 계산 문제처럼 보일 위험",
-      "자유 배치가 작은 화면에서 정밀 조작을 요구할 위험",
-      "실제 물리와 규칙 기반 판정이 시각적으로 불일치할 위험",
-      "이동 중 보정이 매번 같은 반사신경 이벤트가 될 위험",
-      "괴물 footprint 제작량 증가"
-    ],
-    "progression": "근무 평점으로 호텔 층과 새로운 승객/짐 규칙을 해금한다. 보조 도구로 1회 자동 무게 측정, 바닥 고정 스트랩 등을 이후 해금할 수 있으나 MVP는 규칙 해금만 사용한다.",
-    "screen_flow": "Shift Select → Manifest Brief → Loading ↔ InvalidReady → Travel ↔ Correction → Arrival Result → 다음 Manifest. 3~5회 후 Shift Result. 비상정지는 Arrival 대신 Failure Result를 거쳐 같은 ride 재시도 가능.",
-    "state_model": [
-      {
-        "ui": "requests,weights,destinations",
-        "exit": "first drag",
-        "enter": "ride begins",
-        "state": "QueuePreview",
-        "inputs": [
-          "inspect"
-        ]
-      },
-      {
-        "ui": "capacity,center gauge,timer",
-        "exit": "dispatch",
-        "enter": "drag starts",
-        "state": "Loading",
-        "inputs": [
-          "drag",
-          "rotate",
-          "remove"
-        ]
-      },
-      {
-        "ui": "dispatch disabled + cause",
-        "exit": "safe configuration",
-        "enter": "overload or unsafe center",
-        "state": "InvalidReady",
-        "inputs": [
-          "reposition",
-          "remove"
-        ]
-      },
-      {
-        "ui": "floor progress,balance",
-        "exit": "event or arrival",
-        "enter": "dispatch",
-        "state": "Travel",
-        "inputs": [
-          "observe"
-        ]
-      },
-      {
-        "ui": "tilt,critical timer",
-        "exit": "balance recovered/event timeout",
-        "enter": "sway event",
-        "state": "Correction",
-        "inputs": [
-          "drag allowed loads"
-        ]
-      },
-      {
-        "ui": "delivered,score",
-        "exit": "next ride",
-        "enter": "floor reached",
-        "state": "Arrival",
-        "inputs": [
-          "continue"
-        ]
-      }
-    ],
-    "content_unit": "하나의 ride manifest",
-    "content_model": {
-      "axes": {
-        "mass": "light/medium/heavy",
-        "behavior": "stable/shifts/needs wall/fragile",
-        "destination": "current or later floor",
-        "cabin_modifier": "blocked tile/slippery tile",
-        "cargo_footprint": "1x1/1x2/L-shape",
-        "passenger_shape": "small/tall/wide/asymmetric"
-      },
-      "unit": "ride manifest",
-      "expansion": "manifest × cabin layout modifier × one behavior rule creates authored puzzle families without new screens"
+    "rating": {
+      "A": 350,
+      "B": 250,
+      "S": 450
     },
-    "source_run_at": "2026-09-29T16:46:50.362441+00:00",
-    "player_fantasy": "플레이어는 낡은 괴물 호텔의 화물 승강기 담당자다. 서로 다른 체형과 무게의 손님과 짐을 제한된 바닥에 영리하게 배치해 안전 한계 안으로 맞추고, 운행 중 예상 밖의 이동에 빠르게 보정하는 정밀함과 아슬아슬한 통제감을 느낀다.",
-    "session_length": "45~90초/운행, 4~7분/근무",
-    "test_scenarios": [
-      "첫 사용자가 게이지 설명 없이 무거운 물체 위치가 균형에 미치는 영향을 2회 내 이해한다",
-      "4개 물체 배치가 30초 안에 끝나면서도 최소 2개의 유효 해법이 나온다",
-      "invalid dispatch 이유를 2초 내 식별한다",
-      "Correction 이벤트에서 드래그 한 번으로 게이지 변화가 즉시 이해된다",
-      "실제 강체 물리 없이도 흔들림이 납득 가능하고 재미를 만든다"
-    ],
-    "feedback_system": {
-      "sway": "cabin tilt + warning tick increasing with danger",
-      "place": "grid snap + weight thump",
-      "pickup": "footprint ghost + soft grab haptic",
-      "arrival": "doors open + delivered cards clear",
-      "balance": "needle and cabin suspension respond continuously",
-      "invalid": "constraint icon shakes + short error haptic",
-      "recover": "needle re-enters safe band + light haptic",
-      "dispatch": "doors close + motor cue"
+    "capacity_kg": 1000,
+    "snap_grid_cm": 20,
+    "load_phase_sec": 40,
+    "base_passengers": 4,
+    "critical_hold_sec": 3,
+    "dispatch_requires": "total_mass <= capacity and abs(center_offset) <= warning_center_offset",
+    "safe_center_offset": 0.18,
+    "warning_center_offset": 0.28,
+    "critical_center_offset": 0.38
+  },
+  "not_in_mvp": [
+    "다층 호텔 메타",
+    "상점",
+    "2축 무게중심",
+    "복잡한 강체 물리",
+    "승객 대화",
+    "절차 생성",
+    "도구 업그레이드",
+    "온라인 랭킹"
+  ],
+  "updated_at": "2026-09-30T06:36:22.92294+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "무게중심 숫자가 퍼즐보다 계산 문제처럼 보일 위험",
+    "자유 배치가 작은 화면에서 정밀 조작을 요구할 위험",
+    "실제 물리와 규칙 기반 판정이 시각적으로 불일치할 위험",
+    "이동 중 보정이 매번 같은 반사신경 이벤트가 될 위험",
+    "괴물 footprint 제작량 증가"
+  ],
+  "progression": "근무 평점으로 호텔 층과 새로운 승객/짐 규칙을 해금한다. 보조 도구로 1회 자동 무게 측정, 바닥 고정 스트랩 등을 이후 해금할 수 있으나 MVP는 규칙 해금만 사용한다.",
+  "screen_flow": "Shift Select → Manifest Brief → Loading ↔ InvalidReady → Travel ↔ Correction → Arrival Result → 다음 Manifest. 3~5회 후 Shift Result. 비상정지는 Arrival 대신 Failure Result를 거쳐 같은 ride 재시도 가능.",
+  "state_model": [
+    {
+      "ui": "requests,weights,destinations",
+      "exit": "first drag",
+      "enter": "ride begins",
+      "state": "QueuePreview",
+      "inputs": [
+        "inspect"
+      ]
     },
-    "round_structure": "한 운행은 Doors Open/Load → Ready Check → Travel → Arrival의 45~90초 구조다. 3~5회 운행이 한 근무 세션(4~7분). 제한시간 내 요청 승객의 70% 이상을 안전 배송하면 근무 성공. 과하중 출발은 불가하며 이동 중 위험 게이지가 3초 연속 임계치를 넘으면 비상정지로 해당 운행 실패.",
-    "interaction_spec": {
-      "drag": "object follows finger with footprint ghost; release inside valid cabin bounds snaps to 20cm grid",
-      "cancel": "release outside cabin returns to prior valid pose",
-      "hitbox": "visual bounds expanded by 12px",
-      "remove": "drag back through door threshold while doors open",
-      "rotate": "selected cargo gets 90-degree rotate button; two-finger twist optional, button is authoritative mobile path",
-      "invalid": "never silently auto-arrange; show which constraint fails",
-      "dispatch": "enabled only when mass and center rules pass",
-      "priority": "modal/UI > selected object > cabin object > queue object > background",
-      "collision": "overlap preview blocks drop; object returns to origin",
-      "correction": "during travel only highlighted movable objects accept drag; others reject with locked feedback"
+    {
+      "ui": "capacity,center gauge,timer",
+      "exit": "dispatch",
+      "enter": "drag starts",
+      "state": "Loading",
+      "inputs": [
+        "drag",
+        "rotate",
+        "remove"
+      ]
     },
-    "screen_inventory": [
-      "Shift Select",
-      "Manifest Brief",
-      "Elevator Loading",
-      "Travel / Correction",
-      "Arrival Result",
-      "Shift Result"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "Load",
-        "input": "drag passenger or cargo",
-        "target": "elevator floor slots/free area",
-        "feedback": "ghost footprint + load gauge",
-        "condition": "doors open",
-        "state_change": "object enters cabin and mass/center updates"
-      },
-      {
-        "verb": "Reposition",
-        "input": "drag loaded object",
-        "target": "valid floor area",
-        "feedback": "balance needle live update",
-        "condition": "doors open or correction window",
-        "state_change": "center of mass changes"
-      },
-      {
-        "verb": "Rotate cargo",
-        "input": "two-finger twist or rotate button",
-        "target": "rotatable cargo",
-        "feedback": "outline snap",
-        "condition": "doors open",
-        "state_change": "footprint orientation changes"
-      },
-      {
-        "verb": "Dispatch",
-        "input": "tap floor button",
-        "target": "destination",
-        "feedback": "safe-zone lock",
-        "condition": "capacity and balance inside safe zone",
-        "state_change": "doors close and travel begins"
-      },
-      {
-        "verb": "Correct",
-        "input": "drag movable load during sway window",
-        "target": "highlighted movable object",
-        "feedback": "tilt and needle recover",
-        "condition": "travel event active",
-        "state_change": "balance shifts in real time"
-      }
-    ],
-    "wireframe_handoff": [
-      "Manifest의 weight/destination 정보",
-      "Loading의 drag ghost와 snap",
-      "valid/overlap/out-of-bounds drop",
-      "capacity와 center gauge safe/warn/critical",
-      "dispatch enabled/disabled와 원인",
-      "Travel 기본 상태",
-      "Sway Correction 상태와 critical timer",
-      "locked object invalid input",
-      "Arrival/Failure Result",
-      "doors open→close→travel→arrival transition"
-    ],
-    "primary_interaction": "승객/짐 드래그 배치 + 실시간 무게중심 게이지 + 운행 중 제한 재배치",
-    "difficulty_variation": "초반은 질량과 좌우 균형만, 중반은 큰 footprint와 목적층 때문에 당장 최적 배치가 다음 층을 방해하는 문제, 후반은 이동 중 위치가 변하는 승객·깨지기 쉬운 짐·막힌 바닥칸을 조합한다. 시간 압박보다 공간, 미래 하차 순서, 동적 무게 이동의 상충을 키운다.",
-    "visual_direction_brief": "세로 화면에 엘리베이터 내부가 중앙 65~70%를 차지하는 정면/약한 탑다운 혼합 시점. 바닥 footprint가 명확히 보이고 승객 실루엣은 작은 화면에서도 구분되어야 한다. 좌측 총하중, 상단 목적층, 하단 무게중심 바를 고정한다. 물리 연출은 읽기 쉬운 기울기와 흔들림으로 제한하고 사실적 시뮬레이션보다 퍼즐 판독성을 우선한다."
-  }
+    {
+      "ui": "dispatch disabled + cause",
+      "exit": "safe configuration",
+      "enter": "overload or unsafe center",
+      "state": "InvalidReady",
+      "inputs": [
+        "reposition",
+        "remove"
+      ]
+    },
+    {
+      "ui": "floor progress,balance",
+      "exit": "event or arrival",
+      "enter": "dispatch",
+      "state": "Travel",
+      "inputs": [
+        "observe"
+      ]
+    },
+    {
+      "ui": "tilt,critical timer",
+      "exit": "balance recovered/event timeout",
+      "enter": "sway event",
+      "state": "Correction",
+      "inputs": [
+        "drag allowed loads"
+      ]
+    },
+    {
+      "ui": "delivered,score",
+      "exit": "next ride",
+      "enter": "floor reached",
+      "state": "Arrival",
+      "inputs": [
+        "continue"
+      ]
+    }
+  ],
+  "archive_path": "projects/elevator-weightmaster/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "하나의 ride manifest",
+  "content_model": {
+    "axes": {
+      "mass": "light/medium/heavy",
+      "behavior": "stable/shifts/needs wall/fragile",
+      "destination": "current or later floor",
+      "cabin_modifier": "blocked tile/slippery tile",
+      "cargo_footprint": "1x1/1x2/L-shape",
+      "passenger_shape": "small/tall/wide/asymmetric"
+    },
+    "unit": "ride manifest",
+    "expansion": "manifest × cabin layout modifier × one behavior rule creates authored puzzle families without new screens"
+  },
+  "source_run_at": "2026-09-29T16:46:50.362441+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 낡은 괴물 호텔의 화물 승강기 담당자다. 서로 다른 체형과 무게의 손님과 짐을 제한된 바닥에 영리하게 배치해 안전 한계 안으로 맞추고, 운행 중 예상 밖의 이동에 빠르게 보정하는 정밀함과 아슬아슬한 통제감을 느낀다.",
+  "session_length": "45~90초/운행, 4~7분/근무",
+  "test_scenarios": [
+    "첫 사용자가 게이지 설명 없이 무거운 물체 위치가 균형에 미치는 영향을 2회 내 이해한다",
+    "4개 물체 배치가 30초 안에 끝나면서도 최소 2개의 유효 해법이 나온다",
+    "invalid dispatch 이유를 2초 내 식별한다",
+    "Correction 이벤트에서 드래그 한 번으로 게이지 변화가 즉시 이해된다",
+    "실제 강체 물리 없이도 흔들림이 납득 가능하고 재미를 만든다"
+  ],
+  "design_markdown": "\n# Elevator Weightmaster — Playable Game Design Spec v0.1\n## 1. Product Definition\n세로 모바일 physics packing puzzle. 45~90초 운행, 4~7분 근무. 제한된 승강기 바닥에서 하중과 무게중심을 직접 배치로 해결한다. Non-goals: 사실적 강체 시뮬레이터, 승강기 경영, 대화 중심 게임.\n## 2. Player Fantasy\n괴물 호텔의 노련한 화물 담당자로서 한눈에 무게와 공간을 읽고 아슬아슬한 승강기를 안전하게 운행한다.\n## 3. Core Player Verbs\nLoad, Reposition, Rotate, Dispatch, Correct. 각 행동의 input/target/condition/state/feedback은 구조화 필드에 명시.\n## 4. Core Loop\n대기열 읽기 → 배치/균형 → 출발 → 이동 중 흔들림 보정 → 하차/점수 → 다음 manifest.\n## 5. Round / Session Structure\nDoors Open/Load → Ready Check → Travel → Arrival. 45~90초, 3~5회가 한 세션.\n## 6. Game Rules\n용량 1000kg, safe center offset 0.18, warning 0.28, critical 0.38, critical 3초 지속 시 비상정지. 배송/균형/효율 점수.\n## 7. State Model\nQueuePreview, Loading, InvalidReady, Travel, Correction, Arrival. 상태별 입력과 HUD가 다르다.\n## 8. Interaction Spec\n드래그, 20cm grid snap, 12px hitbox 확장, 겹침 drop 거부, 90도 rotate button, 문 밖으로 drag해 제거. 자동 재배치 금지.\n## 9. Content Model\nRide manifest = passenger shape/mass × cargo footprint/behavior × destination × cabin modifier.\n## 10. Difficulty / Variation\n질량/균형 → 큰 footprint/하차 순서 → 이동 물체/fragile/blocked tile. 단순 시간 단축이 아니다.\n## 11. Progression\n근무 평점으로 층과 새 규칙을 해금. 영구 수치 강화보다 규칙 확장.\n## 12. Economy\nNot required for MVP.\n## 13. Screen Inventory\nShift Select, Manifest Brief, Elevator Loading, Travel/Correction, Arrival Result, Shift Result.\n## 14. Screen Flow\nSelect → Brief → Loading ↔ InvalidReady → Travel ↔ Correction → Arrival → next ride → Shift Result. 비상정지는 Failure/Retry.\n## 15. Feedback System\nFootprint ghost, grid snap, weight thump, 실시간 needle/suspension, invalid shake, motor cue, sway warning, recovery haptic.\n## 16. Visual Direction Brief\n세로 중앙에 승강기 65~70%. 정면+약한 탑다운으로 바닥 footprint를 읽게 한다. 사실적 물리보다 실루엣과 게이지 판독성 우선.\n## 17. MVP Scope\n승강기 1, 4~6 물체, drag/collision/snap, 질량+1축 center 계산, 3 manifest, sway 1종, correction, 결과.\n## 18. Test Scenarios\n2회 내 균형 원리 이해, 30초 배치와 복수 해법, invalid 원인 2초 내 식별, correction 즉시성, 규칙 기반 흔들림의 납득성.\n## 19. Known Risks\n계산 문제화, 작은 화면 정밀 조작, 물리 연출 불일치, correction 반복성, footprint 제작량.\n## 20. Wireframe Handoff\nManifest 정보, drag/snap 상태, invalid drop, 3단계 balance gauge, dispatch disabled 이유, Travel/Sway, locked input, Arrival/Failure, 전체 transition을 표현한다.\n",
+  "feedback_system": {
+    "sway": "cabin tilt + warning tick increasing with danger",
+    "place": "grid snap + weight thump",
+    "pickup": "footprint ghost + soft grab haptic",
+    "arrival": "doors open + delivered cards clear",
+    "balance": "needle and cabin suspension respond continuously",
+    "invalid": "constraint icon shakes + short error haptic",
+    "recover": "needle re-enters safe band + light haptic",
+    "dispatch": "doors close + motor cue"
+  },
+  "round_structure": "한 운행은 Doors Open/Load → Ready Check → Travel → Arrival의 45~90초 구조다. 3~5회 운행이 한 근무 세션(4~7분). 제한시간 내 요청 승객의 70% 이상을 안전 배송하면 근무 성공. 과하중 출발은 불가하며 이동 중 위험 게이지가 3초 연속 임계치를 넘으면 비상정지로 해당 운행 실패.",
+  "interaction_spec": {
+    "drag": "object follows finger with footprint ghost; release inside valid cabin bounds snaps to 20cm grid",
+    "cancel": "release outside cabin returns to prior valid pose",
+    "hitbox": "visual bounds expanded by 12px",
+    "remove": "drag back through door threshold while doors open",
+    "rotate": "selected cargo gets 90-degree rotate button; two-finger twist optional, button is authoritative mobile path",
+    "invalid": "never silently auto-arrange; show which constraint fails",
+    "dispatch": "enabled only when mass and center rules pass",
+    "priority": "modal/UI > selected object > cabin object > queue object > background",
+    "collision": "overlap preview blocks drop; object returns to origin",
+    "correction": "during travel only highlighted movable objects accept drag; others reject with locked feedback"
+  },
+  "screen_inventory": [
+    "Shift Select",
+    "Manifest Brief",
+    "Elevator Loading",
+    "Travel / Correction",
+    "Arrival Result",
+    "Shift Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Load",
+      "input": "drag passenger or cargo",
+      "target": "elevator floor slots/free area",
+      "feedback": "ghost footprint + load gauge",
+      "condition": "doors open",
+      "state_change": "object enters cabin and mass/center updates"
+    },
+    {
+      "verb": "Reposition",
+      "input": "drag loaded object",
+      "target": "valid floor area",
+      "feedback": "balance needle live update",
+      "condition": "doors open or correction window",
+      "state_change": "center of mass changes"
+    },
+    {
+      "verb": "Rotate cargo",
+      "input": "two-finger twist or rotate button",
+      "target": "rotatable cargo",
+      "feedback": "outline snap",
+      "condition": "doors open",
+      "state_change": "footprint orientation changes"
+    },
+    {
+      "verb": "Dispatch",
+      "input": "tap floor button",
+      "target": "destination",
+      "feedback": "safe-zone lock",
+      "condition": "capacity and balance inside safe zone",
+      "state_change": "doors close and travel begins"
+    },
+    {
+      "verb": "Correct",
+      "input": "drag movable load during sway window",
+      "target": "highlighted movable object",
+      "feedback": "tilt and needle recover",
+      "condition": "travel event active",
+      "state_change": "balance shifts in real time"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Manifest의 weight/destination 정보",
+    "Loading의 drag ghost와 snap",
+    "valid/overlap/out-of-bounds drop",
+    "capacity와 center gauge safe/warn/critical",
+    "dispatch enabled/disabled와 원인",
+    "Travel 기본 상태",
+    "Sway Correction 상태와 critical timer",
+    "locked object invalid input",
+    "Arrival/Failure Result",
+    "doors open→close→travel→arrival transition"
+  ],
+  "primary_interaction": "승객/짐 드래그 배치 + 실시간 무게중심 게이지 + 운행 중 제한 재배치",
+  "difficulty_variation": "초반은 질량과 좌우 균형만, 중반은 큰 footprint와 목적층 때문에 당장 최적 배치가 다음 층을 방해하는 문제, 후반은 이동 중 위치가 변하는 승객·깨지기 쉬운 짐·막힌 바닥칸을 조합한다. 시간 압박보다 공간, 미래 하차 순서, 동적 무게 이동의 상충을 키운다.",
+  "visual_direction_brief": "세로 화면에 엘리베이터 내부가 중앙 65~70%를 차지하는 정면/약한 탑다운 혼합 시점. 바닥 footprint가 명확히 보이고 승객 실루엣은 작은 화면에서도 구분되어야 한다. 좌측 총하중, 상단 목적층, 하단 무게중심 바를 고정한다. 물리 연출은 읽기 쉬운 기울기와 흔들림으로 제한하고 사실적 시뮬레이션보다 퍼즐 판독성을 우선한다."
 }

@@ -1,210 +1,215 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "fb1c3353-f060-45be-9153-84b090faac8c",
-    "title": "Ant Apartment",
-    "source": "chat_automation",
-    "economy": "Not required for MVP. 별은 해금 조건이며 소비 상점은 없다.",
-    "idea_id": "e7b2b26d-1a16-4ccd-840c-857644844bc8",
-    "version": "v0.1",
-    "one_line": "아파트 내부를 개미 시점으로 정찰하고 페로몬 길을 그려 음식 운반 행렬을 안전하게 운영하는 모바일 경로 잠입 게임.",
-    "core_loop": "정찰 15~30초 → 경로 설계 15~30초 → 운반 45~90초. 운반 중에도 위험을 읽고 길을 수정하거나 행렬을 정지한다. 목표량 전달 후 효율과 생존을 정산한다.",
-    "mvp_scope": "단일 주방, 둥지 1, 음식 1, 정찰 1, 일개미 12, 경로 생성/수정, 경로 추종과 운반, 타이머, 정적 장애물, 주기적 이동 위험 1종, 정지/재개, 결과까지 완주 가능하게 구현.",
-    "game_rules": {
-      "combo": "3회 연속 무손실 전달 시 x1.25, 손실 또는 강제 정지 시 리셋",
-      "score": {
-        "food": 100,
-        "survivor": 20,
-        "time_per_sec": 2,
-        "unused_route_budget": 1
-      },
-      "scouts": 1,
-      "workers": 12,
-      "target_food": 8,
-      "warning_sec": 2,
-      "time_limit_sec": 150,
-      "pheromone_budget": 100,
-      "spawn_interval_sec": 1.2
+  "id": "fb1c3353-f060-45be-9153-84b090faac8c",
+  "title": "Ant Apartment",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required for MVP. 별은 해금 조건이며 소비 상점은 없다.",
+  "idea_id": "e7b2b26d-1a16-4ccd-840c-857644844bc8",
+  "version": "v0.1",
+  "one_line": "아파트 내부를 개미 시점으로 정찰하고 페로몬 길을 그려 음식 운반 행렬을 안전하게 운영하는 모바일 경로 잠입 게임.",
+  "core_loop": "정찰 15~30초 → 경로 설계 15~30초 → 운반 45~90초. 운반 중에도 위험을 읽고 길을 수정하거나 행렬을 정지한다. 목표량 전달 후 효율과 생존을 정산한다.",
+  "mvp_scope": "단일 주방, 둥지 1, 음식 1, 정찰 1, 일개미 12, 경로 생성/수정, 경로 추종과 운반, 타이머, 정적 장애물, 주기적 이동 위험 1종, 정지/재개, 결과까지 완주 가능하게 구현.",
+  "created_at": "2026-09-29T16:45:57.475973+00:00",
+  "game_rules": {
+    "combo": "3회 연속 무손실 전달 시 x1.25, 손실 또는 강제 정지 시 리셋",
+    "score": {
+      "food": 100,
+      "survivor": 20,
+      "time_per_sec": 2,
+      "unused_route_budget": 1
     },
-    "not_in_mvp": [
-      "둥지 확장 메타",
-      "다중 개미 직업",
-      "상점",
-      "절차 생성",
-      "여러 방 연결",
-      "추가 위험 종류",
-      "온라인 기능"
-    ],
-    "known_risks": [
-      "자동 운반이 관전처럼 느껴질 수 있음",
-      "경로 편집과 카메라 입력 충돌",
-      "다수 에이전트 충돌 구현 비용",
-      "위험 패턴 암기 시 재플레이 감소",
-      "작은 대상 판독성"
-    ],
-    "progression": "별 1~3개로 새 방과 역할을 해금한다. 영구 수치 강화보다 새로운 규칙과 도구 해금 중심이다.",
-    "screen_flow": "Mission Select → Brief → Scout → RouteEdit → Haul ↔ Pause/RouteEdit → Result → Next/Retry. 경로 차단 시 5초 수정 유예.",
-    "state_model": [
-      {
-        "ui": "goal,time,hazard",
-        "exit": "start",
-        "enter": "load",
-        "state": "Brief",
-        "inputs": [
-          "start"
-        ]
-      },
-      {
-        "ui": "fog,discovery",
-        "exit": "food found and route begins",
-        "enter": "start",
-        "state": "Scout",
-        "inputs": [
-          "move scout",
-          "pan"
-        ]
-      },
-      {
-        "ui": "budget,ETA,risk",
-        "exit": "dispatch",
-        "enter": "route gesture",
-        "state": "RouteEdit",
-        "inputs": [
-          "draw",
-          "edit",
-          "delete"
-        ]
-      },
-      {
-        "ui": "delivered,survivors,time,warning",
-        "exit": "success/fail",
-        "enter": "dispatch",
-        "state": "Haul",
-        "inputs": [
-          "pause",
-          "edit",
-          "scout",
-          "pan"
-        ]
-      },
-      {
-        "ui": "score,loss,efficiency",
-        "exit": "selection",
-        "enter": "round end",
-        "state": "Result",
-        "inputs": [
-          "retry",
-          "next"
-        ]
-      }
-    ],
-    "content_unit": "방 하나의 음식 운반 미션",
-    "content_model": {
-      "axes": [
-        "layout",
-        "food position",
-        "hazard pattern",
-        "route constraint",
-        "objective"
-      ],
-      "unit": "room mission",
-      "expansion": "combine room layout, food, one or two hazards, and optional objective as data-driven missions"
+    "scouts": 1,
+    "workers": 12,
+    "target_food": 8,
+    "warning_sec": 2,
+    "time_limit_sec": 150,
+    "pheromone_budget": 100,
+    "spawn_interval_sec": 1.2
+  },
+  "not_in_mvp": [
+    "둥지 확장 메타",
+    "다중 개미 직업",
+    "상점",
+    "절차 생성",
+    "여러 방 연결",
+    "추가 위험 종류",
+    "온라인 기능"
+  ],
+  "updated_at": "2026-09-29T17:33:26.657526+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "자동 운반이 관전처럼 느껴질 수 있음",
+    "경로 편집과 카메라 입력 충돌",
+    "다수 에이전트 충돌 구현 비용",
+    "위험 패턴 암기 시 재플레이 감소",
+    "작은 대상 판독성"
+  ],
+  "progression": "별 1~3개로 새 방과 역할을 해금한다. 영구 수치 강화보다 새로운 규칙과 도구 해금 중심이다.",
+  "screen_flow": "Mission Select → Brief → Scout → RouteEdit → Haul ↔ Pause/RouteEdit → Result → Next/Retry. 경로 차단 시 5초 수정 유예.",
+  "state_model": [
+    {
+      "ui": "goal,time,hazard",
+      "exit": "start",
+      "enter": "load",
+      "state": "Brief",
+      "inputs": [
+        "start"
+      ]
     },
-    "source_run_at": "2026-09-29T16:45:57.475973+00:00",
-    "player_fantasy": "플레이어는 군체의 길잡이로서 거대한 생활 공간을 읽고 안전하고 효율적인 길을 설계하며 변화에 즉시 재계획하는 능숙함을 느낀다.",
-    "session_length": "2~3분/라운드, 7~10분/3라운드",
-    "test_scenarios": [
-      "첫 사용자가 30초 내 유효 경로를 만든다",
-      "운반 중 의미 있는 재계획 행동이 발생한다",
-      "2초 위험 예고가 대응 가능하면서 긴장을 유지한다",
-      "12개 에이전트에서 모바일 60fps를 유지한다",
-      "거리와 안전성 사이 서로 다른 선택이 관찰된다"
-    ],
-    "feedback_system": {
-      "draw": "pheromone trail + snap haptic",
-      "loss": "local removal + low tick",
-      "scout": "fog reveal + discovery ping",
-      "danger": "direction pulse + medium haptic",
-      "deliver": "counter absorb + light haptic",
-      "dispatch": "nest pulse + short cue"
+    {
+      "ui": "fog,discovery",
+      "exit": "food found and route begins",
+      "enter": "start",
+      "state": "Scout",
+      "inputs": [
+        "move scout",
+        "pan"
+      ]
     },
-    "round_structure": "Brief 5초 → Scout → Route Edit → Haul → Result. 제한 150초, 평균 2~3분. 목표 음식량을 전달하면 성공, 시간 종료 또는 운반 가능 개미가 없으면 실패.",
-    "interaction_spec": {
-      "draw": "drag from nest or food; sample waypoint every 12px",
-      "edit": "tap path then drag waypoint; long press segment to delete",
-      "snap": "endpoint snaps within 40px",
-      "camera": "two-finger pan always; one-finger pan only outside route edit",
-      "cancel": "two-finger tap or return to start",
-      "hazard": "blocked route warns; no automatic reroute",
-      "invalid": "blocked segment becomes broken preview and dispatch stays disabled",
-      "priority": "UI > waypoint > path > world"
+    {
+      "ui": "budget,ETA,risk",
+      "exit": "dispatch",
+      "enter": "route gesture",
+      "state": "RouteEdit",
+      "inputs": [
+        "draw",
+        "edit",
+        "delete"
+      ]
     },
-    "screen_inventory": [
-      "Mission Select",
-      "Mission Brief",
-      "Apartment Room",
-      "Pause / Route Edit Overlay",
-      "Result"
+    {
+      "ui": "delivered,survivors,time,warning",
+      "exit": "success/fail",
+      "enter": "dispatch",
+      "state": "Haul",
+      "inputs": [
+        "pause",
+        "edit",
+        "scout",
+        "pan"
+      ]
+    },
+    {
+      "ui": "score,loss,efficiency",
+      "exit": "selection",
+      "enter": "round end",
+      "state": "Result",
+      "inputs": [
+        "retry",
+        "next"
+      ]
+    }
+  ],
+  "archive_path": "projects/ant-apartment/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "방 하나의 음식 운반 미션",
+  "content_model": {
+    "axes": [
+      "layout",
+      "food position",
+      "hazard pattern",
+      "route constraint",
+      "objective"
     ],
-    "core_player_verbs": [
-      {
-        "verb": "Scout",
-        "input": "tap destination",
-        "target": "walkable floor",
-        "feedback": "reveal ring",
-        "condition": "scout available",
-        "state_change": "reveal nearby map"
-      },
-      {
-        "verb": "Draw route",
-        "input": "drag",
-        "target": "revealed floor",
-        "feedback": "live path and budget",
-        "condition": "food found",
-        "state_change": "create pheromone path"
-      },
-      {
-        "verb": "Edit route",
-        "input": "drag waypoint",
-        "target": "active path",
-        "feedback": "direction arrows",
-        "condition": "route exists",
-        "state_change": "followers switch at next node"
-      },
-      {
-        "verb": "Dispatch",
-        "input": "tap",
-        "target": "valid route",
-        "feedback": "nest pulse",
-        "condition": "route connected",
-        "state_change": "workers begin hauling"
-      },
-      {
-        "verb": "Pause and reroute",
-        "input": "tap pause then drag",
-        "target": "active convoy",
-        "feedback": "warning pulse",
-        "condition": "hauling",
-        "state_change": "convoy pauses and path changes"
-      }
-    ],
-    "wireframe_handoff": [
-      "Brief 목표/위험",
-      "Scout reveal 전후",
-      "경로 incomplete/valid/blocked/over-budget",
-      "draw/edit gesture",
-      "Haul 정상/경고",
-      "Pause edit overlay",
-      "delivery/loss feedback",
-      "Result",
-      "차단 수정 유예",
-      "dispatch disabled",
-      "상태 전환"
-    ],
-    "primary_interaction": "정찰 탭 이동 + 페로몬 경로 드래그/waypoint 수정",
-    "difficulty_variation": "초반은 정적 장애물과 넓은 통로, 중반은 주기적 차단과 복수 음식, 후반은 교차 운반선·일방 통로·불완전 위험 정보로 확장한다. 난이도는 속도보다 정보량과 재계획 tradeoff로 높인다.",
-    "visual_direction_brief": "세로 2D 탑다운. 생활 사물은 거대하게, 이동 바닥과 위험은 단순하고 선명하게 표현한다. 방의 35~45%를 한 화면에 보여주고 개미는 최소 14~18px. 상단 목표/시간, 하단 출발/정지만 고정 HUD로 둔다."
-  }
+    "unit": "room mission",
+    "expansion": "combine room layout, food, one or two hazards, and optional objective as data-driven missions"
+  },
+  "source_run_at": "2026-09-29T16:45:57.475973+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 군체의 길잡이로서 거대한 생활 공간을 읽고 안전하고 효율적인 길을 설계하며 변화에 즉시 재계획하는 능숙함을 느낀다.",
+  "session_length": "2~3분/라운드, 7~10분/3라운드",
+  "test_scenarios": [
+    "첫 사용자가 30초 내 유효 경로를 만든다",
+    "운반 중 의미 있는 재계획 행동이 발생한다",
+    "2초 위험 예고가 대응 가능하면서 긴장을 유지한다",
+    "12개 에이전트에서 모바일 60fps를 유지한다",
+    "거리와 안전성 사이 서로 다른 선택이 관찰된다"
+  ],
+  "design_markdown": "\n# Ant Apartment — Playable Game Design Spec v0.1\n## 1. Product Definition\n세로 모바일 colony stealth/path-planning. 2~3분 라운드. 안전하고 효율적인 운반로를 설계하고 실시간 변화에 재계획한다. Non-goals: 개별 일개미 마이크로, 대형 기지건설, 전투 중심 플레이.\n## 2. Player Fantasy\n군체의 길잡이가 되어 거대한 생활 공간을 읽고 작은 행렬을 무사히 귀환시킨다.\n## 3. Core Player Verbs\nScout, Draw Route, Edit Route, Dispatch, Pause/Reroute. 각 입력·조건·상태 변화·즉시 피드백은 구조화 필드에 정의.\n## 4. Core Loop\n정찰 → 경로 설계 → 행렬 출발 → 위험 감시/재계획 → 전달 → 정산.\n## 5. Round / Session Structure\nBrief → Scout → RouteEdit → Haul → Result. 150초 제한, 평균 2~3분.\n## 6. Game Rules\n일개미 12, 정찰 1, 목표 음식 8, 경로 예산 100, 1.2초 출발 간격. 음식·생존·시간·예산으로 점수화하고 3회 무손실 전달 콤보를 둔다.\n## 7. State Model\nBrief, Scout, RouteEdit, Haul, Result를 분리하고 상태별 허용 입력과 HUD를 제한한다.\n## 8. Interaction Spec\n노드에서 drag, 12px waypoint sampling, 40px endpoint snap. path tap 후 waypoint drag, segment long-press delete. UI > waypoint > path > world 우선순위.\n## 9. Content Model\nRoom mission = layout × food × hazard × route constraint × objective.\n## 10. Difficulty / Variation\n정적 장애물 → 주기 차단 → 복수 목표 → 교차 경로/불완전 정보. 단순 속도 상승이 아니다.\n## 11. Progression\n별로 새 방과 역할 해금. 수치 강화보다 새 규칙/도구 중심.\n## 12. Economy\nNot required for MVP.\n## 13. Screen Inventory\nMission Select, Mission Brief, Apartment Room, Pause/Route Edit Overlay, Result.\n## 14. Screen Flow\nSelect → Brief → Scout → RouteEdit → Haul ↔ Pause/Edit → Result → Next/Retry.\n## 15. Feedback System\nFog reveal, pheromone trail, snap haptic, danger pulse, delivery absorb, local loss cue.\n## 16. Visual Direction Brief\n세로 탑다운. 거대한 생활 사물과 작은 개미의 스케일 대비. 밤 분위기에서도 바닥·경로·위험은 높은 판독성을 유지.\n## 17. MVP Scope\n주방 1개, 정찰/일개미, 경로 편집, 추종/운반, 이동 위험 1종, 정지/재개, 결과. 메타·상점·절차생성은 제외.\n## 18. Test Scenarios\n30초 내 첫 경로, 운반 중 재계획, 2초 경고 적정성, 12 에이전트 60fps, 거리-안전 tradeoff를 검증.\n## 19. Known Risks\n관전화, 입력 충돌, 에이전트 비용, 패턴 암기, 모바일 판독성.\n## 20. Wireframe Handoff\nBrief, reveal 상태, 경로 4상태, draw/edit gesture, Haul warning, Pause overlay, 전달/손실, Result, 수정 유예, disabled dispatch, 전환을 표현한다.\n",
+  "feedback_system": {
+    "draw": "pheromone trail + snap haptic",
+    "loss": "local removal + low tick",
+    "scout": "fog reveal + discovery ping",
+    "danger": "direction pulse + medium haptic",
+    "deliver": "counter absorb + light haptic",
+    "dispatch": "nest pulse + short cue"
+  },
+  "round_structure": "Brief 5초 → Scout → Route Edit → Haul → Result. 제한 150초, 평균 2~3분. 목표 음식량을 전달하면 성공, 시간 종료 또는 운반 가능 개미가 없으면 실패.",
+  "interaction_spec": {
+    "draw": "drag from nest or food; sample waypoint every 12px",
+    "edit": "tap path then drag waypoint; long press segment to delete",
+    "snap": "endpoint snaps within 40px",
+    "camera": "two-finger pan always; one-finger pan only outside route edit",
+    "cancel": "two-finger tap or return to start",
+    "hazard": "blocked route warns; no automatic reroute",
+    "invalid": "blocked segment becomes broken preview and dispatch stays disabled",
+    "priority": "UI > waypoint > path > world"
+  },
+  "screen_inventory": [
+    "Mission Select",
+    "Mission Brief",
+    "Apartment Room",
+    "Pause / Route Edit Overlay",
+    "Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Scout",
+      "input": "tap destination",
+      "target": "walkable floor",
+      "feedback": "reveal ring",
+      "condition": "scout available",
+      "state_change": "reveal nearby map"
+    },
+    {
+      "verb": "Draw route",
+      "input": "drag",
+      "target": "revealed floor",
+      "feedback": "live path and budget",
+      "condition": "food found",
+      "state_change": "create pheromone path"
+    },
+    {
+      "verb": "Edit route",
+      "input": "drag waypoint",
+      "target": "active path",
+      "feedback": "direction arrows",
+      "condition": "route exists",
+      "state_change": "followers switch at next node"
+    },
+    {
+      "verb": "Dispatch",
+      "input": "tap",
+      "target": "valid route",
+      "feedback": "nest pulse",
+      "condition": "route connected",
+      "state_change": "workers begin hauling"
+    },
+    {
+      "verb": "Pause and reroute",
+      "input": "tap pause then drag",
+      "target": "active convoy",
+      "feedback": "warning pulse",
+      "condition": "hauling",
+      "state_change": "convoy pauses and path changes"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Brief 목표/위험",
+    "Scout reveal 전후",
+    "경로 incomplete/valid/blocked/over-budget",
+    "draw/edit gesture",
+    "Haul 정상/경고",
+    "Pause edit overlay",
+    "delivery/loss feedback",
+    "Result",
+    "차단 수정 유예",
+    "dispatch disabled",
+    "상태 전환"
+  ],
+  "primary_interaction": "정찰 탭 이동 + 페로몬 경로 드래그/waypoint 수정",
+  "difficulty_variation": "초반은 정적 장애물과 넓은 통로, 중반은 주기적 차단과 복수 음식, 후반은 교차 운반선·일방 통로·불완전 위험 정보로 확장한다. 난이도는 속도보다 정보량과 재계획 tradeoff로 높인다.",
+  "visual_direction_brief": "세로 2D 탑다운. 생활 사물은 거대하게, 이동 바닥과 위험은 단순하고 선명하게 표현한다. 방의 35~45%를 한 화면에 보여주고 개미는 최소 14~18px. 상단 목표/시간, 하단 출발/정지만 고정 HUD로 둔다."
 }

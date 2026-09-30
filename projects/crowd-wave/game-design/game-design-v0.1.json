@@ -1,0 +1,277 @@
+{
+  "id": "fedeb352-5141-4c2d-b3dc-710a0a8fb411",
+  "title": "Crowd Wave",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required.",
+  "idea_id": "c04f37d4-ae36-4413-9914-b719b49056a4",
+  "version": "v0.1",
+  "one_line": "콘서트 관객 한 명의 박수·점프·라이트를 비트에 맞춰 인접 군중으로 전파하고, 갈림길에서 전파 방향을 선택해 여러 파동을 합류시키는 공간 리듬 체인 게임.",
+  "core_loop": "곡 구간의 action cue를 읽고 비트에 맞춰 Pulse → wave가 crowd graph를 따라 자동 전파 → junction에서 짧은 Route 선택 → 다른 wave와 시간 맞춰 Merge → 합류 규모가 무대 반응을 키움 → section 종료 시 coverage/merge 목표 판정 → 다음 section 또는 result.",
+  "mvp_scope": "6 performances × 3 sections, 5 content classes, clap/jump/light cues, Perfect/Good/Miss windows, directed crowd graph, integer beat travel, junction routing, default-route penalty, merge timing, coverage/merge goals, 2-of-3 success, stars, unlock, pause/retry.",
+  "created_at": "2026-09-30T10:09:36.351455+00:00",
+  "game_rules": {
+    "beat": {
+      "bpm": "authored 90–150 BPM",
+      "miss": "abs(input-cue)>160ms or no input by cue+160ms",
+      "clock": "beat_index + phase_ms; all timing windows measured against audio transport",
+      "good_ms": 160,
+      "perfect_ms": 80,
+      "accuracy_power": {
+        "good": 1,
+        "miss": 0,
+        "perfect": 2
+      }
+    },
+    "wave": {
+      "route": "junction opens from arrival beat-0.5 to arrival beat+0.5; swipe maps to authored left/right/straight edge; no route by close selects authored default edge with power-1 minimum0",
+      "spawn": "successful Pulse creates token at player node with power=accuracy_power",
+      "expire": "power0 wave still activates current node but does not leave it",
+      "spread": "at each normal node token activates that node then continues",
+      "travel": "edge arrival beat = departure beat + travel_beats"
+    },
+    "crowd": {
+      "coverage": "activated unique audience nodes / total audience nodes",
+      "activated": "node counts once per section when reached by any positive-or-zero wave",
+      "merge_count": "number of successful 2+ token merges"
+    },
+    "graph": {
+      "schema": "directed graph of audience nodes and edges; node types normal/junction/merge/stage; each edge has travel_beats integer 1–4",
+      "adjacency": "wave may only move along authored outgoing edge; normal nodes have exactly 1 outgoing edge, junction 2–3, merge 1, stage 0"
+    },
+    "merge": {
+      "rule": "2+ tokens arriving same merge node with arrival times within 0.5 beat merge; power=sum powers + number_of_tokens-1; one token continues",
+      "nonmerge": "tokens outside window continue separately",
+      "window_beats": 0.5
+    },
+    "pause": "freezes transport and all simulation; resume count-in produces no cues/wave movement until transport resumes.",
+    "retry": "restarts full performance with graph/cues unchanged; clears section activation, waves, scores.",
+    "actions": {
+      "match": "input action must equal cue action; wrong action is miss even inside timing window",
+      "types": [
+        "clap",
+        "jump",
+        "light"
+      ]
+    },
+    "performance": "success if at least 2 of 3 sections pass; failure otherwise. Rating 1 star=success, 2 stars if all 3 sections pass, 3 stars if all pass and total perfect ratio>=0.70.",
+    "section_goal": "Each section authors min_coverage 0.45–0.75 and min_merges 0–2. Section passes when both met; play always continues to next section."
+  },
+  "not_in_mvp": [
+    "free song import",
+    "procedural graphs",
+    "character collection",
+    "currency/shop",
+    "online multiplayer",
+    "leaderboards",
+    "motion controls",
+    "free crowd movement",
+    "more than 6 MVP performances"
+  ],
+  "updated_at": "2026-09-30T11:38:16.317048+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "Spectacle can obscure route readability",
+    "Concurrent route and rhythm input can overload touch interaction",
+    "Graph authored poorly may make route choice feel cosmetic",
+    "Default-route penalty may feel arbitrary without clear preview",
+    "Repeated audience animations may visually flatten wave scale"
+  ],
+  "progression": "6 performances linear unlock; performance success unlocks next. Best stars and per-section best coverage stored. No stat upgrades.",
+  "screen_flow": "Entry→Select→Brief→Count-In→Play→Section Summary→Count-In(next section) 반복→Result. 2/3 section pass면 success와 next unlock, 아니면 failure. Pause→resume 2-beat count-in/Retry/Select.",
+  "state_model": [
+    {
+      "in": "game entry/result",
+      "out": "Brief",
+      "state": "Performance Select",
+      "inputs": [
+        "select unlocked performance"
+      ]
+    },
+    {
+      "in": "selection",
+      "out": "Count-In or Select",
+      "state": "Brief",
+      "inputs": [
+        "start",
+        "back"
+      ]
+    },
+    {
+      "in": "start/resume",
+      "out": "Play",
+      "vars": [
+        "2 beats"
+      ],
+      "state": "Count-In",
+      "inputs": [
+        "pause"
+      ]
+    },
+    {
+      "in": "count-in complete",
+      "out": "Section Summary after authored end beat",
+      "vars": [
+        "beat clock",
+        "waves",
+        "activated nodes",
+        "merge_count",
+        "cue results"
+      ],
+      "state": "Play",
+      "inputs": [
+        "Pulse",
+        "Route",
+        "Pause"
+      ]
+    },
+    {
+      "in": "section end",
+      "out": "next Count-In after 2s or Result after section3",
+      "vars": [
+        "coverage",
+        "merges",
+        "pass"
+      ],
+      "state": "Section Summary",
+      "inputs": []
+    },
+    {
+      "in": "Count-In/Play",
+      "out": "Count-In on resume, Brief on retry, Select",
+      "state": "Pause",
+      "inputs": [
+        "resume",
+        "retry",
+        "select"
+      ]
+    },
+    {
+      "in": "section3 summary",
+      "out": "Brief/Select",
+      "state": "Result",
+      "inputs": [
+        "next if success",
+        "retry",
+        "select"
+      ]
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "3-section authored concert performance",
+  "content_model": {
+    "unit": "performance",
+    "count": 6,
+    "schema": "performance={bpm,3 sections}; section={directed graph, player node, cues(action,beat), junction semantic edges/default, edge travel_beats, goals, end_beat}.",
+    "classes": [
+      {
+        "type": "Single Front",
+        "difference": "one wave, simple junctions; teaches route affects coverage"
+      },
+      {
+        "type": "Cross Merge",
+        "difference": "two cue-launched waves from different branches can converge; merge timing required"
+      },
+      {
+        "type": "Action Split",
+        "difference": "clap/jump/light cues alternate rapidly; wrong action creates misses but graph rules unchanged"
+      },
+      {
+        "type": "Default Trap",
+        "difference": "junction default edge intentionally loses power or coverage; active route choice required"
+      },
+      {
+        "type": "Festival Network",
+        "difference": "3 simultaneous wave lanes and multiple merge nodes combine all prior rules"
+      }
+    ],
+    "coverage": "Across 6 performances all five classes appear; final two are Festival Network combinations. Exact songs, node art and final graph layouts remain content data.",
+    "solvability": "Each section must have authored reference route/input sequence meeting goals with Good timing or better."
+  },
+  "source_run_at": "2026-09-30T10:09:36.351455+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "거대한 공연장의 한 관객으로 시작해 정확한 한 번의 몸짓이 주변 사람을 깨우고 수백 명의 파동으로 번지는 순간을 지휘한다. 핵심은 정확도 점수 자체가 아니라 언제 어느 이웃에게 파동을 넘겨 더 큰 합류를 만들지 판단하는 것이다.",
+  "session_length": "3–4분 / performance",
+  "test_scenarios": [
+    "100 BPM cue at beat10 tapped +60ms with correct action = Perfect power2 wave.",
+    "Correct cue at +120ms = Good power1; +190ms or wrong action = Miss and no wave.",
+    "Wave on 2-beat edge departing beat10 arrives beat12 and activates destination.",
+    "Junction arrival beat12 accepts route from 11.5–12.5; no route uses default and reduces power by1.",
+    "Two power2 waves arriving merge node at beats20.0 and20.4 merge to power5; arrival20.6 does not merge with 20.0.",
+    "Power1 wave missing route becomes power0, activates junction, then expires without leaving.",
+    "Section coverage0.62/min0.60 and merges1/min1 passes; coverage0.59 fails.",
+    "Sections pass,fail,pass yields performance success 1 star unless higher rating condition met.",
+    "Pause freezes transport/waves and resume count-in does not advance authored beat."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Crowd Wave\n\n## 1. Product Definition\n콘서트 관객 한 명의 박수·점프·라이트를 비트에 맞춰 인접 군중으로 전파하고, 갈림길에서 전파 방향을 선택해 여러 파동을 합류시키는 공간 리듬 체인 게임. Landscape mobile, 3–4분 performance. 정확도 리듬게임보다 파동 경로 선택과 합류가 핵심이다.\n\n## 2. Player Fantasy\n거대한 공연장의 한 관객으로 시작해 정확한 한 번의 몸짓이 주변 사람을 깨우고 수백 명의 파동으로 번지는 순간을 지휘한다. 핵심은 정확도 점수 자체가 아니라 언제 어느 이웃에게 파동을 넘겨 더 큰 합류를 만들지 판단하는 것이다.\n\n## 3. Core Player Verbs\n- **Pulse** — beat window에서 박수/점프/라이트 버튼 tap → 현재 player node; Play state; requested action matches cue; 정확도 판정 후 성공이면 wave token 생성; 개인 동작과 첫 ring.\n- **Route** — 활성 wave가 junction node에 도달했을 때 left/right/straight 방향 swipe → junction outgoing edge; route window open; wave next_edge 확정; 선택 edge가 점등.\n- **Merge** — 자동 → 같은 merge node에 merge window 안에 도착한 wave tokens; 2개 이상; tokens 1개 amplified wave로 합쳐지고 chain_power 증가; 큰 crowd crest.\n- **Recover** — 다음 cue 입력 → player node; miss/expired wave 이후; 새 wave 시작 가능; 끊긴 이전 chain은 복구되지 않음; 새 작은 pulse.\n\n## 4. Core Loop\n곡 구간의 action cue를 읽고 비트에 맞춰 Pulse → wave가 crowd graph를 따라 자동 전파 → junction에서 짧은 Route 선택 → 다른 wave와 시간 맞춰 Merge → 합류 규모가 무대 반응을 키움 → section 종료 시 coverage/merge 목표 판정 → 다음 section 또는 result.\n\n## 5. Round / Session Structure\n한 performance는 3 sections, section당 35–55초, 총 3–4분. 각 section은 8–14 Pulse cues와 1–3 junction decisions. Start count-in 2 beats. Section 종료 후 2초 summary. 3 sections 완료 후 performance success/failure. Pause는 음악/beat clock/waves/route windows를 모두 정지하고 resume 시 2-beat count-in 뒤 동일 beat offset에서 재개.\n\n## 6. Game Rules\nBeat clock은 authored BPM 90–150의 audio transport 기준이다. cue와 입력 오차 |Δt|≤80ms=Perfect(power2), ≤160ms=Good(power1), 그 밖/무입력/잘못된 action=Miss(no wave). Crowd는 directed graph이며 normal node outgoing1, junction2–3, merge1, stage0. Edge travel은 integer 1–4 beats. 성공 Pulse는 player node에 wave를 만들고 edge travel 뒤 node를 activate한다. Junction route window는 arrival±0.5 beat; swipe가 없으면 authored default edge를 택하고 power를 1 감소(min0), power0은 현재 node만 activate 후 expire한다. 같은 merge node에 0.5 beat 이내 도착한 2+ token은 power=sum(power)+token_count-1로 합쳐진다. Section coverage=unique activated audience/total audience, merge_count를 목표와 비교한다. 3 sections 중 2개 이상 pass면 performance success. Stars: success=1, 3 sections pass=2, 전부 pass+Perfect ratio≥70%=3. Pause는 transport/wave/window를 정지; resume은 2-beat count-in 뒤 동일 offset. Retry는 performance 전체를 reset한다.\n\n## 7. State Model\nSelect→Brief→Count-In→Play→Section Summary→다음 Count-In 또는 Result. Pause는 Count-In/Play에서 진입하며 Resume/Retry/Select. Result는 Next(success)/Retry/Select.\n\n## 8. Interaction Spec\nPulse는 clap/jump/light tap이며 ±160ms 내 가장 가까운 미판정 cue 하나를 소비한다. Route는 junction window의 left/right/straight semantic edge로 0.08 normalized dimension 이상 swipe; 첫 valid swipe가 lock된다. Route pointer는 그 pointer의 Pulse만 억제하고 다른 finger tap은 허용한다. window 밖 route/이미 lock된 route/무cue tap은 state change 없음.\n\n## 9. Content Model\nMVP 6 performances×3 sections. Classes: Single Front, Cross Merge, Action Split, Default Trap, Festival Network. Section schema={directed graph, cues(action,beat), junction semantic edges/default, edge travel_beats, goals, end_beat}. 모든 class는 정의된 state graph를 재사용하며 final two는 prior rules의 조합이다. 모든 section은 Good 이상 reference sequence로 solvable해야 한다.\n\n## 10. Difficulty / Variation\n초반은 1 wave와 명확한 junction. 중반은 travel_beats가 다른 두 branch의 merge timing과 action type 구분. 후반은 default route가 손해를 만들고 3 wave lane을 동시에 관리한다. BPM만 올려 난도를 만들지 않으며 graph choice, travel-time synchronization, concurrent route windows를 조합한다.\n\n## 11. Progression\n6 performances linear unlock; performance success unlocks next. Best stars and per-section best coverage stored. No stat upgrades.\n\n## 12. Economy\nNot required.\n\n## 13. Screen Inventory\nPerformance Select; Performance Brief; Concert Gameplay; Performance Result.\n\n## 14. Screen Flow\nEntry→Select→Brief→Count-In→Play→Section Summary→Count-In(next section) 반복→Result. 2/3 section pass면 success와 next unlock, 아니면 failure. Pause→resume 2-beat count-in/Retry/Select.\n\n## 15. Feedback System\nPulse는 Perfect/Good/Miss와 개인 동작, wave는 연속 ripple, route는 선택 방향/lock, merge는 큰 crest와 stage reaction, summary는 coverage/merge 목표를 보여준다. Power0 wave는 junction에서 명확히 소멸한다.\n\n## 16. Visual Direction Brief\nLandscape mobile concert crowd viewed as readable layered audience field. Individual figures can reuse animation, but active wave front, junctions, merge convergence and stage reaction must be legible over spectacle. UI should not become a conventional note highway; beat cues support the spatial crowd graph. Exact positions/layout remain Wireframe responsibility.\n\n## 17. MVP Scope + NOT IN MVP\n6 performances × 3 sections, 5 content classes, clap/jump/light cues, Perfect/Good/Miss windows, directed crowd graph, integer beat travel, junction routing, default-route penalty, merge timing, coverage/merge goals, 2-of-3 success, stars, unlock, pause/retry.\nNOT IN MVP: free song import, procedural graphs, character collection, currency/shop, online multiplayer, leaderboards, motion controls, free crowd movement, more than 6 MVP performances.\n\n## 18. Test Scenarios\n- 100 BPM cue at beat10 tapped +60ms with correct action = Perfect power2 wave.\n- Correct cue at +120ms = Good power1; +190ms or wrong action = Miss and no wave.\n- Wave on 2-beat edge departing beat10 arrives beat12 and activates destination.\n- Junction arrival beat12 accepts route from 11.5–12.5; no route uses default and reduces power by1.\n- Two power2 waves arriving merge node at beats20.0 and20.4 merge to power5; arrival20.6 does not merge with 20.0.\n- Power1 wave missing route becomes power0, activates junction, then expires without leaving.\n- Section coverage0.62/min0.60 and merges1/min1 passes; coverage0.59 fails.\n- Sections pass,fail,pass yields performance success 1 star unless higher rating condition met.\n- Pause freezes transport/waves and resume count-in does not advance authored beat.\n\n## 19. Known Risks\n- Spectacle can obscure route readability\n- Concurrent route and rhythm input can overload touch interaction\n- Graph authored poorly may make route choice feel cosmetic\n- Default-route penalty may feel arbitrary without clear preview\n- Repeated audience animations may visually flatten wave scale\n\n## 20. Wireframe Handoff\n- fun_promise: 한 번의 리듬 입력이 군중 전체로 커지는 시각적 보상과, 그 파동을 어디로 보낼지 고르는 공간 판단이 동시에 중심이어야 한다.\n- Represent Select/Brief/Gameplay/Result plus Count-In, Section Summary, Pause.\n- Represent Single Front, Cross Merge, Action Split, Default Trap, Festival Network variations.\n- Show clap/jump/light cue timing, wave travel in beat units, junction route window/default penalty, merge window and power result.\n- Show active/expired wave, unique-node coverage, merge count, section goals, 2-of-3 performance result and stars.\n- Preserve pause/resume 2-beat count-in and retry reset semantics; layout may change but graph/timing rules may not.\n",
+  "feedback_system": {
+    "wave": "활성 node가 ripple로 이어져 경로를 읽게 함",
+    "merge": "두 파동 합류 시 crest 규모/무대 조명 반응",
+    "pulse": "Perfect/Good/Miss와 개인 관객 animation",
+    "route": "junction 직전 선택 가능 방향과 lock feedback",
+    "failure": "끊긴 wave는 해당 위치에서 소멸을 명확히 표시",
+    "summary": "coverage와 merge goal pass/fail"
+  },
+  "round_structure": "한 performance는 3 sections, section당 35–55초, 총 3–4분. 각 section은 8–14 Pulse cues와 1–3 junction decisions. Start count-in 2 beats. Section 종료 후 2초 summary. 3 sections 완료 후 performance success/failure. Pause는 음악/beat clock/waves/route windows를 모두 정지하고 resume 시 2-beat count-in 뒤 동일 beat offset에서 재개.",
+  "interaction_spec": {
+    "pulse": "Three action taps; earliest matching cue within ±160ms consumes input. Wrong action within window marks that cue miss. One cue can score once.",
+    "route": "At junction window, one horizontal/vertical directional swipe selects authored semantic edge label left/right/straight; first valid swipe locks route. Swipe threshold 0.08 normalized screen dimension.",
+    "cancel": "unfinished swipe below threshold does nothing; no undo after route lock.",
+    "invalid": "tap with no cue window, route outside window, second route after lock: no state change.",
+    "priority": "Route swipe pointer suppresses Pulse taps only for that pointer; other finger taps allowed. Pause overrides all."
+  },
+  "screen_inventory": [
+    "Performance Select",
+    "Performance Brief",
+    "Concert Gameplay",
+    "Performance Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Pulse",
+      "input": "beat window에서 박수/점프/라이트 버튼 tap",
+      "target": "현재 player node",
+      "feedback": "개인 동작과 첫 ring",
+      "condition": "Play state; requested action matches cue",
+      "state_change": "정확도 판정 후 성공이면 wave token 생성"
+    },
+    {
+      "verb": "Route",
+      "input": "활성 wave가 junction node에 도달했을 때 left/right/straight 방향 swipe",
+      "target": "junction outgoing edge",
+      "feedback": "선택 edge가 점등",
+      "condition": "route window open",
+      "state_change": "wave next_edge 확정"
+    },
+    {
+      "verb": "Merge",
+      "input": "자동",
+      "target": "같은 merge node에 merge window 안에 도착한 wave tokens",
+      "feedback": "큰 crowd crest",
+      "condition": "2개 이상",
+      "state_change": "tokens 1개 amplified wave로 합쳐지고 chain_power 증가"
+    },
+    {
+      "verb": "Recover",
+      "input": "다음 cue 입력",
+      "target": "player node",
+      "feedback": "새 작은 pulse",
+      "condition": "miss/expired wave 이후",
+      "state_change": "새 wave 시작 가능; 끊긴 이전 chain은 복구되지 않음"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 한 번의 리듬 입력이 군중 전체로 커지는 시각적 보상과, 그 파동을 어디로 보낼지 고르는 공간 판단이 동시에 중심이어야 한다.",
+    "Represent Select/Brief/Gameplay/Result plus Count-In, Section Summary, Pause.",
+    "Represent Single Front, Cross Merge, Action Split, Default Trap, Festival Network variations.",
+    "Show clap/jump/light cue timing, wave travel in beat units, junction route window/default penalty, merge window and power result.",
+    "Show active/expired wave, unique-node coverage, merge count, section goals, 2-of-3 performance result and stars.",
+    "Preserve pause/resume 2-beat count-in and retry reset semantics; layout may change but graph/timing rules may not."
+  ],
+  "primary_interaction": "비트 입력으로 wave 생성 + junction swipe로 전파 경로 선택",
+  "difficulty_variation": "초반은 1 wave와 명확한 junction. 중반은 travel_beats가 다른 두 branch의 merge timing과 action type 구분. 후반은 default route가 손해를 만들고 3 wave lane을 동시에 관리한다. BPM만 올려 난도를 만들지 않으며 graph choice, travel-time synchronization, concurrent route windows를 조합한다.",
+  "visual_direction_brief": "Landscape mobile concert crowd viewed as readable layered audience field. Individual figures can reuse animation, but active wave front, junctions, merge convergence and stage reaction must be legible over spectacle. UI should not become a conventional note highway; beat cues support the spatial crowd graph. Exact positions/layout remain Wireframe responsibility."
+}

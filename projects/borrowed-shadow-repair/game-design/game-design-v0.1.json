@@ -1,254 +1,259 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "c81b3420-2ff8-40a9-bf89-9e0a5d051dc6",
-    "title": "Borrowed Shadow Repair",
-    "source": "chat_automation",
-    "economy": "Not required for MVP. 결과 등급과 해금만 사용.",
-    "idea_id": "29b950ca-2b83-45cc-8a8b-e18d13d84f4b",
-    "version": "v0.1",
-    "one_line": "손님에게서 분리된 그림자의 손상 구조를 작업대에서 직접 맞추고 봉합해 몸과 행동의 이상을 복구하는 세로형 촉각 퍼즐·직업 시뮬레이션.",
-    "core_loop": "증상 관찰 10~20초 → 2~6개 그림자 조각 drag/rotate 정렬 45~90초 → seam trace 봉합 20~45초 → Pose Test 10초 → 필요 시 1회 재수선 → 결과. 핵심은 정렬→봉합→움직임 검증.",
-    "mvp_scope": "세로 모바일 5개 의뢰, 조각 drag, 15° 회전, ghost snap, seam trace, Test hold, 1회 Rework, 결과 등급. 규칙 모듈은 기본 anchor·회전 잠금·봉합 순서.",
-    "game_rules": {
-      "snap": {
-        "position_px": 18,
-        "rotation_deg": 12
-      },
-      "score": {
-        "rework": -10,
-        "stitch": 30,
-        "alignment": 50,
-        "diagnosis": 20
-      },
-      "grades": {
-        "A": 80,
-        "B": 65,
-        "C": 0,
-        "S": 95
-      },
-      "pieces": "초반 2~3, 후반 4~6",
-      "failure": "진행 차단 대신 낮은 등급과 잔여 이상 행동",
-      "rework_limit": 1,
-      "stitch_trace_deviation_px": 20
+  "id": "c81b3420-2ff8-40a9-bf89-9e0a5d051dc6",
+  "title": "Borrowed Shadow Repair",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required for MVP. 결과 등급과 해금만 사용.",
+  "idea_id": "29b950ca-2b83-45cc-8a8b-e18d13d84f4b",
+  "version": "v0.1",
+  "one_line": "손님에게서 분리된 그림자의 손상 구조를 작업대에서 직접 맞추고 봉합해 몸과 행동의 이상을 복구하는 세로형 촉각 퍼즐·직업 시뮬레이션.",
+  "core_loop": "증상 관찰 10~20초 → 2~6개 그림자 조각 drag/rotate 정렬 45~90초 → seam trace 봉합 20~45초 → Pose Test 10초 → 필요 시 1회 재수선 → 결과. 핵심은 정렬→봉합→움직임 검증.",
+  "mvp_scope": "세로 모바일 5개 의뢰, 조각 drag, 15° 회전, ghost snap, seam trace, Test hold, 1회 Rework, 결과 등급. 규칙 모듈은 기본 anchor·회전 잠금·봉합 순서.",
+  "created_at": "2026-09-29T11:50:32.405919+00:00",
+  "game_rules": {
+    "snap": {
+      "position_px": 18,
+      "rotation_deg": 12
     },
-    "not_in_mvp": [
-      "상점/재화",
-      "작업실 꾸미기",
-      "장편 NPC 관계",
-      "절차 생성 퍼즐",
-      "복잡한 도구 인벤토리",
-      "다중 손님",
-      "완성 컨셉아트/에셋"
-    ],
-    "known_risks": [
-      "일반 직소 퍼즐화",
-      "한 손 사용과 회전 gesture 충돌",
-      "실루엣 판독성",
-      "고유 아트 의존 시 콘텐츠 비용",
-      "Test 인과 피드백 부족"
-    ],
-    "progression": "의뢰 완료로 새 수선 규칙을 하나씩 해금한다. 도구는 숫자 강화가 아니라 seam 해제·mirror guide 같은 새 조작 문법을 연다. MVP는 5의뢰 선형 해금.",
-    "screen_flow": "Workshop→Intake→Workbench→Stitch→Test. Pass→Result. 첫 오류→Rework→Workbench/Stitch→최종 Test→Result. 필수 seam 미완료면 Test 차단.",
-    "state_model": [
-      {
-        "ui": "손님+증상",
-        "exit": "작업 시작",
-        "enter": "손님 등장",
-        "input": "증상 관찰",
-        "state": "Intake"
-      },
-      {
-        "ui": "조각 트레이+anchor",
-        "exit": "필수 배치",
-        "enter": "작업대",
-        "input": "drag/rotate",
-        "state": "Repair"
-      },
-      {
-        "ui": "봉합 가능 경계",
-        "exit": "필수 seam 완료",
-        "enter": "정렬 seam",
-        "input": "trace/undo",
-        "state": "Stitch"
-      },
-      {
-        "ui": "작업 UI 숨김",
-        "exit": "pass/Rework",
-        "enter": "Test hold",
-        "input": "hold/release",
-        "state": "Test"
-      },
-      {
-        "ui": "오류 anchor 강조",
-        "exit": "최종 Test",
-        "enter": "첫 오류",
-        "input": "재배치/봉합",
-        "state": "Rework"
-      },
-      {
-        "ui": "등급+행동 변화",
-        "exit": "다음 의뢰",
-        "enter": "테스트 종료",
-        "input": "계속",
-        "state": "Result"
-      }
-    ],
-    "content_unit": "수선 의뢰 1개",
-    "content_model": {
-      "unit": "수선 의뢰",
-      "fields": [
-        "손님",
-        "증상",
-        "base silhouette",
-        "조각",
-        "anchor graph",
-        "seam graph",
-        "rule module",
-        "test pose"
-      ],
-      "modules": [
-        "회전 잠금",
-        "겹침 레이어",
-        "봉합 순서",
-        "거울 anchor",
-        "test pose 오차"
-      ]
+    "score": {
+      "rework": -10,
+      "stitch": 30,
+      "alignment": 50,
+      "diagnosis": 20
     },
-    "source_run_at": "2026-09-29T11:50:32.405919+00:00",
-    "player_fantasy": "플레이어는 밤에만 문을 여는 그림자 수선사다. 손님의 이상 행동을 그림자 구조의 손상으로 진단하고 손으로 조각을 맞추고 봉합해 몸과 그림자를 다시 동기화하는 만족을 느낀다.",
-    "session_length": "의뢰 2~4분 · 3의뢰 8~12분",
-    "test_scenarios": [
-      "20초 내 drag/snap 이해",
-      "rotate/snap/stitch 목적 구분",
-      "Test 오류 후 15초 내 수정 대상 이해",
-      "새 규칙이 기존 조작과 조합되는지",
-      "5회 후 새 규칙 기대 여부"
+    "grades": {
+      "A": 80,
+      "B": 65,
+      "C": 0,
+      "S": 95
+    },
+    "pieces": "초반 2~3, 후반 4~6",
+    "failure": "진행 차단 대신 낮은 등급과 잔여 이상 행동",
+    "rework_limit": 1,
+    "stitch_trace_deviation_px": 20
+  },
+  "not_in_mvp": [
+    "상점/재화",
+    "작업실 꾸미기",
+    "장편 NPC 관계",
+    "절차 생성 퍼즐",
+    "복잡한 도구 인벤토리",
+    "다중 손님",
+    "완성 컨셉아트/에셋"
+  ],
+  "updated_at": "2026-09-29T12:04:23.9933+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "일반 직소 퍼즐화",
+    "한 손 사용과 회전 gesture 충돌",
+    "실루엣 판독성",
+    "고유 아트 의존 시 콘텐츠 비용",
+    "Test 인과 피드백 부족"
+  ],
+  "progression": "의뢰 완료로 새 수선 규칙을 하나씩 해금한다. 도구는 숫자 강화가 아니라 seam 해제·mirror guide 같은 새 조작 문법을 연다. MVP는 5의뢰 선형 해금.",
+  "screen_flow": "Workshop→Intake→Workbench→Stitch→Test. Pass→Result. 첫 오류→Rework→Workbench/Stitch→최종 Test→Result. 필수 seam 미완료면 Test 차단.",
+  "state_model": [
+    {
+      "ui": "손님+증상",
+      "exit": "작업 시작",
+      "enter": "손님 등장",
+      "input": "증상 관찰",
+      "state": "Intake"
+    },
+    {
+      "ui": "조각 트레이+anchor",
+      "exit": "필수 배치",
+      "enter": "작업대",
+      "input": "drag/rotate",
+      "state": "Repair"
+    },
+    {
+      "ui": "봉합 가능 경계",
+      "exit": "필수 seam 완료",
+      "enter": "정렬 seam",
+      "input": "trace/undo",
+      "state": "Stitch"
+    },
+    {
+      "ui": "작업 UI 숨김",
+      "exit": "pass/Rework",
+      "enter": "Test hold",
+      "input": "hold/release",
+      "state": "Test"
+    },
+    {
+      "ui": "오류 anchor 강조",
+      "exit": "최종 Test",
+      "enter": "첫 오류",
+      "input": "재배치/봉합",
+      "state": "Rework"
+    },
+    {
+      "ui": "등급+행동 변화",
+      "exit": "다음 의뢰",
+      "enter": "테스트 종료",
+      "input": "계속",
+      "state": "Result"
+    }
+  ],
+  "archive_path": "projects/borrowed-shadow-repair/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "수선 의뢰 1개",
+  "content_model": {
+    "unit": "수선 의뢰",
+    "fields": [
+      "손님",
+      "증상",
+      "base silhouette",
+      "조각",
+      "anchor graph",
+      "seam graph",
+      "rule module",
+      "test pose"
     ],
-    "feedback_system": [
-      {
-        "sound": "soft tick",
-        "action": "anchor 접근",
-        "haptic": "light",
-        "visual": "ghost 밝아짐"
-      },
-      {
-        "sound": "magnetic click",
-        "action": "snap",
-        "haptic": "medium",
-        "visual": "경계 안정"
-      },
-      {
-        "sound": "천 마찰",
-        "action": "봉합",
-        "haptic": "selection",
-        "visual": "seam 닫힘"
-      },
-      {
-        "sound": "wobble",
-        "action": "Test 오류",
-        "haptic": "warning",
-        "visual": "몸/그림자 잔상"
-      },
-      {
-        "sound": "resolve",
-        "action": "복구",
-        "haptic": "success",
-        "visual": "완전 동기화"
-      }
-    ],
-    "round_structure": "Intake→Repair→Stitch→Test→Rework 0~1회→Result. 의뢰 2~4분, 3의뢰 8~12분. 첫 Test 실패만 재수선 허용, 두 번째 Test 후 등급 확정.",
-    "interaction_spec": [
-      {
-        "error": "겹침 충돌 시 원위치 bounce",
-        "object": "shadow_piece",
-        "gesture": "single-finger drag"
-      },
-      {
-        "error": "미선택 시 disabled",
-        "object": "rotation",
-        "gesture": "two-finger twist / 15° button"
-      },
-      {
-        "error": "잘못된 anchor에는 snap 안 함",
-        "object": "snap",
-        "gesture": "18px/12° proximity"
-      },
-      {
-        "error": "이탈 시 취소, 미정렬 seam 시작 차단",
-        "object": "stitch",
-        "gesture": "seam trace within 20px corridor"
-      },
-      {
-        "error": "필수 seam 미완료 시 해당 seam 강조",
-        "object": "test",
-        "gesture": "0.6s hold"
-      }
-    ],
-    "screen_inventory": [
-      "Night Workshop — 의뢰 시작",
-      "Customer Intake — 증상/목표",
-      "Shadow Workbench — 배치·회전",
-      "Stitch Mode — 봉합",
-      "Pose Test — 동기화 테스트",
-      "Rework Overlay — 오류 수정",
-      "Result — 등급/행동 변화"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "Diagnose",
-        "input": "증상/실루엣 tap",
-        "change": "수선 목표 고정",
-        "target": "손님·그림자",
-        "feedback": "문제 부위 맥동",
-        "condition": "Intake"
-      },
-      {
-        "verb": "Place",
-        "input": "조각 drag",
-        "change": "위치 변경",
-        "target": "작업대",
-        "feedback": "ghost snap",
-        "condition": "Repair"
-      },
-      {
-        "verb": "Rotate",
-        "input": "two-finger twist 또는 15° 버튼",
-        "change": "각도 변경",
-        "target": "선택 조각",
-        "feedback": "각도 tick",
-        "condition": "Repair"
-      },
-      {
-        "verb": "Stitch",
-        "input": "seam trace",
-        "change": "seam 잠금",
-        "target": "정렬된 경계",
-        "feedback": "봉합선+medium haptic",
-        "condition": "허용치 충족"
-      },
-      {
-        "verb": "Test",
-        "input": "0.6초 hold",
-        "change": "포즈 테스트",
-        "target": "완성 그림자",
-        "feedback": "몸/그림자 동시 움직임",
-        "condition": "필수 seam 완료"
-      }
-    ],
-    "wireframe_handoff": [
-      "7개 화면/오버레이와 Rework 분기",
-      "조각 idle/selected/dragging/snap-candidate/snapped",
-      "two-finger 회전과 15° 버튼 대안",
-      "seam unavailable/available/tracing/locked/error",
-      "Test disabled/hold/active",
-      "1회 Rework 제한",
-      "anchor 오류·충돌·trace 이탈"
-    ],
-    "primary_interaction": "조각 drag + 15° 회전 + ghost snap + seam trace + 0.6초 Test hold",
-    "difficulty_variation": "초반 2~3조각 단일 anchor. 중반 4~5조각, 회전 잠금·봉합 순서·겹침. 후반 test pose에서만 드러나는 오차·거울 anchor·복합 증상. 조각 수보다 규칙 조합으로 난도를 올린다.",
-    "visual_direction_brief": "세로 모바일. 중앙 60~70%를 작업대와 그림자 실루엣이 차지한다. 조각 경계와 anchor가 읽히는 명도 차를 사용하고, 초현실성은 장식보다 몸과 그림자의 어긋남/정렬 애니메이션으로 전달한다."
-  }
+    "modules": [
+      "회전 잠금",
+      "겹침 레이어",
+      "봉합 순서",
+      "거울 anchor",
+      "test pose 오차"
+    ]
+  },
+  "source_run_at": "2026-09-29T11:50:32.405919+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 밤에만 문을 여는 그림자 수선사다. 손님의 이상 행동을 그림자 구조의 손상으로 진단하고 손으로 조각을 맞추고 봉합해 몸과 그림자를 다시 동기화하는 만족을 느낀다.",
+  "session_length": "의뢰 2~4분 · 3의뢰 8~12분",
+  "test_scenarios": [
+    "20초 내 drag/snap 이해",
+    "rotate/snap/stitch 목적 구분",
+    "Test 오류 후 15초 내 수정 대상 이해",
+    "새 규칙이 기존 조작과 조합되는지",
+    "5회 후 새 규칙 기대 여부"
+  ],
+  "design_markdown": "# Borrowed Shadow Repair — Playable Game Design Spec v0.1\n\n## 1. Product Definition\n손님에게서 분리된 그림자의 손상 구조를 작업대에서 직접 맞추고 봉합해 몸과 행동의 이상을 복구하는 세로형 촉각 퍼즐·직업 시뮬레이션. Session: 의뢰 2~4분 · 3의뢰 8~12분. Non-goals는 MVP 제외 범위를 따른다.\n\n## 2. Player Fantasy\n플레이어는 밤에만 문을 여는 그림자 수선사다. 손님의 이상 행동을 그림자 구조의 손상으로 진단하고 손으로 조각을 맞추고 봉합해 몸과 그림자를 다시 동기화하는 만족을 느낀다.\n\n## 3. Core Player Verbs\nDiagnose: 증상/실루엣 tap → 수선 목표 고정; 문제 부위 맥동\nPlace: 조각 drag → 위치 변경; ghost snap\nRotate: two-finger twist 또는 15° 버튼 → 각도 변경; 각도 tick\nStitch: seam trace → seam 잠금; 봉합선+medium haptic\nTest: 0.6초 hold → 포즈 테스트; 몸/그림자 동시 움직임\n\n## 4. Core Loop\n증상 관찰 10~20초 → 2~6개 그림자 조각 drag/rotate 정렬 45~90초 → seam trace 봉합 20~45초 → Pose Test 10초 → 필요 시 1회 재수선 → 결과. 핵심은 정렬→봉합→움직임 검증.\n\n## 5. Round / Session Structure\nIntake→Repair→Stitch→Test→Rework 0~1회→Result. 의뢰 2~4분, 3의뢰 8~12분. 첫 Test 실패만 재수선 허용, 두 번째 Test 후 등급 확정.\n\n## 6. Game Rules\n{\n  \"pieces\": \"초반 2~3, 후반 4~6\",\n  \"snap\": {\n    \"position_px\": 18,\n    \"rotation_deg\": 12\n  },\n  \"stitch_trace_deviation_px\": 20,\n  \"rework_limit\": 1,\n  \"score\": {\n    \"alignment\": 50,\n    \"stitch\": 30,\n    \"diagnosis\": 20,\n    \"rework\": -10\n  },\n  \"grades\": {\n    \"S\": 95,\n    \"A\": 80,\n    \"B\": 65,\n    \"C\": 0\n  },\n  \"failure\": \"진행 차단 대신 낮은 등급과 잔여 이상 행동\"\n}\n\n## 7. State Model\n[\n  {\n    \"state\": \"Intake\",\n    \"enter\": \"손님 등장\",\n    \"input\": \"증상 관찰\",\n    \"exit\": \"작업 시작\",\n    \"ui\": \"손님+증상\"\n  },\n  {\n    \"state\": \"Repair\",\n    \"enter\": \"작업대\",\n    \"input\": \"drag/rotate\",\n    \"exit\": \"필수 배치\",\n    \"ui\": \"조각 트레이+anchor\"\n  },\n  {\n    \"state\": \"Stitch\",\n    \"enter\": \"정렬 seam\",\n    \"input\": \"trace/undo\",\n    \"exit\": \"필수 seam 완료\",\n    \"ui\": \"봉합 가능 경계\"\n  },\n  {\n    \"state\": \"Test\",\n    \"enter\": \"Test hold\",\n    \"input\": \"hold/release\",\n    \"exit\": \"pass/Rework\",\n    \"ui\": \"작업 UI 숨김\"\n  },\n  {\n    \"state\": \"Rework\",\n    \"enter\": \"첫 오류\",\n    \"input\": \"재배치/봉합\",\n    \"exit\": \"최종 Test\",\n    \"ui\": \"오류 anchor 강조\"\n  },\n  {\n    \"state\": \"Result\",\n    \"enter\": \"테스트 종료\",\n    \"input\": \"계속\",\n    \"exit\": \"다음 의뢰\",\n    \"ui\": \"등급+행동 변화\"\n  }\n]\n\n## 8. Interaction Spec\n[\n  {\n    \"object\": \"shadow_piece\",\n    \"gesture\": \"single-finger drag\",\n    \"error\": \"겹침 충돌 시 원위치 bounce\"\n  },\n  {\n    \"object\": \"rotation\",\n    \"gesture\": \"two-finger twist / 15° button\",\n    \"error\": \"미선택 시 disabled\"\n  },\n  {\n    \"object\": \"snap\",\n    \"gesture\": \"18px/12° proximity\",\n    \"error\": \"잘못된 anchor에는 snap 안 함\"\n  },\n  {\n    \"object\": \"stitch\",\n    \"gesture\": \"seam trace within 20px corridor\",\n    \"error\": \"이탈 시 취소, 미정렬 seam 시작 차단\"\n  },\n  {\n    \"object\": \"test\",\n    \"gesture\": \"0.6s hold\",\n    \"error\": \"필수 seam 미완료 시 해당 seam 강조\"\n  }\n]\n\n## 9. Content Model\n{\n  \"unit\": \"수선 의뢰\",\n  \"fields\": [\n    \"손님\",\n    \"증상\",\n    \"base silhouette\",\n    \"조각\",\n    \"anchor graph\",\n    \"seam graph\",\n    \"rule module\",\n    \"test pose\"\n  ],\n  \"modules\": [\n    \"회전 잠금\",\n    \"겹침 레이어\",\n    \"봉합 순서\",\n    \"거울 anchor\",\n    \"test pose 오차\"\n  ]\n}\n\n## 10. Difficulty / Variation\n초반 2~3조각 단일 anchor. 중반 4~5조각, 회전 잠금·봉합 순서·겹침. 후반 test pose에서만 드러나는 오차·거울 anchor·복합 증상. 조각 수보다 규칙 조합으로 난도를 올린다.\n\n## 11. Progression\n의뢰 완료로 새 수선 규칙을 하나씩 해금한다. 도구는 숫자 강화가 아니라 seam 해제·mirror guide 같은 새 조작 문법을 연다. MVP는 5의뢰 선형 해금.\n\n## 12. Economy\nNot required for MVP. 결과 등급과 해금만 사용.\n\n## 13. Screen Inventory\nNight Workshop — 의뢰 시작\nCustomer Intake — 증상/목표\nShadow Workbench — 배치·회전\nStitch Mode — 봉합\nPose Test — 동기화 테스트\nRework Overlay — 오류 수정\nResult — 등급/행동 변화\n\n## 14. Screen Flow\nWorkshop→Intake→Workbench→Stitch→Test. Pass→Result. 첫 오류→Rework→Workbench/Stitch→최종 Test→Result. 필수 seam 미완료면 Test 차단.\n\n## 15. Feedback System\n[\n  {\n    \"action\": \"anchor 접근\",\n    \"visual\": \"ghost 밝아짐\",\n    \"sound\": \"soft tick\",\n    \"haptic\": \"light\"\n  },\n  {\n    \"action\": \"snap\",\n    \"visual\": \"경계 안정\",\n    \"sound\": \"magnetic click\",\n    \"haptic\": \"medium\"\n  },\n  {\n    \"action\": \"봉합\",\n    \"visual\": \"seam 닫힘\",\n    \"sound\": \"천 마찰\",\n    \"haptic\": \"selection\"\n  },\n  {\n    \"action\": \"Test 오류\",\n    \"visual\": \"몸/그림자 잔상\",\n    \"sound\": \"wobble\",\n    \"haptic\": \"warning\"\n  },\n  {\n    \"action\": \"복구\",\n    \"visual\": \"완전 동기화\",\n    \"sound\": \"resolve\",\n    \"haptic\": \"success\"\n  }\n]\n\n## 16. Visual Direction Brief\n세로 모바일. 중앙 60~70%를 작업대와 그림자 실루엣이 차지한다. 조각 경계와 anchor가 읽히는 명도 차를 사용하고, 초현실성은 장식보다 몸과 그림자의 어긋남/정렬 애니메이션으로 전달한다.\n\n## 17. MVP Scope\n세로 모바일 5개 의뢰, 조각 drag, 15° 회전, ghost snap, seam trace, Test hold, 1회 Rework, 결과 등급. 규칙 모듈은 기본 anchor·회전 잠금·봉합 순서.\nNOT IN MVP: 상점/재화, 작업실 꾸미기, 장편 NPC 관계, 절차 생성 퍼즐, 복잡한 도구 인벤토리, 다중 손님, 완성 컨셉아트/에셋\n\n## 18. Test Scenarios\n20초 내 drag/snap 이해\nrotate/snap/stitch 목적 구분\nTest 오류 후 15초 내 수정 대상 이해\n새 규칙이 기존 조작과 조합되는지\n5회 후 새 규칙 기대 여부\n\n## 19. Known Risks\n일반 직소 퍼즐화\n한 손 사용과 회전 gesture 충돌\n실루엣 판독성\n고유 아트 의존 시 콘텐츠 비용\nTest 인과 피드백 부족\n\n## 20. Wireframe Handoff\n7개 화면/오버레이와 Rework 분기\n조각 idle/selected/dragging/snap-candidate/snapped\ntwo-finger 회전과 15° 버튼 대안\nseam unavailable/available/tracing/locked/error\nTest disabled/hold/active\n1회 Rework 제한\nanchor 오류·충돌·trace 이탈",
+  "feedback_system": [
+    {
+      "sound": "soft tick",
+      "action": "anchor 접근",
+      "haptic": "light",
+      "visual": "ghost 밝아짐"
+    },
+    {
+      "sound": "magnetic click",
+      "action": "snap",
+      "haptic": "medium",
+      "visual": "경계 안정"
+    },
+    {
+      "sound": "천 마찰",
+      "action": "봉합",
+      "haptic": "selection",
+      "visual": "seam 닫힘"
+    },
+    {
+      "sound": "wobble",
+      "action": "Test 오류",
+      "haptic": "warning",
+      "visual": "몸/그림자 잔상"
+    },
+    {
+      "sound": "resolve",
+      "action": "복구",
+      "haptic": "success",
+      "visual": "완전 동기화"
+    }
+  ],
+  "round_structure": "Intake→Repair→Stitch→Test→Rework 0~1회→Result. 의뢰 2~4분, 3의뢰 8~12분. 첫 Test 실패만 재수선 허용, 두 번째 Test 후 등급 확정.",
+  "interaction_spec": [
+    {
+      "error": "겹침 충돌 시 원위치 bounce",
+      "object": "shadow_piece",
+      "gesture": "single-finger drag"
+    },
+    {
+      "error": "미선택 시 disabled",
+      "object": "rotation",
+      "gesture": "two-finger twist / 15° button"
+    },
+    {
+      "error": "잘못된 anchor에는 snap 안 함",
+      "object": "snap",
+      "gesture": "18px/12° proximity"
+    },
+    {
+      "error": "이탈 시 취소, 미정렬 seam 시작 차단",
+      "object": "stitch",
+      "gesture": "seam trace within 20px corridor"
+    },
+    {
+      "error": "필수 seam 미완료 시 해당 seam 강조",
+      "object": "test",
+      "gesture": "0.6s hold"
+    }
+  ],
+  "screen_inventory": [
+    "Night Workshop — 의뢰 시작",
+    "Customer Intake — 증상/목표",
+    "Shadow Workbench — 배치·회전",
+    "Stitch Mode — 봉합",
+    "Pose Test — 동기화 테스트",
+    "Rework Overlay — 오류 수정",
+    "Result — 등급/행동 변화"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Diagnose",
+      "input": "증상/실루엣 tap",
+      "change": "수선 목표 고정",
+      "target": "손님·그림자",
+      "feedback": "문제 부위 맥동",
+      "condition": "Intake"
+    },
+    {
+      "verb": "Place",
+      "input": "조각 drag",
+      "change": "위치 변경",
+      "target": "작업대",
+      "feedback": "ghost snap",
+      "condition": "Repair"
+    },
+    {
+      "verb": "Rotate",
+      "input": "two-finger twist 또는 15° 버튼",
+      "change": "각도 변경",
+      "target": "선택 조각",
+      "feedback": "각도 tick",
+      "condition": "Repair"
+    },
+    {
+      "verb": "Stitch",
+      "input": "seam trace",
+      "change": "seam 잠금",
+      "target": "정렬된 경계",
+      "feedback": "봉합선+medium haptic",
+      "condition": "허용치 충족"
+    },
+    {
+      "verb": "Test",
+      "input": "0.6초 hold",
+      "change": "포즈 테스트",
+      "target": "완성 그림자",
+      "feedback": "몸/그림자 동시 움직임",
+      "condition": "필수 seam 완료"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "7개 화면/오버레이와 Rework 분기",
+    "조각 idle/selected/dragging/snap-candidate/snapped",
+    "two-finger 회전과 15° 버튼 대안",
+    "seam unavailable/available/tracing/locked/error",
+    "Test disabled/hold/active",
+    "1회 Rework 제한",
+    "anchor 오류·충돌·trace 이탈"
+  ],
+  "primary_interaction": "조각 drag + 15° 회전 + ghost snap + seam trace + 0.6초 Test hold",
+  "difficulty_variation": "초반 2~3조각 단일 anchor. 중반 4~5조각, 회전 잠금·봉합 순서·겹침. 후반 test pose에서만 드러나는 오차·거울 anchor·복합 증상. 조각 수보다 규칙 조합으로 난도를 올린다.",
+  "visual_direction_brief": "세로 모바일. 중앙 60~70%를 작업대와 그림자 실루엣이 차지한다. 조각 경계와 anchor가 읽히는 명도 차를 사용하고, 초현실성은 장식보다 몸과 그림자의 어긋남/정렬 애니메이션으로 전달한다."
 }

@@ -1,164 +1,169 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "0d5a6236-a2a9-44e9-820a-970ae80b3788",
-    "title": "Miniature Moving Day",
-    "source": "chat_automation",
-    "economy": "Not required.",
-    "idea_id": "ebbc5cc4-2ae3-4f9e-8a94-fb2927d02e3e",
-    "version": "v0.1",
-    "one_line": "인형집 단면 아파트에서 가구를 직접 이동·회전해 좁은 통로를 통과시키고 목표 위치에 배치하는 공간 퍼즐.",
-    "core_loop": "목표 확인 → 가구 집기 → 이동 → 필요 시 두 손가락 회전 → 통로 통과 → 목표 포즈에 배치 → 다음 가구.",
-    "mvp_scope": "6 stages, 실제 drag와 two-finger rotation, collision, snap/rollback, undo/reset, scoring, 전체 화면 흐름.",
-    "game_rules": {
-      "score": "clear, par moves, no reset",
-      "collision": "wall and placed furniture overlap forbidden",
-      "mvp_stages": 6,
-      "goal_overlap": 0.85,
-      "angle_tolerance_deg": 12
+  "id": "0d5a6236-a2a9-44e9-820a-970ae80b3788",
+  "title": "Miniature Moving Day",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required.",
+  "idea_id": "ebbc5cc4-2ae3-4f9e-8a94-fb2927d02e3e",
+  "version": "v0.1",
+  "one_line": "인형집 단면 아파트에서 가구를 직접 이동·회전해 좁은 통로를 통과시키고 목표 위치에 배치하는 공간 퍼즐.",
+  "core_loop": "목표 확인 → 가구 집기 → 이동 → 필요 시 두 손가락 회전 → 통로 통과 → 목표 포즈에 배치 → 다음 가구.",
+  "mvp_scope": "6 stages, 실제 drag와 two-finger rotation, collision, snap/rollback, undo/reset, scoring, 전체 화면 흐름.",
+  "created_at": "2026-09-29T14:03:42.901736+00:00",
+  "game_rules": {
+    "score": "clear, par moves, no reset",
+    "collision": "wall and placed furniture overlap forbidden",
+    "mvp_stages": 6,
+    "goal_overlap": 0.85,
+    "angle_tolerance_deg": 12
+  },
+  "not_in_mvp": [
+    "final art",
+    "characters",
+    "economy",
+    "procedural levels",
+    "online scores"
+  ],
+  "updated_at": "2026-09-29T14:03:42.901736+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "멀티터치 충돌 가능성",
+    "모서리 충돌이 답답할 위험",
+    "목표 허용 오차 불공정",
+    "레벨이 단순 경로 노동으로 퇴화할 위험"
+  ],
+  "progression": "6개 스테이지 순차 해금. 별은 숙련 지표이며 화폐는 없다.",
+  "screen_flow": "Stage Select → Brief → Moving Room → Result → Next/Retry. Invalid release는 rollback, Reset은 확인 후 초기화.",
+  "state_model": [
+    {
+      "state": "brief",
+      "inputs": "start"
     },
-    "not_in_mvp": [
-      "final art",
-      "characters",
-      "economy",
-      "procedural levels",
-      "online scores"
-    ],
-    "known_risks": [
-      "멀티터치 충돌 가능성",
-      "모서리 충돌이 답답할 위험",
-      "목표 허용 오차 불공정",
-      "레벨이 단순 경로 노동으로 퇴화할 위험"
-    ],
-    "progression": "6개 스테이지 순차 해금. 별은 숙련 지표이며 화폐는 없다.",
-    "screen_flow": "Stage Select → Brief → Moving Room → Result → Next/Retry. Invalid release는 rollback, Reset은 확인 후 초기화.",
-    "state_model": [
-      {
-        "state": "brief",
-        "inputs": "start"
-      },
-      {
-        "state": "idle",
-        "inputs": "grab, inspect, undo, pause"
-      },
-      {
-        "state": "held",
-        "inputs": "drag, twist, release"
-      },
-      {
-        "state": "invalid_pose",
-        "inputs": "drag, twist, release"
-      },
-      {
-        "state": "complete",
-        "inputs": "next, retry"
-      }
-    ],
-    "content_unit": "room + furniture start/goal poses + ordering constraints",
-    "content_model": {
-      "axes": [
-        "room graph",
-        "door width",
-        "furniture shape",
-        "start pose",
-        "goal pose",
-        "obstacles",
-        "ordering dependency"
-      ],
-      "unit": "moving stage",
-      "mvp_count": 6
+    {
+      "state": "idle",
+      "inputs": "grab, inspect, undo, pause"
     },
-    "source_run_at": "2026-09-29T14:03:42.901736+00:00",
-    "player_fantasy": "좁은 공간의 각도와 경로를 읽는 숙련 이사 전문가가 되어 막힌 가구를 정확한 회전으로 통과시키는 만족을 느낀다.",
-    "session_length": "2~4분 / stage",
-    "test_scenarios": [
-      "회전 없이는 소파가 문을 통과하지 못한다.",
-      "두 손가락 입력이 실제 가구 각도를 바꾼다.",
-      "잘못 놓으면 마지막 유효 포즈로 복귀한다.",
-      "한 스테이지는 배치 순서 판단을 요구한다.",
-      "6개 스테이지가 반복 실행된다."
+    {
+      "state": "held",
+      "inputs": "drag, twist, release"
+    },
+    {
+      "state": "invalid_pose",
+      "inputs": "drag, twist, release"
+    },
+    {
+      "state": "complete",
+      "inputs": "next, retry"
+    }
+  ],
+  "archive_path": "projects/miniature-moving-day/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "room + furniture start/goal poses + ordering constraints",
+  "content_model": {
+    "axes": [
+      "room graph",
+      "door width",
+      "furniture shape",
+      "start pose",
+      "goal pose",
+      "obstacles",
+      "ordering dependency"
     ],
-    "feedback_system": [
-      {
-        "event": "grab",
-        "haptic": "light",
-        "visual": "lift shadow"
-      },
-      {
-        "event": "collision",
-        "haptic": "impact",
-        "visual": "contact outline"
-      },
-      {
-        "event": "goal",
-        "haptic": "selection",
-        "visual": "snap"
-      }
-    ],
-    "round_structure": "스테이지당 2~4개 가구, 평균 2~4분. 모든 목표를 충족하면 성공하며 Undo/Reset으로 막힘을 복구한다.",
-    "interaction_spec": [
-      {
-        "cancel": "rollback",
-        "target": "furniture",
-        "gesture": "drag",
-        "invalid": "clamp to last valid transform"
-      },
-      {
-        "cancel": "keep last valid angle",
-        "target": "held furniture",
-        "gesture": "two-finger twist",
-        "invalid": "do not commit overlap"
-      },
-      {
-        "valid": "snap to goal",
-        "target": "current pose",
-        "gesture": "release",
-        "invalid": "spring back"
-      }
-    ],
-    "screen_inventory": [
-      "Stage Select",
-      "Stage Brief",
-      "Moving Room",
-      "Pause Overlay",
-      "Stage Result"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "move",
-        "input": "one-finger drag",
-        "change": "actual position changes",
-        "target": "furniture",
-        "feedback": "lift and contact outline",
-        "condition": "idle"
-      },
-      {
-        "verb": "rotate",
-        "input": "two-finger twist",
-        "change": "actual angle changes",
-        "target": "held furniture",
-        "feedback": "footprint preview",
-        "condition": "held"
-      },
-      {
-        "verb": "place",
-        "input": "release",
-        "change": "commit or rollback",
-        "target": "floor or goal",
-        "feedback": "snap and haptic",
-        "condition": "held"
-      }
-    ],
-    "wireframe_handoff": [
-      "5개 화면과 Reset 확인 상태 표현",
-      "idle/held/collision/goal-valid/placed 상태 표현",
-      "drag/twist/clamp/rollback/snap 명시",
-      "undo/reset/result transition 표현"
-    ],
-    "primary_interaction": "가구 drag 이동 + held 상태 two-finger 실제 회전 + collision clamp + goal snap.",
-    "difficulty_variation": "넓은 문과 직사각형에서 시작해 긴 가구와 굽은 복도, L자 가구와 배치 순서 의존으로 확장한다. 속도보다 공간 제약을 높인다.",
-    "visual_direction_brief": "Portrait 고정 dollhouse cutaway. 방이 화면 대부분을 차지하고 가구 실루엣, 벽, 목표 영역 판독성을 장식보다 우선한다."
-  }
+    "unit": "moving stage",
+    "mvp_count": 6
+  },
+  "source_run_at": "2026-09-29T14:03:42.901736+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "좁은 공간의 각도와 경로를 읽는 숙련 이사 전문가가 되어 막힌 가구를 정확한 회전으로 통과시키는 만족을 느낀다.",
+  "session_length": "2~4분 / stage",
+  "test_scenarios": [
+    "회전 없이는 소파가 문을 통과하지 못한다.",
+    "두 손가락 입력이 실제 가구 각도를 바꾼다.",
+    "잘못 놓으면 마지막 유효 포즈로 복귀한다.",
+    "한 스테이지는 배치 순서 판단을 요구한다.",
+    "6개 스테이지가 반복 실행된다."
+  ],
+  "design_markdown": "# Miniature Moving Day — Playable Game Design Spec v0.1\n## 1. Product Definition\nPortrait mobile spatial manipulation puzzle. 2–4분. 실제 이동과 회전이 핵심이며 물리 운반·경영은 Non-goal.\n## 2. Player Fantasy\n좁은 공간을 읽는 숙련 이사 전문가.\n## 3. Core Player Verbs\nDrag move, two-finger rotate, release/place, inspect.\n## 4. Core Loop\n목표 확인→집기→이동→회전→통과→배치.\n## 5. Round / Session Structure\n2~4가구, 2~4분, 모든 목표 충족 시 성공.\n## 6. Game Rules\n벽/가구 겹침 금지, 목표 85% 이상, 각도 오차 12도, par 기반 별.\n## 7. State Model\nBrief, idle, held, invalid pose, complete.\n## 8. Interaction Spec\n한 손 drag, held 상태 두 손 twist, 충돌 clamp, invalid release rollback, valid snap.\n## 9. Content Model\n방 구조, 문 폭, 가구 형태, 시작/목표 포즈, 장애물, 배치 순서.\n## 10. Difficulty / Variation\n직사각형/넓은 문→긴 가구/굽은 복도→L자/순서 의존.\n## 11. Progression\n6 stages sequential unlock.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nStage Select, Brief, Moving Room, Pause, Result.\n## 14. Screen Flow\nSelect→Brief→Room→Result→Next/Retry.\n## 15. Feedback System\nLift shadow, contact outline, snap, haptic, rollback.\n## 16. Visual Direction Brief\nFixed dollhouse cutaway, large readable furniture, sparse HUD.\n## 17. MVP Scope\n6 stages, collision, drag/twist, snap/rollback, undo/reset/scoring. Final art/economy 제외.\n## 18. Test Scenarios\n회전 통과, 실제 각도 변화, rollback, 순서 퍼즐, 반복 실행.\n## 19. Known Risks\n멀티터치, 모서리 감각, tolerance, 단순 노동화.\n## 20. Wireframe Handoff\n모든 화면과 idle/held/collision/valid/placed, drag/twist/clamp/rollback/snap, modal/transition을 표현.",
+  "feedback_system": [
+    {
+      "event": "grab",
+      "haptic": "light",
+      "visual": "lift shadow"
+    },
+    {
+      "event": "collision",
+      "haptic": "impact",
+      "visual": "contact outline"
+    },
+    {
+      "event": "goal",
+      "haptic": "selection",
+      "visual": "snap"
+    }
+  ],
+  "round_structure": "스테이지당 2~4개 가구, 평균 2~4분. 모든 목표를 충족하면 성공하며 Undo/Reset으로 막힘을 복구한다.",
+  "interaction_spec": [
+    {
+      "cancel": "rollback",
+      "target": "furniture",
+      "gesture": "drag",
+      "invalid": "clamp to last valid transform"
+    },
+    {
+      "cancel": "keep last valid angle",
+      "target": "held furniture",
+      "gesture": "two-finger twist",
+      "invalid": "do not commit overlap"
+    },
+    {
+      "valid": "snap to goal",
+      "target": "current pose",
+      "gesture": "release",
+      "invalid": "spring back"
+    }
+  ],
+  "screen_inventory": [
+    "Stage Select",
+    "Stage Brief",
+    "Moving Room",
+    "Pause Overlay",
+    "Stage Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "move",
+      "input": "one-finger drag",
+      "change": "actual position changes",
+      "target": "furniture",
+      "feedback": "lift and contact outline",
+      "condition": "idle"
+    },
+    {
+      "verb": "rotate",
+      "input": "two-finger twist",
+      "change": "actual angle changes",
+      "target": "held furniture",
+      "feedback": "footprint preview",
+      "condition": "held"
+    },
+    {
+      "verb": "place",
+      "input": "release",
+      "change": "commit or rollback",
+      "target": "floor or goal",
+      "feedback": "snap and haptic",
+      "condition": "held"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "5개 화면과 Reset 확인 상태 표현",
+    "idle/held/collision/goal-valid/placed 상태 표현",
+    "drag/twist/clamp/rollback/snap 명시",
+    "undo/reset/result transition 표현"
+  ],
+  "primary_interaction": "가구 drag 이동 + held 상태 two-finger 실제 회전 + collision clamp + goal snap.",
+  "difficulty_variation": "넓은 문과 직사각형에서 시작해 긴 가구와 굽은 복도, L자 가구와 배치 순서 의존으로 확장한다. 속도보다 공간 제약을 높인다.",
+  "visual_direction_brief": "Portrait 고정 dollhouse cutaway. 방이 화면 대부분을 차지하고 가구 실루엣, 벽, 목표 영역 판독성을 장식보다 우선한다."
 }

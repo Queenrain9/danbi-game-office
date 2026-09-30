@@ -1,0 +1,331 @@
+{
+  "id": "6cc940fa-15a8-449a-aaf9-b09531e49ce1",
+  "title": "Constellation Crane Operator",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Integrity and Brake Heat are contract-local resources.",
+  "idea_id": "223050fa-748e-4159-9f23-c33fe82b278a",
+  "version": "v0.1",
+  "one_line": "밤하늘 공사장에서 크레인 붐·와이어·별 조각의 흔들림을 직접 제어해 연결 노드에 별을 걸고 별자리를 완성하는 모바일 공간 조립 퍼즐.",
+  "core_loop": "다음 별 조각과 목표 node 확인 → boom/cable로 빈 별에 hook 접근 → Hook → 운반 중 회전·와이어 조절과 brake로 swing 제어 → 목표 node의 layer/거리/속도 조건에 맞춰 Lock → 별자리의 다음 node 반복 → 전 node 완성 또는 충돌/시간 초과.",
+  "mvp_scope": "10 authored contracts covering Open-Sky, Layered, Obstacle, Heat Management, Sequenced Structure; 3–7 pieces/contract; up to 3 depth layers; normalized 2D physics at 60Hz; boom/cable controls, Hook, brake heat, Positioning criteria, Lock, circular hazards, Integrity3, timer90s, prerequisite graph, score/rating, linear unlock, pause/retry.",
+  "created_at": "2026-09-29T19:30:09.27615+00:00",
+  "game_rules": {
+    "boom": {
+      "angle": "-65°..65° from vertical mast axis",
+      "hook_x": "derived by authored crane kinematic function from boom angle and cable; implementation may solve kinematics but node validity uses normalized hook/star center coordinates",
+      "sampling": "control drag maps continuously; physics sampled fixed 60Hz"
+    },
+    "hook": {
+      "valid": "hook center lies within star radius+0.025 normalized units AND relative hook-star speed<=0.35 normalized units/sec AND star is unplaced",
+      "invalid": "otherwise tap has no state change"
+    },
+    "star": {
+      "radius": "piece-specific normalized radius 0.04..0.09 of workspace width",
+      "swing_angle": "angle in degrees between cable vector and world-down axis",
+      "carried_center": "star center in normalized workspace",
+      "angular_velocity": "degrees/sec sampled at 60Hz"
+    },
+    "brake": {
+      "effect": "while held, every 0.5s angular velocity*=0.55 and heat+1",
+      "cooling": "when not held heat-1 every 1.0s to min0",
+      "heat_max": 6,
+      "overheat": "at heat6 brake disables until heat<=3; crane controls remain active",
+      "tick_seconds": 0.5
+    },
+    "cable": {
+      "length": "normalized 0.15..0.85 of workspace height",
+      "sampling": "continuous input, fixed 60Hz physics"
+    },
+    "depth": {
+      "change": "Each star has fixed depth_layer authored per piece; crane depth selector tap cycles available layer only while hook empty. Hook can attach only stars in selected layer. Carrying star locks selector.",
+      "result": "Node requires exact layer."
+    },
+    "nodes": {
+      "valid_lock": "center distance<=0.07 normalized units AND star center speed<=0.18 units/sec AND abs(swing_angle)<=8° AND layer match",
+      "layer_match": "carried star depth_layer equals node required_layer",
+      "snap_radius": 0.07,
+      "speed_limit": 0.18,
+      "swing_limit_deg": 8
+    },
+    "reset": "Retry resets timer90, Integrity3, all stars to spawn/unplaced, nodes empty, selected depth0, heat0, hook empty.",
+    "score": "success: remaining_seconds*10 + Integrity*250 + max(0,600-total_brake_ticks*10). failure=0.",
+    "timer": {
+      "pause": "stops in Pause and Result only",
+      "start": "first gameplay input after contract load",
+      "continues": "Rigging/Hoisting/Positioning and collision grace",
+      "duration_seconds": 90
+    },
+    "failure": "timer reaches0 or Integrity reaches0",
+    "success": "all required nodes filled before timer0 and Integrity>0",
+    "collision": {
+      "result": "Integrity-1, active star returns to its pickup spawn, hook becomes empty, brake heat resets0, timer continues; 1.0s grace disables further collision then Rigging",
+      "hazards": "authored no-go circular zones with center/radius in normalized workspace; active only in contracts class Obstacle",
+      "judgment": "carried star circle overlaps hazard circle when center distance < sum radii",
+      "terminal": "Integrity reaches0 -> failure"
+    },
+    "coordinate": "Gameplay simulation uses 2D normalized crane workspace: x horizontal [-1,1], y vertical [0,1]. Depth is discrete layer integer 0=near,1=mid,2=far; not continuous z."
+  },
+  "not_in_mvp": [
+    "3D free camera",
+    "Continuous z-depth physics",
+    "Procedural constellations",
+    "Crane upgrades",
+    "Currency/shop",
+    "Narrative dialogue",
+    "Online leaderboard",
+    "More than one crane"
+  ],
+  "updated_at": "2026-09-30T06:22:45.562161+00:00",
+  "archived_at": "2026-09-30T06:22:45.562161+00:00",
+  "known_risks": [
+    "Physics can feel imprecise if visual motion diverges from numeric snap criteria",
+    "Two-axis crane control plus brake may overload one-handed mobile play",
+    "Discrete depth must be visually obvious without looking like a separate puzzle mode",
+    "Obstacle collision may feel punitive during high swing",
+    "Late combined contracts risk clutter around target/hazard/prerequisite feedback"
+  ],
+  "progression": "10 contracts unlock linearly on success. Each stores best score and 1–3 stars: 1=success, 2=score>=900, 3=score>=1250. Ratings do not alter crane physics.",
+  "screen_flow": "Home/Select→Brief→Gameplay Rigging→Hoisting↔Positioning→Locked next piece/Rigging; collision→Collision Grace→Rigging; all nodes→success Result; timer0/integrity0→failure Result. Success Next unlocks next Brief. Pause resumes exact state/timer.",
+  "state_model": [
+    {
+      "exit": "select",
+      "next": "Contract Brief",
+      "enter": "Home/Result Next",
+      "state": "Contract Select",
+      "allowed": [
+        "select unlocked contract",
+        "Home"
+      ]
+    },
+    {
+      "exit": "Start/Back",
+      "next": "Rigging/Contract Select",
+      "enter": "contract select",
+      "state": "Contract Brief",
+      "allowed": [
+        "Start",
+        "Back"
+      ]
+    },
+    {
+      "exit": "valid Hook",
+      "next": "Hoisting/Result",
+      "enter": "Start, piece locked, or collision recovery complete",
+      "state": "Rigging",
+      "allowed": [
+        "Rotate Boom",
+        "Adjust Cable",
+        "Depth Select",
+        "Hook Star",
+        "Pause"
+      ],
+      "failure": "timer0",
+      "variables": [
+        "timer",
+        "integrity",
+        "hook",
+        "selected layer"
+      ]
+    },
+    {
+      "exit": "carried star enters target node snap radius",
+      "next": "Positioning/Rigging/Result",
+      "enter": "star hooked",
+      "state": "Hoisting",
+      "allowed": [
+        "Rotate Boom",
+        "Adjust Cable",
+        "Damp Swing",
+        "Pause"
+      ],
+      "failure": "collision/timer",
+      "variables": [
+        "carried pose/velocity/heat"
+      ]
+    },
+    {
+      "exit": "leave radius or valid Lock",
+      "next": "Hoisting/Rigging/Result",
+      "enter": "center distance<=0.07 from target node",
+      "state": "Positioning",
+      "allowed": [
+        "Rotate Boom",
+        "Adjust Cable",
+        "Damp Swing",
+        "Lock",
+        "Pause"
+      ],
+      "failure": "collision/timer",
+      "variables": [
+        "distance",
+        "speed",
+        "swing",
+        "layer",
+        "heat"
+      ]
+    },
+    {
+      "exit": "1s elapsed",
+      "next": "Rigging/Result",
+      "enter": "nonterminal collision",
+      "state": "Collision Grace",
+      "allowed": [
+        "Pause"
+      ],
+      "failure": "timer0 or integrity0",
+      "variables": [
+        "grace_remaining=1.0s",
+        "timer"
+      ]
+    },
+    {
+      "exit": "choice",
+      "next": "Rigging/Contract Select/Home",
+      "enter": "all nodes filled/timer0/integrity0",
+      "state": "Result",
+      "allowed": [
+        "Retry",
+        "Next if success",
+        "Home"
+      ]
+    }
+  ],
+  "archive_path": "projects/constellation-crane-operator/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "constellation construction contract",
+  "content_model": {
+    "unit": "constellation construction contract",
+    "classes": [
+      {
+        "type": "Open-Sky Assembly",
+        "rules": "No hazards, one depth layer; teaches hook/swing/snap."
+      },
+      {
+        "type": "Layered Assembly",
+        "rules": "2–3 depth layers; empty-hook depth selection and exact node layer matching."
+      },
+      {
+        "type": "Obstacle Rig",
+        "rules": "No-go circular hazards; collision causes Integrity loss and star reset with 1s grace."
+      },
+      {
+        "type": "Heat Management",
+        "rules": "Long carries/node precision require brake use under heat6 lockout/cool-to3 rule."
+      },
+      {
+        "type": "Sequenced Structure",
+        "rules": "Nodes have authored prerequisite graph; only nodes whose prerequisites are filled become active targets. Lock on inactive node is invalid."
+      }
+    ],
+    "topology": "Constellation is a directed acyclic prerequisite graph of 3–7 nodes. A star piece maps one-to-one to a node and fixed depth layer. Hazards are circles in normalized workspace; screen placement is Wireframe/art responsibility.",
+    "mvp_count": "10 contracts covering all five classes; contracts may combine classes after introduction.",
+    "variation_axes": [
+      "node count",
+      "prerequisite graph",
+      "depth layers",
+      "star radius",
+      "spawn positions",
+      "node positions",
+      "hazard circles",
+      "required precision pressure"
+    ]
+  },
+  "source_run_at": "2026-09-29T19:30:09.27615+00:00",
+  "archive_commit": "59cc2f4f38a7caa3b1a0117b0ece47f2816386e0",
+  "human_priority": true,
+  "player_fantasy": "플레이어는 밤하늘을 건설하는 크레인 기사다. 무거운 별을 훅에 걸어 진자 흔들림을 죽이고 정확한 깊이 레이어와 연결 노드에 안착시키며, 거대한 기계로 섬세한 별자리를 조립하는 숙련감을 느낀다.",
+  "session_length": "3–6분",
+  "test_scenarios": [
+    "Hook succeeds only within radius+0.025, relative speed<=0.35 and matching selected layer.",
+    "Valid Lock requires distance<=0.07, speed<=0.18, swing<=8°, exact layer; each invalid criterion leaves state unchanged.",
+    "Brake at 0 reaches heat6 after six 0.5s ticks, disables, then re-enables only after cooling to3.",
+    "Hazard overlap deducts exactly 1 Integrity, resets active star/hook, keeps timer running and enters 1s grace.",
+    "Three collisions reach Integrity0 failure; timer0 independently reaches failure.",
+    "Filling all required nodes reaches success and prerequisite-inactive nodes reject Lock.",
+    "Pause freezes timer and physics; Retry fully resets contract.",
+    "All five content classes and combined late contracts require no new interaction rules."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Constellation Crane Operator\n\n## 1. Product Definition\n밤하늘 공사장에서 크레인 붐·와이어·별 조각의 흔들림을 직접 제어해 연결 노드에 별을 걸고 별자리를 완성하는 모바일 공간 조립 퍼즐. Portrait mobile physics/spatial assembly puzzle. Session 3–6 minutes. Non-goals: 3D free camera, Continuous z-depth physics, Procedural constellations, Crane upgrades, Currency/shop, Narrative dialogue, Online leaderboard, More than one crane.\n\n## 2. Player Fantasy\n플레이어는 밤하늘을 건설하는 크레인 기사다. 무거운 별을 훅에 걸어 진자 흔들림을 죽이고 정확한 깊이 레이어와 연결 노드에 안착시키며, 거대한 기계로 섬세한 별자리를 조립하는 숙련감을 느낀다.\n\n## 3. Core Player Verbs\n- **Rotate Boom** — input: horizontal drag on boom control; target: crane boom; condition: Rigging/Hoisting/Positioning; state change: boom_angle changes within mission limits; feedback: boom and projected hook arc update.\n- **Adjust Cable** — input: vertical drag on cable control; target: winch; condition: Rigging/Hoisting/Positioning; state change: cable_length changes; feedback: hook height/depth projection updates.\n- **Hook Star** — input: tap hook when overlap condition valid; target: unplaced star piece; condition: Rigging; hook not carrying; state change: star attaches to hook; state Hoisting; feedback: magnetic latch/haptic.\n- **Damp Swing** — input: press-and-hold brake; target: carried star; condition: Hoisting/Positioning; state change: angular velocity multiplied by 0.55 per 0.5s tick; brake_heat +1 per tick; feedback: swing visibly settles; heat rises.\n- **Place Star** — input: tap Lock; target: active constellation node; condition: Positioning and snap criteria valid; state change: star detached and node filled; next piece or result; feedback: constellation link lights.\n\n## 4. Core Loop\n다음 별 조각과 목표 node 확인 → boom/cable로 빈 별에 hook 접근 → Hook → 운반 중 회전·와이어 조절과 brake로 swing 제어 → 목표 node의 layer/거리/속도 조건에 맞춰 Lock → 별자리의 다음 node 반복 → 전 node 완성 또는 충돌/시간 초과.\n\n## 5. Round / Session Structure\nMVP는 10개 construction contract. 각 contract는 3~7 star pieces와 1~3 depth layers를 가진다. Contract 시작 시 90초, Integrity 3, Brake Heat 0. 모든 required nodes를 채우면 success. Timer 0 또는 Integrity 0이면 failure. 각 piece는 Rigging→Hoisting→Positioning→Locked를 거친다. Result에서 Retry/Next/Home. 평균 3–6분.\n\n## 6. Game Rules\n```json\n{\n  \"coordinate\": \"Gameplay simulation uses 2D normalized crane workspace: x horizontal [-1,1], y vertical [0,1]. Depth is discrete layer integer 0=near,1=mid,2=far; not continuous z.\",\n  \"boom\": {\n    \"angle\": \"-65°..65° from vertical mast axis\",\n    \"sampling\": \"control drag maps continuously; physics sampled fixed 60Hz\",\n    \"hook_x\": \"derived by authored crane kinematic function from boom angle and cable; implementation may solve kinematics but node validity uses normalized hook/star center coordinates\"\n  },\n  \"cable\": {\n    \"length\": \"normalized 0.15..0.85 of workspace height\",\n    \"sampling\": \"continuous input, fixed 60Hz physics\"\n  },\n  \"star\": {\n    \"radius\": \"piece-specific normalized radius 0.04..0.09 of workspace width\",\n    \"swing_angle\": \"angle in degrees between cable vector and world-down axis\",\n    \"angular_velocity\": \"degrees/sec sampled at 60Hz\",\n    \"carried_center\": \"star center in normalized workspace\"\n  },\n  \"hook\": {\n    \"valid\": \"hook center lies within star radius+0.025 normalized units AND relative hook-star speed<=0.35 normalized units/sec AND star is unplaced\",\n    \"invalid\": \"otherwise tap has no state change\"\n  },\n  \"nodes\": {\n    \"snap_radius\": 0.07,\n    \"speed_limit\": 0.18,\n    \"swing_limit_deg\": 8,\n    \"layer_match\": \"carried star depth_layer equals node required_layer\",\n    \"valid_lock\": \"center distance<=0.07 normalized units AND star center speed<=0.18 units/sec AND abs(swing_angle)<=8° AND layer match\"\n  },\n  \"depth\": {\n    \"change\": \"Each star has fixed depth_layer authored per piece; crane depth selector tap cycles available layer only while hook empty. Hook can attach only stars in selected layer. Carrying star locks selector.\",\n    \"result\": \"Node requires exact layer.\"\n  },\n  \"brake\": {\n    \"heat_max\": 6,\n    \"tick_seconds\": 0.5,\n    \"effect\": \"while held, every 0.5s angular velocity*=0.55 and heat+1\",\n    \"cooling\": \"when not held heat-1 every 1.0s to min0\",\n    \"overheat\": \"at heat6 brake disables until heat<=3; crane controls remain active\"\n  },\n  \"collision\": {\n    \"hazards\": \"authored no-go circular zones with center/radius in normalized workspace; active only in contracts class Obstacle\",\n    \"judgment\": \"carried star circle overlaps hazard circle when center distance < sum radii\",\n    \"result\": \"Integrity-1, active star returns to its pickup spawn, hook becomes empty, brake heat resets0, timer continues; 1.0s grace disables further collision then Rigging\",\n    \"terminal\": \"Integrity reaches0 -> failure\"\n  },\n  \"timer\": {\n    \"start\": \"first gameplay input after contract load\",\n    \"duration_seconds\": 90,\n    \"continues\": \"Rigging/Hoisting/Positioning and collision grace\",\n    \"pause\": \"stops in Pause and Result only\"\n  },\n  \"success\": \"all required nodes filled before timer0 and Integrity>0\",\n  \"failure\": \"timer reaches0 or Integrity reaches0\",\n  \"score\": \"success: remaining_seconds*10 + Integrity*250 + max(0,600-total_brake_ticks*10). failure=0.\",\n  \"reset\": \"Retry resets timer90, Integrity3, all stars to spawn/unplaced, nodes empty, selected depth0, heat0, hook empty.\"\n}\n```\n\n## 7. State Model\n- **Contract Select** — enter: Home/Result Next; allowed: select unlocked contract, Home; variables: ; exit: select; failure/cancel: none; next: Contract Brief.\n- **Contract Brief** — enter: contract select; allowed: Start, Back; variables: ; exit: Start/Back; failure/cancel: none; next: Rigging/Contract Select.\n- **Rigging** — enter: Start, piece locked, or collision recovery complete; allowed: Rotate Boom, Adjust Cable, Depth Select, Hook Star, Pause; variables: timer, integrity, hook, selected layer; exit: valid Hook; failure/cancel: timer0; next: Hoisting/Result.\n- **Hoisting** — enter: star hooked; allowed: Rotate Boom, Adjust Cable, Damp Swing, Pause; variables: carried pose/velocity/heat; exit: carried star enters target node snap radius; failure/cancel: collision/timer; next: Positioning/Rigging/Result.\n- **Positioning** — enter: center distance<=0.07 from target node; allowed: Rotate Boom, Adjust Cable, Damp Swing, Lock, Pause; variables: distance, speed, swing, layer, heat; exit: leave radius or valid Lock; failure/cancel: collision/timer; next: Hoisting/Rigging/Result.\n- **Collision Grace** — enter: nonterminal collision; allowed: Pause; variables: grace_remaining=1.0s, timer; exit: 1s elapsed; failure/cancel: timer0 or integrity0; next: Rigging/Result.\n- **Result** — enter: all nodes filled/timer0/integrity0; allowed: Retry, Next if success, Home; variables: ; exit: choice; failure/cancel: none; next: Rigging/Contract Select/Home.\n\n## 8. Interaction Spec\n```json\n{\n  \"boom\": \"Horizontal drag owns pointer; angle clamps -65..65. Release keeps angle.\",\n  \"cable\": \"Vertical drag owns pointer; length clamps 0.15..0.85. Release keeps length.\",\n  \"depth\": \"Tap cycles 0..contract max layer only with empty hook; carrying disables.\",\n  \"hook\": \"Atomic tap; valid overlap+relative speed+layer required. Invalid tap changes nothing.\",\n  \"brake\": \"Hold; ticks every 0.5s. At heat6 further ticks do nothing until passive cooling reaches3. Releasing begins cooling.\",\n  \"lock\": \"Atomic tap in Positioning. Valid iff distance/speed/swing/layer all pass; invalid Lock changes nothing and shows failed criteria.\",\n  \"priority\": \"Only one crane manipulation pointer at once; Lock/Hook ignored during active drag. Pause overrides. Collision resolution overrides all gameplay input.\"\n}\n```\n\n## 9. Content Model\n```json\n{\n  \"unit\": \"constellation construction contract\",\n  \"classes\": [\n    {\n      \"type\": \"Open-Sky Assembly\",\n      \"rules\": \"No hazards, one depth layer; teaches hook/swing/snap.\"\n    },\n    {\n      \"type\": \"Layered Assembly\",\n      \"rules\": \"2–3 depth layers; empty-hook depth selection and exact node layer matching.\"\n    },\n    {\n      \"type\": \"Obstacle Rig\",\n      \"rules\": \"No-go circular hazards; collision causes Integrity loss and star reset with 1s grace.\"\n    },\n    {\n      \"type\": \"Heat Management\",\n      \"rules\": \"Long carries/node precision require brake use under heat6 lockout/cool-to3 rule.\"\n    },\n    {\n      \"type\": \"Sequenced Structure\",\n      \"rules\": \"Nodes have authored prerequisite graph; only nodes whose prerequisites are filled become active targets. Lock on inactive node is invalid.\"\n    }\n  ],\n  \"topology\": \"Constellation is a directed acyclic prerequisite graph of 3–7 nodes. A star piece maps one-to-one to a node and fixed depth layer. Hazards are circles in normalized workspace; screen placement is Wireframe/art responsibility.\",\n  \"variation_axes\": [\n    \"node count\",\n    \"prerequisite graph\",\n    \"depth layers\",\n    \"star radius\",\n    \"spawn positions\",\n    \"node positions\",\n    \"hazard circles\",\n    \"required precision pressure\"\n  ],\n  \"mvp_count\": \"10 contracts covering all five classes; contracts may combine classes after introduction.\"\n}\n```\n\n## 10. Difficulty / Variation\n1–2 Open-Sky, 3–4 add brake heat and smaller stars, 5–6 add depth layers, 7–8 add obstacle rigs, 9–10 combine prerequisite sequences+3 layers+hazards+heat. Difficulty grows through topology, depth and control-resource combinations rather than faster base physics.\n\n## 11. Progression\n10 contracts unlock linearly on success. Each stores best score and 1–3 stars: 1=success, 2=score>=900, 3=score>=1250. Ratings do not alter crane physics.\n\n## 12. Economy\nNot required. Integrity and Brake Heat are contract-local resources.\n\n## 13. Screen Inventory\n- Skyyard Home / Contract Select\n- Contract Brief\n- Crane Gameplay\n- Contract Result\n\n## 14. Screen Flow\nHome/Select→Brief→Gameplay Rigging→Hoisting↔Positioning→Locked next piece/Rigging; collision→Collision Grace→Rigging; all nodes→success Result; timer0/integrity0→failure Result. Success Next unlocks next Brief. Pause resumes exact state/timer.\n\n## 15. Feedback System\n```json\n{\n  \"hook\": \"valid proximity/speed/layer cue + latch\",\n  \"swing\": \"cable/star motion plus swing threshold cue\",\n  \"brake\": \"heat ticks/overheat/cooling\",\n  \"position\": \"node indicates distance/speed/swing/layer criteria independently\",\n  \"lock\": \"link lights and piece becomes fixed\",\n  \"collision\": \"impact+Integrity loss+star reset+1s grace\",\n  \"timer\": \"last 15s urgency\",\n  \"progression\": \"rating/unlock\"\n}\n```\n\n## 16. Visual Direction Brief\nPortrait mobile, fixed side-view sky construction stage with discrete depth layers visually separable but not perspective-measured. Crane, cable, carried star, target node and hazards dominate. Glowing constellation lines communicate completed prerequisite structure. Motion must remain readable against restrained night sky. UI coordinates remain Wireframe responsibility.\n\n## 17. MVP Scope\n10 authored contracts covering Open-Sky, Layered, Obstacle, Heat Management, Sequenced Structure; 3–7 pieces/contract; up to 3 depth layers; normalized 2D physics at 60Hz; boom/cable controls, Hook, brake heat, Positioning criteria, Lock, circular hazards, Integrity3, timer90s, prerequisite graph, score/rating, linear unlock, pause/retry.\nNOT IN MVP: 3D free camera, Continuous z-depth physics, Procedural constellations, Crane upgrades, Currency/shop, Narrative dialogue, Online leaderboard, More than one crane.\n\n## 18. Test Scenarios\n- Hook succeeds only within radius+0.025, relative speed<=0.35 and matching selected layer.\n- Valid Lock requires distance<=0.07, speed<=0.18, swing<=8°, exact layer; each invalid criterion leaves state unchanged.\n- Brake at 0 reaches heat6 after six 0.5s ticks, disables, then re-enables only after cooling to3.\n- Hazard overlap deducts exactly 1 Integrity, resets active star/hook, keeps timer running and enters 1s grace.\n- Three collisions reach Integrity0 failure; timer0 independently reaches failure.\n- Filling all required nodes reaches success and prerequisite-inactive nodes reject Lock.\n- Pause freezes timer and physics; Retry fully resets contract.\n- All five content classes and combined late contracts require no new interaction rules.\n\n## 19. Known Risks\n- Physics can feel imprecise if visual motion diverges from numeric snap criteria\n- Two-axis crane control plus brake may overload one-handed mobile play\n- Discrete depth must be visually obvious without looking like a separate puzzle mode\n- Obstacle collision may feel punitive during high swing\n- Late combined contracts risk clutter around target/hazard/prerequisite feedback\n\n## 20. Wireframe Handoff\n- Represent all 4 screen types and Rigging/Hoisting/Positioning/Collision Grace/Pause/Result states.\n- Represent Open-Sky, Layered, Obstacle, Heat, Sequenced content variations and late combined contracts.\n- Show boom angle, cable length, selected depth, hook validity, carried swing/speed and brake heat states without inventing thresholds.\n- Show Positioning criteria separately: distance<=0.07, speed<=0.18, swing<=8°, exact layer; invalid Lock feedback.\n- Show circular hazard collision→Integrity-1→star reset→1s grace and Integrity0 terminal failure.\n- Show prerequisite node inactive/active/filled states and one-to-one piece mapping.\n- Show 90s timer, success/failure Result, 1–3 rating, unlock Next, Retry full reset.\n",
+  "feedback_system": {
+    "hook": "valid proximity/speed/layer cue + latch",
+    "lock": "link lights and piece becomes fixed",
+    "brake": "heat ticks/overheat/cooling",
+    "swing": "cable/star motion plus swing threshold cue",
+    "timer": "last 15s urgency",
+    "position": "node indicates distance/speed/swing/layer criteria independently",
+    "collision": "impact+Integrity loss+star reset+1s grace",
+    "progression": "rating/unlock"
+  },
+  "round_structure": "MVP는 10개 construction contract. 각 contract는 3~7 star pieces와 1~3 depth layers를 가진다. Contract 시작 시 90초, Integrity 3, Brake Heat 0. 모든 required nodes를 채우면 success. Timer 0 또는 Integrity 0이면 failure. 각 piece는 Rigging→Hoisting→Positioning→Locked를 거친다. Result에서 Retry/Next/Home. 평균 3–6분.",
+  "interaction_spec": {
+    "boom": "Horizontal drag owns pointer; angle clamps -65..65. Release keeps angle.",
+    "hook": "Atomic tap; valid overlap+relative speed+layer required. Invalid tap changes nothing.",
+    "lock": "Atomic tap in Positioning. Valid iff distance/speed/swing/layer all pass; invalid Lock changes nothing and shows failed criteria.",
+    "brake": "Hold; ticks every 0.5s. At heat6 further ticks do nothing until passive cooling reaches3. Releasing begins cooling.",
+    "cable": "Vertical drag owns pointer; length clamps 0.15..0.85. Release keeps length.",
+    "depth": "Tap cycles 0..contract max layer only with empty hook; carrying disables.",
+    "priority": "Only one crane manipulation pointer at once; Lock/Hook ignored during active drag. Pause overrides. Collision resolution overrides all gameplay input."
+  },
+  "screen_inventory": [
+    "Skyyard Home / Contract Select",
+    "Contract Brief",
+    "Crane Gameplay",
+    "Contract Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Rotate Boom",
+      "input": "horizontal drag on boom control",
+      "target": "crane boom",
+      "feedback": "boom and projected hook arc update",
+      "condition": "Rigging/Hoisting/Positioning",
+      "state_change": "boom_angle changes within mission limits"
+    },
+    {
+      "verb": "Adjust Cable",
+      "input": "vertical drag on cable control",
+      "target": "winch",
+      "feedback": "hook height/depth projection updates",
+      "condition": "Rigging/Hoisting/Positioning",
+      "state_change": "cable_length changes"
+    },
+    {
+      "verb": "Hook Star",
+      "input": "tap hook when overlap condition valid",
+      "target": "unplaced star piece",
+      "feedback": "magnetic latch/haptic",
+      "condition": "Rigging; hook not carrying",
+      "state_change": "star attaches to hook; state Hoisting"
+    },
+    {
+      "verb": "Damp Swing",
+      "input": "press-and-hold brake",
+      "target": "carried star",
+      "feedback": "swing visibly settles; heat rises",
+      "condition": "Hoisting/Positioning",
+      "state_change": "angular velocity multiplied by 0.55 per 0.5s tick; brake_heat +1 per tick"
+    },
+    {
+      "verb": "Place Star",
+      "input": "tap Lock",
+      "target": "active constellation node",
+      "feedback": "constellation link lights",
+      "condition": "Positioning and snap criteria valid",
+      "state_change": "star detached and node filled; next piece or result"
+    }
+  ],
+  "human_priority_at": "2026-09-29T19:55:55.734+00:00",
+  "wireframe_handoff": [
+    "Represent all 4 screen types and Rigging/Hoisting/Positioning/Collision Grace/Pause/Result states.",
+    "Represent Open-Sky, Layered, Obstacle, Heat, Sequenced content variations and late combined contracts.",
+    "Show boom angle, cable length, selected depth, hook validity, carried swing/speed and brake heat states without inventing thresholds.",
+    "Show Positioning criteria separately: distance<=0.07, speed<=0.18, swing<=8°, exact layer; invalid Lock feedback.",
+    "Show circular hazard collision→Integrity-1→star reset→1s grace and Integrity0 terminal failure.",
+    "Show prerequisite node inactive/active/filled states and one-to-one piece mapping.",
+    "Show 90s timer, success/failure Result, 1–3 rating, unlock Next, Retry full reset."
+  ],
+  "primary_interaction": "boom/cable manipulation + hook + swing damping + precision lock",
+  "difficulty_variation": "1–2 Open-Sky, 3–4 add brake heat and smaller stars, 5–6 add depth layers, 7–8 add obstacle rigs, 9–10 combine prerequisite sequences+3 layers+hazards+heat. Difficulty grows through topology, depth and control-resource combinations rather than faster base physics.",
+  "visual_direction_brief": "Portrait mobile, fixed side-view sky construction stage with discrete depth layers visually separable but not perspective-measured. Crane, cable, carried star, target node and hazards dominate. Glowing constellation lines communicate completed prerequisite structure. Motion must remain readable against restrained night sky. UI coordinates remain Wireframe responsibility."
+}

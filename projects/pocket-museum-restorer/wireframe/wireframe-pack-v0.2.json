@@ -1,0 +1,1011 @@
+{
+  "id": "a5f8e9d2-adf5-403c-9e47-a4a59302f685",
+  "title": "Pocket Museum Restorer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "f2e6c923-043c-46f0-88df-69d67fbc694b",
+  "screens": [
+    {
+      "id": "desk",
+      "name": "Night Desk / Case Queue",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 58,
+            "w": 84,
+            "x": 8,
+            "y": 18,
+            "id": "queue",
+            "role": "preview",
+            "label": "Queue"
+          }
+        ]
+      },
+      "states": [
+        "idle"
+      ],
+      "purpose": "start session",
+      "feedback": [
+        "case count"
+      ],
+      "components": [
+        {
+          "id": "cases",
+          "box": {
+            "h": 48,
+            "w": 76,
+            "x": 12,
+            "y": 22
+          },
+          "type": "cards",
+          "label": "3 Cases",
+          "state_binding": "session.case_index"
+        },
+        {
+          "id": "begin",
+          "box": {
+            "h": 9,
+            "w": 60,
+            "x": 20,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Begin Shift",
+          "enabled_when": "true",
+          "state_binding": "ready",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "intake",
+          "from": "desk",
+          "trigger": "begin",
+          "animation": "case lift",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset session",
+          "target": "begin",
+          "feedback": "lamp rise",
+          "precondition": "idle",
+          "state_change": "case_index=1",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "intake",
+      "name": "Artifact Intake",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 16,
+            "id": "preview",
+            "role": "preview",
+            "label": "Preview"
+          }
+        ]
+      },
+      "states": [
+        "case_intake"
+      ],
+      "purpose": "preview conditions",
+      "feedback": [
+        "tags"
+      ],
+      "components": [
+        {
+          "id": "artifact_preview",
+          "box": {
+            "h": 48,
+            "w": 70,
+            "x": 15,
+            "y": 19
+          },
+          "type": "viewport",
+          "label": "Artifact",
+          "state_binding": "preview_transform",
+          "interaction_role": "rotate"
+        },
+        {
+          "id": "tags",
+          "box": {
+            "h": 8,
+            "w": 80,
+            "x": 10,
+            "y": 73
+          },
+          "type": "tags",
+          "label": "Conditions",
+          "state_binding": "conditions"
+        },
+        {
+          "id": "begin_case",
+          "box": {
+            "h": 9,
+            "w": 56,
+            "x": 22,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Begin",
+          "enabled_when": "loaded",
+          "state_binding": "loaded",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [
+        "skip absent optional phase"
+      ],
+      "transitions": [
+        {
+          "to": "workspace",
+          "from": "intake",
+          "trigger": "begin_case",
+          "animation": "bench settle",
+          "condition": "loaded"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "rotate preview",
+          "target": "artifact_preview",
+          "feedback": "inertial turn",
+          "precondition": "case_intake",
+          "state_change": "preview_transform",
+          "invalid_input": "pitch clamp"
+        },
+        {
+          "input": "tap",
+          "action": "enter first required phase",
+          "target": "begin_case",
+          "feedback": "work light",
+          "precondition": "loaded",
+          "state_change": "workspace initialized",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "workspace",
+      "name": "Restoration Workspace",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "HUD"
+          },
+          {
+            "h": 58,
+            "w": 90,
+            "x": 5,
+            "y": 15,
+            "id": "artifact_zone",
+            "role": "core",
+            "label": "Artifact"
+          },
+          {
+            "h": 18,
+            "w": 90,
+            "x": 5,
+            "y": 75,
+            "id": "tray",
+            "role": "tools",
+            "label": "Tray"
+          }
+        ]
+      },
+      "states": [
+        "assembly",
+        "surface_inspection",
+        "scraping",
+        "bonding"
+      ],
+      "purpose": "core restoration",
+      "feedback": [
+        "snap",
+        "fluorescence",
+        "flakes",
+        "damage pulse",
+        "wet seam"
+      ],
+      "components": [
+        {
+          "id": "phase",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 5,
+            "y": 5
+          },
+          "type": "status",
+          "label": "Phase",
+          "state_binding": "workspace.phase"
+        },
+        {
+          "id": "integrity",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 38,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Integrity",
+          "state_binding": "integrity"
+        },
+        {
+          "id": "submit",
+          "box": {
+            "h": 7,
+            "w": 12,
+            "x": 70,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Seal",
+          "enabled_when": "completion>=0.7",
+          "state_binding": "completion",
+          "interaction_role": "submit"
+        },
+        {
+          "id": "help",
+          "box": {
+            "h": 7,
+            "w": 11,
+            "x": 84,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Help",
+          "state_binding": "overlay",
+          "interaction_role": "modal"
+        },
+        {
+          "id": "artifact",
+          "box": {
+            "h": 49,
+            "w": 76,
+            "x": 12,
+            "y": 19
+          },
+          "type": "geometry",
+          "label": "Artifact",
+          "enabled_when": "!input_owner",
+          "state_binding": "artifact.transform",
+          "interaction_role": "rotate/pinch"
+        },
+        {
+          "id": "fragments",
+          "box": {
+            "h": 15,
+            "w": 55,
+            "x": 6,
+            "y": 76
+          },
+          "type": "tray",
+          "label": "Fragments",
+          "enabled_when": "phase=assembly",
+          "state_binding": "loose_fragments",
+          "interaction_role": "drag source"
+        },
+        {
+          "id": "tools",
+          "box": {
+            "h": 15,
+            "w": 31,
+            "x": 63,
+            "y": 76
+          },
+          "type": "rail",
+          "label": "Tools",
+          "enabled_when": "phase!=assembly",
+          "state_binding": "active_tool",
+          "interaction_role": "tool source"
+        },
+        {
+          "id": "lamp",
+          "box": {
+            "h": 10,
+            "w": 10,
+            "x": 67,
+            "y": 78
+          },
+          "type": "draggable_tool",
+          "label": "Lamp",
+          "enabled_when": "phase=surface_inspection",
+          "state_binding": "lamp.position",
+          "interaction_role": "scan"
+        },
+        {
+          "id": "scraper",
+          "box": {
+            "h": 10,
+            "w": 7,
+            "x": 78,
+            "y": 78
+          },
+          "type": "tool",
+          "label": "Scraper",
+          "enabled_when": "phase in [surface_inspection,scraping]",
+          "state_binding": "active_tool",
+          "interaction_role": "scrape"
+        },
+        {
+          "id": "adhesive",
+          "box": {
+            "h": 10,
+            "w": 7,
+            "x": 86,
+            "y": 78
+          },
+          "type": "tool",
+          "label": "Adhesive",
+          "enabled_when": "phase=bonding",
+          "state_binding": "active_tool",
+          "interaction_role": "bond"
+        }
+      ],
+      "edge_cases": [
+        "pointer loss cancels transient input",
+        "no fragments skips assembly",
+        "no cracks skips bonding"
+      ],
+      "transitions": [
+        {
+          "to": "surface_inspection",
+          "from": "assembly",
+          "trigger": "fragments complete",
+          "animation": "tool swap",
+          "condition": "inspection required"
+        },
+        {
+          "to": "scraping",
+          "from": "surface_inspection",
+          "trigger": "scraper on revealed patch",
+          "animation": "none",
+          "condition": "patch exists"
+        },
+        {
+          "to": "surface_inspection",
+          "from": "scraping",
+          "trigger": "patch clear/cancel",
+          "animation": "none",
+          "condition": "true"
+        },
+        {
+          "to": "bonding",
+          "from": "surface_inspection",
+          "trigger": "patches clear",
+          "animation": "tool swap",
+          "condition": "cracks exist"
+        },
+        {
+          "to": "evaluation",
+          "from": "workspace",
+          "trigger": "confirmed submit",
+          "animation": "seal",
+          "condition": "completion>=0.7"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag+twist",
+          "action": "move/rotate then validate <=26px and <=14deg",
+          "target": "fragment",
+          "feedback": "click or repel",
+          "precondition": "assembly",
+          "state_change": "join or return",
+          "invalid_input": "return tray"
+        },
+        {
+          "input": "drag",
+          "action": "project to transformed surface",
+          "target": "lamp",
+          "feedback": "local fluorescence",
+          "precondition": "surface_inspection",
+          "state_change": "discover at 35% overlap",
+          "invalid_input": "keep last valid point"
+        },
+        {
+          "input": "stroke",
+          "action": "remove foreign or damage original",
+          "target": "artifact",
+          "feedback": "flakes or amber pulse",
+          "precondition": "scraper active and revealed",
+          "state_change": "coverage down or integrity-3",
+          "invalid_input": "unrevealed no removal"
+        },
+        {
+          "input": "trace",
+          "action": "progress inside 18px corridor",
+          "target": "crack",
+          "feedback": "wet seam",
+          "precondition": "bonding",
+          "state_change": "bond coverage",
+          "invalid_input": "off seam no progress"
+        },
+        {
+          "input": "drag/pinch",
+          "action": "rotate +/-22deg pitch or zoom 0.85..1.65",
+          "target": "artifact",
+          "feedback": "direct transform",
+          "precondition": "no higher input owner",
+          "state_change": "transform",
+          "invalid_input": "suppressed during tool/fragment"
+        },
+        {
+          "input": "tap",
+          "action": "submit or early warning",
+          "target": "submit",
+          "feedback": "seal",
+          "precondition": "completion>=0.7",
+          "state_change": "evaluation/modal",
+          "invalid_input": "disabled below 70%"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "fragment_drag",
+          "name": "Fragment Drag",
+          "notes": "rotate/pinch locked",
+          "condition": "fragment_drag",
+          "components": [
+            {
+              "id": "snap_ghost",
+              "box": {
+                "h": 49,
+                "w": 76,
+                "x": 12,
+                "y": 19
+              },
+              "type": "overlay",
+              "label": "Socket",
+              "state_binding": "nearest_socket"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "lamp_scan",
+          "name": "Lamp Scan",
+          "notes": "foreign visible only under cone",
+          "condition": "phase=surface_inspection",
+          "components": [
+            {
+              "id": "lamp_cone",
+              "box": {
+                "h": 49,
+                "w": 76,
+                "x": 12,
+                "y": 19
+              },
+              "type": "mask",
+              "label": "Cone",
+              "state_binding": "lamp.mask"
+            }
+          ],
+          "hide_components": [
+            "fragments"
+          ],
+          "component_overrides": {}
+        },
+        {
+          "id": "scrape",
+          "name": "Scrape",
+          "notes": "original scrape damages integrity",
+          "condition": "active_tool=scraper",
+          "components": [
+            {
+              "id": "foreign_mask",
+              "box": {
+                "h": 49,
+                "w": 76,
+                "x": 12,
+                "y": 19
+              },
+              "type": "mask",
+              "label": "Foreign Mask",
+              "state_binding": "foreign.coverage"
+            }
+          ],
+          "hide_components": [
+            "fragments"
+          ],
+          "component_overrides": {}
+        },
+        {
+          "id": "bond",
+          "name": "Bond",
+          "notes": "18px corridor",
+          "condition": "phase=bonding",
+          "components": [
+            {
+              "id": "seam",
+              "box": {
+                "h": 49,
+                "w": 76,
+                "x": 12,
+                "y": 19
+              },
+              "type": "trace",
+              "label": "Wet Seam",
+              "state_binding": "bond.coverage"
+            }
+          ],
+          "hide_components": [
+            "fragments"
+          ],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "render transform is sole transform for sockets masks seams and hit tests",
+        "priority modal>tool>fragment>lamp>rotate>pinch"
+      ]
+    },
+    {
+      "id": "evaluation",
+      "name": "Evaluation",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 71,
+            "w": 86,
+            "x": 7,
+            "y": 12,
+            "id": "result",
+            "role": "evaluation",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        "evaluation"
+      ],
+      "purpose": "grade result",
+      "feedback": [
+        "stamp",
+        "grade"
+      ],
+      "components": [
+        {
+          "id": "compare",
+          "box": {
+            "h": 44,
+            "w": 80,
+            "x": 10,
+            "y": 15
+          },
+          "type": "wipe",
+          "label": "Before After",
+          "state_binding": "result"
+        },
+        {
+          "id": "scores",
+          "box": {
+            "h": 15,
+            "w": 80,
+            "x": 10,
+            "y": 66
+          },
+          "type": "panel",
+          "label": "Scores",
+          "state_binding": "score"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 9,
+            "w": 56,
+            "x": 22,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Continue",
+          "enabled_when": "evaluation_complete",
+          "state_binding": "evaluation_complete",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [
+        "integrity<70 caps C"
+      ],
+      "transitions": [
+        {
+          "to": "intake",
+          "from": "evaluation",
+          "trigger": "continue",
+          "animation": "next",
+          "condition": "case_index<3"
+        },
+        {
+          "to": "summary",
+          "from": "evaluation",
+          "trigger": "continue",
+          "animation": "close",
+          "condition": "case_index=3"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "advance",
+          "target": "continue",
+          "feedback": "stamp",
+          "precondition": "evaluation_complete",
+          "state_change": "next/summary",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "summary",
+      "name": "Session Summary",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 18,
+            "id": "totals",
+            "role": "summary",
+            "label": "Totals"
+          }
+        ]
+      },
+      "states": [
+        "summary"
+      ],
+      "purpose": "session close",
+      "feedback": [
+        "totals"
+      ],
+      "components": [
+        {
+          "id": "results",
+          "box": {
+            "h": 45,
+            "w": 80,
+            "x": 10,
+            "y": 22
+          },
+          "type": "cards",
+          "label": "Results",
+          "state_binding": "session.results"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 10,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Replay",
+          "state_binding": "session"
+        },
+        {
+          "id": "desk",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 52,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Desk",
+          "state_binding": "session"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "intake",
+          "from": "summary",
+          "trigger": "replay",
+          "animation": "lift",
+          "condition": "true"
+        },
+        {
+          "to": "desk",
+          "from": "summary",
+          "trigger": "desk",
+          "animation": "fade",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset or close",
+          "target": "replay/desk",
+          "feedback": "card motion",
+          "precondition": "summary",
+          "state_change": "intake/idle",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "pause_help",
+      "name": "Pause / Tool Help Overlay",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 64,
+            "w": 80,
+            "x": 10,
+            "y": 18,
+            "id": "modal",
+            "role": "blocking",
+            "label": "Modal"
+          }
+        ]
+      },
+      "states": [
+        "pause",
+        "help",
+        "early_submit_warning"
+      ],
+      "purpose": "blocking help/warning",
+      "feedback": [
+        "dim"
+      ],
+      "components": [
+        {
+          "id": "body",
+          "box": {
+            "h": 52,
+            "w": 76,
+            "x": 12,
+            "y": 20
+          },
+          "type": "panel",
+          "label": "Context Help",
+          "state_binding": "phase"
+        },
+        {
+          "id": "resume",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 25,
+            "y": 74
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "overlay",
+          "interaction_role": "close"
+        }
+      ],
+      "edge_cases": [
+        "world touches consumed"
+      ],
+      "transitions": [
+        {
+          "to": "workspace",
+          "from": "pause_help",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "true"
+        },
+        {
+          "to": "evaluation",
+          "from": "pause_help",
+          "trigger": "confirm",
+          "animation": "seal",
+          "condition": "completion>=0.7"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume or submit",
+          "target": "resume/confirm",
+          "feedback": "dismiss/seal",
+          "precondition": "overlay open",
+          "state_change": "workspace/evaluation",
+          "invalid_input": "world blocked"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "early_submit",
+          "name": "Early Submit",
+          "notes": "cancel restores exact prior state",
+          "condition": "early_submit_warning",
+          "components": [
+            {
+              "id": "confirm",
+              "box": {
+                "h": 8,
+                "w": 30,
+                "x": 52,
+                "y": 63
+              },
+              "type": "button",
+              "label": "Submit Partial",
+              "state_binding": "completion"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "store prior substate/tool"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "db5d0574-51d2-4d8b-a017-14289d05ee13",
+  "input_map": {
+    "cancel": "pointer loss cancels transient input",
+    "priority": [
+      "modal",
+      "tool_stroke",
+      "fragment_drag",
+      "lamp_drag",
+      "artifact_rotate",
+      "pinch"
+    ],
+    "multitouch": "fragment second touch rotates; tools suppress multitouch"
+  },
+  "created_at": "2026-09-29T16:35:38.065547+00:00",
+  "edge_cases": {
+    "orientation": "locked portrait",
+    "rapid_submit": "debounce",
+    "app_background": "pause",
+    "invalid_geometry": "restore last valid"
+  },
+  "updated_at": "2026-09-29T16:35:38.065547+00:00",
+  "core_screen": "workspace",
+  "orientation": "portrait",
+  "screen_flow": {
+    "normal": [
+      "desk",
+      "intake",
+      "workspace",
+      "evaluation",
+      "intake|summary"
+    ],
+    "branches": [
+      {
+        "to": "summary",
+        "from": "evaluation",
+        "condition": "case_index=3"
+      },
+      {
+        "to": "evaluation",
+        "from": "workspace",
+        "condition": "completion>=0.7"
+      }
+    ],
+    "exception": "pause/help resumes prior workspace state"
+  },
+  "state_count": 12,
+  "screen_count": 6,
+  "global_states": {
+    "pause": {
+      "preserve_state": true
+    },
+    "loading": {
+      "blocks_input": true
+    },
+    "input_lock": {
+      "during": [
+        "snap_commit",
+        "evaluation_transition"
+      ]
+    },
+    "early_submit_warning": {
+      "blocking": true
+    }
+  },
+  "pack_markdown": "# Pocket Museum Restorer — Interaction Wireframe Pack v0.2. Portrait greybox. Desk→Intake→Workspace→Evaluation→Summary. Workspace owns the detailed direct manipulation rules: 26px/14deg snap, local lamp reveal, mask scraping, 18px seam tracing, shared render/hit transform, modal-safe state restoration.",
+  "source_run_at": "2026-09-29T16:35:38.065547+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "min_touch_pt": 44,
+    "coordinate_unit": "percent",
+    "modal_blocks_world": true
+  },
+  "developer_handoff": {
+    "persistence": "session memory only",
+    "critical_rule": "all world tests use exact inverse visual transform",
+    "required_data": [
+      "artifact polygon",
+      "fragment/socket transforms",
+      "foreign masks",
+      "crack splines"
+    ],
+    "scene_hierarchy": [
+      "App",
+      "Desk",
+      "Intake",
+      "Workspace",
+      "Evaluation",
+      "Summary",
+      "Overlay"
+    ],
+    "state_ownership": {
+      "case": "CaseController",
+      "input": "GestureRouter",
+      "session": "SessionController",
+      "workspace": "WorkspaceController"
+    },
+    "reusable_components": [
+      "ArtifactViewport",
+      "Fragment",
+      "SurfaceMask",
+      "TraceSampler",
+      "Modal"
+    ],
+    "implementation_order": [
+      "flow",
+      "shared transform",
+      "snap",
+      "lamp",
+      "scrape",
+      "bond",
+      "score",
+      "overlay"
+    ]
+  },
+  "acceptance_criteria": [
+    "All six screens reachable",
+    "Core workspace has distinct assembly inspection scrape bond states",
+    "Fragment snap enforces 26px and 14deg",
+    "Lamp controls foreign visibility",
+    "Bad scrape reduces integrity",
+    "Bond only progresses in 18px corridor",
+    "Overlay blocks world and restores state",
+    "Early submit requires 70 percent",
+    "Visual and hit transforms remain aligned",
+    "Three cases end in Summary"
+  ],
+  "primary_interaction": "조각 스냅 → 조사광 → 스크레이프 → 균열 트레이스",
+  "interaction_principles": [
+    "artifact-first direct manipulation",
+    "shared visual and hit-test transform",
+    "single active input owner",
+    "local tool feedback",
+    "blocking overlays preserve state"
+  ]
+}

@@ -1,0 +1,1064 @@
+{
+  "id": "3aaa03fd-a52b-47f4-a835-ca60e0ac4cd5",
+  "title": "Last Light Caravan",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "ac06b45a-7b07-4e24-adee-24f7f438483a",
+  "screens": [
+    {
+      "id": "L0",
+      "name": "Route Set Select / Progression",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 14,
+            "id": "sets",
+            "role": "selection",
+            "label": "Route sets"
+          }
+        ]
+      },
+      "states": [
+        "SELECT"
+      ],
+      "purpose": "Choose unlocked route set",
+      "components": [
+        {
+          "id": "set_cards",
+          "box": {
+            "h": 60,
+            "w": 88,
+            "x": 6,
+            "y": 14
+          },
+          "type": "card_list",
+          "label": "Six route sets",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "unlock/completed",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 39,
+            "x": 55,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[7]"
+      ],
+      "transitions": [
+        {
+          "to": "L1",
+          "from": "L0",
+          "trigger": "start",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L0I1",
+          "input": "tap",
+          "target": "set_cards/start",
+          "feedback": "selection",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "fresh MAP_DAY seed",
+          "invalid_input": "locked: zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L1",
+      "name": "Run Map / Day Planning",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 58,
+            "w": 90,
+            "x": 5,
+            "y": 20,
+            "id": "map_area",
+            "role": "core",
+            "label": "Map"
+          }
+        ]
+      },
+      "states": [
+        "MAP_DAY"
+      ],
+      "purpose": "Claim reward, scout and choose adjacent destination",
+      "components": [
+        {
+          "id": "hud",
+          "box": {
+            "h": 9,
+            "w": 92,
+            "x": 4,
+            "y": 3
+          },
+          "type": "hud",
+          "label": "Light/Survivors/Morale/Gear",
+          "source_refs": [
+            "visual_direction_brief"
+          ],
+          "state_binding": "run resources",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "map",
+          "box": {
+            "h": 58,
+            "w": 90,
+            "x": 5,
+            "y": 20
+          },
+          "type": "graph_view",
+          "label": "Node graph",
+          "source_refs": [
+            "game_rules.topology",
+            "game_rules.hidden_route"
+          ],
+          "state_binding": "revealed/hidden; edge cost visible",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "scouts",
+          "box": {
+            "h": 6,
+            "w": 28,
+            "x": 5,
+            "y": 13
+          },
+          "type": "counter",
+          "label": "Scout count",
+          "source_refs": [
+            "game_rules.day"
+          ],
+          "state_binding": "2 or morale0=>1",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "proceed",
+          "box": {
+            "h": 11,
+            "w": 31,
+            "x": 64,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Plan Light",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "state_binding": "destination selected",
+          "decision_origin": "game_design"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "L2",
+          "from": "L1",
+          "trigger": "proceed",
+          "condition": "destination selected",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L1I1",
+          "input": "tap",
+          "target": "adjacent unrevealed node",
+          "feedback": "icons reveal",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "precondition": "scout remains",
+          "state_change": "reveal node and scout-1",
+          "invalid_input": "zero mutation + reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "L1I2",
+          "input": "tap",
+          "target": "directly connected node",
+          "feedback": "edge/cost/risk highlight",
+          "source_refs": [
+            "core_player_verbs[1]"
+          ],
+          "precondition": "MAP_DAY",
+          "state_change": "set destination",
+          "invalid_input": "non-adjacent rejected",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "L1V1",
+          "name": "Unscouted destination",
+          "notes": "Travel remains legal",
+          "condition": "adjacent node unrevealed",
+          "source_refs": [
+            "game_rules.hidden_route"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "map": "unknown incident"
+          },
+          "component_overrides": {
+            "map": {
+              "state_binding": "? incident; edge cost visible"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "L1V2",
+          "name": "Morale zero",
+          "notes": "No immediate failure",
+          "condition": "morale=0",
+          "source_refs": [
+            "game_rules.resources.morale"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "scouts": "reduction visible"
+          },
+          "component_overrides": {
+            "scouts": {
+              "state_binding": "1 scout"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L2",
+      "name": "Dusk Light Allocation",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 20,
+            "id": "alloc",
+            "role": "core",
+            "label": "Allocation"
+          }
+        ]
+      },
+      "states": [
+        "DUSK_ALLOC"
+      ],
+      "purpose": "Allocate all light",
+      "components": [
+        {
+          "id": "road",
+          "box": {
+            "h": 12,
+            "w": 88,
+            "x": 6,
+            "y": 28
+          },
+          "type": "stepper",
+          "label": "Road",
+          "state_binding": "integer>=0"
+        },
+        {
+          "id": "camp",
+          "box": {
+            "h": 12,
+            "w": 88,
+            "x": 6,
+            "y": 44
+          },
+          "type": "stepper",
+          "label": "Camp",
+          "state_binding": "integer>=0"
+        },
+        {
+          "id": "reserve",
+          "box": {
+            "h": 12,
+            "w": 88,
+            "x": 6,
+            "y": 60
+          },
+          "type": "stepper",
+          "label": "Reserve",
+          "state_binding": "integer>=0"
+        },
+        {
+          "id": "confirm",
+          "box": {
+            "h": 10,
+            "w": 39,
+            "x": 55,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Travel",
+          "state_binding": "sum=pool and road>=cost"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "L3",
+          "from": "L2",
+          "trigger": "valid confirm",
+          "condition": "allocation valid",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L1",
+          "from": "L2",
+          "trigger": "back",
+          "condition": "unconfirmed",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L2I1",
+          "input": "tap +/-",
+          "target": "road/camp/reserve",
+          "feedback": "budget updates",
+          "source_refs": [
+            "interaction_spec.allocation"
+          ],
+          "precondition": "DUSK_ALLOC",
+          "state_change": "integer allocation",
+          "invalid_input": "negative/overpool rejected",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "L2I2",
+          "input": "tap",
+          "target": "confirm",
+          "feedback": "commit/night",
+          "source_refs": [
+            "game_rules.dusk",
+            "game_rules.travel"
+          ],
+          "precondition": "sum=light_pool and road>=cost",
+          "state_change": "lock allocation; spend road cost; NIGHT_TRAVEL",
+          "invalid_input": "zero mutation + exact reason",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L3",
+      "name": "Night Travel",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 18,
+            "id": "travel",
+            "role": "core",
+            "label": "Travel"
+          }
+        ]
+      },
+      "states": [
+        "NIGHT_TRAVEL"
+      ],
+      "purpose": "Committed locked traversal",
+      "components": [
+        {
+          "id": "travel_view",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "travel_view",
+          "label": "Caravan traversal",
+          "state_binding": "chosen edge locked"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[2]"
+      ],
+      "transitions": [
+        {
+          "to": "L4",
+          "from": "L3",
+          "trigger": "arrival",
+          "condition": "destination reached",
+          "source_refs": [
+            "state_model[2]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L4",
+      "name": "Incident Decision",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 88,
+            "x": 6,
+            "y": 15,
+            "id": "incident",
+            "role": "core",
+            "label": "Incident"
+          }
+        ]
+      },
+      "states": [
+        "INCIDENT"
+      ],
+      "purpose": "Resolve one response atomically",
+      "components": [
+        {
+          "id": "incident_card",
+          "box": {
+            "h": 28,
+            "w": 88,
+            "x": 6,
+            "y": 16
+          },
+          "type": "panel",
+          "label": "Incident",
+          "state_binding": "5 incident classes"
+        },
+        {
+          "id": "responses",
+          "box": {
+            "h": 36,
+            "w": 88,
+            "x": 6,
+            "y": 48
+          },
+          "type": "button_stack",
+          "label": "Responses",
+          "state_binding": "cost/validity"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "L7",
+          "from": "L4",
+          "trigger": "resolved",
+          "condition": "survivors=0",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L5",
+          "from": "L4",
+          "trigger": "resolved",
+          "condition": "survivors>=1",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L4I1",
+          "input": "tap",
+          "target": "one response",
+          "feedback": "numeric deltas + cause",
+          "source_refs": [
+            "interaction_spec.incident"
+          ],
+          "precondition": "valid and sufficient resource",
+          "state_change": "atomic cost + consequence",
+          "invalid_input": "insufficient choice zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "L4V1",
+          "name": "darkness",
+          "notes": "Rule semantics unchanged",
+          "condition": "incident=darkness",
+          "source_refs": [
+            "game_rules.incidents.darkness"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "responses": "exact resource/result preview"
+          },
+          "component_overrides": {
+            "responses": {
+              "state_binding": "exact defined responses"
+            },
+            "incident_card": {
+              "state_binding": "darkness"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "L4V2",
+          "name": "predator",
+          "notes": "Rule semantics unchanged",
+          "condition": "incident=predator",
+          "source_refs": [
+            "game_rules.incidents.predator"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "responses": "exact resource/result preview"
+          },
+          "component_overrides": {
+            "responses": {
+              "state_binding": "exact defined responses"
+            },
+            "incident_card": {
+              "state_binding": "predator"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "L4V3",
+          "name": "collapse",
+          "notes": "Rule semantics unchanged",
+          "condition": "incident=collapse",
+          "source_refs": [
+            "game_rules.incidents.collapse"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "responses": "exact resource/result preview"
+          },
+          "component_overrides": {
+            "responses": {
+              "state_binding": "exact defined responses"
+            },
+            "incident_card": {
+              "state_binding": "collapse"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "L4V4",
+          "name": "refugees",
+          "notes": "Rule semantics unchanged",
+          "condition": "incident=refugees",
+          "source_refs": [
+            "game_rules.incidents.refugees"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "responses": "exact resource/result preview"
+          },
+          "component_overrides": {
+            "responses": {
+              "state_binding": "exact defined responses"
+            },
+            "incident_card": {
+              "state_binding": "refugees"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "L4V5",
+          "name": "fork_signal",
+          "notes": "Rule semantics unchanged",
+          "condition": "incident=fork_signal",
+          "source_refs": [
+            "game_rules.incidents.fork_signal"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "responses": "exact resource/result preview"
+          },
+          "component_overrides": {
+            "responses": {
+              "state_binding": "exact defined responses"
+            },
+            "incident_card": {
+              "state_binding": "fork_signal"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L5",
+      "name": "Camp Resolution",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 60,
+            "w": 84,
+            "x": 8,
+            "y": 20,
+            "id": "camp",
+            "role": "resolution",
+            "label": "Camp"
+          }
+        ]
+      },
+      "states": [
+        "CAMP_OR_TERMINAL"
+      ],
+      "purpose": "Safe/exposed camp and terminal check",
+      "components": [
+        {
+          "id": "camp_result",
+          "box": {
+            "h": 36,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "result_panel",
+          "label": "Camp outcome",
+          "state_binding": "camp>=1 safe else exposed"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Continue",
+          "state_binding": "resolved"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "L7",
+          "from": "L5",
+          "trigger": "continue",
+          "condition": "Beacon and survivors>=1",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L1",
+          "from": "L5",
+          "trigger": "continue",
+          "condition": "not Beacon",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L5I1",
+          "input": "tap",
+          "target": "continue",
+          "feedback": "morale/reserve delta",
+          "source_refs": [
+            "game_rules.camp",
+            "game_rules.success"
+          ],
+          "precondition": "camp resolved",
+          "state_change": "next day or Beacon success",
+          "invalid_input": "locked until resolved",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L6",
+      "name": "Pause / Retry Confirm",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 70,
+            "x": 15,
+            "y": 25,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        "PAUSED",
+        "RETRY_CONFIRM"
+      ],
+      "purpose": "Freeze/resume or confirmed full-run retry",
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 34
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "always"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 52
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "confirm"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[5]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "L6I1",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "close overlay",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "PAUSED",
+          "state_change": "exact prior state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "L6I2",
+          "input": "tap",
+          "target": "confirmed retry",
+          "feedback": "restart",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "confirm",
+          "state_change": "same-seed initial run; meta kept",
+          "invalid_input": "cancel stays paused",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "L7",
+      "name": "Run Result",
+      "order": 8,
+      "layout": {
+        "regions": [
+          {
+            "h": 78,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "result",
+            "role": "terminal",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        "RESULT_SUCCESS",
+        "RESULT_FAIL"
+      ],
+      "purpose": "Terminal cause, summary, progression and navigation",
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 40,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "summary",
+          "label": "Cause/Survivors/Light/Days",
+          "state_binding": "success/failure"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "always"
+        },
+        {
+          "id": "routes",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Route Sets",
+          "state_binding": "always"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[6]"
+      ],
+      "transitions": [
+        {
+          "to": "L1",
+          "from": "L7",
+          "trigger": "retry",
+          "condition": "always"
+        },
+        {
+          "to": "L0",
+          "from": "L7",
+          "trigger": "routes",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "L7I1",
+          "input": "tap",
+          "target": "retry/routes",
+          "feedback": "unlock shown on success",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "RESULT",
+          "state_change": "retry fresh run or return set select",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "c9aaad40-6b42-4c00-bbb2-5c14ee688468",
+  "input_map": {
+    "cancel": "MAP_DAY route and unconfirmed DUSK allocation only",
+    "conflict": "current-state controls only",
+    "gestures": [
+      "tap"
+    ],
+    "priority": [
+      "pause",
+      "incident response",
+      "allocation confirm",
+      "navigation"
+    ],
+    "multitouch": "single gameplay pointer; extras ignored",
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_note": "Pointer arbitration prevents duplicate atomic actions without changing rules.",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T12:31:09.629747+00:00",
+  "edge_cases": {
+    "items": [
+      "survivors=0 during incident => immediate fail before camp",
+      "Beacon success only after incident with survivors>=1",
+      "road/camp leftovers expire; reserve carry max3",
+      "invalid input zero mutation",
+      "retry same initial seed and preserves meta progression"
+    ],
+    "source_refs": [
+      "game_rules",
+      "interaction_spec.invalid"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T12:31:09.629747+00:00",
+  "core_screen": "L1 Run Map / Day Planning",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "L0",
+    "normal": [
+      "L0",
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "L1"
+    ],
+    "screens": [
+      "L0",
+      "L1",
+      "L2",
+      "L3",
+      "L4",
+      "L5",
+      "L6",
+      "L7"
+    ],
+    "terminal": [
+      "L4->L7 survivors=0",
+      "L5->L7 Beacon and survivors>=1"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "pause_overlay": "L6",
+    "decision_origin": "game_design"
+  },
+  "state_count": 10,
+  "screen_count": 8,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze exact state",
+      "source_refs": [
+        "game_rules.pause_retry"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InputLock": {
+      "effect": "gameplay blocked except pause",
+      "condition": "NIGHT_TRAVEL or atomic incident resolution",
+      "source_refs": [
+        "interaction_spec.priority"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Last Light Caravan — Interaction Wireframe Pack v0.3\n\nWhole-MVP pack covering all 8 screen types, all core states and all rule-relevant node/incident/route variations. Core interactions and real variants are structured with decision trace. Godot architecture is deferred to Implementation Blueprint.",
+  "source_run_at": "2026-09-30T12:31:09.629747+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "빛 하나가 길 비용이면서 위기 대응 자원이어서 지금 길을 확실히 볼지 나중 생존을 위해 남길지 매일 고민하게 한다.",
+    "source_refs": [
+      "visual_direction_brief",
+      "wireframe_handoff"
+    ],
+    "decision_note": "Layout only.",
+    "decision_origin": "wireframe_layout",
+    "coverage_summary": "8 screen types; all core states; 5 node and 5 incident classes; revealed/hidden, costs1-3, morale0, six route sets",
+    "coordinate_system": "0..100 screen-percent"
+  },
+  "developer_handoff": {
+    "fun_promise": "빛 하나가 길 비용이면서 위기 대응 자원이어서 지금 길을 확실히 볼지 나중 생존을 위해 남길지 매일 고민하게 한다.",
+    "source_refs": [
+      "content_model",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "6-10 nodes/set",
+      "direct edges only",
+      "light/survivor/morale/rope/guard",
+      "fixed run seed"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "content_variations": [
+      "5 node rewards",
+      "5 incidents",
+      "edge cost1-3",
+      "revealed/unrevealed",
+      "morale0 scout reduction",
+      "six route sets"
+    ],
+    "responsibility_boundary": "UX/data/state only; Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "All 8 required screen types are present and reachable.",
+    "Scout and hidden-route behavior including morale0 one-scout state are observable.",
+    "Allocation cannot commit unless total equals light_pool and road covers edge cost.",
+    "All five incidents expose exact valid response semantics and zero-mutation invalid behavior.",
+    "Survivor-zero failure precedes camp; Beacon success follows incident only with survivor>=1.",
+    "Safe/exposed camp, reserve carry cap3, pause/retry and six-set progression are observable."
+  ],
+  "primary_interaction": "정찰·경로 선택 후 빛을 road/camp/reserve로 배분하고 incident 대응을 선택하는 탭 기반 전략 입력.",
+  "interaction_principles": [
+    "Direct map decisions before commitment",
+    "Invalid input never mutates state",
+    "Keep Light/Survivors/Morale/Gear legible",
+    "Pause has highest priority"
+  ]
+}

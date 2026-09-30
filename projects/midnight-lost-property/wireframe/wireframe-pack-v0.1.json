@@ -1,0 +1,1194 @@
+{
+  "id": "9d510757-6ab2-4f80-96d8-adbcbbe542c3",
+  "title": "Midnight Lost Property",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "84d59494-178a-40af-9b76-d6af8592895c",
+  "screens": [
+    {
+      "id": "night_desk",
+      "name": "Night Desk",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 9,
+            "w": 90,
+            "x": 5,
+            "y": 4,
+            "id": "header",
+            "role": "shift metadata",
+            "label": "Shift Header"
+          },
+          {
+            "h": 58,
+            "w": 86,
+            "x": 7,
+            "y": 17,
+            "id": "desk",
+            "role": "primary scene",
+            "label": "Night Desk"
+          },
+          {
+            "h": 14,
+            "w": 86,
+            "x": 7,
+            "y": 80,
+            "id": "footer",
+            "role": "primary action",
+            "label": "Start Area"
+          }
+        ]
+      },
+      "states": [
+        "ready"
+      ],
+      "purpose": "근무 시작과 오늘 사건 수 확인",
+      "feedback": [
+        "짧은 역 안내음"
+      ],
+      "components": [
+        {
+          "id": "shift_title",
+          "box": {
+            "h": 6,
+            "w": 55,
+            "x": 10,
+            "y": 7
+          },
+          "type": "label",
+          "label": "MIDNIGHT SHIFT",
+          "state_binding": ""
+        },
+        {
+          "id": "case_counter",
+          "box": {
+            "h": 6,
+            "w": 20,
+            "x": 70,
+            "y": 7
+          },
+          "type": "status",
+          "label": "0 / 3 cases",
+          "state_binding": ""
+        },
+        {
+          "id": "start_shift",
+          "box": {
+            "h": 9,
+            "w": 64,
+            "x": 18,
+            "y": 83
+          },
+          "type": "button",
+          "label": "근무 시작",
+          "state_binding": "ready"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "case_intake",
+          "from": "ready",
+          "trigger": "tap start_shift",
+          "animation": "short fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "첫 사건 로드",
+          "target": "start_shift",
+          "trigger": "tap",
+          "feedback": "button depress + light haptic",
+          "precondition": "ready",
+          "state_change": "Intake",
+          "invalid_input": "중복 tap 무시"
+        }
+      ],
+      "implementation_notes": [
+        "Control 기반 세로 레이아웃",
+        "ShiftController가 case index 소유"
+      ]
+    },
+    {
+      "id": "case_intake",
+      "name": "Case Intake",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 16,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "meta",
+            "role": "case facts",
+            "label": "Case Meta"
+          },
+          {
+            "h": 43,
+            "w": 80,
+            "x": 10,
+            "y": 25,
+            "id": "item",
+            "role": "lost item preview",
+            "label": "Item Preview"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 74,
+            "id": "action",
+            "role": "continue",
+            "label": "Action"
+          }
+        ]
+      },
+      "states": [
+        "intake"
+      ],
+      "purpose": "발견 장소·시간을 읽고 조사 시작",
+      "feedback": [],
+      "components": [
+        {
+          "id": "case_meta",
+          "box": {
+            "h": 11,
+            "w": 82,
+            "x": 9,
+            "y": 8
+          },
+          "type": "panel",
+          "label": "발견 장소 / 시간",
+          "state_binding": ""
+        },
+        {
+          "id": "item_preview",
+          "box": {
+            "h": 36,
+            "w": 64,
+            "x": 18,
+            "y": 28
+          },
+          "type": "object",
+          "label": "분실물",
+          "state_binding": ""
+        },
+        {
+          "id": "inspect_btn",
+          "box": {
+            "h": 9,
+            "w": 64,
+            "x": 18,
+            "y": 78
+          },
+          "type": "button",
+          "label": "조사 시작",
+          "state_binding": "intake"
+        }
+      ],
+      "edge_cases": [
+        "사건 데이터 누락 시 시작 비활성"
+      ],
+      "transitions": [
+        {
+          "to": "inspection",
+          "from": "intake",
+          "trigger": "tap inspect_btn",
+          "animation": "short fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "Inspection 진입",
+          "target": "inspect_btn",
+          "trigger": "tap",
+          "feedback": "fade + light haptic",
+          "precondition": "case loaded",
+          "state_change": "Inspection",
+          "invalid_input": "로딩 중 입력 차단"
+        }
+      ],
+      "implementation_notes": [
+        "CaseData 바인딩"
+      ]
+    },
+    {
+      "id": "inspection_desk",
+      "name": "Inspection Desk",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "meta",
+            "role": "persistent meta",
+            "label": "Case Meta"
+          },
+          {
+            "h": 58,
+            "w": 92,
+            "x": 4,
+            "y": 13,
+            "id": "viewport",
+            "role": "primary manipulation",
+            "label": "Object Viewport"
+          },
+          {
+            "h": 13,
+            "w": 92,
+            "x": 4,
+            "y": 73,
+            "id": "tray",
+            "role": "clues",
+            "label": "Evidence Tray"
+          },
+          {
+            "h": 9,
+            "w": 92,
+            "x": 4,
+            "y": 88,
+            "id": "nav",
+            "role": "next/back",
+            "label": "Mode Nav"
+          }
+        ]
+      },
+      "states": [
+        "idle",
+        "rotating",
+        "zoomed",
+        "hotspot_revealed"
+      ],
+      "purpose": "물건을 회전·확대하고 hotspot에서 물리 단서 획득",
+      "feedback": [
+        "hotspot ring",
+        "clue card pop"
+      ],
+      "components": [
+        {
+          "id": "object",
+          "box": {
+            "h": 45,
+            "w": 76,
+            "x": 12,
+            "y": 19
+          },
+          "type": "manipulable",
+          "label": "Lost Item",
+          "state_binding": "idle|rotating|zoomed"
+        },
+        {
+          "id": "clue_tray",
+          "box": {
+            "h": 9,
+            "w": 86,
+            "x": 7,
+            "y": 75
+          },
+          "type": "tray",
+          "label": "단서 트레이",
+          "state_binding": ""
+        },
+        {
+          "id": "interview_btn",
+          "box": {
+            "h": 7,
+            "w": 40,
+            "x": 54,
+            "y": 89
+          },
+          "type": "button",
+          "label": "방문객 질문",
+          "state_binding": ""
+        },
+        {
+          "id": "review_btn",
+          "box": {
+            "h": 7,
+            "w": 40,
+            "x": 7,
+            "y": 89
+          },
+          "type": "button",
+          "label": "단서 대조",
+          "state_binding": "clues>=2"
+        }
+      ],
+      "edge_cases": [
+        "동일 hotspot 재수집 금지"
+      ],
+      "transitions": [
+        {
+          "to": "visitor_interview",
+          "from": "inspection",
+          "trigger": "tap interview_btn",
+          "animation": "short fade",
+          "condition": "always"
+        },
+        {
+          "to": "evidence_review",
+          "from": "inspection",
+          "trigger": "tap review_btn",
+          "animation": "short fade",
+          "condition": "clues>=2"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "물건 회전",
+          "target": "object",
+          "trigger": "drag",
+          "feedback": "surface moves",
+          "precondition": "Inspection",
+          "state_change": "rotating",
+          "invalid_input": "viewport 밖 drag는 clamp"
+        },
+        {
+          "action": "확대/축소",
+          "target": "object",
+          "trigger": "pinch",
+          "feedback": "scale feedback",
+          "precondition": "Inspection",
+          "state_change": "zoomed",
+          "invalid_input": "min/max clamp"
+        },
+        {
+          "action": "단서 카드 생성",
+          "target": "hotspot",
+          "trigger": "tap",
+          "feedback": "ring + card pop + light haptic",
+          "precondition": "hotspot active",
+          "state_change": "hotspot_revealed",
+          "invalid_input": "비 hotspot은 약한 경계 반응"
+        }
+      ],
+      "implementation_notes": [
+        "SubViewport 또는 Control viewport",
+        "EvidenceTray 재사용"
+      ]
+    },
+    {
+      "id": "visitor_interview",
+      "name": "Visitor Interview",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 35,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "visitor",
+            "role": "speaker",
+            "label": "Visitor"
+          },
+          {
+            "h": 17,
+            "w": 86,
+            "x": 7,
+            "y": 43,
+            "id": "statement",
+            "role": "response",
+            "label": "Statement"
+          },
+          {
+            "h": 25,
+            "w": 88,
+            "x": 6,
+            "y": 63,
+            "id": "questions",
+            "role": "choices",
+            "label": "Questions"
+          },
+          {
+            "h": 7,
+            "w": 88,
+            "x": 6,
+            "y": 90,
+            "id": "nav",
+            "role": "return/review",
+            "label": "Nav"
+          }
+        ]
+      },
+      "states": [
+        "question_ready",
+        "answering",
+        "budget_empty"
+      ],
+      "purpose": "질문 예산 3회 안에서 진술 단서 획득",
+      "feedback": [
+        "answer highlight"
+      ],
+      "components": [
+        {
+          "id": "visitor",
+          "box": {
+            "h": 27,
+            "w": 50,
+            "x": 25,
+            "y": 8
+          },
+          "type": "portrait",
+          "label": "방문객",
+          "state_binding": ""
+        },
+        {
+          "id": "budget",
+          "box": {
+            "h": 6,
+            "w": 20,
+            "x": 72,
+            "y": 5
+          },
+          "type": "status",
+          "label": "질문 3/3",
+          "state_binding": ""
+        },
+        {
+          "id": "question_cards",
+          "box": {
+            "h": 20,
+            "w": 82,
+            "x": 9,
+            "y": 65
+          },
+          "type": "list",
+          "label": "질문 카드",
+          "state_binding": "budget>0"
+        },
+        {
+          "id": "back_inspect",
+          "box": {
+            "h": 6,
+            "w": 40,
+            "x": 7,
+            "y": 91
+          },
+          "type": "button",
+          "label": "물건 다시 보기",
+          "state_binding": ""
+        },
+        {
+          "id": "review_btn",
+          "box": {
+            "h": 6,
+            "w": 40,
+            "x": 53,
+            "y": 91
+          },
+          "type": "button",
+          "label": "단서 대조",
+          "state_binding": "clues>=2"
+        }
+      ],
+      "edge_cases": [
+        "Inspection 복귀 1회 제한"
+      ],
+      "transitions": [
+        {
+          "to": "inspection",
+          "from": "visitor_interview",
+          "trigger": "tap back_inspect",
+          "animation": "short fade",
+          "condition": "return_count<1"
+        },
+        {
+          "to": "evidence_review",
+          "from": "visitor_interview",
+          "trigger": "tap review_btn",
+          "animation": "short fade",
+          "condition": "clues>=2"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "질문 소비·응답 단서 생성",
+          "target": "question_card",
+          "trigger": "tap",
+          "feedback": "핵심 구절 강조",
+          "precondition": "budget>0",
+          "state_change": "answering",
+          "invalid_input": "budget=0이면 잠금 사유 표시"
+        }
+      ],
+      "implementation_notes": [
+        "QuestionBudget state machine"
+      ]
+    },
+    {
+      "id": "evidence_review",
+      "name": "Evidence Review",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 90,
+            "x": 5,
+            "y": 4,
+            "id": "summary",
+            "role": "context",
+            "label": "Case Summary"
+          },
+          {
+            "h": 43,
+            "w": 86,
+            "x": 7,
+            "y": 17,
+            "id": "board",
+            "role": "comparison",
+            "label": "Compare Board"
+          },
+          {
+            "h": 22,
+            "w": 90,
+            "x": 5,
+            "y": 63,
+            "id": "tray",
+            "role": "draggable cards",
+            "label": "Evidence Cards"
+          },
+          {
+            "h": 9,
+            "w": 86,
+            "x": 7,
+            "y": 88,
+            "id": "action",
+            "role": "continue",
+            "label": "Decision Entry"
+          }
+        ]
+      },
+      "states": [
+        "empty",
+        "one_slot",
+        "comparing",
+        "relation_recorded"
+      ],
+      "purpose": "물리/진술 단서를 두 슬롯에 놓아 일치·모순 관계 기록",
+      "feedback": [
+        "match solid line / conflict broken line"
+      ],
+      "components": [
+        {
+          "id": "slot_a",
+          "box": {
+            "h": 20,
+            "w": 32,
+            "x": 12,
+            "y": 23
+          },
+          "type": "dropzone",
+          "label": "비교 A",
+          "state_binding": "empty|filled"
+        },
+        {
+          "id": "slot_b",
+          "box": {
+            "h": 20,
+            "w": 32,
+            "x": 56,
+            "y": 23
+          },
+          "type": "dropzone",
+          "label": "비교 B",
+          "state_binding": "empty|filled"
+        },
+        {
+          "id": "relation",
+          "box": {
+            "h": 8,
+            "w": 56,
+            "x": 22,
+            "y": 47
+          },
+          "type": "status",
+          "label": "관계 결과",
+          "state_binding": "none|match|conflict"
+        },
+        {
+          "id": "evidence_cards",
+          "box": {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 65
+          },
+          "type": "tray",
+          "label": "단서 카드",
+          "state_binding": ""
+        },
+        {
+          "id": "decision_btn",
+          "box": {
+            "h": 7,
+            "w": 60,
+            "x": 20,
+            "y": 89
+          },
+          "type": "button",
+          "label": "판정하기",
+          "state_binding": "clues>=2"
+        }
+      ],
+      "edge_cases": [
+        "같은 카드 양 슬롯 금지"
+      ],
+      "transitions": [
+        {
+          "to": "decision_confirm",
+          "from": "evidence_review",
+          "trigger": "tap decision_btn",
+          "animation": "short fade",
+          "condition": "clues>=2"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "슬롯에 배치",
+          "target": "evidence_card",
+          "trigger": "long-press drag",
+          "feedback": "slot highlight",
+          "precondition": "card available",
+          "state_change": "one_slot|comparing",
+          "invalid_input": "중복 카드면 원위치"
+        },
+        {
+          "action": "관계 계산/기록",
+          "target": "slot",
+          "trigger": "drop",
+          "feedback": "line + medium haptic",
+          "precondition": "two unique clues",
+          "state_change": "relation_recorded",
+          "invalid_input": "부적합 drop bounce"
+        }
+      ],
+      "implementation_notes": [
+        "DragDropController 재사용"
+      ]
+    },
+    {
+      "id": "decision_confirm",
+      "name": "Decision Confirm",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 31,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "evidence",
+            "role": "support",
+            "label": "Evidence Summary"
+          },
+          {
+            "h": 24,
+            "w": 88,
+            "x": 6,
+            "y": 40,
+            "id": "choices",
+            "role": "choice",
+            "label": "Decision Choices"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 72,
+            "id": "confirm",
+            "role": "irreversible confirm",
+            "label": "Confirm Rail"
+          }
+        ]
+      },
+      "states": [
+        "unselected",
+        "selected",
+        "confirming",
+        "locked",
+        "blocked"
+      ],
+      "purpose": "RETURN/HOLD/REPORT 선택 후 스와이프로 판정 잠금",
+      "feedback": [
+        "stamp"
+      ],
+      "components": [
+        {
+          "id": "evidence_summary",
+          "box": {
+            "h": 25,
+            "w": 82,
+            "x": 9,
+            "y": 8
+          },
+          "type": "panel",
+          "label": "근거 요약",
+          "state_binding": ""
+        },
+        {
+          "id": "return",
+          "box": {
+            "h": 15,
+            "w": 26,
+            "x": 8,
+            "y": 43
+          },
+          "type": "button",
+          "label": "RETURN",
+          "state_binding": ""
+        },
+        {
+          "id": "hold",
+          "box": {
+            "h": 15,
+            "w": 26,
+            "x": 37,
+            "y": 43
+          },
+          "type": "button",
+          "label": "HOLD",
+          "state_binding": ""
+        },
+        {
+          "id": "report",
+          "box": {
+            "h": 15,
+            "w": 26,
+            "x": 66,
+            "y": 43
+          },
+          "type": "button",
+          "label": "REPORT",
+          "state_binding": ""
+        },
+        {
+          "id": "confirm_rail",
+          "box": {
+            "h": 10,
+            "w": 76,
+            "x": 12,
+            "y": 75
+          },
+          "type": "slider",
+          "label": "밀어서 확정",
+          "state_binding": "disabled|armed"
+        }
+      ],
+      "edge_cases": [
+        "확정 후 back 차단"
+      ],
+      "transitions": [
+        {
+          "to": "outcome",
+          "from": "decision_confirm",
+          "trigger": "confirm complete",
+          "animation": "short fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "조치 선택",
+          "target": "decision buttons",
+          "trigger": "tap",
+          "feedback": "selected outline",
+          "precondition": "clues>=2",
+          "state_change": "selected",
+          "invalid_input": "근거 부족이면 Review 안내"
+        },
+        {
+          "action": "판정 잠금",
+          "target": "confirm_rail",
+          "trigger": "horizontal swipe",
+          "feedback": "stamp + rigid haptic",
+          "precondition": "decision selected",
+          "state_change": "locked",
+          "invalid_input": "중간 release면 rail reset"
+        }
+      ],
+      "implementation_notes": [
+        "DecisionController가 irreversible lock 소유"
+      ]
+    },
+    {
+      "id": "outcome",
+      "name": "Outcome",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 86,
+            "x": 7,
+            "y": 5,
+            "id": "result",
+            "role": "explanation",
+            "label": "Result"
+          },
+          {
+            "h": 17,
+            "w": 80,
+            "x": 10,
+            "y": 59,
+            "id": "score",
+            "role": "scoring",
+            "label": "Score"
+          },
+          {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 82,
+            "id": "next",
+            "role": "continue",
+            "label": "Next"
+          }
+        ]
+      },
+      "states": [
+        "correct",
+        "incorrect",
+        "complete"
+      ],
+      "purpose": "판정의 결과·근거·점수를 이해하고 다음 사건으로 이동",
+      "feedback": [
+        "score count"
+      ],
+      "components": [
+        {
+          "id": "result_stamp",
+          "box": {
+            "h": 12,
+            "w": 50,
+            "x": 25,
+            "y": 9
+          },
+          "type": "status",
+          "label": "판정 결과",
+          "state_binding": ""
+        },
+        {
+          "id": "reason",
+          "box": {
+            "h": 28,
+            "w": 80,
+            "x": 10,
+            "y": 24
+          },
+          "type": "panel",
+          "label": "왜 맞았나/틀렸나",
+          "state_binding": ""
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 12,
+            "w": 64,
+            "x": 18,
+            "y": 61
+          },
+          "type": "status",
+          "label": "점수 변화",
+          "state_binding": ""
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 8,
+            "w": 60,
+            "x": 20,
+            "y": 84
+          },
+          "type": "button",
+          "label": "계속",
+          "state_binding": ""
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "case_intake",
+          "from": "outcome",
+          "trigger": "tap continue",
+          "animation": "short fade",
+          "condition": "case_index<3"
+        },
+        {
+          "to": "shift_summary",
+          "from": "outcome",
+          "trigger": "tap continue",
+          "animation": "short fade",
+          "condition": "case_index=3"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "다음 사건 또는 요약",
+          "target": "continue",
+          "trigger": "tap",
+          "feedback": "success/neutral haptic",
+          "precondition": "outcome shown",
+          "state_change": "complete",
+          "invalid_input": "연타 무시"
+        }
+      ],
+      "implementation_notes": [
+        "OutcomePresenter"
+      ]
+    },
+    {
+      "id": "shift_summary",
+      "name": "Shift Summary",
+      "order": 8,
+      "layout": {
+        "regions": [
+          {
+            "h": 22,
+            "w": 80,
+            "x": 10,
+            "y": 6,
+            "id": "grade",
+            "role": "shift grade",
+            "label": "Grade"
+          },
+          {
+            "h": 43,
+            "w": 86,
+            "x": 7,
+            "y": 31,
+            "id": "cases",
+            "role": "case rows",
+            "label": "Cases"
+          },
+          {
+            "h": 14,
+            "w": 80,
+            "x": 10,
+            "y": 80,
+            "id": "footer",
+            "role": "finish",
+            "label": "Footer"
+          }
+        ]
+      },
+      "states": [
+        "summary"
+      ],
+      "purpose": "3사건의 점수와 근무 등급 요약",
+      "feedback": [],
+      "components": [
+        {
+          "id": "grade",
+          "box": {
+            "h": 15,
+            "w": 44,
+            "x": 28,
+            "y": 10
+          },
+          "type": "status",
+          "label": "근무 등급",
+          "state_binding": ""
+        },
+        {
+          "id": "case_rows",
+          "box": {
+            "h": 36,
+            "w": 80,
+            "x": 10,
+            "y": 34
+          },
+          "type": "list",
+          "label": "사건 3개 요약",
+          "state_binding": ""
+        },
+        {
+          "id": "finish",
+          "box": {
+            "h": 8,
+            "w": 60,
+            "x": 20,
+            "y": 83
+          },
+          "type": "button",
+          "label": "근무 종료",
+          "state_binding": ""
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "night_desk",
+          "from": "shift_summary",
+          "trigger": "tap finish",
+          "animation": "short fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "action": "Night Desk 복귀",
+          "target": "finish",
+          "trigger": "tap",
+          "feedback": "fade",
+          "precondition": "summary",
+          "state_change": "ready",
+          "invalid_input": "none"
+        }
+      ],
+      "implementation_notes": [
+        "ShiftSummaryData"
+      ]
+    }
+  ],
+  "version": "v0.1",
+  "design_id": "cd44b43d-0022-45e5-9cad-7028ab8da75a",
+  "input_map": [
+    {
+      "use": "hotspot/questions/choices/buttons",
+      "input": "tap",
+      "priority": 3
+    },
+    {
+      "use": "evidence cards",
+      "input": "long-press drag",
+      "priority": 4
+    },
+    {
+      "use": "object rotation",
+      "input": "drag",
+      "priority": 2
+    },
+    {
+      "use": "object zoom",
+      "input": "pinch",
+      "priority": 5
+    },
+    {
+      "use": "irreversible decision",
+      "input": "horizontal confirm swipe",
+      "priority": 5
+    }
+  ],
+  "created_at": "2026-09-29T12:04:23.9933+00:00",
+  "edge_cases": [
+    {
+      "case": "clues<2",
+      "recovery": "Decision disabled; Review/Inspection 안내"
+    },
+    {
+      "case": "question budget 0",
+      "recovery": "cards disabled with reason"
+    },
+    {
+      "case": "duplicate evidence",
+      "recovery": "reject and return card"
+    },
+    {
+      "case": "confirmed decision",
+      "recovery": "no undo; proceed Outcome"
+    }
+  ],
+  "updated_at": "2026-09-29T12:04:23.9933+00:00",
+  "core_screen": "Inspection Desk",
+  "orientation": "portrait",
+  "screen_flow": {
+    "loop": "outcome→case_intake until 3 cases",
+    "finish": "third outcome→shift_summary",
+    "normal": [
+      "night_desk",
+      "case_intake",
+      "inspection_desk",
+      "visitor_interview",
+      "evidence_review",
+      "decision_confirm",
+      "outcome"
+    ],
+    "exception": "inspection↔visitor_interview once; decision blocked below 2 clues"
+  },
+  "state_count": 18,
+  "screen_count": 8,
+  "global_states": [
+    {
+      "id": "loading",
+      "rule": "사건 데이터 준비 중 입력 차단"
+    },
+    {
+      "id": "pause",
+      "rule": "현재 사건 상태 보존"
+    },
+    {
+      "id": "decision_locked",
+      "rule": "판정 후 back/수정 금지"
+    }
+  ],
+  "pack_markdown": "# Midnight Lost Property — Interaction Wireframe Pack v0.1\n\n## Pack Overview\nTarget: Mobile / portrait\nPrimary Interaction: 물건 회전·핀치·hotspot 조사 + 단서 long-press drag 비교 + 판정 confirm swipe\nCore Screen: Inspection Desk\n\n## Interaction Principles\n- 물건 조사 영역을 화면의 최우선 터치 공간으로 유지\n- 읽기보다 조작→단서 생성→비교 순서를 시각적으로 강조\n- 되돌릴 수 없는 판정은 tap 선택 뒤 별도 confirm swipe로 분리\n- 질문 예산·단서 수·현재 단계는 항상 가시화\n\n## Screen Flow\n{\n  \"normal\": [\n    \"night_desk\",\n    \"case_intake\",\n    \"inspection_desk\",\n    \"visitor_interview\",\n    \"evidence_review\",\n    \"decision_confirm\",\n    \"outcome\"\n  ],\n  \"loop\": \"outcome→case_intake until 3 cases\",\n  \"finish\": \"third outcome→shift_summary\",\n  \"exception\": \"inspection↔visitor_interview once; decision blocked below 2 clues\"\n}\n\n## Screens\n### 01. Night Desk\nPurpose: 근무 시작과 오늘 사건 수 확인\nStates: ready\nRegions: [{\"id\":\"header\",\"label\":\"Shift Header\",\"x\":5,\"y\":4,\"w\":90,\"h\":9,\"role\":\"shift metadata\"},{\"id\":\"desk\",\"label\":\"Night Desk\",\"x\":7,\"y\":17,\"w\":86,\"h\":58,\"role\":\"primary scene\"},{\"id\":\"footer\",\"label\":\"Start Area\",\"x\":7,\"y\":80,\"w\":86,\"h\":14,\"role\":\"primary action\"}]\nComponents: [{\"id\":\"shift_title\",\"label\":\"MIDNIGHT SHIFT\",\"type\":\"label\",\"box\":{\"x\":10,\"y\":7,\"w\":55,\"h\":6},\"state_binding\":\"\"},{\"id\":\"case_counter\",\"label\":\"0 / 3 cases\",\"type\":\"status\",\"box\":{\"x\":70,\"y\":7,\"w\":20,\"h\":6},\"state_binding\":\"\"},{\"id\":\"start_shift\",\"label\":\"근무 시작\",\"type\":\"button\",\"box\":{\"x\":18,\"y\":83,\"w\":64,\"h\":9},\"state_binding\":\"ready\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"start_shift\",\"precondition\":\"ready\",\"action\":\"첫 사건 로드\",\"state_change\":\"Intake\",\"feedback\":\"button depress + light haptic\",\"invalid_input\":\"중복 tap 무시\"}]\nTransitions: [{\"from\":\"ready\",\"to\":\"case_intake\",\"trigger\":\"tap start_shift\",\"condition\":\"always\",\"animation\":\"short fade\"}]\nFeedback: [\"짧은 역 안내음\"]\nEdge Cases: []\nImplementation Notes: [\"Control 기반 세로 레이아웃\",\"ShiftController가 case index 소유\"]\n\n### 02. Case Intake\nPurpose: 발견 장소·시간을 읽고 조사 시작\nStates: intake\nRegions: [{\"id\":\"meta\",\"label\":\"Case Meta\",\"x\":6,\"y\":5,\"w\":88,\"h\":16,\"role\":\"case facts\"},{\"id\":\"item\",\"label\":\"Item Preview\",\"x\":10,\"y\":25,\"w\":80,\"h\":43,\"role\":\"lost item preview\"},{\"id\":\"action\",\"label\":\"Action\",\"x\":8,\"y\":74,\"w\":84,\"h\":18,\"role\":\"continue\"}]\nComponents: [{\"id\":\"case_meta\",\"label\":\"발견 장소 / 시간\",\"type\":\"panel\",\"box\":{\"x\":9,\"y\":8,\"w\":82,\"h\":11},\"state_binding\":\"\"},{\"id\":\"item_preview\",\"label\":\"분실물\",\"type\":\"object\",\"box\":{\"x\":18,\"y\":28,\"w\":64,\"h\":36},\"state_binding\":\"\"},{\"id\":\"inspect_btn\",\"label\":\"조사 시작\",\"type\":\"button\",\"box\":{\"x\":18,\"y\":78,\"w\":64,\"h\":9},\"state_binding\":\"intake\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"inspect_btn\",\"precondition\":\"case loaded\",\"action\":\"Inspection 진입\",\"state_change\":\"Inspection\",\"feedback\":\"fade + light haptic\",\"invalid_input\":\"로딩 중 입력 차단\"}]\nTransitions: [{\"from\":\"intake\",\"to\":\"inspection\",\"trigger\":\"tap inspect_btn\",\"condition\":\"always\",\"animation\":\"short fade\"}]\nFeedback: []\nEdge Cases: [\"사건 데이터 누락 시 시작 비활성\"]\nImplementation Notes: [\"CaseData 바인딩\"]\n\n### 03. Inspection Desk\nPurpose: 물건을 회전·확대하고 hotspot에서 물리 단서 획득\nStates: idle, rotating, zoomed, hotspot_revealed\nRegions: [{\"id\":\"meta\",\"label\":\"Case Meta\",\"x\":4,\"y\":3,\"w\":92,\"h\":8,\"role\":\"persistent meta\"},{\"id\":\"viewport\",\"label\":\"Object Viewport\",\"x\":4,\"y\":13,\"w\":92,\"h\":58,\"role\":\"primary manipulation\"},{\"id\":\"tray\",\"label\":\"Evidence Tray\",\"x\":4,\"y\":73,\"w\":92,\"h\":13,\"role\":\"clues\"},{\"id\":\"nav\",\"label\":\"Mode Nav\",\"x\":4,\"y\":88,\"w\":92,\"h\":9,\"role\":\"next/back\"}]\nComponents: [{\"id\":\"object\",\"label\":\"Lost Item\",\"type\":\"manipulable\",\"box\":{\"x\":12,\"y\":19,\"w\":76,\"h\":45},\"state_binding\":\"idle|rotating|zoomed\"},{\"id\":\"clue_tray\",\"label\":\"단서 트레이\",\"type\":\"tray\",\"box\":{\"x\":7,\"y\":75,\"w\":86,\"h\":9},\"state_binding\":\"\"},{\"id\":\"interview_btn\",\"label\":\"방문객 질문\",\"type\":\"button\",\"box\":{\"x\":54,\"y\":89,\"w\":40,\"h\":7},\"state_binding\":\"\"},{\"id\":\"review_btn\",\"label\":\"단서 대조\",\"type\":\"button\",\"box\":{\"x\":7,\"y\":89,\"w\":40,\"h\":7},\"state_binding\":\"clues>=2\"}]\nInteractions: [{\"trigger\":\"drag\",\"target\":\"object\",\"precondition\":\"Inspection\",\"action\":\"물건 회전\",\"state_change\":\"rotating\",\"feedback\":\"surface moves\",\"invalid_input\":\"viewport 밖 drag는 clamp\"},{\"trigger\":\"pinch\",\"target\":\"object\",\"precondition\":\"Inspection\",\"action\":\"확대/축소\",\"state_change\":\"zoomed\",\"feedback\":\"scale feedback\",\"invalid_input\":\"min/max clamp\"},{\"trigger\":\"tap\",\"target\":\"hotspot\",\"precondition\":\"hotspot active\",\"action\":\"단서 카드 생성\",\"state_change\":\"hotspot_revealed\",\"feedback\":\"ring + card pop + light haptic\",\"invalid_input\":\"비 hotspot은 약한 경계 반응\"}]\nTransitions: [{\"from\":\"inspection\",\"to\":\"visitor_interview\",\"trigger\":\"tap interview_btn\",\"condition\":\"always\",\"animation\":\"short fade\"},{\"from\":\"inspection\",\"to\":\"evidence_review\",\"trigger\":\"tap review_btn\",\"condition\":\"clues>=2\",\"animation\":\"short fade\"}]\nFeedback: [\"hotspot ring\",\"clue card pop\"]\nEdge Cases: [\"동일 hotspot 재수집 금지\"]\nImplementation Notes: [\"SubViewport 또는 Control viewport\",\"EvidenceTray 재사용\"]\n\n### 04. Visitor Interview\nPurpose: 질문 예산 3회 안에서 진술 단서 획득\nStates: question_ready, answering, budget_empty\nRegions: [{\"id\":\"visitor\",\"label\":\"Visitor\",\"x\":5,\"y\":5,\"w\":90,\"h\":35,\"role\":\"speaker\"},{\"id\":\"statement\",\"label\":\"Statement\",\"x\":7,\"y\":43,\"w\":86,\"h\":17,\"role\":\"response\"},{\"id\":\"questions\",\"label\":\"Questions\",\"x\":6,\"y\":63,\"w\":88,\"h\":25,\"role\":\"choices\"},{\"id\":\"nav\",\"label\":\"Nav\",\"x\":6,\"y\":90,\"w\":88,\"h\":7,\"role\":\"return/review\"}]\nComponents: [{\"id\":\"visitor\",\"label\":\"방문객\",\"type\":\"portrait\",\"box\":{\"x\":25,\"y\":8,\"w\":50,\"h\":27},\"state_binding\":\"\"},{\"id\":\"budget\",\"label\":\"질문 3/3\",\"type\":\"status\",\"box\":{\"x\":72,\"y\":5,\"w\":20,\"h\":6},\"state_binding\":\"\"},{\"id\":\"question_cards\",\"label\":\"질문 카드\",\"type\":\"list\",\"box\":{\"x\":9,\"y\":65,\"w\":82,\"h\":20},\"state_binding\":\"budget>0\"},{\"id\":\"back_inspect\",\"label\":\"물건 다시 보기\",\"type\":\"button\",\"box\":{\"x\":7,\"y\":91,\"w\":40,\"h\":6},\"state_binding\":\"\"},{\"id\":\"review_btn\",\"label\":\"단서 대조\",\"type\":\"button\",\"box\":{\"x\":53,\"y\":91,\"w\":40,\"h\":6},\"state_binding\":\"clues>=2\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"question_card\",\"precondition\":\"budget>0\",\"action\":\"질문 소비·응답 단서 생성\",\"state_change\":\"answering\",\"feedback\":\"핵심 구절 강조\",\"invalid_input\":\"budget=0이면 잠금 사유 표시\"}]\nTransitions: [{\"from\":\"visitor_interview\",\"to\":\"inspection\",\"trigger\":\"tap back_inspect\",\"condition\":\"return_count<1\",\"animation\":\"short fade\"},{\"from\":\"visitor_interview\",\"to\":\"evidence_review\",\"trigger\":\"tap review_btn\",\"condition\":\"clues>=2\",\"animation\":\"short fade\"}]\nFeedback: [\"answer highlight\"]\nEdge Cases: [\"Inspection 복귀 1회 제한\"]\nImplementation Notes: [\"QuestionBudget state machine\"]\n\n### 05. Evidence Review\nPurpose: 물리/진술 단서를 두 슬롯에 놓아 일치·모순 관계 기록\nStates: empty, one_slot, comparing, relation_recorded\nRegions: [{\"id\":\"summary\",\"label\":\"Case Summary\",\"x\":5,\"y\":4,\"w\":90,\"h\":10,\"role\":\"context\"},{\"id\":\"board\",\"label\":\"Compare Board\",\"x\":7,\"y\":17,\"w\":86,\"h\":43,\"role\":\"comparison\"},{\"id\":\"tray\",\"label\":\"Evidence Cards\",\"x\":5,\"y\":63,\"w\":90,\"h\":22,\"role\":\"draggable cards\"},{\"id\":\"action\",\"label\":\"Decision Entry\",\"x\":7,\"y\":88,\"w\":86,\"h\":9,\"role\":\"continue\"}]\nComponents: [{\"id\":\"slot_a\",\"label\":\"비교 A\",\"type\":\"dropzone\",\"box\":{\"x\":12,\"y\":23,\"w\":32,\"h\":20},\"state_binding\":\"empty|filled\"},{\"id\":\"slot_b\",\"label\":\"비교 B\",\"type\":\"dropzone\",\"box\":{\"x\":56,\"y\":23,\"w\":32,\"h\":20},\"state_binding\":\"empty|filled\"},{\"id\":\"relation\",\"label\":\"관계 결과\",\"type\":\"status\",\"box\":{\"x\":22,\"y\":47,\"w\":56,\"h\":8},\"state_binding\":\"none|match|conflict\"},{\"id\":\"evidence_cards\",\"label\":\"단서 카드\",\"type\":\"tray\",\"box\":{\"x\":8,\"y\":65,\"w\":84,\"h\":18},\"state_binding\":\"\"},{\"id\":\"decision_btn\",\"label\":\"판정하기\",\"type\":\"button\",\"box\":{\"x\":20,\"y\":89,\"w\":60,\"h\":7},\"state_binding\":\"clues>=2\"}]\nInteractions: [{\"trigger\":\"long-press drag\",\"target\":\"evidence_card\",\"precondition\":\"card available\",\"action\":\"슬롯에 배치\",\"state_change\":\"one_slot|comparing\",\"feedback\":\"slot highlight\",\"invalid_input\":\"중복 카드면 원위치\"},{\"trigger\":\"drop\",\"target\":\"slot\",\"precondition\":\"two unique clues\",\"action\":\"관계 계산/기록\",\"state_change\":\"relation_recorded\",\"feedback\":\"line + medium haptic\",\"invalid_input\":\"부적합 drop bounce\"}]\nTransitions: [{\"from\":\"evidence_review\",\"to\":\"decision_confirm\",\"trigger\":\"tap decision_btn\",\"condition\":\"clues>=2\",\"animation\":\"short fade\"}]\nFeedback: [\"match solid line / conflict broken line\"]\nEdge Cases: [\"같은 카드 양 슬롯 금지\"]\nImplementation Notes: [\"DragDropController 재사용\"]\n\n### 06. Decision Confirm\nPurpose: RETURN/HOLD/REPORT 선택 후 스와이프로 판정 잠금\nStates: unselected, selected, confirming, locked, blocked\nRegions: [{\"id\":\"evidence\",\"label\":\"Evidence Summary\",\"x\":6,\"y\":5,\"w\":88,\"h\":31,\"role\":\"support\"},{\"id\":\"choices\",\"label\":\"Decision Choices\",\"x\":6,\"y\":40,\"w\":88,\"h\":24,\"role\":\"choice\"},{\"id\":\"confirm\",\"label\":\"Confirm Rail\",\"x\":8,\"y\":72,\"w\":84,\"h\":18,\"role\":\"irreversible confirm\"}]\nComponents: [{\"id\":\"evidence_summary\",\"label\":\"근거 요약\",\"type\":\"panel\",\"box\":{\"x\":9,\"y\":8,\"w\":82,\"h\":25},\"state_binding\":\"\"},{\"id\":\"return\",\"label\":\"RETURN\",\"type\":\"button\",\"box\":{\"x\":8,\"y\":43,\"w\":26,\"h\":15},\"state_binding\":\"\"},{\"id\":\"hold\",\"label\":\"HOLD\",\"type\":\"button\",\"box\":{\"x\":37,\"y\":43,\"w\":26,\"h\":15},\"state_binding\":\"\"},{\"id\":\"report\",\"label\":\"REPORT\",\"type\":\"button\",\"box\":{\"x\":66,\"y\":43,\"w\":26,\"h\":15},\"state_binding\":\"\"},{\"id\":\"confirm_rail\",\"label\":\"밀어서 확정\",\"type\":\"slider\",\"box\":{\"x\":12,\"y\":75,\"w\":76,\"h\":10},\"state_binding\":\"disabled|armed\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"decision buttons\",\"precondition\":\"clues>=2\",\"action\":\"조치 선택\",\"state_change\":\"selected\",\"feedback\":\"selected outline\",\"invalid_input\":\"근거 부족이면 Review 안내\"},{\"trigger\":\"horizontal swipe\",\"target\":\"confirm_rail\",\"precondition\":\"decision selected\",\"action\":\"판정 잠금\",\"state_change\":\"locked\",\"feedback\":\"stamp + rigid haptic\",\"invalid_input\":\"중간 release면 rail reset\"}]\nTransitions: [{\"from\":\"decision_confirm\",\"to\":\"outcome\",\"trigger\":\"confirm complete\",\"condition\":\"always\",\"animation\":\"short fade\"}]\nFeedback: [\"stamp\"]\nEdge Cases: [\"확정 후 back 차단\"]\nImplementation Notes: [\"DecisionController가 irreversible lock 소유\"]\n\n### 07. Outcome\nPurpose: 판정의 결과·근거·점수를 이해하고 다음 사건으로 이동\nStates: correct, incorrect, complete\nRegions: [{\"id\":\"result\",\"label\":\"Result\",\"x\":7,\"y\":5,\"w\":86,\"h\":50,\"role\":\"explanation\"},{\"id\":\"score\",\"label\":\"Score\",\"x\":10,\"y\":59,\"w\":80,\"h\":17,\"role\":\"scoring\"},{\"id\":\"next\",\"label\":\"Next\",\"x\":10,\"y\":82,\"w\":80,\"h\":12,\"role\":\"continue\"}]\nComponents: [{\"id\":\"result_stamp\",\"label\":\"판정 결과\",\"type\":\"status\",\"box\":{\"x\":25,\"y\":9,\"w\":50,\"h\":12},\"state_binding\":\"\"},{\"id\":\"reason\",\"label\":\"왜 맞았나/틀렸나\",\"type\":\"panel\",\"box\":{\"x\":10,\"y\":24,\"w\":80,\"h\":28},\"state_binding\":\"\"},{\"id\":\"score\",\"label\":\"점수 변화\",\"type\":\"status\",\"box\":{\"x\":18,\"y\":61,\"w\":64,\"h\":12},\"state_binding\":\"\"},{\"id\":\"continue\",\"label\":\"계속\",\"type\":\"button\",\"box\":{\"x\":20,\"y\":84,\"w\":60,\"h\":8},\"state_binding\":\"\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"continue\",\"precondition\":\"outcome shown\",\"action\":\"다음 사건 또는 요약\",\"state_change\":\"complete\",\"feedback\":\"success/neutral haptic\",\"invalid_input\":\"연타 무시\"}]\nTransitions: [{\"from\":\"outcome\",\"to\":\"case_intake\",\"trigger\":\"tap continue\",\"condition\":\"case_index<3\",\"animation\":\"short fade\"},{\"from\":\"outcome\",\"to\":\"shift_summary\",\"trigger\":\"tap continue\",\"condition\":\"case_index=3\",\"animation\":\"short fade\"}]\nFeedback: [\"score count\"]\nEdge Cases: []\nImplementation Notes: [\"OutcomePresenter\"]\n\n### 08. Shift Summary\nPurpose: 3사건의 점수와 근무 등급 요약\nStates: summary\nRegions: [{\"id\":\"grade\",\"label\":\"Grade\",\"x\":10,\"y\":6,\"w\":80,\"h\":22,\"role\":\"shift grade\"},{\"id\":\"cases\",\"label\":\"Cases\",\"x\":7,\"y\":31,\"w\":86,\"h\":43,\"role\":\"case rows\"},{\"id\":\"footer\",\"label\":\"Footer\",\"x\":10,\"y\":80,\"w\":80,\"h\":14,\"role\":\"finish\"}]\nComponents: [{\"id\":\"grade\",\"label\":\"근무 등급\",\"type\":\"status\",\"box\":{\"x\":28,\"y\":10,\"w\":44,\"h\":15},\"state_binding\":\"\"},{\"id\":\"case_rows\",\"label\":\"사건 3개 요약\",\"type\":\"list\",\"box\":{\"x\":10,\"y\":34,\"w\":80,\"h\":36},\"state_binding\":\"\"},{\"id\":\"finish\",\"label\":\"근무 종료\",\"type\":\"button\",\"box\":{\"x\":20,\"y\":83,\"w\":60,\"h\":8},\"state_binding\":\"\"}]\nInteractions: [{\"trigger\":\"tap\",\"target\":\"finish\",\"precondition\":\"summary\",\"action\":\"Night Desk 복귀\",\"state_change\":\"ready\",\"feedback\":\"fade\",\"invalid_input\":\"none\"}]\nTransitions: [{\"from\":\"shift_summary\",\"to\":\"night_desk\",\"trigger\":\"tap finish\",\"condition\":\"always\",\"animation\":\"short fade\"}]\nFeedback: []\nEdge Cases: []\nImplementation Notes: [\"ShiftSummaryData\"]\n\n## Global States\n[\n  {\n    \"id\": \"loading\",\n    \"rule\": \"사건 데이터 준비 중 입력 차단\"\n  },\n  {\n    \"id\": \"pause\",\n    \"rule\": \"현재 사건 상태 보존\"\n  },\n  {\n    \"id\": \"decision_locked\",\n    \"rule\": \"판정 후 back/수정 금지\"\n  }\n]\n\n## Input Map\n[\n  {\n    \"input\": \"tap\",\n    \"priority\": 3,\n    \"use\": \"hotspot/questions/choices/buttons\"\n  },\n  {\n    \"input\": \"long-press drag\",\n    \"priority\": 4,\n    \"use\": \"evidence cards\"\n  },\n  {\n    \"input\": \"drag\",\n    \"priority\": 2,\n    \"use\": \"object rotation\"\n  },\n  {\n    \"input\": \"pinch\",\n    \"priority\": 5,\n    \"use\": \"object zoom\"\n  },\n  {\n    \"input\": \"horizontal confirm swipe\",\n    \"priority\": 5,\n    \"use\": \"irreversible decision\"\n  }\n]\n\n## Global Edge Cases\n[\n  {\n    \"case\": \"clues<2\",\n    \"recovery\": \"Decision disabled; Review/Inspection 안내\"\n  },\n  {\n    \"case\": \"question budget 0\",\n    \"recovery\": \"cards disabled with reason\"\n  },\n  {\n    \"case\": \"duplicate evidence\",\n    \"recovery\": \"reject and return card\"\n  },\n  {\n    \"case\": \"confirmed decision\",\n    \"recovery\": \"no undo; proceed Outcome\"\n  }\n]\n\n## Developer Handoff\n{\n  \"scene_hierarchy\": [\n    \"AppRoot\",\n    \"ShiftController\",\n    \"CaseSceneRouter\",\n    \"HUDLayer\",\n    \"ModalLayer\"\n  ],\n  \"reusable\": [\n    \"EvidenceCard\",\n    \"PrimaryButton\",\n    \"StatusChip\",\n    \"DragDropSlot\",\n    \"ConfirmRail\"\n  ],\n  \"required_data\": [\n    \"CaseData\",\n    \"EvidenceData\",\n    \"VisitorData\",\n    \"DecisionRule\"\n  ],\n  \"state_owner\": \"CaseSessionState\",\n  \"persistence\": \"shift progress only\",\n  \"implementation_order\": [\n    \"navigation/state machine\",\n    \"inspection gestures\",\n    \"evidence tray\",\n    \"interview budget\",\n    \"compare drag-drop\",\n    \"decision lock\",\n    \"outcome/summary\"\n  ]\n}\n\n## Acceptance Criteria\n- 8개 화면이 정의된 흐름대로 이동한다\n- Inspection에서 drag/pinch/hotspot이 충돌 없이 동작한다\n- 질문 예산이 3→0으로 감소하고 0에서 추가 질문이 차단된다\n- 단서 카드를 long-press drag하여 두 비교 슬롯에 배치할 수 있다\n- 단서 2개 미만이면 Decision 확정이 불가능하다\n- RETURN/HOLD/REPORT 선택 뒤 confirm swipe 완료 시 판정이 잠긴다\n- 세 번째 Outcome 뒤 Shift Summary로 이동한다",
+  "source_run_at": "2026-09-29T12:02:22+00:00",
+  "target_device": "Mobile",
+  "global_ui_rules": {
+    "persistent": [
+      "case metadata",
+      "evidence count"
+    ],
+    "safe_margin_percent": 4,
+    "modal_blocks_background": true,
+    "min_touch_target_percent": 10
+  },
+  "developer_handoff": {
+    "reusable": [
+      "EvidenceCard",
+      "PrimaryButton",
+      "StatusChip",
+      "DragDropSlot",
+      "ConfirmRail"
+    ],
+    "persistence": "shift progress only",
+    "state_owner": "CaseSessionState",
+    "required_data": [
+      "CaseData",
+      "EvidenceData",
+      "VisitorData",
+      "DecisionRule"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "ShiftController",
+      "CaseSceneRouter",
+      "HUDLayer",
+      "ModalLayer"
+    ],
+    "implementation_order": [
+      "navigation/state machine",
+      "inspection gestures",
+      "evidence tray",
+      "interview budget",
+      "compare drag-drop",
+      "decision lock",
+      "outcome/summary"
+    ]
+  },
+  "acceptance_criteria": [
+    "8개 화면이 정의된 흐름대로 이동한다",
+    "Inspection에서 drag/pinch/hotspot이 충돌 없이 동작한다",
+    "질문 예산이 3→0으로 감소하고 0에서 추가 질문이 차단된다",
+    "단서 카드를 long-press drag하여 두 비교 슬롯에 배치할 수 있다",
+    "단서 2개 미만이면 Decision 확정이 불가능하다",
+    "RETURN/HOLD/REPORT 선택 뒤 confirm swipe 완료 시 판정이 잠긴다",
+    "세 번째 Outcome 뒤 Shift Summary로 이동한다"
+  ],
+  "primary_interaction": "물건 회전·핀치·hotspot 조사 + 단서 long-press drag 비교 + 판정 confirm swipe",
+  "interaction_principles": [
+    "물건 조사 영역을 화면의 최우선 터치 공간으로 유지",
+    "읽기보다 조작→단서 생성→비교 순서를 시각적으로 강조",
+    "되돌릴 수 없는 판정은 tap 선택 뒤 별도 confirm swipe로 분리",
+    "질문 예산·단서 수·현재 단계는 항상 가시화"
+  ]
+}

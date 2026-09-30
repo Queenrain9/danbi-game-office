@@ -1,0 +1,1136 @@
+{
+  "id": "b020ca46-7d2e-445b-9944-b67741446926",
+  "title": "Ghost Train Coupler",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "b18d1dde-2104-4085-bdb5-4349c2a110a0",
+  "screens": [
+    {
+      "id": "puzzle_select",
+      "name": "Puzzle Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 14,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "top",
+            "role": "title/progress",
+            "label": "Progress"
+          },
+          {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 16,
+            "id": "grid",
+            "role": "puzzle selection",
+            "label": "Puzzle Grid"
+          },
+          {
+            "h": 8,
+            "w": 90,
+            "x": 5,
+            "y": 90,
+            "id": "footer",
+            "role": "navigation",
+            "label": "Footer"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "select_ready",
+          "condition": "screen entered"
+        },
+        {
+          "id": "select_locked",
+          "condition": "card is locked"
+        }
+      ],
+      "purpose": "8개 hand-authored yard puzzle의 해금/선택 상태를 보여주고 Brief로 진입.",
+      "feedback": [
+        "card press",
+        "locked badge"
+      ],
+      "components": [
+        {
+          "id": "title",
+          "box": {
+            "h": 6,
+            "w": 70,
+            "x": 5,
+            "y": 4
+          },
+          "type": "label",
+          "label": "Ghost Train Coupler",
+          "state_binding": "static"
+        },
+        {
+          "id": "progress",
+          "box": {
+            "h": 6,
+            "w": 20,
+            "x": 75,
+            "y": 4
+          },
+          "type": "counter",
+          "label": "Unlocked / 8",
+          "state_binding": "progress.unlocked"
+        },
+        {
+          "id": "puzzle_grid",
+          "box": {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 16
+          },
+          "type": "grid",
+          "label": "Puzzle cards 1–8",
+          "state_binding": "progress.puzzles",
+          "interaction_role": "tap unlocked puzzle"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 7,
+            "w": 24,
+            "x": 5,
+            "y": 91
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "nav",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "locked puzzle tap is inert"
+      ],
+      "transitions": [
+        {
+          "to": "yard_brief",
+          "from": "puzzle_select",
+          "trigger": "tap unlocked card",
+          "animation": "push",
+          "condition": "selected_puzzle != null"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select puzzle",
+          "target": "unlocked puzzle card",
+          "feedback": "pressed state",
+          "precondition": "puzzle unlocked",
+          "state_change": "selected_puzzle=id",
+          "invalid_input": "locked card: no transition"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "locked_card",
+          "name": "Locked Puzzle",
+          "notes": "Locked card consumes no selection input.",
+          "condition": "puzzle.locked",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "puzzle_grid": {
+              "state_binding": "progress.puzzles.locked"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Cards bind to hand-authored puzzle metadata."
+      ]
+    },
+    {
+      "id": "yard_brief",
+      "name": "Yard Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 42,
+            "w": 90,
+            "x": 5,
+            "y": 7,
+            "id": "rules",
+            "role": "requirements",
+            "label": "Rule Cards"
+          },
+          {
+            "h": 34,
+            "w": 90,
+            "x": 5,
+            "y": 51,
+            "id": "preview",
+            "role": "topology preview",
+            "label": "Yard Preview"
+          },
+          {
+            "h": 10,
+            "w": 90,
+            "x": 5,
+            "y": 87,
+            "id": "actions",
+            "role": "start/back",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "condition": "puzzle selected"
+        }
+      ],
+      "purpose": "선택 퍼즐의 rule cards와 yard preview를 읽고 시작.",
+      "feedback": [
+        "rule-card expand",
+        "start cue"
+      ],
+      "components": [
+        {
+          "id": "rule_cards",
+          "box": {
+            "h": 42,
+            "w": 90,
+            "x": 5,
+            "y": 7
+          },
+          "type": "stack",
+          "label": "2–4 Rule Cards",
+          "state_binding": "puzzle.rules",
+          "interaction_role": "tap inspect"
+        },
+        {
+          "id": "yard_preview",
+          "box": {
+            "h": 34,
+            "w": 90,
+            "x": 5,
+            "y": 51
+          },
+          "type": "diagram",
+          "label": "Track / cars preview",
+          "state_binding": "puzzle.preview"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 8,
+            "w": 28,
+            "x": 5,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "nav",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 8,
+            "w": 37,
+            "x": 58,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Start Yard",
+          "enabled_when": "puzzle loaded",
+          "state_binding": "brief.ready",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "loading disables Start"
+      ],
+      "transitions": [
+        {
+          "to": "yard_puzzle",
+          "from": "yard_brief",
+          "trigger": "tap Start",
+          "animation": "push",
+          "condition": "puzzle loaded"
+        },
+        {
+          "to": "puzzle_select",
+          "from": "yard_brief",
+          "trigger": "tap Back",
+          "animation": "pop",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "expand rule semantics",
+          "target": "rule card",
+          "feedback": "card expands",
+          "precondition": "brief active",
+          "state_change": "inspected_rule=id",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "enter yard",
+          "target": "start",
+          "feedback": "short cue",
+          "precondition": "puzzle loaded",
+          "state_change": "yard state=idle",
+          "invalid_input": "disabled while not loaded"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Preview is non-interactive."
+      ]
+    },
+    {
+      "id": "yard_puzzle",
+      "core": true,
+      "name": "Yard Puzzle",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 18,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "rule_strip",
+            "role": "constraints",
+            "label": "Rule Strip"
+          },
+          {
+            "h": 68,
+            "w": 100,
+            "x": 0,
+            "y": 18,
+            "id": "yard",
+            "role": "rail playfield",
+            "label": "Interactive Yard"
+          },
+          {
+            "h": 14,
+            "w": 100,
+            "x": 0,
+            "y": 86,
+            "id": "controls",
+            "role": "moves/undo/dispatch",
+            "label": "Control Bar"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "yard_idle",
+          "condition": "yard entered or gesture released"
+        },
+        {
+          "id": "shunting",
+          "condition": "car drag active"
+        },
+        {
+          "id": "coupling",
+          "condition": "compatible ends enter couple range"
+        },
+        {
+          "id": "blocked",
+          "condition": "drag reaches occupied segment"
+        },
+        {
+          "id": "inspect",
+          "condition": "passenger/car tapped"
+        }
+      ],
+      "purpose": "핵심 shunt/couple/uncouple/switch/inspect/dispatch 조작을 수행.",
+      "feedback": [
+        "continuous rail highlight",
+        "snap tick haptic",
+        "collision bumper compression",
+        "couple clack",
+        "rule pulse"
+      ],
+      "components": [
+        {
+          "id": "rule_strip",
+          "box": {
+            "h": 14,
+            "w": 96,
+            "x": 2,
+            "y": 2
+          },
+          "type": "horizontal_strip",
+          "label": "Rule Cards",
+          "state_binding": "rules.status",
+          "interaction_role": "tap inspect"
+        },
+        {
+          "id": "rail_canvas",
+          "box": {
+            "h": 65,
+            "w": 96,
+            "x": 2,
+            "y": 19
+          },
+          "type": "spline_playfield",
+          "label": "Rail Network",
+          "state_binding": "yard.rails",
+          "interaction_role": "drag constrained cars / tap switch"
+        },
+        {
+          "id": "cars",
+          "box": {
+            "h": 52,
+            "w": 92,
+            "x": 4,
+            "y": 24
+          },
+          "type": "draggable_entities",
+          "label": "Cars / consists",
+          "enabled_when": "state in yard_idle,shunting,coupling",
+          "state_binding": "yard.cars",
+          "interaction_role": "drag; tap passenger"
+        },
+        {
+          "id": "coupler_handles",
+          "box": {
+            "h": 52,
+            "w": 92,
+            "x": 4,
+            "y": 24
+          },
+          "type": "hit_targets",
+          "label": "44pt Coupler Handles",
+          "enabled_when": "train stopped",
+          "state_binding": "yard.couplers",
+          "interaction_role": "tap then outward swipe"
+        },
+        {
+          "id": "switch_levers",
+          "box": {
+            "h": 38,
+            "w": 84,
+            "x": 8,
+            "y": 30
+          },
+          "type": "hit_targets",
+          "label": "Junction Lever",
+          "enabled_when": "switch safety zone empty",
+          "state_binding": "yard.switches",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "departure_zone",
+          "box": {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 69
+          },
+          "type": "drop_zone",
+          "label": "Departure Zone",
+          "state_binding": "yard.departure_occupancy"
+        },
+        {
+          "id": "moves",
+          "box": {
+            "h": 8,
+            "w": 25,
+            "x": 3,
+            "y": 88
+          },
+          "type": "counter",
+          "label": "Moves / Par",
+          "state_binding": "score.moves"
+        },
+        {
+          "id": "undo",
+          "box": {
+            "h": 8,
+            "w": 22,
+            "x": 31,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Undo ×3",
+          "enabled_when": "undo.remaining>0 && state=yard_idle",
+          "state_binding": "undo.remaining",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "dispatch_signal",
+          "box": {
+            "h": 12,
+            "w": 20,
+            "x": 76,
+            "y": 86
+          },
+          "type": "vertical_swipe_control",
+          "label": "Dispatch Signal",
+          "enabled_when": "consist on departure track && state=yard_idle",
+          "state_binding": "dispatch.ready",
+          "interaction_role": "swipe up >=36px"
+        },
+        {
+          "id": "inspect_callout",
+          "box": {
+            "h": 16,
+            "w": 80,
+            "x": 10,
+            "y": 20
+          },
+          "type": "popover",
+          "label": "Passenger / constraint callout",
+          "state_binding": "inspect.active"
+        }
+      ],
+      "edge_cases": [
+        "system cancel restores pre-gesture state without move cost",
+        "cars cannot overlap/pass occupied rail",
+        "forbidden passenger constraints are not auto-checked until dispatch unless inspected"
+      ],
+      "transitions": [
+        {
+          "to": "dispatch_check",
+          "from": "yard_puzzle",
+          "trigger": "valid dispatch swipe",
+          "animation": "overlay",
+          "condition": "consist on departure track"
+        },
+        {
+          "to": "yard_brief",
+          "from": "yard_puzzle",
+          "trigger": "system/back confirmation",
+          "animation": "pop",
+          "condition": "no active gesture"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "project movement onto rail; snap nearest free stop <=32px",
+          "target": "car/connected consist",
+          "feedback": "wheel rumble + path highlight + snap ticks",
+          "precondition": "track segment free",
+          "state_change": "position changes; successful new snap counts 1 move",
+          "invalid_input": "occupied segment stops motion; release without valid snap returns origin"
+        },
+        {
+          "input": "release",
+          "action": "join consists",
+          "target": "compatible car end",
+          "feedback": "ghost magnet → clack + medium haptic",
+          "precondition": "same aligned track and within couple range",
+          "state_change": "coupled=true",
+          "invalid_input": "incompatible end rejects and remains separate"
+        },
+        {
+          "input": "tap then outward swipe >=24px",
+          "action": "split consist",
+          "target": "coupler handle",
+          "feedback": "chain opens",
+          "precondition": "train stopped",
+          "state_change": "coupled=false",
+          "invalid_input": "short/incorrect swipe cancels selection"
+        },
+        {
+          "input": "tap",
+          "action": "toggle junction route",
+          "target": "switch lever",
+          "feedback": "route glow changes",
+          "precondition": "no car overlaps switch safety zone",
+          "state_change": "switch.route toggles",
+          "invalid_input": "tap ignored while safety zone occupied"
+        },
+        {
+          "input": "tap",
+          "action": "show destination/constraint",
+          "target": "passenger/car or rule card",
+          "feedback": "symbol callout",
+          "precondition": "yard active",
+          "state_change": "inspect.active=id",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "restore previous shunt state",
+          "target": "Undo",
+          "feedback": "reverse motion cue",
+          "precondition": "remaining>0 && yard_idle",
+          "state_change": "undo-- and state restored",
+          "invalid_input": "disabled otherwise"
+        },
+        {
+          "input": "swipe up >=36px",
+          "action": "lock yard input and validate",
+          "target": "dispatch signal",
+          "feedback": "signal/check overlay begins",
+          "precondition": "consist on departure track",
+          "state_change": "state=validation",
+          "invalid_input": "short swipe cancels; unmet requirements handled by overlay"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "dragging",
+          "name": "Dragging Consist",
+          "notes": "Finger offset preserved; connected consist moves as unit.",
+          "condition": "state=shunting",
+          "components": [],
+          "hide_components": [
+            "inspect_callout"
+          ],
+          "component_overrides": {
+            "cars": {
+              "state_binding": "yard.dragged_consist"
+            },
+            "rail_canvas": {
+              "state_binding": "yard.valid_path_and_snap_points"
+            }
+          }
+        },
+        {
+          "id": "snap_candidate",
+          "name": "Snap / Couple Candidate",
+          "notes": "Blue magnetic ghost appears.",
+          "condition": "compatible end within range",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "coupler_handles": {
+              "state_binding": "coupler.ghost_candidate"
+            }
+          }
+        },
+        {
+          "id": "blocked_path",
+          "name": "Blocked Route",
+          "notes": "Movement stops before occupied car; bumper feedback.",
+          "condition": "occupied segment reached",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "rail_canvas": {
+              "state_binding": "yard.blocked_segment"
+            }
+          }
+        },
+        {
+          "id": "rule_inspected",
+          "name": "Rule Inspected",
+          "notes": "Destination/constraint symbols visible.",
+          "condition": "rule/passenger tapped",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "inspect_callout": {
+              "state_binding": "inspect.active"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Rail geometry and car positions are world-space; boxes describe touch/display envelope, not physical rail coordinates.",
+        "Input priority: modal/overlay > coupler/switch > car drag > world."
+      ]
+    },
+    {
+      "id": "dispatch_check",
+      "name": "Dispatch Check Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "scrim",
+            "role": "input lock",
+            "label": "Yard Scrim"
+          },
+          {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 18,
+            "id": "panel",
+            "role": "rule validation",
+            "label": "Validation Panel"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "validation",
+          "condition": "dispatch entered"
+        },
+        {
+          "id": "validation_fail",
+          "condition": "one or more rules fail"
+        },
+        {
+          "id": "validation_pass",
+          "condition": "all requirements pass"
+        }
+      ],
+      "purpose": "Dispatch 동안 입력을 잠그고 규칙을 순차 검증해 성공/실패를 명료하게 표시.",
+      "feedback": [
+        "rule-by-rule check",
+        "violated pulse",
+        "green signal"
+      ],
+      "components": [
+        {
+          "id": "scrim",
+          "box": {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "overlay",
+          "label": "Input Lock Scrim",
+          "state_binding": "validation.lock"
+        },
+        {
+          "id": "check_list",
+          "box": {
+            "h": 42,
+            "w": 76,
+            "x": 12,
+            "y": 23
+          },
+          "type": "list",
+          "label": "Rule Check List",
+          "state_binding": "validation.rules"
+        },
+        {
+          "id": "status",
+          "box": {
+            "h": 8,
+            "w": 60,
+            "x": 20,
+            "y": 67
+          },
+          "type": "status",
+          "label": "Checking / Pass / Conflict",
+          "state_binding": "validation.status"
+        },
+        {
+          "id": "conflict_link",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 25,
+            "y": 77
+          },
+          "type": "button",
+          "label": "Show Conflict",
+          "enabled_when": "validation failed",
+          "state_binding": "validation.failed",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "all yard inputs locked during validation"
+      ],
+      "transitions": [
+        {
+          "to": "yard_puzzle",
+          "from": "dispatch_check",
+          "trigger": "validation fail / Show Conflict",
+          "animation": "fade overlay",
+          "condition": "any rule fails"
+        },
+        {
+          "to": "result",
+          "from": "dispatch_check",
+          "trigger": "validation pass",
+          "animation": "departure animation",
+          "condition": "all dispatch requirements true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "close overlay and focus violated rule",
+          "target": "Show Conflict",
+          "feedback": "pulse implicated cars",
+          "precondition": "validation failed",
+          "state_change": "state=yard_idle; violated highlight persists briefly",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failed",
+          "name": "Conflict",
+          "notes": "Only violated rule cards pulse; implicated cars outline on underlying yard.",
+          "condition": "validation failed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "status": {
+              "label": "Conflict"
+            },
+            "check_list": {
+              "state_binding": "violated rules pulse"
+            }
+          }
+        },
+        {
+          "id": "passed",
+          "name": "Ready to Depart",
+          "notes": "Signal turns green before departure.",
+          "condition": "all rules pass",
+          "components": [],
+          "hide_components": [
+            "conflict_link"
+          ],
+          "component_overrides": {
+            "status": {
+              "label": "Ready"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Validation reads Game Design requirements without altering them."
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 54,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "summary",
+            "role": "score",
+            "label": "Summary"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 72,
+            "id": "actions",
+            "role": "next/replay",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result",
+          "condition": "successful departure completed"
+        }
+      ],
+      "purpose": "moves/score와 다음 행동을 표시.",
+      "feedback": [
+        "score count-up",
+        "perfect marker when score>=95"
+      ],
+      "components": [
+        {
+          "id": "score",
+          "box": {
+            "h": 14,
+            "w": 60,
+            "x": 20,
+            "y": 16
+          },
+          "type": "large_number",
+          "label": "Score",
+          "state_binding": "result.score"
+        },
+        {
+          "id": "moves_used",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 12,
+            "y": 34
+          },
+          "type": "stat",
+          "label": "Moves Used / Par",
+          "state_binding": "result.moves"
+        },
+        {
+          "id": "breakdown",
+          "box": {
+            "h": 24,
+            "w": 36,
+            "x": 52,
+            "y": 34
+          },
+          "type": "list",
+          "label": "Score Breakdown",
+          "state_binding": "result.breakdown"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 10,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Replay",
+          "state_binding": "result",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 54,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Next Puzzle",
+          "enabled_when": "next puzzle exists",
+          "state_binding": "progress.next",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "last puzzle hides/disables Next"
+      ],
+      "transitions": [
+        {
+          "to": "yard_brief",
+          "from": "result",
+          "trigger": "Replay",
+          "animation": "push",
+          "condition": "always"
+        },
+        {
+          "to": "yard_brief",
+          "from": "result",
+          "trigger": "Next",
+          "animation": "push",
+          "condition": "next exists"
+        },
+        {
+          "to": "puzzle_select",
+          "from": "result",
+          "trigger": "back/end",
+          "animation": "pop",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reload same puzzle brief",
+          "target": "Replay",
+          "feedback": "button press",
+          "precondition": "result",
+          "state_change": "selected_puzzle unchanged",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "select next unlocked puzzle",
+          "target": "Next",
+          "feedback": "button press",
+          "precondition": "next exists",
+          "state_change": "selected_puzzle=next",
+          "invalid_input": "disabled at end"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Score breakdown binds base, move over par, invalid dispatch, unused move bonus."
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "e5b1798d-221b-42b9-84a8-6f7fa68177a1",
+  "input_map": {
+    "cancel": "drag to origin or system cancel restores pre-gesture state",
+    "gestures": {
+      "tap": [
+        "inspect",
+        "switch",
+        "undo"
+      ],
+      "drag": [
+        "rail-constrained shunt"
+      ],
+      "swipe": [
+        "uncouple outward >=24px",
+        "dispatch upward >=36px"
+      ]
+    },
+    "priority": [
+      "overlay controls",
+      "coupler handle",
+      "switch lever",
+      "car/consist drag",
+      "rule/passenger inspect",
+      "yard background"
+    ],
+    "multitouch": "not required in MVP"
+  },
+  "created_at": "2026-09-29T17:33:26.657526+00:00",
+  "edge_cases": {
+    "collision": "stop before occupied car",
+    "invalid_snap": "return to origin without move cost",
+    "small_coupler": "44pt invisible hit target",
+    "invalid_switch": "ignore tap while safety zone occupied",
+    "invalid_dispatch": "validation fail costs score per Game Design then returns yard"
+  },
+  "updated_at": "2026-09-29T17:33:26.657526+00:00",
+  "core_screen": "yard_puzzle",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "dispatch requires consist on departure track",
+      "switch requires empty safety zone",
+      "uncouple requires stopped train"
+    ],
+    "normal": [
+      "puzzle_select",
+      "yard_brief",
+      "yard_puzzle",
+      "dispatch_check",
+      "result"
+    ],
+    "branches": [
+      {
+        "to": "yard_puzzle",
+        "from": "dispatch_check",
+        "when": "validation fail"
+      },
+      {
+        "to": "yard_brief",
+        "from": "result",
+        "when": "replay"
+      },
+      {
+        "to": "yard_brief",
+        "from": "result",
+        "when": "next"
+      }
+    ]
+  },
+  "state_count": 14,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "input_lock",
+      "effect": "yard gestures disabled",
+      "condition": "dispatch validation active"
+    },
+    {
+      "id": "departure",
+      "effect": "signal green + consist exits before result",
+      "condition": "validation pass"
+    }
+  ],
+  "pack_markdown": "# Ghost Train Coupler — Interaction Wireframe Pack v0.2\n\n## Pack Overview\n- Device: mobile phone\n- Orientation: portrait\n- Core Screen: yard_puzzle\n- Primary Interaction: 레일 제약 객차 드래그 + 커플링/분리\n\n## Interaction Principles\n- 객차 직접 조작이 메뉴 조작보다 우선\n- 레일 제약은 손가락 오프셋을 보존\n- 작은 커플러는 44pt hit area\n- 실패 dispatch는 원인만 강조하고 즉시 재편성 복귀\n\n## Screen Flow\n- Normal: puzzle_select → yard_brief → yard_puzzle → dispatch_check → result\n\n## Screens\n### 1. Puzzle Select\n8개 hand-authored yard puzzle의 해금/선택 상태를 보여주고 Brief로 진입.\n\nComponents:\n- title: Ghost Train Coupler [label] box(5,4,70,6) · static\n- progress: Unlocked / 8 [counter] box(75,4,20,6) · progress.unlocked\n- puzzle_grid: Puzzle cards 1–8 [grid] box(5,16,90,72) · progress.puzzles\n- back: Back [button] box(5,91,24,7) · nav\nState variants:\n- Locked Puzzle: puzzle.locked — Locked card consumes no selection input.\nInteractions:\n- tap → unlocked puzzle card: select puzzle; state=selected_puzzle=id; invalid=locked card: no transition\n\n### 2. Yard Brief\n선택 퍼즐의 rule cards와 yard preview를 읽고 시작.\n\nComponents:\n- rule_cards: 2–4 Rule Cards [stack] box(5,7,90,42) · puzzle.rules\n- yard_preview: Track / cars preview [diagram] box(5,51,90,34) · puzzle.preview\n- back: Back [button] box(5,88,28,8) · nav\n- start: Start Yard [button] box(58,88,37,8) · brief.ready\nInteractions:\n- tap → rule card: expand rule semantics; state=inspected_rule=id; invalid=none\n- tap → start: enter yard; state=yard state=idle; invalid=disabled while not loaded\n\n### 3. Yard Puzzle\n핵심 shunt/couple/uncouple/switch/inspect/dispatch 조작을 수행.\n\nComponents:\n- rule_strip: Rule Cards [horizontal_strip] box(2,2,96,14) · rules.status\n- rail_canvas: Rail Network [spline_playfield] box(2,19,96,65) · yard.rails\n- cars: Cars / consists [draggable_entities] box(4,24,92,52) · yard.cars\n- coupler_handles: 44pt Coupler Handles [hit_targets] box(4,24,92,52) · yard.couplers\n- switch_levers: Junction Lever [hit_targets] box(8,30,84,38) · yard.switches\n- departure_zone: Departure Zone [drop_zone] box(4,69,92,12) · yard.departure_occupancy\n- moves: Moves / Par [counter] box(3,88,25,8) · score.moves\n- undo: Undo ×3 [button] box(31,88,22,8) · undo.remaining\n- dispatch_signal: Dispatch Signal [vertical_swipe_control] box(76,86,20,12) · dispatch.ready\n- inspect_callout: Passenger / constraint callout [popover] box(10,20,80,16) · inspect.active\nState variants:\n- Dragging Consist: state=shunting — Finger offset preserved; connected consist moves as unit.\n- Snap / Couple Candidate: compatible end within range — Blue magnetic ghost appears.\n- Blocked Route: occupied segment reached — Movement stops before occupied car; bumper feedback.\n- Rule Inspected: rule/passenger tapped — Destination/constraint symbols visible.\nInteractions:\n- drag → car/connected consist: project movement onto rail; snap nearest free stop <=32px; state=position changes; successful new snap counts 1 move; invalid=occupied segment stops motion; release without valid snap returns origin\n- release → compatible car end: join consists; state=coupled=true; invalid=incompatible end rejects and remains separate\n- tap then outward swipe >=24px → coupler handle: split consist; state=coupled=false; invalid=short/incorrect swipe cancels selection\n- tap → switch lever: toggle junction route; state=switch.route toggles; invalid=tap ignored while safety zone occupied\n- tap → passenger/car or rule card: show destination/constraint; state=inspect.active=id; invalid=none\n- tap → Undo: restore previous shunt state; state=undo-- and state restored; invalid=disabled otherwise\n- swipe up >=36px → dispatch signal: lock yard input and validate; state=state=validation; invalid=short swipe cancels; unmet requirements handled by overlay\n\n### 4. Dispatch Check Overlay\nDispatch 동안 입력을 잠그고 규칙을 순차 검증해 성공/실패를 명료하게 표시.\n\nComponents:\n- scrim: Input Lock Scrim [overlay] box(0,0,100,100) · validation.lock\n- check_list: Rule Check List [list] box(12,23,76,42) · validation.rules\n- status: Checking / Pass / Conflict [status] box(20,67,60,8) · validation.status\n- conflict_link: Show Conflict [button] box(25,77,50,8) · validation.failed\nState variants:\n- Conflict: validation failed — Only violated rule cards pulse; implicated cars outline on underlying yard.\n- Ready to Depart: all rules pass — Signal turns green before departure.\nInteractions:\n- tap → Show Conflict: close overlay and focus violated rule; state=state=yard_idle; violated highlight persists briefly; invalid=none\n\n### 5. Result\nmoves/score와 다음 행동을 표시.\n\nComponents:\n- score: Score [large_number] box(20,16,60,14) · result.score\n- moves_used: Moves Used / Par [stat] box(12,34,36,10) · result.moves\n- breakdown: Score Breakdown [list] box(52,34,36,24) · result.breakdown\n- replay: Replay [button] box(10,75,36,10) · result\n- next: Next Puzzle [button] box(54,75,36,10) · progress.next\nInteractions:\n- tap → Replay: reload same puzzle brief; state=selected_puzzle unchanged; invalid=none\n- tap → Next: select next unlocked puzzle; state=selected_puzzle=next; invalid=disabled at end\n\n## Global States\n- input_lock: dispatch validation active → yard gestures disabled\n- departure: validation pass → signal green + consist exits before result\n\n## Input Map\n```json\n{\n  \"priority\": [\n    \"overlay controls\",\n    \"coupler handle\",\n    \"switch lever\",\n    \"car/consist drag\",\n    \"rule/passenger inspect\",\n    \"yard background\"\n  ],\n  \"gestures\": {\n    \"tap\": [\n      \"inspect\",\n      \"switch\",\n      \"undo\"\n    ],\n    \"drag\": [\n      \"rail-constrained shunt\"\n    ],\n    \"swipe\": [\n      \"uncouple outward >=24px\",\n      \"dispatch upward >=36px\"\n    ]\n  },\n  \"cancel\": \"drag to origin or system cancel restores pre-gesture state\",\n  \"multitouch\": \"not required in MVP\"\n}\n```\n\n## Global Edge Cases\n```json\n{\n  \"collision\": \"stop before occupied car\",\n  \"invalid_snap\": \"return to origin without move cost\",\n  \"invalid_switch\": \"ignore tap while safety zone occupied\",\n  \"invalid_dispatch\": \"validation fail costs score per Game Design then returns yard\",\n  \"small_coupler\": \"44pt invisible hit target\"\n}\n```\n\n## Developer Handoff\n```json\n{\n  \"scene_hierarchy\": [\n    \"App\",\n    \"PuzzleSelect\",\n    \"YardBrief\",\n    \"YardPuzzle{RuleStrip,RailWorld,ControlBar}\",\n    \"DispatchOverlay\",\n    \"Result\"\n  ],\n  \"reusable_components\": [\n    \"RuleCard\",\n    \"RailSpline\",\n    \"CarBody\",\n    \"CouplerHandle\",\n    \"SwitchLever\",\n    \"DispatchSignal\",\n    \"ScoreRow\"\n  ],\n  \"required_data\": [\n    \"8 puzzle definitions\",\n    \"rail topology\",\n    \"car set/orientation\",\n    \"passenger constraints\",\n    \"par/move budget\",\n    \"unlock state\"\n  ],\n  \"state_ownership\": {\n    \"puzzle\": \"PuzzleController\",\n    \"yard\": \"YardState\",\n    \"gesture\": \"InputController\",\n    \"validation\": \"RuleValidator\",\n    \"progress\": \"ProgressStore\"\n  },\n  \"persistence\": [\n    \"puzzle unlocks\",\n    \"best score\"\n  ],\n  \"implementation_order\": [\n    \"rail projection + collision\",\n    \"car/consist drag + snap\",\n    \"couple/uncouple\",\n    \"switch\",\n    \"rule validation + overlay\",\n    \"score/undo\",\n    \"selection/result\"\n  ],\n  \"notes\": [\n    \"Use deterministic rail-stop occupancy; no real train physics.\",\n    \"World geometry is data-driven; UI percent boxes do not replace rail coordinates.\"\n  ]\n}\n```\n\n## Acceptance Criteria\n- 첫 사용자가 20초 내 객차를 레일을 따라 이동시킬 수 있다.\n- 드래그 중 객차가 레일을 이탈하지 않고 손가락 오프셋을 유지한다.\n- 32px 이내 유효 snap과 occupied collision이 서로 구분된다.\n- 호환 커플러만 결합되고 분리는 tap+24px outward swipe로 동작한다.\n- switch safety zone 점유 중 lever 입력은 무효다.\n- dispatch 중 yard 입력이 잠기며 실패 시 위반 규칙과 관련 객차만 강조된다.\n- 성공 dispatch는 출발 애니메이션 후 Result로 전환된다.\n- Puzzle Select→Brief→Yard→Result→Next/Replay 전체 루프에 막다른 흐름이 없다.",
+  "source_run_at": "2026-09-29T17:33:24.217+00:00",
+  "target_device": "mobile phone",
+  "global_ui_rules": {
+    "zones": {
+      "yard": "middle 68%",
+      "rules": "top 18%",
+      "controls": "bottom 14%"
+    },
+    "safe_area": "respect top/bottom mobile safe areas",
+    "touch_min": "44pt",
+    "input_lock": "validation overlay blocks all yard input",
+    "visual_priority": [
+      "active gesture",
+      "collision/snap feedback",
+      "rule status",
+      "score"
+    ]
+  },
+  "developer_handoff": {
+    "notes": [
+      "Use deterministic rail-stop occupancy; no real train physics.",
+      "World geometry is data-driven; UI percent boxes do not replace rail coordinates."
+    ],
+    "persistence": [
+      "puzzle unlocks",
+      "best score"
+    ],
+    "required_data": [
+      "8 puzzle definitions",
+      "rail topology",
+      "car set/orientation",
+      "passenger constraints",
+      "par/move budget",
+      "unlock state"
+    ],
+    "scene_hierarchy": [
+      "App",
+      "PuzzleSelect",
+      "YardBrief",
+      "YardPuzzle{RuleStrip,RailWorld,ControlBar}",
+      "DispatchOverlay",
+      "Result"
+    ],
+    "state_ownership": {
+      "yard": "YardState",
+      "puzzle": "PuzzleController",
+      "gesture": "InputController",
+      "progress": "ProgressStore",
+      "validation": "RuleValidator"
+    },
+    "reusable_components": [
+      "RuleCard",
+      "RailSpline",
+      "CarBody",
+      "CouplerHandle",
+      "SwitchLever",
+      "DispatchSignal",
+      "ScoreRow"
+    ],
+    "implementation_order": [
+      "rail projection + collision",
+      "car/consist drag + snap",
+      "couple/uncouple",
+      "switch",
+      "rule validation + overlay",
+      "score/undo",
+      "selection/result"
+    ]
+  },
+  "acceptance_criteria": [
+    "첫 사용자가 20초 내 객차를 레일을 따라 이동시킬 수 있다.",
+    "드래그 중 객차가 레일을 이탈하지 않고 손가락 오프셋을 유지한다.",
+    "32px 이내 유효 snap과 occupied collision이 서로 구분된다.",
+    "호환 커플러만 결합되고 분리는 tap+24px outward swipe로 동작한다.",
+    "switch safety zone 점유 중 lever 입력은 무효다.",
+    "dispatch 중 yard 입력이 잠기며 실패 시 위반 규칙과 관련 객차만 강조된다.",
+    "성공 dispatch는 출발 애니메이션 후 Result로 전환된다.",
+    "Puzzle Select→Brief→Yard→Result→Next/Replay 전체 루프에 막다른 흐름이 없다."
+  ],
+  "primary_interaction": "레일 제약 객차 드래그 + 커플링/분리",
+  "interaction_principles": [
+    "객차 직접 조작이 메뉴 조작보다 우선",
+    "레일 제약은 손가락 오프셋을 보존",
+    "작은 커플러는 44pt hit area",
+    "실패 dispatch는 원인만 강조하고 즉시 재편성 복귀"
+  ]
+}

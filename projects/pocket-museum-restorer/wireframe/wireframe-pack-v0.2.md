@@ -1,0 +1,1 @@
+# Pocket Museum Restorer — Interaction Wireframe Pack v0.2. Portrait greybox. Desk→Intake→Workspace→Evaluation→Summary. Workspace owns the detailed direct manipulation rules: 26px/14deg snap, local lamp reveal, mask scraping, 18px seam tracing, shared render/hit transform, modal-safe state restoration.

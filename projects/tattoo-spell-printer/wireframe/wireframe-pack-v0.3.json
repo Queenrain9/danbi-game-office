@@ -1,0 +1,390 @@
+{
+  "id": "650d5fca-a1c9-46fd-aa38-29c127115420",
+  "title": "Tattoo Spell Printer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "c7f614f6-d4b6-4013-8d6a-00935d6c0f83",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Case Select",
+      "order": 1,
+      "states": [
+        "Select"
+      ],
+      "purpose": "select unlocked case",
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 70,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          },
+          "type": "card_grid",
+          "state_binding": "unlock/best grade"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "cards",
+          "feedback": "highlight",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected",
+          "invalid_input": "locked unchanged",
+          "decision_origin": "game_design"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Tattoo Workbench",
+      "order": 2,
+      "states": [
+        "Placement",
+        "Inking",
+        "Correction",
+        "Activation"
+      ],
+      "purpose": "place stencil, trace rune, manage density, correct breaks, activate",
+      "components": [
+        {
+          "id": "integrity",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 4,
+            "y": 3
+          },
+          "type": "meter",
+          "state_binding": "0..3"
+        },
+        {
+          "id": "density",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 27,
+            "y": 3
+          },
+          "type": "meter",
+          "state_binding": "target 0.7..1"
+        },
+        {
+          "id": "surface",
+          "box": {
+            "h": 65,
+            "w": 92,
+            "x": 4,
+            "y": 14
+          },
+          "type": "direct_surface",
+          "state_binding": "stencil/rune/motion"
+        },
+        {
+          "id": "confirm",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 4,
+            "y": 83
+          },
+          "type": "button",
+          "state_binding": "valid placement"
+        },
+        {
+          "id": "rotate",
+          "box": {
+            "h": 11,
+            "w": 20,
+            "x": 35,
+            "y": 83
+          },
+          "type": "gesture_handle",
+          "state_binding": "Placement"
+        },
+        {
+          "id": "skip",
+          "box": {
+            "h": 11,
+            "w": 20,
+            "x": 59,
+            "y": 83
+          },
+          "type": "button",
+          "state_binding": "Correction"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 11,
+            "w": 14,
+            "x": 82,
+            "y": 83
+          },
+          "type": "button",
+          "state_binding": "work states"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "place",
+          "input": "drag",
+          "target": "stencil",
+          "feedback": "fit preview",
+          "source_refs": [
+            "interaction_spec.place"
+          ],
+          "precondition": "Placement",
+          "state_change": "pose changes",
+          "invalid_input": "invalid ghost; confirm disabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rotate",
+          "input": "twist or handle",
+          "target": "stencil",
+          "feedback": "snap cue",
+          "source_refs": [
+            "interaction_spec.rotate"
+          ],
+          "precondition": "Placement",
+          "state_change": "rotation changes with authored snap",
+          "invalid_input": "may remain invalid",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "trace",
+          "input": "continuous drag",
+          "target": "ordered rune corridor",
+          "feedback": "live luminous line",
+          "source_refs": [
+            "interaction_spec.trace",
+            "game_rules.trigger_rules.off_path"
+          ],
+          "precondition": "Inking correct stroke",
+          "state_change": "inked length/accuracy/density",
+          "invalid_input": "wrong stroke produces no ink; authored off-path rule applies",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pressure",
+          "input": "hold while tracing",
+          "target": "active tracing tool",
+          "feedback": "line weight/vibration",
+          "source_refs": [
+            "core_player_verbs[2]"
+          ],
+          "precondition": "Inking",
+          "state_change": "density changes",
+          "invalid_input": "authored over-density rule applies",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "repair",
+          "input": "short retrace",
+          "target": "broken segment",
+          "feedback": "gap closes",
+          "source_refs": [
+            "game_rules.recovery"
+          ],
+          "precondition": "Correction and repair available",
+          "state_change": "segment repaired once; score penalty remains",
+          "invalid_input": "non-broken segment unchanged",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V1",
+          "name": "Invalid Placement",
+          "notes": "No rule change.",
+          "condition": "outside valid fit",
+          "source_refs": [
+            "interaction_spec.place"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "placement": "invalid outline"
+          },
+          "component_overrides": {
+            "confirm": {
+              "state_binding": "disabled"
+            },
+            "surface": {
+              "state_binding": "invalid ghost"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V2",
+          "name": "Motion Warning",
+          "notes": "Anticipation only.",
+          "condition": "600ms before authored displacement",
+          "source_refs": [
+            "game_rules.trigger_rules.skin_motion"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "hazard": "warning pulse"
+          },
+          "component_overrides": {
+            "surface": {
+              "state_binding": "motion pre-signal"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V3",
+          "name": "Correction",
+          "notes": "Authored recovery.",
+          "condition": "repairable break exists",
+          "source_refs": [
+            "game_rules.recovery"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "repair": "gap closes; penalty remains"
+          },
+          "component_overrides": {
+            "skip": {
+              "state_binding": "visible"
+            }
+          },
+          "interaction_overrides": {
+            "trace": "short retrace targets break"
+          }
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Case Result",
+      "order": 3,
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "outcome grade retry next",
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 50,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "summary",
+          "state_binding": "success/failure"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 8,
+            "y": 72
+          },
+          "type": "button",
+          "state_binding": "always"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 54,
+            "y": 72
+          },
+          "type": "button",
+          "state_binding": "success"
+        }
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "3c181fc4-747b-454c-b9a0-63ffe9ad5f13",
+  "input_map": {
+    "cancel": "lifting ends trace; cancelled placement returns stencil to tray",
+    "priority": [
+      "Pause",
+      "active trace",
+      "stencil manipulation",
+      "buttons"
+    ],
+    "single_pointer": true
+  },
+  "created_at": "2026-09-30T08:31:29.518652+00:00",
+  "edge_cases": {
+    "items": [
+      "non-junction lift creates authored break",
+      "wrong stroke creates no ink",
+      "retry resets all case-local state"
+    ]
+  },
+  "updated_at": "2026-09-30T08:31:29.518652+00:00",
+  "core_screen": "S2",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      "Confirm only valid placement",
+      "success uses authored connectivity and accuracy"
+    ],
+    "normal": [
+      "S1",
+      "S2",
+      "S3"
+    ],
+    "branches": [
+      "optional Correction",
+      "failure -> S3"
+    ]
+  },
+  "state_count": 7,
+  "screen_count": 3,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze motion/timers and resume exact state"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Tattoo Spell Printer",
+  "source_run_at": "2026-09-30T08:31:29.518652+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coordinates": "0..100",
+    "fun_promise": "Directly place and trace luminous runes on a subtly moving work surface."
+  },
+  "developer_handoff": {
+    "fun_promise": "Direct placement and tracing should feel like skilled occult craft.",
+    "upstream_issues": [],
+    "content_variants": [
+      "simple stationary",
+      "crossing plus periodic motion",
+      "narrow tolerance plus density/forbidden zones"
+    ],
+    "implementation_architecture": "Blueprint decides Godot structure."
+  },
+  "acceptance_criteria": [
+    "Three screens and all five authored states are represented.",
+    "All three cases complete full flow.",
+    "Placement validity, trace, density, break and motion warning are observable.",
+    "Correction preserves one-retrace recovery meaning.",
+    "Retry fully resets."
+  ],
+  "primary_interaction": "stencil placement + direct rune tracing + correction",
+  "interaction_principles": [
+    "direct manipulation preserves precision craft promise",
+    "keep feedback outside finger-critical path",
+    "preserve authored thresholds"
+  ]
+}

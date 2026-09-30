@@ -1,0 +1,1171 @@
+{
+  "id": "882d0b63-7088-4055-a687-f84c62ec5b16",
+  "title": "Pocket Canal Keeper",
+  "source": "chat_automation",
+  "status": "build",
+  "idea_id": "ae75ee43-2f25-40f6-9c27-a43030891f4e",
+  "screens": [
+    {
+      "id": "stage_select",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "header",
+            "role": "status",
+            "label": "progress"
+          },
+          {
+            "h": 72,
+            "w": 88,
+            "x": 6,
+            "y": 18,
+            "id": "grid",
+            "role": "selection",
+            "label": "stages"
+          }
+        ]
+      },
+      "states": [
+        "ready",
+        "locked"
+      ],
+      "purpose": "select unlocked stage and view stars",
+      "feedback": [
+        "stars visible per completed stage"
+      ],
+      "components": [
+        {
+          "id": "stage_cards",
+          "box": {
+            "h": 66,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "grid",
+          "label": "Stage cards",
+          "state_binding": "unlocks/stars",
+          "interaction_role": "tap stage"
+        },
+        {
+          "id": "progress",
+          "box": {
+            "h": 7,
+            "w": 84,
+            "x": 8,
+            "y": 6
+          },
+          "type": "status",
+          "label": "Progress",
+          "state_binding": "unlocked_stage"
+        }
+      ],
+      "edge_cases": [
+        "stage1 always unlocked"
+      ],
+      "transitions": [
+        {
+          "to": "stage_brief",
+          "from": "stage_select",
+          "trigger": "unlocked stage tap",
+          "animation": "push",
+          "condition": "unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select stage",
+          "target": "stage_cards",
+          "feedback": "press",
+          "precondition": "unlocked",
+          "state_change": "selected_stage",
+          "invalid_input": "lock pulse"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "locked_stage",
+          "name": "Locked Stage",
+          "notes": "locked tap pulses",
+          "condition": "stage > unlocked",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "six data stages"
+      ]
+    },
+    {
+      "id": "stage_brief",
+      "name": "Stage Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 48,
+            "w": 86,
+            "x": 7,
+            "y": 12,
+            "id": "preview",
+            "role": "preview",
+            "label": "canal preview"
+          },
+          {
+            "h": 18,
+            "w": 86,
+            "x": 7,
+            "y": 63,
+            "id": "rules",
+            "role": "rules",
+            "label": "boats/constraints"
+          },
+          {
+            "h": 11,
+            "w": 86,
+            "x": 7,
+            "y": 84,
+            "id": "actions",
+            "role": "navigation",
+            "label": "actions"
+          }
+        ]
+      },
+      "states": [
+        "brief"
+      ],
+      "purpose": "preview canal, boats and special constraints",
+      "feedback": [
+        "manifest exposes trait icons"
+      ],
+      "components": [
+        {
+          "id": "map_preview",
+          "box": {
+            "h": 44,
+            "w": 82,
+            "x": 9,
+            "y": 14
+          },
+          "type": "map",
+          "label": "Map preview",
+          "state_binding": "stage.graph"
+        },
+        {
+          "id": "boat_manifest",
+          "box": {
+            "h": 16,
+            "w": 48,
+            "x": 9,
+            "y": 64
+          },
+          "type": "list",
+          "label": "Boat manifest",
+          "state_binding": "boats"
+        },
+        {
+          "id": "constraints",
+          "box": {
+            "h": 16,
+            "w": 31,
+            "x": 60,
+            "y": 64
+          },
+          "type": "chips",
+          "label": "Constraints",
+          "state_binding": "stage.rules"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 8,
+            "w": 39,
+            "x": 52,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "loaded"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 8,
+            "w": 25,
+            "x": 9,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "loaded"
+        }
+      ],
+      "edge_cases": [
+        "invalid graph blocks start"
+      ],
+      "transitions": [
+        {
+          "to": "canal_board",
+          "from": "stage_brief",
+          "trigger": "start",
+          "animation": "fade",
+          "condition": "loaded"
+        },
+        {
+          "to": "stage_select",
+          "from": "stage_brief",
+          "trigger": "back",
+          "animation": "pop",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "initialize stage",
+          "target": "start",
+          "feedback": "press",
+          "precondition": "loaded",
+          "state_change": "running",
+          "invalid_input": "disabled until loaded"
+        },
+        {
+          "input": "tap",
+          "action": "return select",
+          "target": "back",
+          "feedback": "press",
+          "precondition": "true",
+          "state_change": "none",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "read-only preview"
+      ]
+    },
+    {
+      "id": "canal_board",
+      "name": "Canal Board",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "stage status"
+          },
+          {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 16,
+            "id": "board",
+            "role": "simulation",
+            "label": "canal graph"
+          },
+          {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 84,
+            "id": "device_tray",
+            "role": "status",
+            "label": "selected device/status"
+          }
+        ]
+      },
+      "states": [
+        "running",
+        "device_busy",
+        "warning",
+        "paused",
+        "success_pending",
+        "failure_pending"
+      ],
+      "purpose": "core traffic control",
+      "feedback": [
+        "protected occupancy visible",
+        "waiting intent arrows visible",
+        "device state must be readable without opening menus"
+      ],
+      "components": [
+        {
+          "id": "safety_meter",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 6,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Safety strikes",
+          "state_binding": "strikes/3"
+        },
+        {
+          "id": "ops_counter",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 31,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Operations",
+          "state_binding": "operations/par"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 84,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "running/busy"
+        },
+        {
+          "id": "canal_graph",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "world_view",
+          "label": "Canal graph",
+          "state_binding": "segments/occupancy/routes",
+          "interaction_role": "result feedback"
+        },
+        {
+          "id": "gate_lever",
+          "box": {
+            "h": 20,
+            "w": 18,
+            "x": 10,
+            "y": 54
+          },
+          "type": "arc_control",
+          "label": "Sluice lever",
+          "enabled_when": "gate idle && interlock safe",
+          "state_binding": "gate_state",
+          "interaction_role": "arc drag"
+        },
+        {
+          "id": "bridge_wheel",
+          "box": {
+            "h": 19,
+            "w": 19,
+            "x": 70,
+            "y": 26
+          },
+          "type": "rotary",
+          "label": "Bridge wheel",
+          "enabled_when": "crossing empty",
+          "state_binding": "bridge_state",
+          "interaction_role": "circular drag"
+        },
+        {
+          "id": "lock_control",
+          "box": {
+            "h": 21,
+            "w": 16,
+            "x": 72,
+            "y": 56
+          },
+          "type": "vertical_slider",
+          "label": "Lock level control",
+          "enabled_when": "safe door sequence",
+          "state_binding": "lock_level",
+          "interaction_role": "vertical drag"
+        },
+        {
+          "id": "signal_buoy",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 35,
+            "y": 30
+          },
+          "type": "toggle",
+          "label": "Traffic signal",
+          "enabled_when": "signal available",
+          "state_binding": "signal hold/go",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "boat_layer",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "interactive_layer",
+          "label": "Boats",
+          "state_binding": "boat positions/traits",
+          "interaction_role": "tap inspect"
+        },
+        {
+          "id": "device_status",
+          "box": {
+            "h": 7,
+            "w": 86,
+            "x": 7,
+            "y": 86
+          },
+          "type": "status",
+          "label": "Device status",
+          "state_binding": "selected/busy/warning"
+        }
+      ],
+      "edge_cases": [
+        "unsafe same-segment entry produces strike before visual overlap",
+        "45s boat timeout fails stage",
+        "device pointer owns gesture until release",
+        "second touch ignored"
+      ],
+      "transitions": [
+        {
+          "to": "boat_inspect_popover",
+          "from": "canal_board",
+          "trigger": "boat tap",
+          "animation": "popover",
+          "condition": "boat exists"
+        },
+        {
+          "to": "pause_overlay",
+          "from": "canal_board",
+          "trigger": "pause",
+          "animation": "overlay",
+          "condition": "running or device_busy"
+        },
+        {
+          "to": "stage_result",
+          "from": "canal_board",
+          "trigger": "all delivered or fail",
+          "animation": "result sheet",
+          "condition": "terminal"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "arc_drag",
+          "action": "snap closed/half/open",
+          "target": "gate_lever",
+          "feedback": "gate/water arrows + clunk/tick",
+          "precondition": "idle && safe",
+          "state_change": "gate state; operations+1",
+          "invalid_input": "shake/no commit"
+        },
+        {
+          "input": "circular_drag",
+          "action": "toggle road/water orientation",
+          "target": "bridge_wheel",
+          "feedback": "gear rotation/path update",
+          "precondition": "crossing empty",
+          "state_change": "bridge busy then new state; operations+1",
+          "invalid_input": "red crossing outline/no commit"
+        },
+        {
+          "input": "vertical_drag",
+          "action": "equalize to nearest legal low/high",
+          "target": "lock_control",
+          "feedback": "water/gauge/boat height",
+          "precondition": "safe door sequence",
+          "state_change": "device_busy then level; operations+1",
+          "invalid_input": "warning/no commit"
+        },
+        {
+          "input": "tap",
+          "action": "toggle hold/go",
+          "target": "signal_buoy",
+          "feedback": "buoy/intent arrow",
+          "precondition": "available",
+          "state_change": "queue permission; operations+1",
+          "invalid_input": "locked pulse"
+        },
+        {
+          "input": "tap",
+          "action": "select boat",
+          "target": "boat_layer",
+          "feedback": "route highlight/popover",
+          "precondition": "running or device_busy",
+          "state_change": "inspect selection only",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "busy_variant",
+          "name": "Device Busy",
+          "notes": "busy device locked; independent devices remain live",
+          "condition": "device animation/equalizing",
+          "components": [
+            {
+              "id": "busy_progress",
+              "box": {
+                "h": 5,
+                "w": 32,
+                "x": 60,
+                "y": 86
+              },
+              "type": "progress",
+              "label": "Device progress",
+              "state_binding": "device progress"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "warning_variant",
+          "name": "Unsafe Command Warning",
+          "notes": "red/amber only on affected zone; no invalid commit",
+          "condition": "invalid interlock or protected-entry command",
+          "components": [
+            {
+              "id": "protected_warning",
+              "box": {
+                "h": 35,
+                "w": 60,
+                "x": 20,
+                "y": 30
+              },
+              "type": "overlay",
+              "label": "Protected zone warning",
+              "state_binding": "affected segment"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {
+            "device_status": {
+              "label": "Unsafe command rejected"
+            }
+          }
+        },
+        {
+          "id": "route_inspect",
+          "name": "Boat Selected",
+          "notes": "popover is separate overlay surface",
+          "condition": "boat selected",
+          "components": [
+            {
+              "id": "route_highlight",
+              "box": {
+                "h": 56,
+                "w": 84,
+                "x": 8,
+                "y": 20
+              },
+              "type": "overlay",
+              "label": "Planned route",
+              "state_binding": "selected boat route"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "deterministic graph simulation",
+        "do not make free boat steering",
+        "device handles may visually exceed physical scale"
+      ]
+    },
+    {
+      "id": "boat_inspect_popover",
+      "name": "Boat Inspect Popover",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 27,
+            "w": 76,
+            "x": 12,
+            "y": 56,
+            "id": "popover",
+            "role": "overlay",
+            "label": "boat info"
+          }
+        ]
+      },
+      "states": [
+        "open"
+      ],
+      "purpose": "inspect destination traits and route without pausing simulation",
+      "feedback": [
+        "route remains highlighted behind popover"
+      ],
+      "components": [
+        {
+          "id": "boat_name",
+          "box": {
+            "h": 6,
+            "w": 30,
+            "x": 16,
+            "y": 59
+          },
+          "type": "status",
+          "label": "Boat",
+          "state_binding": "selected_boat"
+        },
+        {
+          "id": "traits",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 16,
+            "y": 67
+          },
+          "type": "chips",
+          "label": "Traits",
+          "state_binding": "size/draft/height/priority"
+        },
+        {
+          "id": "destination",
+          "box": {
+            "h": 8,
+            "w": 28,
+            "x": 54,
+            "y": 59
+          },
+          "type": "status",
+          "label": "Destination",
+          "state_binding": "destination"
+        },
+        {
+          "id": "close",
+          "box": {
+            "h": 8,
+            "w": 14,
+            "x": 70,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Close",
+          "state_binding": "selected"
+        }
+      ],
+      "edge_cases": [
+        "if boat delivered while open, popover closes"
+      ],
+      "transitions": [
+        {
+          "to": "canal_board",
+          "from": "boat_inspect_popover",
+          "trigger": "close/outside",
+          "animation": "dismiss",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "clear selection",
+          "target": "close",
+          "feedback": "popover closes",
+          "precondition": "open",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "clear selection",
+          "target": "outside popover",
+          "feedback": "close",
+          "precondition": "open",
+          "state_change": "running",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "simulation continues"
+      ]
+    },
+    {
+      "id": "pause_overlay",
+      "name": "Pause Overlay",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 70,
+            "x": 15,
+            "y": 25,
+            "id": "modal",
+            "role": "overlay",
+            "label": "pause modal"
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "freeze simulation and resume/restart/exit",
+      "feedback": [
+        "all boat/device timers frozen"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 37
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        {
+          "id": "restart",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 50
+          },
+          "type": "button",
+          "label": "Restart",
+          "state_binding": "paused"
+        },
+        {
+          "id": "exit",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 63
+          },
+          "type": "button",
+          "label": "Exit",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [
+        "active gesture cancelled before pause commit"
+      ],
+      "transitions": [
+        {
+          "to": "canal_board",
+          "from": "pause_overlay",
+          "trigger": "resume/restart",
+          "animation": "fade",
+          "condition": "true"
+        },
+        {
+          "to": "stage_select",
+          "from": "pause_overlay",
+          "trigger": "exit",
+          "animation": "pop",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume frozen simulation",
+          "target": "resume",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "previous board state",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "reset stage",
+          "target": "restart",
+          "feedback": "reset",
+          "precondition": "paused",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "discard stage",
+          "target": "exit",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "select",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "overlay only"
+      ]
+    },
+    {
+      "id": "stage_result",
+      "name": "Stage Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 52,
+            "w": 84,
+            "x": 8,
+            "y": 14,
+            "id": "summary",
+            "role": "evaluation",
+            "label": "result"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 72,
+            "id": "actions",
+            "role": "navigation",
+            "label": "actions"
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "show stars/strikes/operations and retry/next",
+      "feedback": [
+        "success bell/dock pulse resolves before sheet"
+      ],
+      "components": [
+        {
+          "id": "result_title",
+          "box": {
+            "h": 9,
+            "w": 70,
+            "x": 15,
+            "y": 18
+          },
+          "type": "status",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 30
+          },
+          "type": "rating",
+          "label": "Stars",
+          "state_binding": "score"
+        },
+        {
+          "id": "stats",
+          "box": {
+            "h": 16,
+            "w": 64,
+            "x": 18,
+            "y": 43
+          },
+          "type": "summary",
+          "label": "Strikes / Ops",
+          "state_binding": "strikes,operations,par"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 10,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "result"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 54,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Next Stage",
+          "enabled_when": "success && next stage exists",
+          "state_binding": "result"
+        }
+      ],
+      "edge_cases": [
+        "unlock is idempotent"
+      ],
+      "transitions": [
+        {
+          "to": "canal_board",
+          "from": "stage_result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "true"
+        },
+        {
+          "to": "stage_brief",
+          "from": "stage_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "success && next exists"
+        },
+        {
+          "to": "stage_select",
+          "from": "stage_result",
+          "trigger": "next/continue",
+          "animation": "pop",
+          "condition": "final stage or choose select"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset same stage",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "unlock/select next",
+          "target": "next",
+          "feedback": "press",
+          "precondition": "success && next exists",
+          "state_change": "brief",
+          "invalid_input": "disabled pulse"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure_result",
+          "name": "Failure",
+          "notes": "retry primary",
+          "condition": "!success",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "next": {
+              "state_binding": "disabled"
+            },
+            "result_title": {
+              "label": "Stage Failed"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "stars: success, no strike, under par"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "69cfd48e-f740-49c9-9f33-9171b44501b2",
+  "input_map": {
+    "tap": [
+      "signal",
+      "boat",
+      "buttons"
+    ],
+    "cancel": "pointer cancel restores last committed device state and no operation increment",
+    "arc_drag": "gate notch snap",
+    "priority": [
+      "active device gesture",
+      "pause/popover",
+      "device handles",
+      "boat tap",
+      "board"
+    ],
+    "multitouch": "second pointer ignored while gesture owned",
+    "circular_drag": "bridge threshold then orientation snap",
+    "vertical_drag": "lock legal level snap",
+    "single_pointer": true
+  },
+  "created_at": "2026-09-29T13:28:56.204346+00:00",
+  "edge_cases": {
+    "app_background": "pause and cancel active gesture",
+    "collision_race": "reserve protected segment atomically before movement",
+    "graph_deadlock": "stage data validation should ensure solvable initial graph; runtime timeout still fails",
+    "orientation_change": "portrait locked",
+    "rapid_device_input": "busy interlock rejects repeat",
+    "boat_removed_while_inspected": "close popover"
+  },
+  "updated_at": "2026-09-30T17:42:38.721437+00:00",
+  "core_screen": "canal_board",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      {
+        "from": "canal_board",
+        "trigger": "bridge rotate",
+        "condition": "crossing zone empty"
+      },
+      {
+        "from": "canal_board",
+        "trigger": "lock level",
+        "condition": "safe door sequence"
+      }
+    ],
+    "normal": [
+      "stage_select",
+      "stage_brief",
+      "canal_board",
+      "stage_result",
+      "stage_select"
+    ],
+    "branches": [
+      {
+        "to": "boat_inspect_popover",
+        "from": "canal_board",
+        "trigger": "boat tap"
+      },
+      {
+        "to": "pause_overlay",
+        "from": "canal_board",
+        "trigger": "pause"
+      },
+      {
+        "to": "canal_board",
+        "from": "stage_result",
+        "trigger": "retry"
+      },
+      {
+        "to": "stage_brief",
+        "from": "stage_result",
+        "trigger": "next"
+      }
+    ],
+    "exception_return": "warning/invalid device command stays on board with no invalid commit"
+  },
+  "state_count": 12,
+  "screen_count": 6,
+  "global_states": {
+    "retry": {
+      "reset": "boats,occupancy,devices,timers,strikes,operations"
+    },
+    "paused": {
+      "freeze_all_timers": true
+    },
+    "failure": {
+      "terminal": true
+    },
+    "loading": {
+      "input_lock": true
+    },
+    "running": {
+      "simulation": true
+    },
+    "success": {
+      "terminal": true
+    },
+    "warning": {
+      "simulation": true,
+      "invalid_state_not_committed": true
+    },
+    "device_busy": {
+      "simulation": true,
+      "busy_device_locked": true
+    }
+  },
+  "pack_markdown": " # Pocket Canal Keeper — Interaction Wireframe Pack v0.2\nCore: Canal Board. Portrait fixed oblique board with the whole canal graph readable while devices are manipulated. Six inventory surfaces are represented: Stage Select, Stage Brief, Canal Board, Boat Inspect Popover, Pause Overlay, Stage Result. Core controls are gate arc drag, bridge circular drag, lock vertical drag, signal tap and boat inspect. Protected-segment occupancy is atomic and unsafe commands are rejected before state corruption. Device Busy is a board variant, not a new screen; independent devices remain usable. Warning highlights only the affected protected zone. Boat inspection is non-destructive and simulation continues. Godot ownership: AppRoot progression, CanalSimulation graph/boats/devices/timers, UI presentation. Six data-driven stages and complete retry/next/unlock loop are required. ",
+  "source_run_at": "2026-09-29T13:28:56.204346+00:00",
+  "target_device": "mobile phone",
+  "global_ui_rules": {
+    "camera": "fixed oblique top-down",
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "board_rule": "protected segments, boats and device states must remain simultaneously readable",
+    "min_hit_dp": 44,
+    "coordinate_system": "0-100 percent"
+  },
+  "developer_handoff": {
+    "hints": [
+      "reserve protected segment before movement animation",
+      "unsafe lock command is rejected, not partially applied",
+      "boat inspection never pauses simulation",
+      "no free steering or rigid-body water"
+    ],
+    "persistence": [
+      "highest unlocked stage",
+      "best stars"
+    ],
+    "required_data": [
+      "6 stage graphs",
+      "segments/protected flags",
+      "device nodes",
+      "boat spawn schedules",
+      "traits/destinations/routes",
+      "par operations"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "StageSelect",
+      "StageBrief",
+      "CanalBoard",
+      "BoatInspectPopover",
+      "PauseOverlay",
+      "StageResult"
+    ],
+    "state_ownership": {
+      "UI": "presentation/selection only",
+      "AppRoot": "stage unlock/stars",
+      "CanalSimulation": "graph occupancy,boats,devices,timers,strikes,operations"
+    },
+    "reusable_components": [
+      "DeviceHandle",
+      "BoatView",
+      "ProtectedSegmentView",
+      "TraitChip",
+      "ResultMetric"
+    ],
+    "implementation_order": [
+      "stage schema/graph validator",
+      "deterministic CanalSimulation",
+      "boat movement/atomic occupancy",
+      "device controls/interlocks",
+      "inspect/pause",
+      "result/unlock",
+      "six stage data"
+    ]
+  },
+  "acceptance_criteria": [
+    "All six inventory surfaces exist and are reachable",
+    "Gate arc drag, bridge circular drag, lock vertical drag, signal tap and boat inspect each connect to explicit components and state changes",
+    "Protected narrow segment never visually contains two boats; reservation is atomic",
+    "Occupied bridge rotation and unsafe lock sequence are rejected with feedback and no state corruption",
+    "Device busy locks only that device while independent controls remain usable",
+    "Pause freezes boat movement, device animation and timeout timers",
+    "Three strikes or a 45-second boat timeout reaches failure Result",
+    "All boats delivered reaches success Result and computes stars from success/no-strike/par operations",
+    "Six data stages can be played/retried sequentially and occupancy/devices reset cleanly"
+  ],
+  "primary_interaction": "수문 레버·회전교·lock 수위를 직접 조작해 배 흐름 관제",
+  "interaction_principles": [
+    "Canal graph remains visible while operating devices",
+    "Device handles are exaggerated to >=44dp",
+    "Unsafe commands are rejected before corrupting simulation",
+    "Direct manipulation outranks map/boat inspection"
+  ]
+}

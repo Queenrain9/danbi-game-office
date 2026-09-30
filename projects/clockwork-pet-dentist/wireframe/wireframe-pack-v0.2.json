@@ -1,0 +1,1112 @@
+{
+  "id": "dd91a7c2-0c9b-444d-bce1-e40fd0b1a926",
+  "title": "Clockwork Pet Dentist",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "f3b0fa40-a199-4eaa-9d1d-80f9271a5992",
+  "screens": [
+    {
+      "id": "patient_select",
+      "name": "Patient Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 14,
+            "id": "cards",
+            "role": "selection",
+            "label": "Patients"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "select",
+          "ui": "cards",
+          "enter": "app/result",
+          "allowed_input": "tap"
+        },
+        {
+          "id": "selected",
+          "ui": "selection",
+          "enter": "card tap",
+          "allowed_input": "tap"
+        }
+      ],
+      "purpose": "choose unlocked patient",
+      "feedback": [],
+      "components": [
+        {
+          "id": "patient_cards",
+          "box": {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 14
+          },
+          "type": "card_list",
+          "label": "4 patients",
+          "enabled_when": "unlocked",
+          "state_binding": "select",
+          "interaction_role": "select"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 9,
+            "w": 60,
+            "x": 20,
+            "y": 86
+          },
+          "type": "button",
+          "label": "VIEW",
+          "enabled_when": "patient_selected",
+          "state_binding": "selected",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "patient_brief",
+          "from": "selected",
+          "trigger": "open",
+          "animation": "slide",
+          "condition": "selected"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select",
+          "target": "patient_cards",
+          "feedback": "outline",
+          "precondition": "unlocked",
+          "state_change": "selected",
+          "invalid_input": "locked cue"
+        },
+        {
+          "input": "tap",
+          "action": "open brief",
+          "target": "open",
+          "feedback": "press",
+          "precondition": "selected",
+          "state_change": "brief",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "patient_brief",
+      "name": "Patient Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 68,
+            "w": 86,
+            "x": 7,
+            "y": 8,
+            "id": "brief",
+            "role": "context",
+            "label": "Brief"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "ui": "symptoms",
+          "enter": "patient selected",
+          "allowed_input": "start/back"
+        }
+      ],
+      "purpose": "symptoms and constraints",
+      "feedback": [],
+      "components": [
+        {
+          "id": "symptoms",
+          "box": {
+            "h": 68,
+            "w": 86,
+            "x": 7,
+            "y": 8
+          },
+          "type": "card",
+          "label": "Symptoms",
+          "state_binding": "brief"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 10,
+            "w": 35,
+            "x": 7,
+            "y": 82
+          },
+          "type": "button",
+          "label": "BACK",
+          "state_binding": "brief",
+          "interaction_role": "back"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 42,
+            "x": 51,
+            "y": 82
+          },
+          "type": "button",
+          "label": "START",
+          "enabled_when": "loaded",
+          "state_binding": "brief",
+          "interaction_role": "start"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "treatment",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "open",
+          "condition": "loaded"
+        },
+        {
+          "to": "patient_select",
+          "from": "brief",
+          "trigger": "back",
+          "animation": "slide",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "create mechanism",
+          "target": "start",
+          "feedback": "mouth opens",
+          "precondition": "loaded",
+          "state_change": "inspection",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "treatment",
+      "name": "Treatment / Mouth",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "Status"
+          },
+          {
+            "h": 62,
+            "w": 90,
+            "x": 5,
+            "y": 14,
+            "id": "mouth",
+            "role": "play",
+            "label": "Mouth"
+          },
+          {
+            "h": 14,
+            "w": 90,
+            "x": 5,
+            "y": 78,
+            "id": "dock",
+            "role": "tools",
+            "label": "Tools"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "inspection",
+          "ui": "mouth/probe",
+          "enter": "start/test return",
+          "allowed_input": "pinch/pan/probe/tool"
+        },
+        {
+          "id": "repair",
+          "ui": "tools/parts/tolerance",
+          "enter": "repair action",
+          "allowed_input": "extract/lubricate/align/seat/camera"
+        },
+        {
+          "id": "testing",
+          "ui": "mechanism cycles; input locked",
+          "enter": "crank hold",
+          "allowed_input": "crank release"
+        }
+      ],
+      "purpose": "inspect and repair mechanism",
+      "feedback": [
+        "probe rattle",
+        "extract snap",
+        "oil sheen",
+        "alignment detent",
+        "seat click",
+        "jam pulse"
+      ],
+      "components": [
+        {
+          "id": "mouth_view",
+          "box": {
+            "h": 62,
+            "w": 90,
+            "x": 5,
+            "y": 14
+          },
+          "type": "viewport",
+          "label": "Mechanism",
+          "enabled_when": "!testing",
+          "state_binding": "inspection|repair",
+          "interaction_role": "pinch/pan"
+        },
+        {
+          "id": "gear_layer",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 17
+          },
+          "type": "hit_layer",
+          "label": "Gears/Sockets",
+          "enabled_when": "!testing",
+          "state_binding": "inspection|repair",
+          "interaction_role": "probe/extract/align/seat; +12dp hit"
+        },
+        {
+          "id": "retainers",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 17
+          },
+          "type": "hit_layer",
+          "label": "Retainers",
+          "enabled_when": "retainer_present",
+          "state_binding": "repair",
+          "interaction_role": "release"
+        },
+        {
+          "id": "fault_meter",
+          "box": {
+            "h": 6,
+            "w": 30,
+            "x": 7,
+            "y": 15
+          },
+          "type": "meter",
+          "label": "Wobble/Noise",
+          "state_binding": "probing"
+        },
+        {
+          "id": "tools",
+          "box": {
+            "h": 14,
+            "w": 54,
+            "x": 5,
+            "y": 78
+          },
+          "type": "tool_tray",
+          "label": "Probe Extract Oil",
+          "enabled_when": "!held_part",
+          "state_binding": "inspection|repair",
+          "interaction_role": "tool select/drag"
+        },
+        {
+          "id": "parts",
+          "box": {
+            "h": 14,
+            "w": 34,
+            "x": 61,
+            "y": 78
+          },
+          "type": "part_tray",
+          "label": "Part Tray",
+          "state_binding": "repair",
+          "interaction_role": "part drag/bench"
+        },
+        {
+          "id": "test",
+          "box": {
+            "h": 5,
+            "w": 37,
+            "x": 58,
+            "y": 93
+          },
+          "type": "crank",
+          "label": "BITE TEST",
+          "enabled_when": "required_sockets_occupied",
+          "state_binding": "repair",
+          "interaction_role": "hold crank"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 5,
+            "w": 12,
+            "x": 5,
+            "y": 93
+          },
+          "type": "button",
+          "label": "II",
+          "enabled_when": "!gesture_active",
+          "state_binding": "inspection|repair",
+          "interaction_role": "pause"
+        }
+      ],
+      "edge_cases": [
+        "pointer lost returns held part to last valid location"
+      ],
+      "transitions": [
+        {
+          "to": "part_bench",
+          "from": "repair",
+          "trigger": "grind part",
+          "animation": "overlay",
+          "condition": "part available"
+        },
+        {
+          "to": "testing",
+          "from": "repair",
+          "trigger": "hold test",
+          "animation": "none",
+          "condition": "sockets occupied"
+        },
+        {
+          "to": "repair",
+          "from": "testing",
+          "trigger": "jam/release",
+          "animation": "pulse",
+          "condition": "fault remains"
+        },
+        {
+          "to": "treatment_result",
+          "from": "testing",
+          "trigger": "full cycle",
+          "animation": "success",
+          "condition": "all defects repaired"
+        },
+        {
+          "to": "pause",
+          "from": "inspection",
+          "trigger": "pause",
+          "animation": "modal",
+          "condition": "idle"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "pinch/pan",
+          "action": "zoom/pan clamps",
+          "target": "mouth_view",
+          "feedback": "direct follow",
+          "precondition": "no held part/tool",
+          "state_change": "camera only",
+          "invalid_input": "clamp"
+        },
+        {
+          "input": "tap/short drag",
+          "action": "reveal diagnostic flag",
+          "target": "gear_layer",
+          "feedback": "wobble/noise",
+          "precondition": "probe selected",
+          "state_change": "fault knowledge",
+          "invalid_input": "empty cue"
+        },
+        {
+          "input": "press-drag removal axis",
+          "action": "extract to tray",
+          "target": "gear_layer",
+          "feedback": "resistance then snap",
+          "precondition": "extractor && retainer released",
+          "state_change": "socket empty",
+          "invalid_input": "locked red resistance; unchanged"
+        },
+        {
+          "input": "hold-drag",
+          "action": "lubricate",
+          "target": "gear_layer",
+          "feedback": "oil sheen",
+          "precondition": "oil selected",
+          "state_change": "friction down/overfill up",
+          "invalid_input": "reject non-bearing"
+        },
+        {
+          "input": "circular drag",
+          "action": "change phase",
+          "target": "gear_layer",
+          "feedback": "ghost/detent",
+          "precondition": "replacement over empty socket",
+          "state_change": "phase angle",
+          "invalid_input": "locked installed gear unchanged"
+        },
+        {
+          "input": "drag-release",
+          "action": "seat valid part",
+          "target": "parts→gear_layer",
+          "feedback": "snap/click",
+          "precondition": "socket empty",
+          "state_change": "installed",
+          "invalid_input": "wrong size/phase returns tray"
+        },
+        {
+          "input": "hold",
+          "action": "cycle mechanism",
+          "target": "test",
+          "feedback": "motion/strain",
+          "precondition": "required sockets occupied",
+          "state_change": "testing→repair/result",
+          "invalid_input": "disabled missing-socket cue"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "gear_locked",
+          "name": "Locked",
+          "notes": "extract resists; unchanged",
+          "condition": "retainer attached",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "gear_layer": {
+              "state_binding": "locked"
+            }
+          }
+        },
+        {
+          "id": "gear_held",
+          "name": "Held",
+          "notes": "held object beats camera",
+          "condition": "part captured",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "mouth_view": {
+              "state_binding": "camera_locked"
+            }
+          }
+        },
+        {
+          "id": "aligning",
+          "name": "Alignment Candidate",
+          "notes": "circular drag; 3° steps",
+          "condition": "replacement over socket",
+          "components": [
+            {
+              "id": "ghost",
+              "box": {
+                "h": 36,
+                "w": 56,
+                "x": 22,
+                "y": 26
+              },
+              "type": "guide",
+              "label": "Ghost teeth ±12°",
+              "state_binding": "aligning"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "seated",
+          "name": "Seated",
+          "notes": "magnetic snap",
+          "condition": "size within 12% and phase ±12°",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "gear_layer": {
+              "state_binding": "seated"
+            }
+          }
+        },
+        {
+          "id": "jammed",
+          "name": "Jammed",
+          "notes": "stop at reproducible fault",
+          "condition": "test fault",
+          "components": [
+            {
+              "id": "fault_pulse",
+              "box": {
+                "h": 44,
+                "w": 64,
+                "x": 18,
+                "y": 22
+              },
+              "type": "indicator",
+              "label": "Stress location",
+              "state_binding": "jammed"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "priority testing > held part/tool > circular rotate > probe > camera",
+        "deterministic state; no rigid-body dependency"
+      ]
+    },
+    {
+      "id": "part_bench",
+      "name": "Part Bench Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 76,
+            "w": 86,
+            "x": 7,
+            "y": 12,
+            "id": "panel",
+            "role": "modal",
+            "label": "Bench"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "bench",
+          "ui": "part/grinder/gauge",
+          "enter": "part selected",
+          "allowed_input": "grind/rotate/discard/return"
+        }
+      ],
+      "purpose": "grind replacement part",
+      "feedback": [
+        "sparks"
+      ],
+      "components": [
+        {
+          "id": "part",
+          "box": {
+            "h": 38,
+            "w": 38,
+            "x": 18,
+            "y": 25
+          },
+          "type": "interactive_part",
+          "label": "Gear",
+          "enabled_when": "usable",
+          "state_binding": "bench",
+          "interaction_role": "drag/rotate"
+        },
+        {
+          "id": "grinder",
+          "box": {
+            "h": 42,
+            "w": 20,
+            "x": 64,
+            "y": 23
+          },
+          "type": "grinder",
+          "label": "Grinder",
+          "enabled_when": "usable",
+          "state_binding": "bench",
+          "interaction_role": "hold-drag contact"
+        },
+        {
+          "id": "gauge",
+          "box": {
+            "h": 7,
+            "w": 66,
+            "x": 18,
+            "y": 67
+          },
+          "type": "meter",
+          "label": "Fit",
+          "state_binding": "bench"
+        },
+        {
+          "id": "discard",
+          "box": {
+            "h": 8,
+            "w": 32,
+            "x": 10,
+            "y": 78
+          },
+          "type": "button",
+          "label": "DISCARD",
+          "state_binding": "bench",
+          "interaction_role": "discard"
+        },
+        {
+          "id": "return",
+          "box": {
+            "h": 8,
+            "w": 32,
+            "x": 58,
+            "y": 78
+          },
+          "type": "button",
+          "label": "RETURN",
+          "state_binding": "bench",
+          "interaction_role": "close"
+        }
+      ],
+      "edge_cases": [
+        "release stops removal immediately"
+      ],
+      "transitions": [
+        {
+          "to": "treatment",
+          "from": "bench",
+          "trigger": "return",
+          "animation": "down",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "hold-drag",
+          "action": "remove material",
+          "target": "part→grinder",
+          "feedback": "sparks/gauge",
+          "precondition": "usable",
+          "state_change": "fit decreases",
+          "invalid_input": "minimum clamp warning"
+        },
+        {
+          "input": "tap",
+          "action": "return to treatment",
+          "target": "return",
+          "feedback": "overlay down",
+          "precondition": "always",
+          "state_change": "repair",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "overground",
+          "name": "Overground",
+          "notes": "clamp; discard required",
+          "condition": "below minimum size",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "part": {
+              "state_binding": "unusable"
+            },
+            "gauge": {
+              "state_binding": "warning"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "blocks treatment input"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause Overlay",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 36,
+            "w": 70,
+            "x": 15,
+            "y": 30,
+            "id": "panel",
+            "role": "modal",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused",
+          "ui": "blocked treatment",
+          "enter": "pause",
+          "allowed_input": "resume/quit"
+        }
+      ],
+      "purpose": "pause treatment",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 40
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused",
+          "interaction_role": "resume"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 53
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused",
+          "interaction_role": "quit"
+        }
+      ],
+      "edge_cases": [
+        "background blocked"
+      ],
+      "transitions": [
+        {
+          "to": "treatment",
+          "from": "paused",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        },
+        {
+          "to": "patient_select",
+          "from": "paused",
+          "trigger": "confirmed quit",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "restore prior",
+          "target": "resume",
+          "feedback": "fade",
+          "precondition": "paused",
+          "state_change": "prior",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "treatment_result",
+      "name": "Treatment Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 66,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "result",
+            "role": "summary",
+            "label": "Result"
+          },
+          {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 80,
+            "id": "actions",
+            "role": "navigation",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result",
+          "ui": "rating/report",
+          "enter": "success/3 strikes",
+          "allowed_input": "retry/next"
+        }
+      ],
+      "purpose": "rating and fault report",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 50,
+            "x": 25,
+            "y": 12
+          },
+          "type": "rating",
+          "label": "1-3 Stars",
+          "state_binding": "result"
+        },
+        {
+          "id": "report",
+          "box": {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 32
+          },
+          "type": "report",
+          "label": "Fault report",
+          "state_binding": "result"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 82
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "result",
+          "interaction_role": "retry"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "NEXT",
+          "enabled_when": "success",
+          "state_binding": "result",
+          "interaction_role": "next"
+        }
+      ],
+      "edge_cases": [
+        "clear runtime state"
+      ],
+      "transitions": [
+        {
+          "to": "patient_brief",
+          "from": "result",
+          "trigger": "retry/next",
+          "animation": "fade",
+          "condition": "patient exists"
+        },
+        {
+          "to": "patient_select",
+          "from": "result",
+          "trigger": "final next",
+          "animation": "fade",
+          "condition": "no next"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset patient",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "brief",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "unlock next",
+          "target": "next",
+          "feedback": "unlock",
+          "precondition": "success",
+          "state_change": "brief/select",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "6a8fbbea-11c0-461d-9a97-0757ad8d76a4",
+  "input_map": [
+    {
+      "input": "crank hold",
+      "cancel": "release pauses safely",
+      "priority": 6
+    },
+    {
+      "input": "held part/tool drag",
+      "cancel": "return valid tray/socket",
+      "priority": 5
+    },
+    {
+      "input": "circular gear drag",
+      "cancel": "nearest 3°",
+      "priority": 4
+    },
+    {
+      "input": "probe tap",
+      "cancel": "release",
+      "priority": 3
+    },
+    {
+      "input": "pinch/pan",
+      "cancel": "preserve camera",
+      "priority": 2
+    }
+  ],
+  "created_at": "2026-09-29T14:31:21.314508+00:00",
+  "edge_cases": [
+    {
+      "case": "pointer lost",
+      "recovery": "return held part valid location"
+    },
+    {
+      "case": "wrong seat",
+      "recovery": "reject unchanged"
+    },
+    {
+      "case": "locked extract",
+      "recovery": "resistance unchanged"
+    },
+    {
+      "case": "overgrind",
+      "recovery": "clamp/unusable"
+    },
+    {
+      "case": "patient change",
+      "recovery": "reset transient state"
+    }
+  ],
+  "updated_at": "2026-09-29T14:31:21.314508+00:00",
+  "core_screen": "Treatment / Mouth",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "test requires occupied sockets",
+      "seat requires valid size/alignment",
+      "extract requires released retainer"
+    ],
+    "normal": [
+      "patient_select",
+      "patient_brief",
+      "treatment",
+      "treatment_result"
+    ],
+    "branches": [
+      "treatment→part_bench→treatment",
+      "treatment→testing→treatment",
+      "treatment→testing→treatment_result",
+      "treatment→pause→treatment"
+    ]
+  },
+  "state_count": 14,
+  "screen_count": 6,
+  "global_states": [
+    {
+      "id": "input_lock",
+      "rule": "testing/modal blocks unrelated input"
+    },
+    {
+      "id": "paused",
+      "rule": "freeze treatment"
+    },
+    {
+      "id": "damage_failure",
+      "rule": "third damage strike→result"
+    }
+  ],
+  "pack_markdown": "# Clockwork Pet Dentist — Interaction Wireframe Pack v0.2\n\nPortrait greybox. Six inventory surfaces preserved. Treatment is the detailed core screen with deterministic gear/socket/retainer state, explicit gesture priority, invalid recovery, Part Bench grinding and Bite Test verification.",
+  "source_run_at": "2026-09-29T14:31:21.314508+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "mouth": "65-75%",
+    "coords": "0-100%",
+    "min_touch": "44dp",
+    "safe_area": "4% top/bottom",
+    "tool_dock": "bottom"
+  },
+  "developer_handoff": {
+    "persistence": "unlock only; treatment session transient",
+    "required_data": [
+      "PatientCase",
+      "MechanismPart",
+      "FaultDefinition",
+      "RepairRuntime",
+      "ProgressionState"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "PatientRouter",
+      "TreatmentController",
+      "MouthViewport",
+      "MechanismLayer",
+      "HUDLayer",
+      "ToolDock",
+      "OverlayLayer"
+    ],
+    "state_ownership": {
+      "PartBench": "grind",
+      "MechanismPart": "fit,phase,friction,seat",
+      "MouthViewport": "camera",
+      "PatientRouter": "progression",
+      "TreatmentController": "faults,strikes,tools,test"
+    },
+    "reusable_components": [
+      "GearView",
+      "SocketView",
+      "RetainerView",
+      "ProbeTool",
+      "ExtractorTool",
+      "OilNozzle",
+      "PartTray",
+      "FitGauge",
+      "TestCrank"
+    ],
+    "implementation_order": [
+      "data",
+      "routing",
+      "mechanism",
+      "camera/probe",
+      "extract",
+      "grind",
+      "oil",
+      "align/seat",
+      "test",
+      "result/reset"
+    ]
+  },
+  "acceptance_criteria": [
+    "All 6 inventory screens/overlays reachable",
+    "All eight core verbs have component+interaction mappings",
+    "Locked gear extraction leaves state unchanged",
+    "Wrong size or >12° phase cannot seat",
+    "Grinding changes fit and overgrind makes part unusable",
+    "Bite Test disabled until required sockets occupied and exposes remaining faults",
+    "Three damage strikes fail; clean full cycle succeeds",
+    "Retry/next clears patient runtime state"
+  ],
+  "primary_interaction": "pinch/probe → extract/grind/lubricate → rotate-seat → crank test",
+  "interaction_principles": [
+    "Direct manipulation",
+    "Held object outranks camera",
+    "Invalid actions preserve state",
+    "Expanded precision hit targets",
+    "Bite Test verifies repair"
+  ]
+}

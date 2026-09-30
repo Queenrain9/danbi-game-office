@@ -1,0 +1,1034 @@
+{
+  "id": "f1127755-de6a-4810-8cc8-cfc7b1e4565a",
+  "title": "Tidepool Kingdom",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "a3c921ee-8a34-4bfe-aa27-6a8c86c773a5",
+  "screens": [
+    {
+      "id": "T1",
+      "name": "Run Select / Tidepool Map",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 88,
+            "w": 92,
+            "x": 4,
+            "y": 6,
+            "id": "map",
+            "role": "progression",
+            "label": "Run Map"
+          }
+        ]
+      },
+      "states": [
+        "Run Map"
+      ],
+      "purpose": "Choose unlocked run or Field Guide",
+      "feedback": [],
+      "components": [
+        {
+          "id": "runs",
+          "box": {
+            "h": 50,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "run_nodes",
+          "label": "3 Run Nodes",
+          "state_binding": "unlock,best_marks"
+        },
+        {
+          "id": "guide",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 8,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Field Guide",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 54,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Start Run",
+          "state_binding": "selected+unlocked"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "T2",
+          "from": "T1",
+          "trigger": "start",
+          "condition": "unlocked"
+        },
+        {
+          "to": "T6",
+          "from": "T1",
+          "trigger": "guide",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start_run",
+          "input": "tap",
+          "target": "unlocked run",
+          "feedback": "selection",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "precondition": "unlocked",
+          "state_change": "Forecast",
+          "invalid_input": "locked no-op",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "T2",
+      "name": "Cycle Forecast",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "forecast",
+            "role": "forecast",
+            "label": "Forecast"
+          }
+        ]
+      },
+      "states": [
+        "Forecast"
+      ],
+      "purpose": "Show cycle candidates and objective before commitment",
+      "feedback": [],
+      "components": [
+        {
+          "id": "cycle",
+          "box": {
+            "h": 10,
+            "w": 28,
+            "x": 6,
+            "y": 6
+          },
+          "type": "status",
+          "label": "Cycle/Marks",
+          "state_binding": "cycle1..6 marks0..6"
+        },
+        {
+          "id": "candidates",
+          "box": {
+            "h": 32,
+            "w": 88,
+            "x": 6,
+            "y": 20
+          },
+          "type": "cards",
+          "label": "3 Candidate Species",
+          "state_binding": "species+attraction tags"
+        },
+        {
+          "id": "objective",
+          "box": {
+            "h": 18,
+            "w": 88,
+            "x": 6,
+            "y": 55
+          },
+          "type": "criteria",
+          "label": "Objective",
+          "state_binding": "authored type+threshold"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 56,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Prepare",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "T3",
+          "from": "T2",
+          "trigger": "continue",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "prepare",
+          "input": "tap",
+          "target": "continue",
+          "feedback": "ring becomes editable",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "precondition": "Forecast",
+          "state_change": "Preparation",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "T3",
+      "name": "Tidepool Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 9,
+            "w": 94,
+            "x": 3,
+            "y": 2,
+            "id": "hud",
+            "role": "status",
+            "label": "Cycle HUD"
+          },
+          {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "pool",
+            "role": "simulation",
+            "label": "Six-pocket Ring"
+          },
+          {
+            "h": 19,
+            "w": 94,
+            "x": 3,
+            "y": 78,
+            "id": "actions",
+            "role": "controls",
+            "label": "Context Actions"
+          }
+        ]
+      },
+      "states": [
+        "Preparation",
+        "Flood",
+        "Ebb Resolve",
+        "Intervention"
+      ],
+      "purpose": "Prepare habitat, observe Flood/Ebb, intervene between resolves",
+      "feedback": [
+        "resource→feeding→predation→energy loss→death→breeding distinct 1s resolve cues"
+      ],
+      "components": [
+        {
+          "id": "hud",
+          "box": {
+            "h": 8,
+            "w": 75,
+            "x": 3,
+            "y": 2
+          },
+          "type": "status",
+          "label": "Cycle/Turn/Marks/Budgets",
+          "state_binding": "cycle,turn,marks,prep3/charges2"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 9,
+            "x": 88,
+            "y": 2
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "play states"
+        },
+        {
+          "id": "slot0",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 43,
+            "y": 13
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 0",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "slot1",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 68,
+            "y": 25
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 1",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "slot2",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 68,
+            "y": 49
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 2",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "slot3",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 43,
+            "y": 61
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 3",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "slot4",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 18,
+            "y": 49
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 4",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "slot5",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 18,
+            "y": 25
+          },
+          "type": "ring_slot",
+          "label": "Habitat Slot 5",
+          "state_binding": "modifier/organisms/resources"
+        },
+        {
+          "id": "modifier_tray",
+          "box": {
+            "h": 18,
+            "w": 38,
+            "x": 3,
+            "y": 78
+          },
+          "type": "drag_tray",
+          "label": "Habitat/Lure Modifiers",
+          "state_binding": "Preparation"
+        },
+        {
+          "id": "tools",
+          "box": {
+            "h": 18,
+            "w": 34,
+            "x": 43,
+            "y": 78
+          },
+          "type": "tool_tray",
+          "label": "Heal Relocate Shelter",
+          "state_binding": "Intervention"
+        },
+        {
+          "id": "advance",
+          "box": {
+            "h": 18,
+            "w": 18,
+            "x": 79,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Confirm / Continue",
+          "state_binding": "Preparation/Intervention"
+        }
+      ],
+      "edge_cases": [
+        "invalid intervention no spend",
+        "population cap4",
+        "Pause blocks all"
+      ],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Flood",
+          "from": "Preparation",
+          "trigger": "Confirm"
+        },
+        {
+          "to": "Ebb Resolve",
+          "from": "Flood",
+          "trigger": "arrival complete"
+        },
+        {
+          "to": "Intervention",
+          "from": "Ebb Resolve",
+          "trigger": "ordered resolve complete"
+        },
+        {
+          "to": "Ebb Resolve",
+          "from": "Intervention",
+          "trigger": "Continue turn<6"
+        },
+        {
+          "to": "T4",
+          "from": "Intervention",
+          "trigger": "Continue turn6"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "place",
+          "input": "drag",
+          "target": "modifier->empty ring slot",
+          "feedback": "valid slots+attraction preview",
+          "source_refs": [
+            "interaction_spec.placement"
+          ],
+          "precondition": "Preparation; prep>0",
+          "state_change": "assign modifier; prep-1",
+          "invalid_input": "return/no spend",
+          "decision_origin": "game_design",
+          "resource_effects": "-1 only valid"
+        },
+        {
+          "id": "remove",
+          "input": "drag away",
+          "target": "placed modifier",
+          "feedback": "forecast tags update",
+          "source_refs": [
+            "interaction_spec.placement"
+          ],
+          "precondition": "Preparation before confirm",
+          "state_change": "remove; prep+1",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "inspect",
+          "input": "tap",
+          "target": "organism",
+          "feedback": "energy/food/prey tags",
+          "source_refs": [
+            "interaction_spec.inspect"
+          ],
+          "precondition": "organism visible",
+          "state_change": "read-only inspect overlay",
+          "invalid_input": "empty no-op",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "heal",
+          "input": "drag/tap",
+          "target": "organism",
+          "feedback": "pulse+decrement",
+          "source_refs": [
+            "game_rules.interventions.heal"
+          ],
+          "precondition": "Intervention; charge>0",
+          "state_change": "energy+2 capped; charge-1",
+          "invalid_input": "shake/no spend",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "relocate",
+          "input": "drag",
+          "target": "organism->adjacent slot",
+          "feedback": "adjacent valid pockets highlight",
+          "source_refs": [
+            "game_rules.interventions.relocate"
+          ],
+          "precondition": "Intervention; charge>0; species destination<4",
+          "state_change": "move; charge-1",
+          "invalid_input": "snapback/no spend",
+          "spatial_rules": "ring neighbor only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "shelter",
+          "input": "drag/tap",
+          "target": "slot",
+          "feedback": "shelter badge/cancel pulse",
+          "source_refs": [
+            "game_rules.interventions.shelter"
+          ],
+          "precondition": "Intervention; charge>0",
+          "state_change": "next Resolve first predation into slot cancelled then expires; charge-1",
+          "invalid_input": "no-op/no spend",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "advance",
+          "input": "tap",
+          "target": "advance",
+          "feedback": "water/controls transition",
+          "source_refs": [
+            "interaction_spec.continue"
+          ],
+          "precondition": "Preparation or Intervention; no active drag",
+          "state_change": "Preparation->Flood; Intervention->next Resolve/Review",
+          "invalid_input": "disabled during drag",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "food_chain",
+          "name": "Food Chain",
+          "notes": "base dependencies",
+          "condition": "class Food Chain",
+          "source_refs": [
+            "content_model.classes[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "events": "feeding+predation emphasized"
+          },
+          "component_overrides": {},
+          "interaction_overrides": []
+        },
+        {
+          "id": "nursery",
+          "name": "Crowded Nursery",
+          "notes": "base rules",
+          "condition": "class Crowded Nursery",
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "events": "breeding eligibility/birth emphasized"
+          },
+          "component_overrides": {
+            "hud": {
+              "state_binding": "population cap4 context"
+            }
+          },
+          "interaction_overrides": []
+        },
+        {
+          "id": "refuge",
+          "name": "Refuge Puzzle",
+          "notes": "timing emphasis",
+          "condition": "class Refuge Puzzle",
+          "source_refs": [
+            "content_model.classes[2]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "threat": "adjacency threat shown"
+          },
+          "component_overrides": {
+            "tools": {
+              "state_binding": "Shelter/Relocate target emphasis"
+            }
+          },
+          "interaction_overrides": [
+            "relocate",
+            "shelter"
+          ]
+        },
+        {
+          "id": "reserve",
+          "name": "Resource Reserve",
+          "notes": "objective emphasis",
+          "condition": "class Resource Reserve",
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resource": "unconsumed bundles remain visible"
+          },
+          "component_overrides": {
+            "hud": {
+              "state_binding": "resource bundles emphasized"
+            }
+          },
+          "interaction_overrides": []
+        },
+        {
+          "id": "mixed",
+          "name": "Mixed Web",
+          "notes": "combines prior rules",
+          "condition": "class Mixed Web",
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "dependencies": "combined cues"
+          },
+          "component_overrides": {},
+          "interaction_overrides": []
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "ring adjacency is logical i±1 modulo6"
+      ]
+    },
+    {
+      "id": "T4",
+      "name": "Cycle Review",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "review",
+            "role": "closure",
+            "label": "Review"
+          }
+        ]
+      },
+      "states": [
+        "Review"
+      ],
+      "purpose": "Objective result, carryover, next/retry",
+      "feedback": [],
+      "components": [
+        {
+          "id": "result",
+          "box": {
+            "h": 18,
+            "w": 88,
+            "x": 6,
+            "y": 6
+          },
+          "type": "criteria",
+          "label": "Objective Result",
+          "state_binding": "pass/fail +1/0 mark"
+        },
+        {
+          "id": "carry",
+          "box": {
+            "h": 38,
+            "w": 88,
+            "x": 6,
+            "y": 28
+          },
+          "type": "select_grid",
+          "label": "Carryover",
+          "state_binding": "0..2 eligible"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 6,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Retry Cycle",
+          "state_binding": "unused retry"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 56,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Next Tide",
+          "state_binding": "0..2 selected valid"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "T2",
+          "from": "T4",
+          "trigger": "Next Tide",
+          "condition": "cycle<6"
+        },
+        {
+          "to": "T3",
+          "from": "T4",
+          "trigger": "Retry",
+          "condition": "unused"
+        },
+        {
+          "to": "T5",
+          "from": "T4",
+          "trigger": "Next Tide",
+          "condition": "cycle6"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "carry",
+          "input": "tap",
+          "target": "eligible unit",
+          "feedback": "0/2 meter+preview",
+          "source_refs": [
+            "interaction_spec.carryover"
+          ],
+          "precondition": "Review",
+          "state_change": "toggle retained",
+          "invalid_input": "third rejected",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "forecast unchanged",
+          "source_refs": [
+            "game_rules.failure_recovery"
+          ],
+          "precondition": "unused",
+          "state_change": "exact cycle-start snapshot; consume retry",
+          "invalid_input": "disabled used",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "T5",
+      "name": "Run Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 88,
+            "x": 6,
+            "y": 8,
+            "id": "result",
+            "role": "terminal",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        "Run Result Success",
+        "Run Result Failure"
+      ],
+      "purpose": "Marks outcome unlock replay/map",
+      "feedback": [],
+      "components": [
+        {
+          "id": "marks",
+          "box": {
+            "h": 18,
+            "w": 80,
+            "x": 10,
+            "y": 12
+          },
+          "type": "score",
+          "label": "Reef Marks",
+          "state_binding": "0..6"
+        },
+        {
+          "id": "outcome",
+          "box": {
+            "h": 14,
+            "w": 80,
+            "x": 10,
+            "y": 34
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "state_binding": "success>=4"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 14,
+            "w": 40,
+            "x": 8,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Replay",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "map",
+          "box": {
+            "h": 14,
+            "w": 40,
+            "x": 52,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Map",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "T2",
+          "from": "T5",
+          "trigger": "Replay"
+        },
+        {
+          "to": "T1",
+          "from": "T5",
+          "trigger": "Map"
+        }
+      ],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "T6",
+      "name": "Field Guide",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "guide",
+            "role": "reference",
+            "label": "Guide"
+          }
+        ]
+      },
+      "states": [
+        "Field Guide"
+      ],
+      "purpose": "Read-only encountered species",
+      "feedback": [],
+      "components": [
+        {
+          "id": "species",
+          "box": {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "scroll_cards",
+          "label": "Species Entries",
+          "state_binding": "encountered only"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 88,
+            "x": 6,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[5]"
+      ],
+      "transitions": [
+        {
+          "to": "T1",
+          "from": "T6",
+          "trigger": "Back"
+        }
+      ],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "fb77c651-4178-4543-b93a-f462516b8a0d",
+  "input_map": {
+    "cancel": "cancel drag restores committed state",
+    "invalid": "invalid target/budget no-op/no spend",
+    "priority": [
+      "Pause",
+      "active drag",
+      "tap/Continue"
+    ],
+    "source_refs": [
+      "interaction_spec.priority"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T11:37:37.182356+00:00",
+  "edge_cases": {
+    "items": [
+      "species/slot cap4",
+      "Flood lowest-index tie",
+      "Shelter first predation cancellation then expiry",
+      "objective miss continues",
+      "unselected carryover discarded"
+    ],
+    "source_refs": [
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T11:37:37.182356+00:00",
+  "core_screen": "T3",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "T1",
+    "pause": "T3/T4 -> Pause overlay -> exact return state",
+    "normal": [
+      "T1",
+      "T2",
+      "T3:Preparation",
+      "T3:Flood",
+      "T3:Ebb Resolve",
+      "T3:Intervention",
+      "T4",
+      "T2 next cycle",
+      "T5 after cycle6"
+    ],
+    "branches": [
+      "T4 Retry->T3 Preparation snapshot",
+      "T1<->T6 Field Guide"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 12,
+  "screen_count": 6,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze animation/input/state; resume exact return state",
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InspectOverlay": {
+      "effect": "read-only species info",
+      "source_refs": [
+        "interaction_spec.inspect"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Tidepool Kingdom\nWhole-MVP UX blueprint covering all six screens, core states, deterministic ecology interactions, carryover/retry/progression and five content classes. Decision trace is embedded in JSON. Godot architecture remains downstream.",
+  "source_run_at": "2026-09-30T11:37:37.182356+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "밀물/썰물의 리셋 리듬 속 제한 개입이 먹이망 연쇄를 바꾸고 다음 조수를 학습하게 한다",
+    "source_refs": [
+      "wireframe_handoff[0]",
+      "visual_direction_brief"
+    ],
+    "decision_origin": "wireframe_layout",
+    "safe_area_percent": 3
+  },
+  "developer_handoff": {
+    "fun_promise": "Limited interventions visibly cause learnable ecosystem chains across tides",
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "3 runs x 6 cycles",
+      "8-10 species",
+      "modifier tags",
+      "objective thresholds",
+      "cycle-start snapshot"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "persistent unlock/best/guide",
+      "run marks/retry",
+      "cycle board/budgets/turn"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "Food Chain",
+      "Crowded Nursery",
+      "Refuge Puzzle",
+      "Resource Reserve",
+      "Mixed Web"
+    ],
+    "architecture_boundary": "Implementation Blueprint chooses Godot scene/node/script architecture"
+  },
+  "acceptance_criteria": [
+    "T1-T6 cover every required screen type",
+    "T3 preserves six-slot ring and Preparation/Flood/Ebb Resolve/Intervention",
+    "Placement spends/refunds prep exactly as specified and invalid placement spends nothing",
+    "Ebb cause order is visibly resource→feeding→predation→energy loss→death→breeding",
+    "Heal Relocate Shelter spend exactly one charge only when valid",
+    "Review awards 1/0 Mark, permits 0–2 carryover, rejects third, Retry restores snapshot once/run",
+    "Cycle6 success is marks>=4 with unlock/best marks; failure permits replay",
+    "All five content classes are structured T3 variants"
+  ],
+  "primary_interaction": "서식처/유도물 배치 + 썰물 사이 제한 Intervention + 생존자/자원 carryover 선택",
+  "interaction_principles": [
+    "Living six-pocket pool stays central",
+    "Deterministic ecology causes are visually ordered",
+    "Direct manipulation preserves Place/Intervene/Keep verbs",
+    "Invalid input never spends cycle budgets"
+  ]
+}

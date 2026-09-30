@@ -1,0 +1,918 @@
+{
+  "id": "2a519ef3-428d-4ee3-90ea-c002f33378b3",
+  "title": "Candle Creature Keeper",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "a5b7a285-1c6d-44d1-ab73-cac9492a5233",
+  "screens": [
+    {
+      "id": "case_select",
+      "name": "Case Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "top",
+            "role": "title/progress",
+            "label": "Journal"
+          },
+          {
+            "h": 70,
+            "w": 86,
+            "x": 7,
+            "y": 20,
+            "id": "cases",
+            "role": "selection",
+            "label": "Case Cards"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "select",
+          "condition": "screen open"
+        }
+      ],
+      "purpose": "choose unlocked case",
+      "feedback": [
+        "lock icon",
+        "journal stars"
+      ],
+      "components": [
+        {
+          "id": "case1",
+          "box": {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 23
+          },
+          "type": "button",
+          "label": "Case 1",
+          "state_binding": "unlocked"
+        },
+        {
+          "id": "case2",
+          "box": {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 45
+          },
+          "type": "button",
+          "label": "Case 2",
+          "state_binding": "unlock after case1"
+        },
+        {
+          "id": "case3",
+          "box": {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 67
+          },
+          "type": "button",
+          "label": "Case 3",
+          "state_binding": "unlock after case2"
+        }
+      ],
+      "edge_cases": [
+        "locked selection does not transition"
+      ],
+      "transitions": [
+        {
+          "to": "creature_care",
+          "from": "case_select",
+          "trigger": "tap unlocked case",
+          "animation": "short fade",
+          "condition": "unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select case",
+          "target": "unlocked case card",
+          "feedback": "pressed card",
+          "precondition": "unlocked",
+          "state_change": "enter brief for creature1",
+          "invalid_input": "locked card gives locked pulse"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "case unlock and stars are persisted"
+      ]
+    },
+    {
+      "id": "creature_care",
+      "name": "Creature Care",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "integrity/test/grace",
+            "label": "Status HUD"
+          },
+          {
+            "h": 22,
+            "w": 27,
+            "x": 68,
+            "y": 18,
+            "id": "habitat",
+            "role": "goal and fit socket",
+            "label": "Habitat Target"
+          },
+          {
+            "h": 58,
+            "w": 60,
+            "x": 5,
+            "y": 18,
+            "id": "work",
+            "role": "five-region manipulation",
+            "label": "Creature Workbench"
+          },
+          {
+            "h": 16,
+            "w": 90,
+            "x": 5,
+            "y": 79,
+            "id": "tools",
+            "role": "heat/cool/pause",
+            "label": "Tool Dock"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "condition": "creature spawn"
+        },
+        {
+          "id": "care",
+          "condition": "start pressed"
+        },
+        {
+          "id": "overheat",
+          "condition": "region >=90 for 1s"
+        },
+        {
+          "id": "fit",
+          "condition": "valid habitat placement"
+        },
+        {
+          "id": "correction",
+          "condition": "fit fail and tests<3 and integrity>0"
+        },
+        {
+          "id": "input_lock",
+          "condition": "fit evaluation"
+        }
+      ],
+      "purpose": "brief, heat, shape, cool and fit-test creature",
+      "feedback": [
+        "material gloss/matte",
+        "threshold haptics",
+        "exact mismatch flash"
+      ],
+      "components": [
+        {
+          "id": "integrity",
+          "box": {
+            "h": 7,
+            "w": 24,
+            "x": 5,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Integrity 3",
+          "state_binding": "integrity 0..3"
+        },
+        {
+          "id": "test_count",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 32,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Fit Tests",
+          "state_binding": "tests 0..3"
+        },
+        {
+          "id": "grace",
+          "box": {
+            "h": 7,
+            "w": 24,
+            "x": 57,
+            "y": 5
+          },
+          "type": "timer",
+          "label": "Correction Time",
+          "state_binding": "visible only correction"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 85,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "care/brief/correction"
+        },
+        {
+          "id": "habitat_socket",
+          "box": {
+            "h": 18,
+            "w": 25,
+            "x": 69,
+            "y": 20
+          },
+          "type": "drop_target",
+          "label": "Target Habitat",
+          "state_binding": "target required forms"
+        },
+        {
+          "id": "region_head",
+          "box": {
+            "h": 14,
+            "w": 25,
+            "x": 22,
+            "y": 24
+          },
+          "type": "manipulation_zone",
+          "label": "Region Head",
+          "state_binding": "heat/form/locked"
+        },
+        {
+          "id": "region_left",
+          "box": {
+            "h": 16,
+            "w": 24,
+            "x": 9,
+            "y": 39
+          },
+          "type": "manipulation_zone",
+          "label": "Region Left",
+          "state_binding": "heat/form/locked"
+        },
+        {
+          "id": "region_core",
+          "box": {
+            "h": 18,
+            "w": 25,
+            "x": 28,
+            "y": 39
+          },
+          "type": "manipulation_zone",
+          "label": "Region Core",
+          "state_binding": "heat/form/locked"
+        },
+        {
+          "id": "region_right",
+          "box": {
+            "h": 16,
+            "w": 15,
+            "x": 48,
+            "y": 39
+          },
+          "type": "manipulation_zone",
+          "label": "Region Right",
+          "state_binding": "heat/form/locked"
+        },
+        {
+          "id": "region_base",
+          "box": {
+            "h": 15,
+            "w": 28,
+            "x": 22,
+            "y": 58
+          },
+          "type": "manipulation_zone",
+          "label": "Region Base",
+          "state_binding": "heat/form/locked"
+        },
+        {
+          "id": "heat_tool",
+          "box": {
+            "h": 10,
+            "w": 24,
+            "x": 8,
+            "y": 82
+          },
+          "type": "drag_tool",
+          "label": "Heat Source",
+          "state_binding": "available in care/correction"
+        },
+        {
+          "id": "cool_tool",
+          "box": {
+            "h": 10,
+            "w": 24,
+            "x": 38,
+            "y": 82
+          },
+          "type": "drag_tool",
+          "label": "Cooling Plate",
+          "state_binding": "available in care/correction"
+        },
+        {
+          "id": "place_handle",
+          "box": {
+            "h": 10,
+            "w": 24,
+            "x": 68,
+            "y": 82
+          },
+          "type": "drag_handle",
+          "label": "Creature Place Handle",
+          "state_binding": "enabled when required regions locked"
+        }
+      ],
+      "edge_cases": [
+        "pause freezes passive cooling, tool effects and correction timer",
+        "multitouch ignored after first active pointer",
+        "grace0 terminal failure"
+      ],
+      "transitions": [
+        {
+          "to": "care",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "brief collapses",
+          "condition": "always"
+        },
+        {
+          "to": "overheat",
+          "from": "care",
+          "trigger": "heat>=90 for1s",
+          "animation": "red shimmer/drip",
+          "condition": "integrity>0"
+        },
+        {
+          "to": "care",
+          "from": "overheat",
+          "trigger": "penalty applied",
+          "animation": "reset form; heat70",
+          "condition": "integrity>0"
+        },
+        {
+          "to": "fit",
+          "from": "care",
+          "trigger": "valid placement",
+          "animation": "input lock",
+          "condition": "required regions locked"
+        },
+        {
+          "to": "correction",
+          "from": "fit",
+          "trigger": "fail",
+          "animation": "mismatch flash",
+          "condition": "tests<3 and integrity>0"
+        },
+        {
+          "to": "creature_result",
+          "from": "fit",
+          "trigger": "pass or terminal",
+          "animation": "result overlay",
+          "condition": "resolved"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag/hold",
+          "action": "closest intersected region gains +20 heat/sec near or +10/sec mid; Case3 adjacent gets 25%",
+          "target": "heat_tool -> intersected region",
+          "feedback": "gloss/sizzle/haptic thresholds",
+          "precondition": "care/correction",
+          "state_change": "heat rises; at50 unlock/shapeable; 80 warning; >=90 for1s overheat",
+          "invalid_input": "outside region causes no heat"
+        },
+        {
+          "input": "drag",
+          "action": "preview form; release snaps nearest of 3 forms",
+          "target": "region",
+          "feedback": "stretch then snap tick",
+          "precondition": "heat50-89 and not input_lock",
+          "state_change": "form index changes",
+          "invalid_input": "hard/locked/overheated region rigid bounce; drag back before release cancels"
+        },
+        {
+          "input": "drag/hold",
+          "action": "cool -25 heat/sec while covered",
+          "target": "cool_tool -> one region",
+          "feedback": "hiss, matte/frost, lock tick",
+          "precondition": "care/correction",
+          "state_change": "below25 locked",
+          "invalid_input": "outside region no effect"
+        },
+        {
+          "input": "drag/release",
+          "action": "run exact required-form fit",
+          "target": "place_handle -> habitat_socket",
+          "feedback": "chime or buzz; mismatches flash",
+          "precondition": "all required regions locked",
+          "state_change": "fit pass -> result; fail -> tests+1 and correction20s unless terminal",
+          "invalid_input": "release outside habitat returns creature to work area"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "soft",
+          "name": "Shapeable",
+          "notes": "region glossy/drooped and shape drag enabled",
+          "condition": "focused region heat 50-89",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "locked",
+          "name": "Locked",
+          "notes": "matte/frost; shape disabled until heat reaches50",
+          "condition": "region heat <25",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "warning",
+          "name": "Heat Warning",
+          "notes": "warning shimmer/haptic; at >=90 for1s overheat penalty",
+          "condition": "region heat >=80",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "correction_ui",
+          "name": "Correction",
+          "notes": "exact mismatching required regions flash",
+          "condition": "fit failed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "grace": {
+              "state_binding": "20s countdown"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "passive cooling -5/sec during unpaused care/correction",
+        "region data owns heat/form/locked; UI only reflects it"
+      ]
+    },
+    {
+      "id": "creature_result",
+      "name": "Creature Result Overlay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 52,
+            "w": 80,
+            "x": 10,
+            "y": 24,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "success",
+          "condition": "fit pass"
+        },
+        {
+          "id": "failure",
+          "condition": "integrity0 or third failed test or grace0"
+        }
+      ],
+      "purpose": "report pass or terminal failure",
+      "feedback": [
+        "outcome audio/haptic"
+      ],
+      "components": [
+        {
+          "id": "result_text",
+          "box": {
+            "h": 18,
+            "w": 68,
+            "x": 16,
+            "y": 30
+          },
+          "type": "text",
+          "label": "Outcome",
+          "state_binding": "pass/failure reason"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 64,
+            "x": 18,
+            "y": 58
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "resolved"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "creature_care",
+          "from": "creature_result",
+          "trigger": "next",
+          "animation": "fade",
+          "condition": "fewer than3 resolved"
+        },
+        {
+          "to": "case_result",
+          "from": "creature_result",
+          "trigger": "next",
+          "animation": "fade",
+          "condition": "3 resolved"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "advance",
+          "target": "next",
+          "feedback": "button press",
+          "precondition": "resolved",
+          "state_change": "next creature brief or case result",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "overlay blocks care input"
+      ]
+    },
+    {
+      "id": "case_result",
+      "name": "Case Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 62,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "summary",
+            "role": "results",
+            "label": "Case Summary"
+          },
+          {
+            "h": 15,
+            "w": 84,
+            "x": 8,
+            "y": 78,
+            "id": "actions",
+            "role": "navigation",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "case_complete",
+          "condition": "3 creatures resolved"
+        }
+      ],
+      "purpose": "summarize three creatures",
+      "feedback": [
+        "journal star update"
+      ],
+      "components": [
+        {
+          "id": "summary_cards",
+          "box": {
+            "h": 50,
+            "w": 80,
+            "x": 10,
+            "y": 18
+          },
+          "type": "summary",
+          "label": "3 Creature Results",
+          "state_binding": "three resolved outcomes"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 10,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Retry Case",
+          "state_binding": "always"
+        },
+        {
+          "id": "next_case",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 54,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Next Case",
+          "state_binding": "case progression"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "creature_care",
+          "from": "case_result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "always"
+        },
+        {
+          "to": "case_select",
+          "from": "case_result",
+          "trigger": "next/select",
+          "animation": "fade",
+          "condition": "case resolved"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset case",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "always",
+          "state_change": "case initial state",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "advance",
+          "target": "next_case",
+          "feedback": "press",
+          "precondition": "available",
+          "state_change": "next case brief/select",
+          "invalid_input": "disabled if unavailable"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "retry resets all creature/test/integrity states"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 38,
+            "w": 70,
+            "x": 15,
+            "y": 30,
+            "id": "pause_modal",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused",
+          "condition": "pause opened"
+        }
+      ],
+      "purpose": "freeze and resume current simulation",
+      "feedback": [
+        "simulation visibly frozen"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 39
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        {
+          "id": "retry_case",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 53
+          },
+          "type": "button",
+          "label": "Retry Case",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [
+        "all heat/cool/grace timers frozen"
+      ],
+      "transitions": [
+        {
+          "to": "creature_care",
+          "from": "pause",
+          "trigger": "resume",
+          "animation": "overlay dismiss",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "close overlay",
+          "target": "resume",
+          "feedback": "press",
+          "precondition": "paused",
+          "state_change": "resume exact prior state/timers",
+          "invalid_input": "background blocked"
+        },
+        {
+          "input": "tap",
+          "action": "reset case",
+          "target": "retry_case",
+          "feedback": "press",
+          "precondition": "paused",
+          "state_change": "first creature brief",
+          "invalid_input": "background blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "pause is overlay, not replacement gameplay state"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "9e539239-f1b1-4a29-9128-23c37816c529",
+  "input_map": {
+    "tap": [
+      "buttons"
+    ],
+    "drag": [
+      "heat tool",
+      "cool tool",
+      "shapeable region",
+      "creature placement"
+    ],
+    "hold": [
+      "heat/cool application"
+    ],
+    "cancel": [
+      "shape drag returns before release",
+      "invalid placement returns work area"
+    ],
+    "priority": [
+      "shape_drag",
+      "tool_drag",
+      "creature_placement"
+    ],
+    "multitouch": "disabled; additional pointers ignored",
+    "single_touch": true
+  },
+  "created_at": "2026-09-29T18:29:48.993562+00:00",
+  "edge_cases": {
+    "pointer_loss": "cancel current drag without state mutation except continuous heat/cool already elapsed",
+    "pause_mid_drag": "cancel drag then freeze",
+    "fit_during_timer": "fit evaluation input-locks before result",
+    "orientation_change": "not supported during active case"
+  },
+  "updated_at": "2026-09-29T18:29:48.993562+00:00",
+  "core_screen": "creature_care",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "place enabled only when required regions locked",
+      "next case only after three creatures resolved"
+    ],
+    "normal": [
+      "case_select",
+      "creature_care:brief",
+      "creature_care:care",
+      "creature_care:fit",
+      "creature_result",
+      "next creature or case_result"
+    ],
+    "branches": [
+      "overheat returns to care after penalty",
+      "fit fail returns to care with 20s correction",
+      "integrity0/third failed fit/grace0 -> creature_result failure"
+    ],
+    "overlays": [
+      "pause over creature_care"
+    ]
+  },
+  "state_count": 11,
+  "screen_count": 5,
+  "global_states": {
+    "pause": {
+      "effect": "freeze all simulation timers and block tools"
+    },
+    "retry": {
+      "effect": "reset full case seed/state"
+    },
+    "failure": {
+      "scope": "creature terminal result"
+    },
+    "success": {
+      "scope": "creature result"
+    },
+    "input_lock": {
+      "effect": "block manipulation during fit evaluation"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.2 — Candle Creature Keeper\nPortrait mobile greybox translating the approved heat→shape→cool→fit loop without changing rules.\n\n## Flow\nCase Select → Creature Care (Brief/Care/Overheat/Fit/Correction) → Creature Result → next creature; after three resolved creatures → Case Result. Pause is an overlay that freezes all simulation.\n\n## Core Screen\nCreature Care reserves the left/center workbench for five independently hittable body regions, the upper-right for the habitat target, a thin status HUD, and a bottom tool dock. Heat, shape, cool and place are direct-manipulation gestures. Shape has input priority over tools, tools over placement. Multitouch is disabled.\n\n## State presentation\nHeat 50–89 is visibly soft/glossy and shapeable; 80+ adds warning feedback; 90+ for one second triggers overheat. Below 25 is matte/locked. Failed fit highlights exact mismatching required regions and exposes the 20-second correction timer.\n\n## Developer handoff\nGameplay state owns region heat/form/lock, integrity, tests and timers. UI sends commands and renders state. Passive cooling is -5/sec; plate cooling -25/sec; heat is +20/sec near or +10/sec mid, with Case 3 adjacent-region 25% transfer. Pause freezes all timers.\n\n## Acceptance\nGreybox passes when all approved screens, gestures, thresholds, invalid-input returns, fit correction, terminal failure paths and retry/pause behavior can be observed without reopening the Game Design document.",
+  "source_run_at": "2026-09-29T18:29:48.993562+00:00",
+  "target_device": "mobile phone",
+  "global_ui_rules": {
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "touch_rule": "single touch; shape > tool > placement",
+    "base_overlap": "none except overlays",
+    "coordinate_system": "0-100 screen-percent"
+  },
+  "developer_handoff": {
+    "persistence": [
+      "case unlocks",
+      "journal stars"
+    ],
+    "required_data": [
+      "5 region heat/form/locked",
+      "required form indices",
+      "integrity",
+      "fit test count",
+      "correction timer",
+      "case/creature index"
+    ],
+    "scene_hierarchy": [
+      "CaseSelect",
+      "CreatureCare",
+      "CreatureResultOverlay",
+      "CaseResult",
+      "PauseOverlay"
+    ],
+    "state_ownership": "gameplay model owns heat/form/lock/integrity/tests/timers; views bind read-only except commands",
+    "reusable_components": [
+      "RegionHitArea",
+      "DragTool",
+      "Meter",
+      "Modal"
+    ],
+    "implementation_order": [
+      "state model and timers",
+      "five region hit areas",
+      "heat/cool tools",
+      "shape snap",
+      "fit evaluation",
+      "results/pause"
+    ]
+  },
+  "acceptance_criteria": [
+    "All five Game Design screens are reachable and represented.",
+    "Each of the five regions exposes heat/form/locked state and a manipulation hit area.",
+    "Heat at 50 enables shaping; 80 warns; 90 sustained for 1 second applies the specified overheat penalty.",
+    "Cooling below 25 locks and reheating to 50 unlocks.",
+    "Fit checks exact required form indices and failed fits show exact mismatches with a 20 second correction timer.",
+    "Pause freezes heat, cooling and grace timers and blocks gameplay input.",
+    "Single-touch priority is shape over tool over placement; invalid inputs do not invent state changes."
+  ],
+  "primary_interaction": "열원 드래그 + softened region 변형 + 냉각 lock",
+  "interaction_principles": [
+    "single-touch direct manipulation",
+    "material state before numeric HUD",
+    "core creature remains visually dominant",
+    "invalid gestures return without hidden state change"
+  ]
+}

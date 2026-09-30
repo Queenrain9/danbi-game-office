@@ -1,0 +1,239 @@
+{
+  "id": "f40804ba-b9fb-4fee-b1ad-26532a1d9400",
+  "title": "Orbit Shepherd",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required",
+  "idea_id": "5412ff64-e16c-4078-96cf-5d75f5ef444e",
+  "version": "v0.1",
+  "one_line": "손가락으로 작은 행성의 중력을 켰다 껐다 하며 우주 생물 떼의 궤도를 이어 목적지까지 몰아가는 궤도 목축 게임.",
+  "core_loop": "초기 행성·목표·무리 상태를 읽는다 → 행성 중력을 탭으로 켜고 끈다 → 예측선과 실제 궤도 차이를 관찰한다 → 다음 중력 토글로 포획/스윙바이/재결집을 수정한다 → 목표 천체에 요구 수를 도착시킨다 → 결과를 확인하고 다음 스테이지 또는 재시도한다.",
+  "mvp_scope": "중력 토글만으로 완결되는 다중 스테이지 싱글플레이: 고정 행성 배치, 실시간 2D 중력, 생물 무리, 목표 도착/유실, 예측선, pause/retry, 선형 해금, 난도 variation.",
+  "created_at": "2026-09-30T20:09:49.276878+00:00",
+  "game_rules": [
+    {
+      "id": "R1",
+      "result": "gravity_active를 즉시 반전",
+      "trigger": "플레이어가 행성을 탭",
+      "recovery": "무효 대상/비진행 상태 입력은 상태 변화 없이 거부 피드백",
+      "judgement": "해당 행성이 toggleable=true이고 PLAYING 상태"
+    },
+    {
+      "id": "R2",
+      "result": "속도와 위치 갱신; 행성 중심의 capture_radius 내부 충돌은 금지하고 최소 안전반경에서 접선 방향으로 통과",
+      "trigger": "매 물리 tick",
+      "recovery": "수치 불안정 시 해당 tick 이동량을 최대 이동거리로 clamp",
+      "judgement": "각 생물에 대해 active 행성들의 거리 기반 중력 가속을 합산"
+    },
+    {
+      "id": "R3",
+      "result": "arrived 처리 후 시뮬레이션에서 제거하고 arrived_count +1",
+      "trigger": "생물이 목표 천체의 arrival_radius 진입",
+      "recovery": "속도가 초과하면 도착 처리하지 않고 계속 이동",
+      "judgement": "진입 순간 속도 크기가 target_max_speed 이하"
+    },
+    {
+      "id": "R4",
+      "result": "lost 처리 후 active simulation에서 제거",
+      "trigger": "생물이 play_bounds 밖으로 이탈",
+      "recovery": "lost는 라운드 중 복구되지 않으며 재시도로 초기화",
+      "judgement": "경계 밖 위치"
+    },
+    {
+      "id": "R5",
+      "result": "SUCCESS",
+      "trigger": "arrived_count >= K",
+      "recovery": "결과에서 next/retry",
+      "judgement": "성공 임계 충족"
+    },
+    {
+      "id": "R6",
+      "result": "FAILURE",
+      "trigger": "timer<=0 또는 lost_count>N-K",
+      "recovery": "결과에서 retry/stage select",
+      "judgement": "남은 생물 전부 도착해도 K 미달"
+    },
+    {
+      "id": "R7",
+      "result": "물리·타이머 동결",
+      "trigger": "pause",
+      "recovery": "resume로 동일 상태 계속; retry로 초기 스냅샷 복원",
+      "judgement": "PLAYING"
+    }
+  ],
+  "not_in_mvp": [
+    "행성 직접 이동/배치 편집",
+    "생물 직접 드래그",
+    "업그레이드/재화/상점",
+    "절차 생성",
+    "스토리 캠페인",
+    "온라인 기능",
+    "행성 간 충돌/파괴"
+  ],
+  "updated_at": "2026-09-30T20:09:49.276878+00:00",
+  "archived_at": "2026-09-30T20:10:16.121899+00:00",
+  "known_risks": [
+    "예측선이 실제 궤도와 크게 다르면 플레이가 우연처럼 느껴질 수 있음",
+    "중력 합산이 강하면 수치적으로 급격한 속도 증가가 발생할 수 있음",
+    "생물 개별 궤도가 과도하게 흩어지면 무리 단위 판단이 어려울 수 있음",
+    "도착 속도 조건이 시각적으로 불명확하면 성공 판정이 자의적으로 느껴질 수 있음"
+  ],
+  "progression": "선형 스테이지 해금. 스테이지 성공 시 다음 스테이지가 열린다. 별점/영구 능력치는 MVP에 없다. 실패해도 해금 상태를 잃지 않는다.",
+  "screen_flow": "Stage Select → Observe(3초) → Playing → Success 또는 Failure. Playing ↔ Pause. Success에서 Next 또는 Stage Select, Failure에서 Retry 또는 Stage Select. Retry는 동일 스테이지의 완전한 초기 스냅샷으로 돌아간다.",
+  "state_model": {
+    "planet": [
+      "ACTIVE_GRAVITY",
+      "INACTIVE_GRAVITY"
+    ],
+    "session": [
+      "STAGE_SELECT",
+      "OBSERVE",
+      "PLAYING",
+      "PAUSED",
+      "SUCCESS",
+      "FAILURE"
+    ],
+    "creature": [
+      "ACTIVE",
+      "ARRIVED",
+      "LOST"
+    ],
+    "transitions": [
+      "STAGE_SELECT→OBSERVE:start",
+      "OBSERVE→PLAYING:3s",
+      "PLAYING↔PAUSED:pause/resume",
+      "PLAYING→SUCCESS:R5",
+      "PLAYING→FAILURE:R6",
+      "SUCCESS→STAGE_SELECT/next",
+      "FAILURE→OBSERVE:retry"
+    ]
+  },
+  "archive_path": "projects/orbit-shepherd/game-design/game-design-v0.1.md",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "중력 행성 배치 + 초기 생물 무리 + 목표 천체 + 성공 임계값으로 구성된 1개 스테이지",
+  "content_model": {
+    "classes": {
+      "stage": [
+        "initial_creatures",
+        "required_arrivals",
+        "time_limit",
+        "play_bounds",
+        "target",
+        "planets"
+      ],
+      "planet": [
+        "position",
+        "gravity_strength",
+        "influence_radius",
+        "capture_radius",
+        "toggleable",
+        "initial_active"
+      ],
+      "target": [
+        "position",
+        "arrival_radius",
+        "max_arrival_speed"
+      ],
+      "creature": [
+        "position",
+        "velocity"
+      ]
+    },
+    "topology": "공간은 연속 2D이며 중력권은 겹칠 수 있다. 모든 판정은 월드 좌표 거리와 속도로 수행한다.",
+    "variation_axes": [
+      "행성 수",
+      "행성 위치",
+      "중력 세기",
+      "초기 활성 조합",
+      "생물 시작 위치/속도",
+      "무리 크기",
+      "목표 위치/도착 허용속도",
+      "시간 제한",
+      "플레이 경계"
+    ]
+  },
+  "source_run_at": "2026-09-30T20:09:49.276878+00:00",
+  "archive_commit": "7310017ed912fe7d92e9f37d22a7f782df0ae2c0",
+  "human_priority": false,
+  "player_fantasy": "작은 우주 목동이 되어 직접 생물을 조종하지 않고 행성의 중력만 켜고 끄며 무리의 궤도를 읽고, 포획과 스윙바이를 연쇄시켜 흩어진 떼를 목적지로 인도한다.",
+  "session_length": "스테이지당 약 1~2분, 연속 플레이 5~10분",
+  "test_scenarios": [
+    "성공: N=10,K=7,60초에서 토글 연쇄로 7번째 생물이 허용속도로 목표 반경에 진입하면 즉시 SUCCESS.",
+    "실패-유실: N=10,K=7에서 4번째 생물이 경계 밖으로 나가면 최대 도착 가능 수가 6이므로 즉시 FAILURE.",
+    "실패-시간: arrived=6,lost=0 상태에서 timer=0이면 FAILURE.",
+    "복구: PLAYING 중 pause 후 resume 시 위치/속도/시간이 보존되고, retry 시 모든 값이 스테이지 초기값으로 복원.",
+    "입력: 비토글 행성 탭과 결과 화면 탭은 중력 상태를 바꾸지 않는다."
+  ],
+  "design_markdown": "# Orbit Shepherd — Playable Game Design Spec v0.1\n\n## 1. Product Definition\n손가락으로 작은 행성의 중력을 켰다 껐다 하며 우주 생물 떼의 궤도를 이어 목적지까지 몰아가는 궤도 목축 게임.\n\n## 2. Player Fantasy\n작은 우주 목동이 되어 직접 생물을 조종하지 않고 행성의 중력만 켜고 끄며 무리의 궤도를 읽고, 포획과 스윙바이를 연쇄시켜 흩어진 떼를 목적지로 인도한다.\n\n## 3. Core Player Verbs\n[\n  {\n    \"verb\": \"중력 토글\",\n    \"input\": \"행성 탭\",\n    \"target\": \"토글 가능한 행성\",\n    \"condition\": \"라운드 진행 중\",\n    \"state_change\": \"gravity_active 반전\",\n    \"feedback\": \"중력권·궤도 예측선 즉시 갱신\"\n  },\n  {\n    \"verb\": \"관찰\",\n    \"input\": \"입력 없음/대기\",\n    \"target\": \"생물 무리\",\n    \"condition\": \"항상\",\n    \"state_change\": \"시간 경과에 따라 위치·속도 갱신\",\n    \"feedback\": \"실제 이동 궤적과 예상 경로 표시\"\n  },\n  {\n    \"verb\": \"재결집\",\n    \"input\": \"중력 토글의 연쇄\",\n    \"target\": \"분산된 생물\",\n    \"condition\": \"서로 다른 궤도에 있을 때\",\n    \"state_change\": \"동일 중력권/유사 진행방향으로 수렴\",\n    \"feedback\": \"무리 밀도 상승·결집 신호\"\n  },\n  {\n    \"verb\": \"일시정지/재시작\",\n    \"input\": \"pause/retry\",\n    \"target\": \"현재 라운드\",\n    \"condition\": \"진행/결과 상태\",\n    \"state_change\": \"시뮬레이션 정지 또는 초기 스냅샷 복원\",\n    \"feedback\": \"상태 명시\"\n  }\n]\n\n## 4. Core Loop\n초기 행성·목표·무리 상태를 읽는다 → 행성 중력을 탭으로 켜고 끈다 → 예측선과 실제 궤도 차이를 관찰한다 → 다음 중력 토글로 포획/스윙바이/재결집을 수정한다 → 목표 천체에 요구 수를 도착시킨다 → 결과를 확인하고 다음 스테이지 또는 재시도한다.\n\n## 5. Round / Session Structure\n스테이지 시작 시 생물 N마리와 요구 도착 수 K, 행성들의 고정 위치·중력 세기·초기 활성 상태가 로드된다. 3초의 무위험 관찰 단계 뒤 실시간 진행한다. 제한시간은 스테이지 데이터로 정하며 기본 60초. K마리가 목표에 도착하면 즉시 성공, 시간 0 또는 회수 불가능 경계 밖으로 이탈한 수가 N-K+1에 도달하면 즉시 실패. 성공/실패 후 결과 상태에서 재시도 또는 다음 스테이지 선택.\n\n## 6. Game Rules\n[\n  {\n    \"id\": \"R1\",\n    \"trigger\": \"플레이어가 행성을 탭\",\n    \"judgement\": \"해당 행성이 toggleable=true이고 PLAYING 상태\",\n    \"result\": \"gravity_active를 즉시 반전\",\n    \"recovery\": \"무효 대상/비진행 상태 입력은 상태 변화 없이 거부 피드백\"\n  },\n  {\n    \"id\": \"R2\",\n    \"trigger\": \"매 물리 tick\",\n    \"judgement\": \"각 생물에 대해 active 행성들의 거리 기반 중력 가속을 합산\",\n    \"result\": \"속도와 위치 갱신; 행성 중심의 capture_radius 내부 충돌은 금지하고 최소 안전반경에서 접선 방향으로 통과\",\n    \"recovery\": \"수치 불안정 시 해당 tick 이동량을 최대 이동거리로 clamp\"\n  },\n  {\n    \"id\": \"R3\",\n    \"trigger\": \"생물이 목표 천체의 arrival_radius 진입\",\n    \"judgement\": \"진입 순간 속도 크기가 target_max_speed 이하\",\n    \"result\": \"arrived 처리 후 시뮬레이션에서 제거하고 arrived_count +1\",\n    \"recovery\": \"속도가 초과하면 도착 처리하지 않고 계속 이동\"\n  },\n  {\n    \"id\": \"R4\",\n    \"trigger\": \"생물이 play_bounds 밖으로 이탈\",\n    \"judgement\": \"경계 밖 위치\",\n    \"result\": \"lost 처리 후 active simulation에서 제거\",\n    \"recovery\": \"lost는 라운드 중 복구되지 않으며 재시도로 초기화\"\n  },\n  {\n    \"id\": \"R5\",\n    \"trigger\": \"arrived_count >= K\",\n    \"judgement\": \"성공 임계 충족\",\n    \"result\": \"SUCCESS\",\n    \"recovery\": \"결과에서 next/retry\"\n  },\n  {\n    \"id\": \"R6\",\n    \"trigger\": \"timer<=0 또는 lost_count>N-K\",\n    \"judgement\": \"남은 생물 전부 도착해도 K 미달\",\n    \"result\": \"FAILURE\",\n    \"recovery\": \"결과에서 retry/stage select\"\n  },\n  {\n    \"id\": \"R7\",\n    \"trigger\": \"pause\",\n    \"judgement\": \"PLAYING\",\n    \"result\": \"물리·타이머 동결\",\n    \"recovery\": \"resume로 동일 상태 계속; retry로 초기 스냅샷 복원\"\n  }\n]\n\n## 7. State Model\n{\n  \"session\": [\n    \"STAGE_SELECT\",\n    \"OBSERVE\",\n    \"PLAYING\",\n    \"PAUSED\",\n    \"SUCCESS\",\n    \"FAILURE\"\n  ],\n  \"creature\": [\n    \"ACTIVE\",\n    \"ARRIVED\",\n    \"LOST\"\n  ],\n  \"planet\": [\n    \"ACTIVE_GRAVITY\",\n    \"INACTIVE_GRAVITY\"\n  ],\n  \"transitions\": [\n    \"STAGE_SELECT→OBSERVE:start\",\n    \"OBSERVE→PLAYING:3s\",\n    \"PLAYING↔PAUSED:pause/resume\",\n    \"PLAYING→SUCCESS:R5\",\n    \"PLAYING→FAILURE:R6\",\n    \"SUCCESS→STAGE_SELECT/next\",\n    \"FAILURE→OBSERVE:retry\"\n  ]\n}\n\n## 8. Interaction Spec\n{\n  \"primary\": \"행성 단일 탭 토글\",\n  \"timing\": \"입력은 PLAYING에서 즉시 다음 physics tick에 반영\",\n  \"prediction\": \"선택 입력 없이 모든 ACTIVE 생물에 짧은 미래 궤도 예측을 표시하며 토글 직후 재계산\",\n  \"pause\": \"명시적 pause/resume/retry\",\n  \"direct_creature_control\": \"금지\"\n}\n\n## 9. Content Model\n{\n  \"classes\": {\n    \"stage\": [\n      \"initial_creatures\",\n      \"required_arrivals\",\n      \"time_limit\",\n      \"play_bounds\",\n      \"target\",\n      \"planets\"\n    ],\n    \"planet\": [\n      \"position\",\n      \"gravity_strength\",\n      \"influence_radius\",\n      \"capture_radius\",\n      \"toggleable\",\n      \"initial_active\"\n    ],\n    \"creature\": [\n      \"position\",\n      \"velocity\"\n    ],\n    \"target\": [\n      \"position\",\n      \"arrival_radius\",\n      \"max_arrival_speed\"\n    ]\n  },\n  \"variation_axes\": [\n    \"행성 수\",\n    \"행성 위치\",\n    \"중력 세기\",\n    \"초기 활성 조합\",\n    \"생물 시작 위치/속도\",\n    \"무리 크기\",\n    \"목표 위치/도착 허용속도\",\n    \"시간 제한\",\n    \"플레이 경계\"\n  ],\n  \"topology\": \"공간은 연속 2D이며 중력권은 겹칠 수 있다. 모든 판정은 월드 좌표 거리와 속도로 수행한다.\"\n}\n\n## 10. Difficulty / Variation\n초반은 1~2개 토글 행성과 넓은 목표/낮은 초기 속도, 중반은 중력권 중첩과 분산 무리, 후반은 3개 이상 행성·좁은 도착 속도 허용·서로 다른 초기 속도의 하위 무리를 조합한다. 새 조작을 추가하지 않고 예측과 수정의 난도만 높인다.\n\n## 11. Progression\n선형 스테이지 해금. 스테이지 성공 시 다음 스테이지가 열린다. 별점/영구 능력치는 MVP에 없다. 실패해도 해금 상태를 잃지 않는다.\n\n## 12. Economy\nNot required\n\n## 13. Screen Inventory\nStage Select\n- Gameplay / Observe\n- Gameplay / Playing\n- Pause Overlay\n- Result / Success\n- Result / Failure\n\n## 14. Screen Flow\nStage Select → Observe(3초) → Playing → Success 또는 Failure. Playing ↔ Pause. Success에서 Next 또는 Stage Select, Failure에서 Retry 또는 Stage Select. Retry는 동일 스테이지의 완전한 초기 스냅샷으로 돌아간다.\n\n## 15. Feedback System\n{\n  \"gravity\": \"활성/비활성 상태를 행성 자체와 영향권으로 이중 표현\",\n  \"trajectory\": \"짧은 미래 예측선과 실제 이동 trail을 구분\",\n  \"creature\": \"ACTIVE/ARRIVED/LOST 즉시 상태 변화\",\n  \"goal\": \"K와 arrived_count, 남은 시간, 도착 허용속도를 판독 가능하게 표시\",\n  \"failure\": \"lost 또는 시간초과 원인을 결과에 명시\",\n  \"input\": \"탭 직후 중력권과 예측선 갱신\"\n}\n\n## 16. Visual Direction Brief\n고정 2D 우주 평면 카메라. 행성·목표·생물 점 무리의 실루엣과 궤도가 최우선이며 장식은 궤도 판독을 방해하지 않는다. UI는 월드 위 핵심 카운트/시간만 겹치고 상세 상태는 가장자리 정보층에 둔다. 중력권 중첩에서도 활성 상태와 예측선이 분리되어 읽혀야 한다.\n\n## 17. MVP Scope + NOT IN MVP\n중력 토글만으로 완결되는 다중 스테이지 싱글플레이: 고정 행성 배치, 실시간 2D 중력, 생물 무리, 목표 도착/유실, 예측선, pause/retry, 선형 해금, 난도 variation.\n\nNOT IN MVP:\n- 행성 직접 이동/배치 편집\n- 생물 직접 드래그\n- 업그레이드/재화/상점\n- 절차 생성\n- 스토리 캠페인\n- 온라인 기능\n- 행성 간 충돌/파괴\n\n## 18. Test Scenarios\n성공: N=10,K=7,60초에서 토글 연쇄로 7번째 생물이 허용속도로 목표 반경에 진입하면 즉시 SUCCESS.\n- 실패-유실: N=10,K=7에서 4번째 생물이 경계 밖으로 나가면 최대 도착 가능 수가 6이므로 즉시 FAILURE.\n- 실패-시간: arrived=6,lost=0 상태에서 timer=0이면 FAILURE.\n- 복구: PLAYING 중 pause 후 resume 시 위치/속도/시간이 보존되고, retry 시 모든 값이 스테이지 초기값으로 복원.\n- 입력: 비토글 행성 탭과 결과 화면 탭은 중력 상태를 바꾸지 않는다.\n\n## 19. Known Risks\n예측선이 실제 궤도와 크게 다르면 플레이가 우연처럼 느껴질 수 있음\n- 중력 합산이 강하면 수치적으로 급격한 속도 증가가 발생할 수 있음\n- 생물 개별 궤도가 과도하게 흩어지면 무리 단위 판단이 어려울 수 있음\n- 도착 속도 조건이 시각적으로 불명확하면 성공 판정이 자의적으로 느껴질 수 있음\n\n## 20. Wireframe Handoff\nfun_promise: 탭 한 번으로 궤도가 크게 바뀌되, 플레이어가 그 변화를 읽고 다음 토글로 수정할 수 있는 우주 목축.\n- MVP 전체 화면: Stage Select, Observe/Playing gameplay, Pause, Success, Failure.\n- 핵심 상태를 시각적으로 구분: 행성 gravity on/off, 생물 active/arrived/lost, observe/playing/paused/result.\n- 고유 제스처는 행성 탭 토글과 pause/result 선택뿐이며 생물 직접 조작 금지.\n- Gameplay에는 현재 도착수/K, 시간, 목표 도착속도 조건, 활성 중력권, 예측 궤도, 실제 trail이 판독되어야 함.\n- variation은 동일 화면에서 행성 수/중첩, 무리 분산, 목표 허용치, 시작 속도 차이로 표현하며 새 규칙을 발명하지 말 것.\n- retry는 동일 스테이지 초기 스냅샷으로, next는 해금된 다음 스테이지로 전환.",
+  "feedback_system": {
+    "goal": "K와 arrived_count, 남은 시간, 도착 허용속도를 판독 가능하게 표시",
+    "input": "탭 직후 중력권과 예측선 갱신",
+    "failure": "lost 또는 시간초과 원인을 결과에 명시",
+    "gravity": "활성/비활성 상태를 행성 자체와 영향권으로 이중 표현",
+    "creature": "ACTIVE/ARRIVED/LOST 즉시 상태 변화",
+    "trajectory": "짧은 미래 예측선과 실제 이동 trail을 구분"
+  },
+  "round_structure": "스테이지 시작 시 생물 N마리와 요구 도착 수 K, 행성들의 고정 위치·중력 세기·초기 활성 상태가 로드된다. 3초의 무위험 관찰 단계 뒤 실시간 진행한다. 제한시간은 스테이지 데이터로 정하며 기본 60초. K마리가 목표에 도착하면 즉시 성공, 시간 0 또는 회수 불가능 경계 밖으로 이탈한 수가 N-K+1에 도달하면 즉시 실패. 성공/실패 후 결과 상태에서 재시도 또는 다음 스테이지 선택.",
+  "interaction_spec": {
+    "pause": "명시적 pause/resume/retry",
+    "timing": "입력은 PLAYING에서 즉시 다음 physics tick에 반영",
+    "primary": "행성 단일 탭 토글",
+    "prediction": "선택 입력 없이 모든 ACTIVE 생물에 짧은 미래 궤도 예측을 표시하며 토글 직후 재계산",
+    "direct_creature_control": "금지"
+  },
+  "screen_inventory": [
+    "Stage Select",
+    "Gameplay / Observe",
+    "Gameplay / Playing",
+    "Pause Overlay",
+    "Result / Success",
+    "Result / Failure"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "중력 토글",
+      "input": "행성 탭",
+      "target": "토글 가능한 행성",
+      "feedback": "중력권·궤도 예측선 즉시 갱신",
+      "condition": "라운드 진행 중",
+      "state_change": "gravity_active 반전"
+    },
+    {
+      "verb": "관찰",
+      "input": "입력 없음/대기",
+      "target": "생물 무리",
+      "feedback": "실제 이동 궤적과 예상 경로 표시",
+      "condition": "항상",
+      "state_change": "시간 경과에 따라 위치·속도 갱신"
+    },
+    {
+      "verb": "재결집",
+      "input": "중력 토글의 연쇄",
+      "target": "분산된 생물",
+      "feedback": "무리 밀도 상승·결집 신호",
+      "condition": "서로 다른 궤도에 있을 때",
+      "state_change": "동일 중력권/유사 진행방향으로 수렴"
+    },
+    {
+      "verb": "일시정지/재시작",
+      "input": "pause/retry",
+      "target": "현재 라운드",
+      "feedback": "상태 명시",
+      "condition": "진행/결과 상태",
+      "state_change": "시뮬레이션 정지 또는 초기 스냅샷 복원"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 탭 한 번으로 궤도가 크게 바뀌되, 플레이어가 그 변화를 읽고 다음 토글로 수정할 수 있는 우주 목축.",
+    "MVP 전체 화면: Stage Select, Observe/Playing gameplay, Pause, Success, Failure.",
+    "핵심 상태를 시각적으로 구분: 행성 gravity on/off, 생물 active/arrived/lost, observe/playing/paused/result.",
+    "고유 제스처는 행성 탭 토글과 pause/result 선택뿐이며 생물 직접 조작 금지.",
+    "Gameplay에는 현재 도착수/K, 시간, 목표 도착속도 조건, 활성 중력권, 예측 궤도, 실제 trail이 판독되어야 함.",
+    "variation은 동일 화면에서 행성 수/중첩, 무리 분산, 목표 허용치, 시작 속도 차이로 표현하며 새 규칙을 발명하지 말 것.",
+    "retry는 동일 스테이지 초기 스냅샷으로, next는 해금된 다음 스테이지로 전환."
+  ],
+  "primary_interaction": "행성을 탭해 중력을 실시간 ON/OFF하며 생물 무리의 궤도를 수정",
+  "difficulty_variation": "초반은 1~2개 토글 행성과 넓은 목표/낮은 초기 속도, 중반은 중력권 중첩과 분산 무리, 후반은 3개 이상 행성·좁은 도착 속도 허용·서로 다른 초기 속도의 하위 무리를 조합한다. 새 조작을 추가하지 않고 예측과 수정의 난도만 높인다.",
+  "visual_direction_brief": "고정 2D 우주 평면 카메라. 행성·목표·생물 점 무리의 실루엣과 궤도가 최우선이며 장식은 궤도 판독을 방해하지 않는다. UI는 월드 위 핵심 카운트/시간만 겹치고 상세 상태는 가장자리 정보층에 둔다. 중력권 중첩에서도 활성 상태와 예측선이 분리되어 읽혀야 한다."
+}

@@ -1,55 +1,15 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "idea_id": "11b17ea3-f686-4f14-8401-949c58675cf5",
+  "id": "e909c470-cbf0-472b-bf9b-da017b98aefc",
   "title": "Deep Sea Cable Splicer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required.",
+  "idea_id": "11b17ea3-f686-4f14-8401-949c58675cf5",
   "version": "v0.1",
   "one_line": "심해 작업대에서 해저 케이블을 절개하고 광섬유를 직접 짝지어 압착해 신호를 복구하는 모바일 수리 퍼즐.",
-  "player_fantasy": "플레이어는 심해 통신 수리기사다. 복잡한 케이블 속 규칙을 읽고 손으로 정리·접속해 죽은 신호가 살아나는 공학적 만족을 느낀다.",
-  "core_player_verbs": [
-    {
-      "verb": "strip",
-      "input": "drag blade along marked sheath",
-      "target": "cable jacket",
-      "feedback": "sheath peels",
-      "condition": "sealed",
-      "state_change": "reveals fibers"
-    },
-    {
-      "verb": "route",
-      "input": "drag fiber end",
-      "target": "splice slot",
-      "feedback": "snap preview",
-      "condition": "exposed",
-      "state_change": "fiber assigned"
-    },
-    {
-      "verb": "splice",
-      "input": "press/hold clamp",
-      "target": "paired slot",
-      "feedback": "clamp flash",
-      "condition": "two fibers seated",
-      "state_change": "pair locked"
-    },
-    {
-      "verb": "test",
-      "input": "tap test",
-      "target": "manifest",
-      "feedback": "waveform",
-      "condition": "all required pairs locked",
-      "state_change": "signal evaluated"
-    },
-    {
-      "verb": "rework",
-      "input": "long-press failed splice",
-      "target": "locked pair",
-      "feedback": "connector opens",
-      "condition": "test failed",
-      "state_change": "unlock pair, consume rework"
-    }
-  ],
   "core_loop": "케이블 확인→피복 절개→4–6가닥 펼치기→신호 규칙을 보고 대응 가닥을 drag/snap→압착→Test→오류 가닥만 재작업→복구. 세션 3 케이블.",
-  "round_structure": "Job 시작 시 sealed cable과 manifest가 생성. Strip→Routing→Locked/Test→Rework(optional)→Result. 모든 required channel 통과 성공. Rework token 2개 소진 후 test 실패면 job 실패. 60–120초/job, 4–6분/session.",
+  "mvp_scope": "3 jobs: 4-fiber direct color, 4-fiber symbol remap, 6-fiber crossing-sensitive. Strip damage, routing/snap, clamp, test, 2 rework tokens, pass/fail/result/retry를 구현.",
+  "created_at": "2026-09-29T18:14:49.272106+00:00",
   "game_rules": {
     "test": "each locked pair computes compatibility minus attenuation; pass >=0.8",
     "reset": "retry restores sheath, fibers, tokens and manifest initial state",
@@ -69,6 +29,24 @@
     "signal_threshold": 0.8,
     "strip_tolerance_px": 20
   },
+  "not_in_mvp": [
+    "Freeform cable generation",
+    "Economy",
+    "Tool upgrades",
+    "Narrative base",
+    "More than 6 fibers",
+    "Timed emergency mode"
+  ],
+  "updated_at": "2026-09-30T08:31:12.54041+00:00",
+  "archived_at": "2026-09-29T18:15:25.245093+00:00",
+  "known_risks": [
+    "fiber가 많아지면 손가락 occlusion",
+    "색 의존 접근성",
+    "crossing 판정이 시각과 불일치할 위험",
+    "strip 단계가 반복적으로 느껴질 위험"
+  ],
+  "progression": "MVP는 3 jobs 순차 해금과 best repair grade. 이후 장비/기지 구역 해금 가능.",
+  "screen_flow": "Job Select→Sealed/Strip→Routing→ReadyTest→Pass Result 또는 Failed Test→Rework→ReadyTest. tokens 0에서 재실패→Fail Result. Retry는 job 전체 reset.",
   "state_model": [
     {
       "exit": "sheath opened",
@@ -141,28 +119,9 @@
       ]
     }
   ],
-  "interaction_spec": {
-    "clamp": {
-      "input": "hold 400ms",
-      "condition": "two ends seated",
-      "state_change": "locks pair"
-    },
-    "route": {
-      "snap": "24px",
-      "input": "drag exposed fiber tip",
-      "cancel": "release off-slot returns to last rest position",
-      "target": "empty compatible-size slot",
-      "invalid": "occupied slot rejects and returns fiber"
-    },
-    "strip": {
-      "input": "drag along sheath seam",
-      "valid": "within 20px corridor and forward progress",
-      "cancel": "lift pauses progress",
-      "invalid": "150ms outside causes damage once per strip"
-    },
-    "rework": "long-press failed locked pair 300ms; costs token only when unlock completes",
-    "priority": "dragged fiber captures pointer; test disabled until required pairs locked"
-  },
+  "archive_path": "projects/deep-sea-cable-splicer/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "cable repair job",
   "content_model": {
     "mvp": {
       "jobs": 3,
@@ -187,15 +146,19 @@
     ],
     "unit": "cable repair job"
   },
-  "difficulty_variation": "초반은 색 직접 매칭 4가닥, 중반은 색 대신 symbol/signature remap, 후반은 6가닥과 crossing attenuation으로 공간 정리를 요구한다. 속도보다 정보 규칙과 배선 topology를 어렵게 한다.",
-  "progression": "MVP는 3 jobs 순차 해금과 best repair grade. 이후 장비/기지 구역 해금 가능.",
-  "economy": "Not required.",
-  "screen_inventory": [
-    "Job Select",
-    "Splice Workbench",
-    "Job Result"
+  "source_run_at": "2026-09-29T18:14:49.272106+00:00",
+  "archive_commit": "068295b30825a231bf34397a1eb97df3ad27d5b8",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 심해 통신 수리기사다. 복잡한 케이블 속 규칙을 읽고 손으로 정리·접속해 죽은 신호가 살아나는 공학적 만족을 느낀다.",
+  "session_length": "4–6분",
+  "test_scenarios": [
+    "세 jobs 모두 규칙만 읽고 완주 가능",
+    "invalid slot release가 항상 원위치로 복귀",
+    "failed test가 정확한 channel을 특정",
+    "rework token 감소와 terminal failure가 일관됨",
+    "pause/retry 후 timers/state가 정확히 복구/reset"
   ],
-  "screen_flow": "Job Select→Sealed/Strip→Routing→ReadyTest→Pass Result 또는 Failed Test→Rework→ReadyTest. tokens 0에서 재실패→Fail Result. Retry는 job 전체 reset.",
+  "design_markdown": "# Playable Game Design Spec v0.1 — Deep Sea Cable Splicer\\n\\n## 1. Product Definition\\n해저 케이블을 손으로 절개·배선·압착하는 portrait mobile repair puzzle, 4–6분. Non-goals: 선택지 게임, 경영, 실시간 액션.\\n## 2. Player Fantasy\\n심해 통신 수리기사로서 복잡한 신호 규칙을 읽고 죽은 회선을 살린다.\\n## 3. Core Player Verbs\\nStrip(drag), Route(drag/snap), Splice(hold clamp), Test(tap), Rework(long-press). 각 행동은 cable state/assignment/token을 변경한다.\\n## 4. Core Loop\\n확인→절개→4–6 fibers 배선→압착→test→오류 rework→복구. 3 jobs/session.\\n## 5. Round / Session Structure\\nSealed→Routing→ReadyTest→Rework(optional)→Result. 60–120초/job. Next/Retry.\\n## 6. Game Rules\\nRework 2. Strip corridor 20px; 150ms 이탈은 한 fiber attenuation +0.25. Bad pair는 signature mismatch. 2개 초과 crossing마다 attenuation +0.15. Signal >=0.8 pass. Failed channel은 waveform으로 특정. Unlock 완료 시 token -1. Token 0에서 재실패하면 terminal fail. Retry full reset.\\n## 7. State Model\\nSealed(strip), Routing(route/snap/clamp), ReadyTest(test), Rework(unlock/reroute), Result(next/retry). Pause 시 모든 timers/animation simulation 정지.\\n## 8. Interaction Spec\\nStrip은 seam corridor forward drag. Lift는 pause. Fiber는 empty slot 24px snap; occupied rejects and returns. Clamp hold 400ms locks. Dragged fiber pointer priority. Test는 required pairs locked 전 disabled. Rework long-press 300ms.\\n## 9. Content Model\\nJob = fiber count×signature mapping×crossing constraint×damage×slot order. MVP 3 authored jobs.\\n## 10. Difficulty / Variation\\n4 direct color→4 symbol remap→6 crossing-sensitive. Speed-only scaling 없음.\\n## 11. Progression\\n3 jobs sequential unlock+best grade.\\n## 12. Economy\\nNot required.\\n## 13. Screen Inventory\\nJob Select, Splice Workbench, Job Result.\\n## 14. Screen Flow\\nSelect→Strip→Routing→Test→Pass Result 또는 Rework→Test; tokens 0 fail→Result; Retry full reset.\\n## 15. Feedback System\\nSheath peel/damage tick, slot glow/snap, clamp pulse, waveform sweep, failed-channel isolation, clean signal success.\\n## 16. Visual Direction Brief\\nPortrait close-up workbench, dark deep-sea hardware vs luminous fibers, thick readable endpoints/slots, diagnostic waveform without layout prescription.\\n## 17. MVP Scope\\n3 jobs: 4 direct, 4 remap, 6 crossing. Strip damage, route/snap, clamp, test, 2 tokens, result/retry. NOT IN MVP: procedural, economy, upgrades, narrative, >6 fibers, timed mode.\\n## 18. Test Scenarios\\nAll jobs complete; invalid slot always returns; failed test identifies channel; token/terminal fail consistent; pause/retry deterministic.\\n## 19. Known Risks\\nOcclusion, color accessibility, crossing mismatch, repetitive stripping.\\n## 20. Wireframe Handoff\\nShow all screens/states, strip damage/cancel, route snap/reject, clamp/test lock, waveform diagnosis, token use, terminal fail, full retry reset. No game-rule invention required.",
   "feedback_system": {
     "fail": {
       "audio": "low buzz",
@@ -227,29 +190,77 @@
       "visual": "peeling sheath/damage nick"
     }
   },
-  "visual_direction_brief": "Portrait mobile workbench close-up. 검은 심해 장비와 밝은 fiber glow 대비. Fiber end와 slot이 손가락 아래에서도 구분되도록 굵은 실루엣과 충분한 간격을 유지하되 좌표는 Wireframe에서 결정. Waveform은 진단 의미만 명확히.",
-  "mvp_scope": "3 jobs: 4-fiber direct color, 4-fiber symbol remap, 6-fiber crossing-sensitive. Strip damage, routing/snap, clamp, test, 2 rework tokens, pass/fail/result/retry를 구현.",
-  "not_in_mvp": [
-    "Freeform cable generation",
-    "Economy",
-    "Tool upgrades",
-    "Narrative base",
-    "More than 6 fibers",
-    "Timed emergency mode"
+  "round_structure": "Job 시작 시 sealed cable과 manifest가 생성. Strip→Routing→Locked/Test→Rework(optional)→Result. 모든 required channel 통과 성공. Rework token 2개 소진 후 test 실패면 job 실패. 60–120초/job, 4–6분/session.",
+  "interaction_spec": {
+    "clamp": {
+      "input": "hold 400ms",
+      "condition": "two ends seated",
+      "state_change": "locks pair"
+    },
+    "route": {
+      "snap": "24px",
+      "input": "drag exposed fiber tip",
+      "cancel": "release off-slot returns to last rest position",
+      "target": "empty compatible-size slot",
+      "invalid": "occupied slot rejects and returns fiber"
+    },
+    "strip": {
+      "input": "drag along sheath seam",
+      "valid": "within 20px corridor and forward progress",
+      "cancel": "lift pauses progress",
+      "invalid": "150ms outside causes damage once per strip"
+    },
+    "rework": "long-press failed locked pair 300ms; costs token only when unlock completes",
+    "priority": "dragged fiber captures pointer; test disabled until required pairs locked"
+  },
+  "screen_inventory": [
+    "Job Select",
+    "Splice Workbench",
+    "Job Result"
   ],
-  "test_scenarios": [
-    "세 jobs 모두 규칙만 읽고 완주 가능",
-    "invalid slot release가 항상 원위치로 복귀",
-    "failed test가 정확한 channel을 특정",
-    "rework token 감소와 terminal failure가 일관됨",
-    "pause/retry 후 timers/state가 정확히 복구/reset"
+  "core_player_verbs": [
+    {
+      "verb": "strip",
+      "input": "drag blade along marked sheath",
+      "target": "cable jacket",
+      "feedback": "sheath peels",
+      "condition": "sealed",
+      "state_change": "reveals fibers"
+    },
+    {
+      "verb": "route",
+      "input": "drag fiber end",
+      "target": "splice slot",
+      "feedback": "snap preview",
+      "condition": "exposed",
+      "state_change": "fiber assigned"
+    },
+    {
+      "verb": "splice",
+      "input": "press/hold clamp",
+      "target": "paired slot",
+      "feedback": "clamp flash",
+      "condition": "two fibers seated",
+      "state_change": "pair locked"
+    },
+    {
+      "verb": "test",
+      "input": "tap test",
+      "target": "manifest",
+      "feedback": "waveform",
+      "condition": "all required pairs locked",
+      "state_change": "signal evaluated"
+    },
+    {
+      "verb": "rework",
+      "input": "long-press failed splice",
+      "target": "locked pair",
+      "feedback": "connector opens",
+      "condition": "test failed",
+      "state_change": "unlock pair, consume rework"
+    }
   ],
-  "known_risks": [
-    "fiber가 많아지면 손가락 occlusion",
-    "색 의존 접근성",
-    "crossing 판정이 시각과 불일치할 위험",
-    "strip 단계가 반복적으로 느껴질 위험"
-  ],
+  "human_priority_at": null,
   "wireframe_handoff": [
     "3 screens and five states",
     "strip valid/damage/cancel",
@@ -260,9 +271,6 @@
     "terminal fail and full retry reset"
   ],
   "primary_interaction": "피복 drag 절개 + 광섬유 drag/snap 배선 + clamp/test/rework",
-  "session_length": "4–6분",
-  "content_unit": "cable repair job",
-  "design_markdown": "# Playable Game Design Spec v0.1 — Deep Sea Cable Splicer\\n\\n## 1. Product Definition\\n해저 케이블을 손으로 절개·배선·압착하는 portrait mobile repair puzzle, 4–6분. Non-goals: 선택지 게임, 경영, 실시간 액션.\\n## 2. Player Fantasy\\n심해 통신 수리기사로서 복잡한 신호 규칙을 읽고 죽은 회선을 살린다.\\n## 3. Core Player Verbs\\nStrip(drag), Route(drag/snap), Splice(hold clamp), Test(tap), Rework(long-press). 각 행동은 cable state/assignment/token을 변경한다.\\n## 4. Core Loop\\n확인→절개→4–6 fibers 배선→압착→test→오류 rework→복구. 3 jobs/session.\\n## 5. Round / Session Structure\\nSealed→Routing→ReadyTest→Rework(optional)→Result. 60–120초/job. Next/Retry.\\n## 6. Game Rules\\nRework 2. Strip corridor 20px; 150ms 이탈은 한 fiber attenuation +0.25. Bad pair는 signature mismatch. 2개 초과 crossing마다 attenuation +0.15. Signal >=0.8 pass. Failed channel은 waveform으로 특정. Unlock 완료 시 token -1. Token 0에서 재실패하면 terminal fail. Retry full reset.\\n## 7. State Model\\nSealed(strip), Routing(route/snap/clamp), ReadyTest(test), Rework(unlock/reroute), Result(next/retry). Pause 시 모든 timers/animation simulation 정지.\\n## 8. Interaction Spec\\nStrip은 seam corridor forward drag. Lift는 pause. Fiber는 empty slot 24px snap; occupied rejects and returns. Clamp hold 400ms locks. Dragged fiber pointer priority. Test는 required pairs locked 전 disabled. Rework long-press 300ms.\\n## 9. Content Model\\nJob = fiber count×signature mapping×crossing constraint×damage×slot order. MVP 3 authored jobs.\\n## 10. Difficulty / Variation\\n4 direct color→4 symbol remap→6 crossing-sensitive. Speed-only scaling 없음.\\n## 11. Progression\\n3 jobs sequential unlock+best grade.\\n## 12. Economy\\nNot required.\\n## 13. Screen Inventory\\nJob Select, Splice Workbench, Job Result.\\n## 14. Screen Flow\\nSelect→Strip→Routing→Test→Pass Result 또는 Rework→Test; tokens 0 fail→Result; Retry full reset.\\n## 15. Feedback System\\nSheath peel/damage tick, slot glow/snap, clamp pulse, waveform sweep, failed-channel isolation, clean signal success.\\n## 16. Visual Direction Brief\\nPortrait close-up workbench, dark deep-sea hardware vs luminous fibers, thick readable endpoints/slots, diagnostic waveform without layout prescription.\\n## 17. MVP Scope\\n3 jobs: 4 direct, 4 remap, 6 crossing. Strip damage, route/snap, clamp, test, 2 tokens, result/retry. NOT IN MVP: procedural, economy, upgrades, narrative, >6 fibers, timed mode.\\n## 18. Test Scenarios\\nAll jobs complete; invalid slot always returns; failed test identifies channel; token/terminal fail consistent; pause/retry deterministic.\\n## 19. Known Risks\\nOcclusion, color accessibility, crossing mismatch, repetitive stripping.\\n## 20. Wireframe Handoff\\nShow all screens/states, strip damage/cancel, route snap/reject, clamp/test lock, waveform diagnosis, token use, terminal fail, full retry reset. No game-rule invention required.",
-  "source": "chat_automation",
-  "source_run_at": "2026-09-29 18:14:49.272106+00"
+  "difficulty_variation": "초반은 색 직접 매칭 4가닥, 중반은 색 대신 symbol/signature remap, 후반은 6가닥과 crossing attenuation으로 공간 정리를 요구한다. 속도보다 정보 규칙과 배선 topology를 어렵게 한다.",
+  "visual_direction_brief": "Portrait mobile workbench close-up. 검은 심해 장비와 밝은 fiber glow 대비. Fiber end와 slot이 손가락 아래에서도 구분되도록 굵은 실루엣과 충분한 간격을 유지하되 좌표는 Wireframe에서 결정. Waveform은 진단 의미만 명확히."
 }

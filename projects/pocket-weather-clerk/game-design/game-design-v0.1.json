@@ -1,253 +1,258 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
-    "title": "Pocket Weather Clerk",
-    "source": "chat_automation",
-    "economy": "Not required. MVP에는 화폐나 상점이 없다.",
-    "idea_id": "b05bf62b-6849-434c-82a4-6787557d18ef",
-    "version": "v0.1",
-    "one_line": "구름·바람·습도 장치를 직접 만져 미니어처 동네의 국지 날씨 주문을 맞추는 모바일 촉각 퍼즐.",
-    "core_loop": "의뢰 확인 → 현재 상태 읽기 → 구름 드래그·바람 회전·습도 조절 → 1.2초 정착 관찰 → 미세 조정 → 제출 → 구역별 결과 확인 → 다음 의뢰. 플레이어는 숫자 정답을 고르는 대신 환경 반응을 읽어 직접 조작한다.",
-    "mvp_scope": "6개 화면/overlay, 5개 데이터 주문, cloud drag/wind rotation/humidity drag, settle simulation, 결합 날씨 규칙, 평가·별, retry/next, Shift 완료 unlock을 구현한다.",
-    "game_rules": {
-      "rules": [
-        "high humidity + low cloud + low wind = fog",
-        "high humidity + sufficient cloud = rain",
-        "strong wind moves/disperses clouds",
-        "cloud footprint affects only overlapping districts"
-      ],
-      "score": "success 1 star; <=5 adjustments +1; no forbidden overshoot +1",
-      "failure": "forbidden condition at submit or adjustment budget exceeded",
-      "success": "all district targets within tolerance 15",
-      "variables": {
-        "humidity": "0-100",
-        "cloud_cover": "0-100",
-        "wind_strength": "0-3",
-        "cloud_altitude": "low/mid/high",
-        "wind_direction": "8-way"
-      },
-      "shift_orders": 5,
-      "adjustment_budget": 8
+  "id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
+  "title": "Pocket Weather Clerk",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. MVP에는 화폐나 상점이 없다.",
+  "idea_id": "b05bf62b-6849-434c-82a4-6787557d18ef",
+  "version": "v0.1",
+  "one_line": "구름·바람·습도 장치를 직접 만져 미니어처 동네의 국지 날씨 주문을 맞추는 모바일 촉각 퍼즐.",
+  "core_loop": "의뢰 확인 → 현재 상태 읽기 → 구름 드래그·바람 회전·습도 조절 → 1.2초 정착 관찰 → 미세 조정 → 제출 → 구역별 결과 확인 → 다음 의뢰. 플레이어는 숫자 정답을 고르는 대신 환경 반응을 읽어 직접 조작한다.",
+  "mvp_scope": "6개 화면/overlay, 5개 데이터 주문, cloud drag/wind rotation/humidity drag, settle simulation, 결합 날씨 규칙, 평가·별, retry/next, Shift 완료 unlock을 구현한다.",
+  "created_at": "2026-09-29T13:24:14.996435+00:00",
+  "game_rules": {
+    "rules": [
+      "high humidity + low cloud + low wind = fog",
+      "high humidity + sufficient cloud = rain",
+      "strong wind moves/disperses clouds",
+      "cloud footprint affects only overlapping districts"
+    ],
+    "score": "success 1 star; <=5 adjustments +1; no forbidden overshoot +1",
+    "failure": "forbidden condition at submit or adjustment budget exceeded",
+    "success": "all district targets within tolerance 15",
+    "variables": {
+      "humidity": "0-100",
+      "cloud_cover": "0-100",
+      "wind_strength": "0-3",
+      "cloud_altitude": "low/mid/high",
+      "wind_direction": "8-way"
     },
-    "not_in_mvp": [
-      "economy/store",
-      "season system",
-      "procedural town generation",
-      "complex fluid simulation",
-      "online leaderboard",
-      "final art/audio polish"
-    ],
-    "known_risks": [
-      "결합 규칙이 불투명하면 무작위 조절로 퇴화",
-      "작은 화면에서 구역 피드백 판독성 위험",
-      "연속 drag를 여러 adjustment로 잘못 계산할 위험",
-      "날씨 효과 과밀 위험"
-    ],
-    "progression": "첫 Shift 완료 시 Hard Orders 2개와 새 동네 레이아웃을 연다. MVP 메타는 이 최소 unlock만 구현한다.",
-    "screen_flow": "Shift Board → Order Brief → Weather Desk ↔ Settling → Evaluating → Result → Retry/Next; 5개 완료 → Shift Complete → Shift Board. Pause는 Weather Desk overlay.",
-    "state_model": [
-      {
-        "ui": "targets/map",
-        "exit": "continue",
-        "enter": "new order",
-        "state": "order_brief",
-        "inputs": [
-          "continue",
-          "back"
-        ]
-      },
-      {
-        "ui": "live controls/count",
-        "exit": "observe/submit",
-        "enter": "brief accepted/settle done",
-        "state": "adjusting",
-        "inputs": [
-          "cloud",
-          "wind",
-          "humidity",
-          "observe",
-          "submit"
-        ]
-      },
-      {
-        "ui": "controls dim, town emphasized",
-        "exit": "1.2s",
-        "enter": "observe/control commit",
-        "state": "settling",
-        "inputs": [
-          "skip"
-        ]
-      },
-      {
-        "ui": "input lock/compare",
-        "exit": "evaluation complete",
-        "enter": "submit",
-        "state": "evaluating",
-        "inputs": []
-      },
-      {
-        "ui": "stars/failed conditions",
-        "exit": "choice",
-        "enter": "evaluation done",
-        "state": "result",
-        "inputs": [
-          "retry",
-          "next"
-        ]
-      },
-      {
-        "ui": "summary",
-        "exit": "continue",
-        "enter": "5 resolved",
-        "state": "shift_complete",
-        "inputs": [
-          "continue"
-        ]
-      }
-    ],
-    "content_unit": "weather order = district targets + starting conditions + device limits",
-    "content_model": {
-      "axes": [
-        "district layout",
-        "target conditions",
-        "initial cloud",
-        "initial wind",
-        "initial humidity",
-        "device locks",
-        "forbidden conditions",
-        "budget"
-      ],
-      "unit": "weather order",
-      "authoring": "data-driven combinations; no bespoke code per order",
-      "mvp_count": 5
+    "shift_orders": 5,
+    "adjustment_budget": 8
+  },
+  "not_in_mvp": [
+    "economy/store",
+    "season system",
+    "procedural town generation",
+    "complex fluid simulation",
+    "online leaderboard",
+    "final art/audio polish"
+  ],
+  "updated_at": "2026-09-29T13:28:56.204346+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "결합 규칙이 불투명하면 무작위 조절로 퇴화",
+    "작은 화면에서 구역 피드백 판독성 위험",
+    "연속 drag를 여러 adjustment로 잘못 계산할 위험",
+    "날씨 효과 과밀 위험"
+  ],
+  "progression": "첫 Shift 완료 시 Hard Orders 2개와 새 동네 레이아웃을 연다. MVP 메타는 이 최소 unlock만 구현한다.",
+  "screen_flow": "Shift Board → Order Brief → Weather Desk ↔ Settling → Evaluating → Result → Retry/Next; 5개 완료 → Shift Complete → Shift Board. Pause는 Weather Desk overlay.",
+  "state_model": [
+    {
+      "ui": "targets/map",
+      "exit": "continue",
+      "enter": "new order",
+      "state": "order_brief",
+      "inputs": [
+        "continue",
+        "back"
+      ]
     },
-    "source_run_at": "2026-09-29T13:24:14.996435+00:00",
-    "player_fantasy": "작은 동네의 날씨를 책임지는 기상 사무원으로서 세 변수의 결합을 읽고 최소 조작으로 원하는 미기후를 만드는 숙련감과 즉각적인 환경 변화의 만족을 느낀다.",
-    "session_length": "4~6분 / 5개 의뢰",
-    "test_scenarios": [
-      "Order 1을 외부 설명 없이 완료 가능",
-      "바람 변경이 구름의 구역 이동과 결과에 반영",
-      "최소 한 주문은 세 조작을 모두 요구",
-      "invalid/locked 입력이 상태를 오염시키지 않음",
-      "5-order Shift를 재시작해도 stale state 없음"
+    {
+      "ui": "live controls/count",
+      "exit": "observe/submit",
+      "enter": "brief accepted/settle done",
+      "state": "adjusting",
+      "inputs": [
+        "cloud",
+        "wind",
+        "humidity",
+        "observe",
+        "submit"
+      ]
+    },
+    {
+      "ui": "controls dim, town emphasized",
+      "exit": "1.2s",
+      "enter": "observe/control commit",
+      "state": "settling",
+      "inputs": [
+        "skip"
+      ]
+    },
+    {
+      "ui": "input lock/compare",
+      "exit": "evaluation complete",
+      "enter": "submit",
+      "state": "evaluating",
+      "inputs": []
+    },
+    {
+      "ui": "stars/failed conditions",
+      "exit": "choice",
+      "enter": "evaluation done",
+      "state": "result",
+      "inputs": [
+        "retry",
+        "next"
+      ]
+    },
+    {
+      "ui": "summary",
+      "exit": "continue",
+      "enter": "5 resolved",
+      "state": "shift_complete",
+      "inputs": [
+        "continue"
+      ]
+    }
+  ],
+  "archive_path": "projects/pocket-weather-clerk/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "weather order = district targets + starting conditions + device limits",
+  "content_model": {
+    "axes": [
+      "district layout",
+      "target conditions",
+      "initial cloud",
+      "initial wind",
+      "initial humidity",
+      "device locks",
+      "forbidden conditions",
+      "budget"
     ],
-    "feedback_system": [
-      {
-        "event": "cloud move",
-        "sound": "wind swipe",
-        "haptic": "altitude tick",
-        "visual": "shadow/footprint"
-      },
-      {
-        "event": "wind notch",
-        "sound": "detent",
-        "haptic": "selection tick",
-        "visual": "streamers/arrows"
-      },
-      {
-        "event": "humidity",
-        "sound": "valve",
-        "haptic": "band tick",
-        "visual": "gauge/haze"
-      },
-      {
-        "event": "submit",
-        "sound": "stamp/sting",
-        "haptic": "success/fail pattern",
-        "visual": "district green/red then stars"
-      }
-    ],
-    "round_structure": "의뢰 1개 45~90초. Brief → Adjusting/Settling 반복 → Submit/Evaluate → Result. 5개 의뢰를 한 Shift(4~6분)로 묶고 Result에서 Retry 또는 Next Order로 즉시 이어진다.",
-    "interaction_spec": [
-      {
-        "cancel": "invalid sky returns last valid",
-        "target": "cloud silhouette +12dp",
-        "gesture": "drag",
-        "invalid": "locked shake",
-        "priority": "beats background"
-      },
-      {
-        "cancel": "snap nearest direction",
-        "target": "wind nozzle annulus",
-        "gesture": "circular drag",
-        "invalid": "cap haptic",
-        "priority": "beats nearby taps"
-      },
-      {
-        "cancel": "snap 5%",
-        "target": "humidity handle +16dp corridor",
-        "gesture": "vertical drag",
-        "invalid": "clamp/error pulse",
-        "priority": "beats scroll"
-      },
-      {
-        "target": "submit",
-        "gesture": "tap",
-        "invalid": "disabled",
-        "condition": "at least one adjustment and not settling"
-      }
-    ],
-    "screen_inventory": [
-      "Shift Board",
-      "Order Brief",
-      "Weather Desk",
-      "Pause Overlay",
-      "Order Result",
-      "Shift Complete"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "Move Clouds",
-        "input": "drag",
-        "change": "position/coverage changes",
-        "target": "cloud bank",
-        "feedback": "shadow and cloud footprint move",
-        "condition": "adjusting"
-      },
-      {
-        "verb": "Aim Wind",
-        "input": "circular drag",
-        "change": "direction/strength changes",
-        "target": "wind nozzle",
-        "feedback": "streamers and drift update",
-        "condition": "adjusting"
-      },
-      {
-        "verb": "Tune Humidity",
-        "input": "vertical drag",
-        "change": "humidity changes",
-        "target": "humidity valve",
-        "feedback": "gauge/haze update",
-        "condition": "adjusting"
-      },
-      {
-        "verb": "Observe",
-        "input": "tap",
-        "change": "simulation settles",
-        "target": "observe",
-        "feedback": "town weather resolves",
-        "condition": "not settling"
-      },
-      {
-        "verb": "Submit",
-        "input": "tap",
-        "change": "order evaluated",
-        "target": "stamp",
-        "feedback": "district compare/result",
-        "condition": "after adjustment"
-      }
-    ],
-    "wireframe_handoff": [
-      "6개 화면/overlay 모두 표현",
-      "Weather Desk hit area와 3개 장치/target/count/Observe/Submit 표현",
-      "adjusting dragging settling evaluating success failure locked disabled variant 표현",
-      "district target/current compare와 retry/next transition 표현"
-    ],
-    "primary_interaction": "구름을 끌고 바람 노즐을 돌리고 습도 밸브를 조절해 실제 동네 반응을 맞춘다.",
-    "difficulty_variation": "초반은 단일 구역·단일 목표로 변수 관계를 익힌다. 중반은 두 구역의 상충 목표로 공간 배치와 바람을 결합한다. 후반은 장치 제한·금지 조건·정착 지연을 추가한다. 속도 상승이 아니라 변수 결합과 공간 제약으로 난도를 올린다.",
-    "visual_direction_brief": "Portrait 고정 약간 탑다운 미니어처 디오라마. 동네가 화면 중심, 제어 장치는 가장자리. 구역·구름·날씨 상태가 작은 화면에서 텍스트 없이 읽혀야 한다. MVP는 greybox이며 월드 피드백이 장식 UI보다 우선한다."
-  }
+    "unit": "weather order",
+    "authoring": "data-driven combinations; no bespoke code per order",
+    "mvp_count": 5
+  },
+  "source_run_at": "2026-09-29T13:24:14.996435+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "작은 동네의 날씨를 책임지는 기상 사무원으로서 세 변수의 결합을 읽고 최소 조작으로 원하는 미기후를 만드는 숙련감과 즉각적인 환경 변화의 만족을 느낀다.",
+  "session_length": "4~6분 / 5개 의뢰",
+  "test_scenarios": [
+    "Order 1을 외부 설명 없이 완료 가능",
+    "바람 변경이 구름의 구역 이동과 결과에 반영",
+    "최소 한 주문은 세 조작을 모두 요구",
+    "invalid/locked 입력이 상태를 오염시키지 않음",
+    "5-order Shift를 재시작해도 stale state 없음"
+  ],
+  "design_markdown": "# Pocket Weather Clerk — Playable Game Design Spec v0.1\n\n## 1. Product Definition\nPortrait mobile tactile puzzle/simulation. 4~6분 세션. 구름·바람·습도를 직접 조작해 국지 날씨 주문을 맞춘다. 목표 감각은 촉각적 조정과 환경 반응 읽기. Non-goals: 도시경영, 경제, 복잡 유체물리.\n## 2. Player Fantasy\n작은 동네의 기상 사무원. 변수 결합을 이해해 원하는 미기후를 만드는 숙련감을 준다.\n## 3. Core Player Verbs\nCloud drag, wind circular drag, humidity vertical drag, Observe, Submit. 각 입력은 즉시 월드 피드백과 상태 변화에 연결된다.\n## 4. Core Loop\nBrief → 상태 읽기 → 장치 조절 → settle 관찰 → 미세조정 → submit → compare → next.\n## 5. Round / Session Structure\n의뢰 45~90초, 5개가 한 Shift. Retry/Next로 연속 진행.\n## 6. Game Rules\nCloud cover/altitude, 8-way wind/strength, humidity. 결합 규칙으로 clear/fog/rain 등을 파생. tolerance 15, budget 8, 3-star 평가.\n## 7. State Model\norder_brief, adjusting, settling, evaluating, result, shift_complete. evaluating 입력 잠금.\n## 8. Interaction Spec\nCloud silhouette drag, nozzle circular drag, valve vertical drag. snap/cancel/locked/disabled 처리 포함.\n## 9. Content Model\nWeather Order 데이터 = district layout, targets, initial variables, device limits, forbidden states, budget. MVP 5개.\n## 10. Difficulty / Variation\n단일 목표 → 상충 다중 구역 → 장치 제한/금지 조건/정착 지연.\n## 11. Progression\nShift 완료 시 Hard Orders 2개와 새 레이아웃 unlock.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nShift Board, Order Brief, Weather Desk, Pause Overlay, Order Result, Shift Complete.\n## 14. Screen Flow\nBoard → Brief → Desk ↔ Settle → Evaluate → Result → Retry/Next → Complete.\n## 15. Feedback System\n그림자, drift, haze, 강수, detent sound, haptic tick, stamp, district compare.\n## 16. Visual Direction Brief\nPortrait fixed top-down miniature diorama; town central, hardware edges; small-screen readability first.\n## 17. MVP Scope\n5 orders, three tactile controls, settle/evaluate/result/full Shift loop. Store/season/procedural/final polish 제외.\n## 18. Test Scenarios\n무설명 Order1, wind spatial effect, all-three-control order, invalid safety, repeat Shift reset.\n## 19. Known Risks\n규칙 불투명성, 판독성, drag count, 효과 과밀.\n## 20. Wireframe Handoff\n모든 화면과 hit area, 3 gestures, adjusting/settling/evaluating/result/locked/disabled states, feedback and transitions를 명시한다.",
+  "feedback_system": [
+    {
+      "event": "cloud move",
+      "sound": "wind swipe",
+      "haptic": "altitude tick",
+      "visual": "shadow/footprint"
+    },
+    {
+      "event": "wind notch",
+      "sound": "detent",
+      "haptic": "selection tick",
+      "visual": "streamers/arrows"
+    },
+    {
+      "event": "humidity",
+      "sound": "valve",
+      "haptic": "band tick",
+      "visual": "gauge/haze"
+    },
+    {
+      "event": "submit",
+      "sound": "stamp/sting",
+      "haptic": "success/fail pattern",
+      "visual": "district green/red then stars"
+    }
+  ],
+  "round_structure": "의뢰 1개 45~90초. Brief → Adjusting/Settling 반복 → Submit/Evaluate → Result. 5개 의뢰를 한 Shift(4~6분)로 묶고 Result에서 Retry 또는 Next Order로 즉시 이어진다.",
+  "interaction_spec": [
+    {
+      "cancel": "invalid sky returns last valid",
+      "target": "cloud silhouette +12dp",
+      "gesture": "drag",
+      "invalid": "locked shake",
+      "priority": "beats background"
+    },
+    {
+      "cancel": "snap nearest direction",
+      "target": "wind nozzle annulus",
+      "gesture": "circular drag",
+      "invalid": "cap haptic",
+      "priority": "beats nearby taps"
+    },
+    {
+      "cancel": "snap 5%",
+      "target": "humidity handle +16dp corridor",
+      "gesture": "vertical drag",
+      "invalid": "clamp/error pulse",
+      "priority": "beats scroll"
+    },
+    {
+      "target": "submit",
+      "gesture": "tap",
+      "invalid": "disabled",
+      "condition": "at least one adjustment and not settling"
+    }
+  ],
+  "screen_inventory": [
+    "Shift Board",
+    "Order Brief",
+    "Weather Desk",
+    "Pause Overlay",
+    "Order Result",
+    "Shift Complete"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Move Clouds",
+      "input": "drag",
+      "change": "position/coverage changes",
+      "target": "cloud bank",
+      "feedback": "shadow and cloud footprint move",
+      "condition": "adjusting"
+    },
+    {
+      "verb": "Aim Wind",
+      "input": "circular drag",
+      "change": "direction/strength changes",
+      "target": "wind nozzle",
+      "feedback": "streamers and drift update",
+      "condition": "adjusting"
+    },
+    {
+      "verb": "Tune Humidity",
+      "input": "vertical drag",
+      "change": "humidity changes",
+      "target": "humidity valve",
+      "feedback": "gauge/haze update",
+      "condition": "adjusting"
+    },
+    {
+      "verb": "Observe",
+      "input": "tap",
+      "change": "simulation settles",
+      "target": "observe",
+      "feedback": "town weather resolves",
+      "condition": "not settling"
+    },
+    {
+      "verb": "Submit",
+      "input": "tap",
+      "change": "order evaluated",
+      "target": "stamp",
+      "feedback": "district compare/result",
+      "condition": "after adjustment"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "6개 화면/overlay 모두 표현",
+    "Weather Desk hit area와 3개 장치/target/count/Observe/Submit 표현",
+    "adjusting dragging settling evaluating success failure locked disabled variant 표현",
+    "district target/current compare와 retry/next transition 표현"
+  ],
+  "primary_interaction": "구름을 끌고 바람 노즐을 돌리고 습도 밸브를 조절해 실제 동네 반응을 맞춘다.",
+  "difficulty_variation": "초반은 단일 구역·단일 목표로 변수 관계를 익힌다. 중반은 두 구역의 상충 목표로 공간 배치와 바람을 결합한다. 후반은 장치 제한·금지 조건·정착 지연을 추가한다. 속도 상승이 아니라 변수 결합과 공간 제약으로 난도를 올린다.",
+  "visual_direction_brief": "Portrait 고정 약간 탑다운 미니어처 디오라마. 동네가 화면 중심, 제어 장치는 가장자리. 구역·구름·날씨 상태가 작은 화면에서 텍스트 없이 읽혀야 한다. MVP는 greybox이며 월드 피드백이 장식 UI보다 우선한다."
 }

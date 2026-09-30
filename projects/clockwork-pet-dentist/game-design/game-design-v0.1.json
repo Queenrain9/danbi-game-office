@@ -1,320 +1,325 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "archived_from": "danbi_game_designs",
-  "spec": {
-    "id": "6a8fbbea-11c0-461d-9a97-0757ad8d76a4",
-    "title": "Clockwork Pet Dentist",
-    "source": "chat_automation",
-    "economy": "Not required. MVP에는 화폐·상점이 없다.",
-    "idea_id": "f3b0fa40-a199-4eaa-9d1d-80f9271a5992",
-    "version": "v0.1",
-    "one_line": "태엽 기계동물의 입속에서 고장 난 톱니 이빨을 진단하고 정밀 도구로 제거·가공·교체한 뒤 실제 물림을 시험하는 모바일 수리 시뮬레이션.",
-    "core_loop": "환자 증상 확인 → 입을 열고 확대 탐색 → 문제 톱니를 probe로 확인 → 고정핀 해제·제거 → 교체 부품 선택/갈기/윤활 → 회전 정렬 후 socket에 삽입 → crank를 돌려 물림 테스트 → 실패 원인을 다시 고치거나 치료 완료. 20~40초 단위의 진단-수리-검증이 한 환자 안에서 2~4회 반복된다.",
-    "mvp_scope": "첫 Godot playable: 4환자, 재사용 가능한 gear/socket/retainer 구조, pinch/pan inspection, probe, extraction, grinder bench, lubrication, rotation alignment, seating, bite-test simulation, jam feedback, 3-strike failure, rating, retry/next flow.",
-    "game_rules": {
-      "rules": [
-        "locked gear cannot be extracted before retainer release",
-        "wrong size gear cannot seat",
-        "excess grinding can make a part unusable",
-        "over-lubrication reduces cleanliness score but does not hard-fail",
-        "bite test exposes remaining fit/alignment/friction faults"
-      ],
-      "score": {
-        "1": "treatment complete",
-        "2": "no damage strike",
-        "3": "under par tool actions"
-      },
-      "faults": [
-        "cracked tooth",
-        "worn gear",
-        "loose axle",
-        "dry bearing",
-        "misaligned phase"
-      ],
-      "failure": "3 damage strikes",
-      "success": "all required defects repaired and full crank cycle completes without jam",
-      "fit_tolerance": 0.12,
-      "damage_strikes": 3,
-      "defects_per_patient": "2-4",
-      "alignment_tolerance_deg": 12
+  "id": "6a8fbbea-11c0-461d-9a97-0757ad8d76a4",
+  "title": "Clockwork Pet Dentist",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required. MVP에는 화폐·상점이 없다.",
+  "idea_id": "f3b0fa40-a199-4eaa-9d1d-80f9271a5992",
+  "version": "v0.1",
+  "one_line": "태엽 기계동물의 입속에서 고장 난 톱니 이빨을 진단하고 정밀 도구로 제거·가공·교체한 뒤 실제 물림을 시험하는 모바일 수리 시뮬레이션.",
+  "core_loop": "환자 증상 확인 → 입을 열고 확대 탐색 → 문제 톱니를 probe로 확인 → 고정핀 해제·제거 → 교체 부품 선택/갈기/윤활 → 회전 정렬 후 socket에 삽입 → crank를 돌려 물림 테스트 → 실패 원인을 다시 고치거나 치료 완료. 20~40초 단위의 진단-수리-검증이 한 환자 안에서 2~4회 반복된다.",
+  "mvp_scope": "첫 Godot playable: 4환자, 재사용 가능한 gear/socket/retainer 구조, pinch/pan inspection, probe, extraction, grinder bench, lubrication, rotation alignment, seating, bite-test simulation, jam feedback, 3-strike failure, rating, retry/next flow.",
+  "created_at": "2026-09-29T13:26:49.623245+00:00",
+  "game_rules": {
+    "rules": [
+      "locked gear cannot be extracted before retainer release",
+      "wrong size gear cannot seat",
+      "excess grinding can make a part unusable",
+      "over-lubrication reduces cleanliness score but does not hard-fail",
+      "bite test exposes remaining fit/alignment/friction faults"
+    ],
+    "score": {
+      "1": "treatment complete",
+      "2": "no damage strike",
+      "3": "under par tool actions"
     },
-    "not_in_mvp": [
-      "final character art",
-      "economy/store",
-      "procedural mouths",
-      "dozens of tools",
-      "narrative dialogue",
-      "online score",
-      "realistic dental simulation"
+    "faults": [
+      "cracked tooth",
+      "worn gear",
+      "loose axle",
+      "dry bearing",
+      "misaligned phase"
     ],
-    "known_risks": [
-      "작은 gear의 터치 타깃이 정밀도보다 답답함을 만들 위험",
-      "grinding을 연속 수치 조절로 만들면 재미보다 노동이 될 위험",
-      "진단 feedback이 약하면 시행착오 게임으로 퇴화",
-      "복합 gear train 구현이 물리엔진 의존 시 불안정할 위험"
-    ],
-    "progression": "환자 완료로 새 기계동물 종과 새 결함 유형을 순차 해금한다. MVP는 4환자 선형 unlock만 사용하며 장기 메타 장식/수집은 제외한다.",
-    "screen_flow": "Patient Select → Patient Brief → Treatment. Treatment 안에서 Inspection ↔ Repair ↔ Part Bench를 오가며 Bite Test → (fault 발견 시 Treatment 복귀 | 성공 시 Result). Pause는 Treatment 위 overlay. Result → Retry/Next Patient.",
-    "state_model": [
-      {
-        "ui": "symptoms, portrait, constraints",
-        "exit": "start",
-        "enter": "patient selected",
-        "state": "patient_brief",
-        "inputs": [
-          "start",
-          "back"
-        ]
-      },
-      {
-        "ui": "mouth, tool tray, symptom meter",
-        "exit": "repair action",
-        "enter": "mouth opens",
-        "state": "inspection",
-        "inputs": [
-          "pinch",
-          "pan",
-          "probe",
-          "select tool"
-        ]
-      },
-      {
-        "ui": "active tool, part tray, tolerance cues",
-        "exit": "test or inspect",
-        "enter": "repair tool selected",
-        "state": "repair",
-        "inputs": [
-          "extract",
-          "grind",
-          "lubricate",
-          "align",
-          "seat",
-          "camera"
-        ]
-      },
-      {
-        "ui": "large part view and fit gauge",
-        "exit": "return",
-        "enter": "removed/replacement part selected for grinding",
-        "state": "bench",
-        "inputs": [
-          "grind",
-          "rotate",
-          "discard",
-          "return"
-        ]
-      },
-      {
-        "ui": "inputs locked except crank; strain/noise feedback",
-        "exit": "jam or full cycle",
-        "enter": "crank held",
-        "state": "testing",
-        "inputs": [
-          "hold/release crank"
-        ]
-      },
-      {
-        "ui": "rating and diagnosed/repaired faults",
-        "exit": "choice",
-        "enter": "successful cycle or failure limit",
-        "state": "result",
-        "inputs": [
-          "retry",
-          "next"
-        ]
-      }
-    ],
-    "content_unit": "patient repair case: mouth layout + fault set + reusable mechanism parts",
-    "content_model": {
-      "axes": [
-        "pet mouth layout",
-        "fault set",
-        "gear sizes",
-        "gear phase",
-        "retainer type",
-        "tool restriction",
-        "par actions",
-        "visual pet shell"
-      ],
-      "unit": "patient repair case",
-      "authoring": "case data references reusable mechanism pieces and fault parameters; standard cases require no bespoke code",
-      "mvp_count": 4
+    "failure": "3 damage strikes",
+    "success": "all required defects repaired and full crank cycle completes without jam",
+    "fit_tolerance": 0.12,
+    "damage_strikes": 3,
+    "defects_per_patient": "2-4",
+    "alignment_tolerance_deg": 12
+  },
+  "not_in_mvp": [
+    "final character art",
+    "economy/store",
+    "procedural mouths",
+    "dozens of tools",
+    "narrative dialogue",
+    "online score",
+    "realistic dental simulation"
+  ],
+  "updated_at": "2026-09-29T13:26:49.623245+00:00",
+  "archived_at": "2026-09-29T16:54:20.003456+00:00",
+  "known_risks": [
+    "작은 gear의 터치 타깃이 정밀도보다 답답함을 만들 위험",
+    "grinding을 연속 수치 조절로 만들면 재미보다 노동이 될 위험",
+    "진단 feedback이 약하면 시행착오 게임으로 퇴화",
+    "복합 gear train 구현이 물리엔진 의존 시 불안정할 위험"
+  ],
+  "progression": "환자 완료로 새 기계동물 종과 새 결함 유형을 순차 해금한다. MVP는 4환자 선형 unlock만 사용하며 장기 메타 장식/수집은 제외한다.",
+  "screen_flow": "Patient Select → Patient Brief → Treatment. Treatment 안에서 Inspection ↔ Repair ↔ Part Bench를 오가며 Bite Test → (fault 발견 시 Treatment 복귀 | 성공 시 Result). Pause는 Treatment 위 overlay. Result → Retry/Next Patient.",
+  "state_model": [
+    {
+      "ui": "symptoms, portrait, constraints",
+      "exit": "start",
+      "enter": "patient selected",
+      "state": "patient_brief",
+      "inputs": [
+        "start",
+        "back"
+      ]
     },
-    "source_run_at": "2026-09-29T13:26:49.623245+00:00",
-    "player_fantasy": "플레이어는 작은 기계동물을 치료하는 정밀 치과공이다. 증상을 보고 원인을 찾아내고, 손으로 도구를 정확히 다뤄 복잡한 기어 물림을 정상화하는 숙련감과 환자가 다시 부드럽게 움직이는 안도감을 느낀다.",
-    "session_length": "환자당 3~6분",
-    "test_scenarios": [
-      "첫 환자를 외부 설명 없이 probe→extract→replace→test로 완주할 수 있다.",
-      "틀린 크기의 gear는 seat되지 않고 상태를 손상시키지 않는다.",
-      "정렬 오차가 큰 gear는 Bite Test에서 같은 위치의 jam으로 재현된다.",
-      "pinch/pan과 part drag가 충돌하지 않는다.",
-      "4환자를 연속 완료/재시도해도 이전 환자 상태가 누수되지 않는다."
+    {
+      "ui": "mouth, tool tray, symptom meter",
+      "exit": "repair action",
+      "enter": "mouth opens",
+      "state": "inspection",
+      "inputs": [
+        "pinch",
+        "pan",
+        "probe",
+        "select tool"
+      ]
+    },
+    {
+      "ui": "active tool, part tray, tolerance cues",
+      "exit": "test or inspect",
+      "enter": "repair tool selected",
+      "state": "repair",
+      "inputs": [
+        "extract",
+        "grind",
+        "lubricate",
+        "align",
+        "seat",
+        "camera"
+      ]
+    },
+    {
+      "ui": "large part view and fit gauge",
+      "exit": "return",
+      "enter": "removed/replacement part selected for grinding",
+      "state": "bench",
+      "inputs": [
+        "grind",
+        "rotate",
+        "discard",
+        "return"
+      ]
+    },
+    {
+      "ui": "inputs locked except crank; strain/noise feedback",
+      "exit": "jam or full cycle",
+      "enter": "crank held",
+      "state": "testing",
+      "inputs": [
+        "hold/release crank"
+      ]
+    },
+    {
+      "ui": "rating and diagnosed/repaired faults",
+      "exit": "choice",
+      "enter": "successful cycle or failure limit",
+      "state": "result",
+      "inputs": [
+        "retry",
+        "next"
+      ]
+    }
+  ],
+  "archive_path": "projects/clockwork-pet-dentist/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "patient repair case: mouth layout + fault set + reusable mechanism parts",
+  "content_model": {
+    "axes": [
+      "pet mouth layout",
+      "fault set",
+      "gear sizes",
+      "gear phase",
+      "retainer type",
+      "tool restriction",
+      "par actions",
+      "visual pet shell"
     ],
-    "feedback_system": [
-      {
-        "event": "probe fault",
-        "sound": "metal tick/rattle",
-        "haptic": "light irregular ticks",
-        "visual": "localized wobble/heat ring"
-      },
-      {
-        "event": "extract",
-        "sound": "spring snap",
-        "haptic": "medium pop",
-        "visual": "gear follows axis then releases"
-      },
-      {
-        "event": "grind",
-        "sound": "fine grind",
-        "haptic": "continuous light texture",
-        "visual": "material edge shrinks + sparks"
-      },
-      {
-        "event": "valid alignment",
-        "sound": "detent",
-        "haptic": "selection tick",
-        "visual": "ghost teeth converge"
-      },
-      {
-        "event": "seat",
-        "sound": "clean click",
-        "haptic": "medium tick",
-        "visual": "socket snap"
-      },
-      {
-        "event": "jam test",
-        "sound": "clunk",
-        "haptic": "double warning",
-        "visual": "mechanism stops and stress location pulses"
-      }
-    ],
-    "round_structure": "환자 카드에서 증상과 제한을 확인하고 Treatment로 진입한다. 한 환자는 2~4개의 결함을 가지며 3~6분 소요. Bite Test에서 모든 필수 기어가 허용 오차 안에 있고 jam이 없으면 성공. 테스트 실패는 치료 화면으로 복귀하며 치명적 파손 3회면 환자 실패. 결과 후 다음 환자 또는 재시도.",
-    "interaction_spec": [
-      {
-        "input": "pinch",
-        "cancel": "release preserves zoom",
-        "target": "mouth viewport",
-        "invalid": "zoom clamps",
-        "hit_test": "background or mechanism",
-        "priority": "disabled while holding a tool part"
-      },
-      {
-        "input": "drag",
-        "cancel": "return to last valid tray/socket",
-        "target": "tool/gear",
-        "invalid": "red resistance cue; state unchanged",
-        "hit_test": "expanded 12dp silhouette",
-        "priority": "held object beats camera pan"
-      },
-      {
-        "input": "circular drag",
-        "cancel": "keeps nearest 3-degree step",
-        "target": "gear",
-        "invalid": "installed locked gear cannot rotate",
-        "hit_test": "gear silhouette",
-        "priority": "gear rotation beats pan"
-      },
-      {
-        "input": "hold-drag",
-        "cancel": "release stops material removal immediately",
-        "target": "grinder contact edge",
-        "invalid": "minimum size clamp + warning",
-        "hit_test": "grinder zone",
-        "priority": "bench only"
-      },
-      {
-        "input": "hold",
-        "cancel": "release pauses test safely",
-        "target": "test crank",
-        "invalid": "disabled until required sockets occupied",
-        "hit_test": "crank handle",
-        "priority": "testing state exclusive"
-      }
-    ],
-    "screen_inventory": [
-      "Patient Select",
-      "Patient Brief",
-      "Treatment / Mouth",
-      "Part Bench Overlay",
-      "Pause Overlay",
-      "Treatment Result"
-    ],
-    "core_player_verbs": [
-      {
-        "verb": "Inspect",
-        "input": "pinch/pan",
-        "target": "mouth mechanism",
-        "feedback": "suspect gears highlight under probe",
-        "condition": "inspection/repair",
-        "state_change": "camera focus only"
-      },
-      {
-        "verb": "Probe",
-        "input": "tap/short drag",
-        "target": "tooth/gear",
-        "feedback": "wobble/noise meter",
-        "condition": "tool=probe",
-        "state_change": "diagnostic flags revealed"
-      },
-      {
-        "verb": "Extract",
-        "input": "press-drag along removal axis",
-        "target": "unlocked damaged gear",
-        "feedback": "resistance then snap",
-        "condition": "retainer released",
-        "state_change": "gear removed to tray"
-      },
-      {
-        "verb": "Grind",
-        "input": "drag part against grinder",
-        "target": "replacement gear",
-        "feedback": "sparks, fit gauge",
-        "condition": "part on bench",
-        "state_change": "diameter/tooth fit changes"
-      },
-      {
-        "verb": "Lubricate",
-        "input": "drag nozzle + hold",
-        "target": "bearing/gear",
-        "feedback": "oil sheen/meter",
-        "condition": "repair",
-        "state_change": "friction decreases; overfill risk rises"
-      },
-      {
-        "verb": "Align",
-        "input": "two-finger rotate or circular drag",
-        "target": "replacement gear",
-        "feedback": "teeth ghost-match",
-        "condition": "socket empty",
-        "state_change": "phase angle changes"
-      },
-      {
-        "verb": "Seat",
-        "input": "drag into socket",
-        "target": "replacement gear",
-        "feedback": "magnetic snap",
-        "condition": "size/alignment valid",
-        "state_change": "gear installed"
-      },
-      {
-        "verb": "Bite Test",
-        "input": "hold crank",
-        "target": "test crank",
-        "feedback": "motion/noise/strain result",
-        "condition": "all required parts seated",
-        "state_change": "mechanism cycles"
-      }
-    ],
-    "wireframe_handoff": [
-      "Patient Select/Brief/Treatment/Result와 Part Bench/Pause overlay를 표현",
-      "Treatment에서 camera gesture와 held-part gesture의 우선순위를 명시",
-      "gear locked/removable/held/aligned/seated/jammed 상태 variant를 표현",
-      "extract axis, grinder contact, rotation ghost, socket snap, crank hold를 gesture annotation으로 표시",
-      "invalid size, locked retainer, overgrind, jam, disabled test 상태와 전환을 포함"
-    ],
-    "primary_interaction": "확대된 기계 입속에서 부품을 직접 집어 빼고 갈고 회전 정렬해 socket에 끼운 뒤 crank로 실제 물림을 시험한다.",
-    "difficulty_variation": "초반은 한 개의 명백한 파손 기어와 교체/정렬을 익힌다. 중반은 겉보기 증상과 실제 원인이 달라 probe 진단이 필요하고, 같은 입 안에서 여러 기어가 연쇄 물림한다. 후반은 접근을 막는 retainer, 제한된 예비 부품, loose axle+misalignment 같은 복합 결함이 나온다. 속도가 아니라 진단 불확실성, 공간 접근성, 공차와 결함 결합으로 어려워진다.",
-    "visual_direction_brief": "Portrait. 입속 기계 구조가 화면 65~75%를 차지하고 하단에 얕은 도구 트레이를 둔다. 카메라는 정면에 가까운 2D cutaway이며 pinch 확대 시에도 핵심 socket과 gear silhouette가 선명해야 한다. 생물 외형은 프레임 역할만 하고 정밀 조작 대상은 큰 단순 기하로 읽힌다. 최종 아트보다 hit target과 깊이 순서가 우선이다."
-  }
+    "unit": "patient repair case",
+    "authoring": "case data references reusable mechanism pieces and fault parameters; standard cases require no bespoke code",
+    "mvp_count": 4
+  },
+  "source_run_at": "2026-09-29T13:26:49.623245+00:00",
+  "archive_commit": "35c46707bdd31c68873c385c9997c0fc64577cac",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 작은 기계동물을 치료하는 정밀 치과공이다. 증상을 보고 원인을 찾아내고, 손으로 도구를 정확히 다뤄 복잡한 기어 물림을 정상화하는 숙련감과 환자가 다시 부드럽게 움직이는 안도감을 느낀다.",
+  "session_length": "환자당 3~6분",
+  "test_scenarios": [
+    "첫 환자를 외부 설명 없이 probe→extract→replace→test로 완주할 수 있다.",
+    "틀린 크기의 gear는 seat되지 않고 상태를 손상시키지 않는다.",
+    "정렬 오차가 큰 gear는 Bite Test에서 같은 위치의 jam으로 재현된다.",
+    "pinch/pan과 part drag가 충돌하지 않는다.",
+    "4환자를 연속 완료/재시도해도 이전 환자 상태가 누수되지 않는다."
+  ],
+  "design_markdown": "# Clockwork Pet Dentist — Playable Game Design Spec v0.1\n\n## 1. Product Definition\nPortrait mobile Precision Repair/Simulation. 기계동물의 톱니 이빨을 진단·제거·가공·교체하고 물림을 시험한다. 환자당 3~6분. 목표는 정밀 수리의 손맛과 원인-결과 판독이다. Non-goals: 현실 치과 시뮬레이션, 경제/상점, 복잡한 rigid-body 물리.\n\n## 2. Player Fantasy\n작은 기계동물을 치료하는 치과공. 결함을 찾아 손으로 정확히 고쳐 다시 부드럽게 움직이게 한다.\n\n## 3. Core Player Verbs\nInspect(pinch/pan), Probe(tap/drag), Extract(axis drag), Grind(contact drag), Lubricate(hold-drag), Align(circular drag), Seat(drag/snap), Bite Test(crank hold). 모든 행동은 실제 mechanism state를 바꾼다.\n\n## 4. Core Loop\n증상 확인 → 확대 탐색 → 결함 진단 → retainer 해제/부품 제거 → 가공·윤활 → 회전 정렬/삽입 → Bite Test → 결함 재수리 또는 완료.\n\n## 5. Round / Session Structure\n환자당 결함 2~4개, 3~6분. 성공은 full crank cycle 무 jam. 치명적 파손 3회 실패. Result 후 Retry/Next.\n\n## 6. Game Rules\nFit tolerance 12%, alignment ±12°. Wrong size는 seat 불가. locked gear는 retainer 해제 전 추출 불가. 과연마는 부품 폐기. Bite Test가 fit/alignment/friction 오류를 노출한다. 성공/무손상/par 이하로 3별.\n\n## 7. State Model\nPatient Brief → Inspection ↔ Repair ↔ Part Bench → Testing → Result. Testing 중 crank 외 입력 잠금.\n\n## 8. Interaction Spec\n카메라 pinch/pan, part/tool drag, circular gear rotation, grinder hold-drag, crank hold. held object가 camera pan보다 우선. invalid action은 state 변경 없이 저항/경고 feedback.\n\n## 9. Content Model\nPatient Case = mouth layout + fault set + gear sizes/phases + retainer + tool limits + par. 재사용 mechanism 데이터 조합. MVP 4개.\n\n## 10. Difficulty / Variation\n명백한 단일 결함 → 진단 필요한 결함 → 연쇄 gear train → 접근 제한과 복합 결함. 속도 대신 진단/공차/접근성으로 상승.\n\n## 11. Progression\n환자 완료로 동물 종과 fault type unlock. MVP는 4환자 선형 진행.\n\n## 12. Economy\nNot required.\n\n## 13. Screen Inventory\nPatient Select, Patient Brief, Treatment/Mouth, Part Bench Overlay, Pause Overlay, Treatment Result.\n\n## 14. Screen Flow\nSelect → Brief → Treatment(Inspection/Repair/Bench) → Bite Test → Treatment 또는 Result → Retry/Next.\n\n## 15. Feedback System\nProbe rattle, extraction snap, grinding sparks, alignment ghost/detent, seating click, jam stress pulse와 대응 사운드/햅틱.\n\n## 16. Visual Direction Brief\nPortrait 2D cutaway. 입 구조가 65~75%. 큰 gear silhouette와 socket depth가 우선. 하단 얕은 tool tray. 생물 외형은 프레임, 조작 판독성이 중심.\n\n## 17. MVP Scope\n4환자, gear/socket/retainer, inspection, probe, extraction, grinding, lubrication, alignment, seating, bite test, jam/failure/rating/retry-next.\n\n## 18. Test Scenarios\n무설명 첫 환자 완주, wrong-size reject, alignment-jam 재현, camera/part gesture 충돌 없음, 환자 간 state reset.\n\n## 19. Known Risks\n작은 터치 타깃, grinding 노동화, 진단 feedback 부족, 물리 의존 gear train 불안정.\n\n## 20. Wireframe Handoff\n모든 화면/overlay와 gear lifecycle variant를 표현한다. extract axis, grinder contact, circular alignment, snap, crank hold를 annotation하고 locked/wrong-size/overgrind/jam/disabled test error state를 포함한다.",
+  "feedback_system": [
+    {
+      "event": "probe fault",
+      "sound": "metal tick/rattle",
+      "haptic": "light irregular ticks",
+      "visual": "localized wobble/heat ring"
+    },
+    {
+      "event": "extract",
+      "sound": "spring snap",
+      "haptic": "medium pop",
+      "visual": "gear follows axis then releases"
+    },
+    {
+      "event": "grind",
+      "sound": "fine grind",
+      "haptic": "continuous light texture",
+      "visual": "material edge shrinks + sparks"
+    },
+    {
+      "event": "valid alignment",
+      "sound": "detent",
+      "haptic": "selection tick",
+      "visual": "ghost teeth converge"
+    },
+    {
+      "event": "seat",
+      "sound": "clean click",
+      "haptic": "medium tick",
+      "visual": "socket snap"
+    },
+    {
+      "event": "jam test",
+      "sound": "clunk",
+      "haptic": "double warning",
+      "visual": "mechanism stops and stress location pulses"
+    }
+  ],
+  "round_structure": "환자 카드에서 증상과 제한을 확인하고 Treatment로 진입한다. 한 환자는 2~4개의 결함을 가지며 3~6분 소요. Bite Test에서 모든 필수 기어가 허용 오차 안에 있고 jam이 없으면 성공. 테스트 실패는 치료 화면으로 복귀하며 치명적 파손 3회면 환자 실패. 결과 후 다음 환자 또는 재시도.",
+  "interaction_spec": [
+    {
+      "input": "pinch",
+      "cancel": "release preserves zoom",
+      "target": "mouth viewport",
+      "invalid": "zoom clamps",
+      "hit_test": "background or mechanism",
+      "priority": "disabled while holding a tool part"
+    },
+    {
+      "input": "drag",
+      "cancel": "return to last valid tray/socket",
+      "target": "tool/gear",
+      "invalid": "red resistance cue; state unchanged",
+      "hit_test": "expanded 12dp silhouette",
+      "priority": "held object beats camera pan"
+    },
+    {
+      "input": "circular drag",
+      "cancel": "keeps nearest 3-degree step",
+      "target": "gear",
+      "invalid": "installed locked gear cannot rotate",
+      "hit_test": "gear silhouette",
+      "priority": "gear rotation beats pan"
+    },
+    {
+      "input": "hold-drag",
+      "cancel": "release stops material removal immediately",
+      "target": "grinder contact edge",
+      "invalid": "minimum size clamp + warning",
+      "hit_test": "grinder zone",
+      "priority": "bench only"
+    },
+    {
+      "input": "hold",
+      "cancel": "release pauses test safely",
+      "target": "test crank",
+      "invalid": "disabled until required sockets occupied",
+      "hit_test": "crank handle",
+      "priority": "testing state exclusive"
+    }
+  ],
+  "screen_inventory": [
+    "Patient Select",
+    "Patient Brief",
+    "Treatment / Mouth",
+    "Part Bench Overlay",
+    "Pause Overlay",
+    "Treatment Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Inspect",
+      "input": "pinch/pan",
+      "target": "mouth mechanism",
+      "feedback": "suspect gears highlight under probe",
+      "condition": "inspection/repair",
+      "state_change": "camera focus only"
+    },
+    {
+      "verb": "Probe",
+      "input": "tap/short drag",
+      "target": "tooth/gear",
+      "feedback": "wobble/noise meter",
+      "condition": "tool=probe",
+      "state_change": "diagnostic flags revealed"
+    },
+    {
+      "verb": "Extract",
+      "input": "press-drag along removal axis",
+      "target": "unlocked damaged gear",
+      "feedback": "resistance then snap",
+      "condition": "retainer released",
+      "state_change": "gear removed to tray"
+    },
+    {
+      "verb": "Grind",
+      "input": "drag part against grinder",
+      "target": "replacement gear",
+      "feedback": "sparks, fit gauge",
+      "condition": "part on bench",
+      "state_change": "diameter/tooth fit changes"
+    },
+    {
+      "verb": "Lubricate",
+      "input": "drag nozzle + hold",
+      "target": "bearing/gear",
+      "feedback": "oil sheen/meter",
+      "condition": "repair",
+      "state_change": "friction decreases; overfill risk rises"
+    },
+    {
+      "verb": "Align",
+      "input": "two-finger rotate or circular drag",
+      "target": "replacement gear",
+      "feedback": "teeth ghost-match",
+      "condition": "socket empty",
+      "state_change": "phase angle changes"
+    },
+    {
+      "verb": "Seat",
+      "input": "drag into socket",
+      "target": "replacement gear",
+      "feedback": "magnetic snap",
+      "condition": "size/alignment valid",
+      "state_change": "gear installed"
+    },
+    {
+      "verb": "Bite Test",
+      "input": "hold crank",
+      "target": "test crank",
+      "feedback": "motion/noise/strain result",
+      "condition": "all required parts seated",
+      "state_change": "mechanism cycles"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Patient Select/Brief/Treatment/Result와 Part Bench/Pause overlay를 표현",
+    "Treatment에서 camera gesture와 held-part gesture의 우선순위를 명시",
+    "gear locked/removable/held/aligned/seated/jammed 상태 variant를 표현",
+    "extract axis, grinder contact, rotation ghost, socket snap, crank hold를 gesture annotation으로 표시",
+    "invalid size, locked retainer, overgrind, jam, disabled test 상태와 전환을 포함"
+  ],
+  "primary_interaction": "확대된 기계 입속에서 부품을 직접 집어 빼고 갈고 회전 정렬해 socket에 끼운 뒤 crank로 실제 물림을 시험한다.",
+  "difficulty_variation": "초반은 한 개의 명백한 파손 기어와 교체/정렬을 익힌다. 중반은 겉보기 증상과 실제 원인이 달라 probe 진단이 필요하고, 같은 입 안에서 여러 기어가 연쇄 물림한다. 후반은 접근을 막는 retainer, 제한된 예비 부품, loose axle+misalignment 같은 복합 결함이 나온다. 속도가 아니라 진단 불확실성, 공간 접근성, 공차와 결함 결합으로 어려워진다.",
+  "visual_direction_brief": "Portrait. 입속 기계 구조가 화면 65~75%를 차지하고 하단에 얕은 도구 트레이를 둔다. 카메라는 정면에 가까운 2D cutaway이며 pinch 확대 시에도 핵심 socket과 gear silhouette가 선명해야 한다. 생물 외형은 프레임 역할만 하고 정밀 조작 대상은 큰 단순 기하로 읽힌다. 최종 아트보다 hit target과 깊이 순서가 우선이다."
 }

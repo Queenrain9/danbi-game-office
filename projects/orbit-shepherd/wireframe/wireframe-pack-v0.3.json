@@ -1,0 +1,799 @@
+{
+  "id": "6d6fdb2e-c57a-48dc-a2ed-5c7a91f8b522",
+  "title": "Orbit Shepherd",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "5412ff64-e16c-4078-96cf-5d75f5ef444e",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "list",
+            "box": {
+              "h": 76,
+              "w": 84,
+              "x": 8,
+              "y": 12
+            }
+          }
+        ]
+      },
+      "states": [
+        "STAGE_SELECT"
+      ],
+      "purpose": "Choose unlocked stage.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stage_cards",
+          "box": {
+            "h": 76,
+            "w": 84,
+            "x": 8,
+            "y": 12
+          },
+          "type": "stage_card_list"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "unlocked selected"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select_stage",
+          "input": "tap",
+          "target": "unlocked stage card",
+          "feedback": "selection confirmation",
+          "source_refs": [
+            "Progression",
+            "Screen Flow"
+          ],
+          "precondition": "unlocked",
+          "state_change": "load initial snapshot; OBSERVE",
+          "invalid_input": "locked card stays put",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S2",
+      "name": "Gameplay / Observe & Playing",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "hud",
+            "box": {
+              "h": 10,
+              "w": 96,
+              "x": 2,
+              "y": 2
+            }
+          },
+          {
+            "id": "world",
+            "box": {
+              "h": 82,
+              "w": 96,
+              "x": 2,
+              "y": 13
+            }
+          }
+        ]
+      },
+      "states": [
+        "OBSERVE",
+        "PLAYING"
+      ],
+      "purpose": "Observe trajectories then shepherd flock by gravity toggles.",
+      "feedback": [
+        "gravity on/off dual-coded",
+        "prediction distinct from actual trail",
+        "arrival/lost immediate",
+        "arrival speed condition visible"
+      ],
+      "components": [
+        {
+          "id": "world_playfield",
+          "box": {
+            "h": 82,
+            "w": 96,
+            "x": 2,
+            "y": 13
+          },
+          "type": "continuous_2d_world"
+        },
+        {
+          "id": "planet_layer",
+          "box": {
+            "h": 82,
+            "w": 96,
+            "x": 2,
+            "y": 13
+          },
+          "type": "planet_set"
+        },
+        {
+          "id": "creature_layer",
+          "box": {
+            "h": 82,
+            "w": 96,
+            "x": 2,
+            "y": 13
+          },
+          "type": "creature_set"
+        },
+        {
+          "id": "target_body",
+          "box": {
+            "h": 82,
+            "w": 96,
+            "x": 2,
+            "y": 13
+          },
+          "type": "goal"
+        },
+        {
+          "id": "trajectory_layer",
+          "box": {
+            "h": 82,
+            "w": 96,
+            "x": 2,
+            "y": 13
+          },
+          "type": "prediction_and_trails"
+        },
+        {
+          "id": "arrival_counter",
+          "box": {
+            "h": 8,
+            "w": 18,
+            "x": 3,
+            "y": 2
+          },
+          "type": "counter"
+        },
+        {
+          "id": "timer",
+          "box": {
+            "h": 8,
+            "w": 16,
+            "x": 42,
+            "y": 2
+          },
+          "type": "timer"
+        },
+        {
+          "id": "arrival_speed_rule",
+          "box": {
+            "h": 8,
+            "w": 24,
+            "x": 63,
+            "y": 2
+          },
+          "type": "goal_condition"
+        },
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 9,
+            "w": 7,
+            "x": 91,
+            "y": 2
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [
+        "No direct creature control",
+        "Over-speed target entry continues movement",
+        "Non-toggleable planet does not change state"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "guard": "pause"
+        },
+        {
+          "to": "S4",
+          "guard": "arrived_count>=K"
+        },
+        {
+          "to": "S5",
+          "guard": "timer<=0 or lost_count>N-K"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "toggle_gravity",
+          "input": "single tap",
+          "target": "toggleable planet",
+          "feedback": "planet+influence field switch and predictions recalculate",
+          "source_refs": [
+            "R1",
+            "Core Player Verbs"
+          ],
+          "precondition": "PLAYING and toggleable=true",
+          "state_change": "gravity_active reverses; next physics tick uses new state",
+          "invalid_input": "no state change; rejection feedback",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "R7"
+          ],
+          "precondition": "PLAYING",
+          "state_change": "PAUSED; physics/timer frozen",
+          "invalid_input": "ignored outside PLAYING",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "observe",
+          "name": "Observe",
+          "notes": "risk-free read-only observation",
+          "condition": "first 3 seconds",
+          "source_refs": [
+            "Round Structure"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "world_playfield": "3-second observation cue"
+          },
+          "component_overrides": {
+            "timer": "not counting",
+            "planet_layer": "toggle disabled"
+          },
+          "interaction_overrides": {
+            "toggle_gravity": "disabled"
+          }
+        },
+        {
+          "id": "playing",
+          "name": "Playing",
+          "notes": "",
+          "condition": "observe elapsed 3s",
+          "source_refs": [
+            "R1",
+            "Interaction Spec"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "trajectory_layer": "prediction recalculates after valid toggle"
+          },
+          "component_overrides": {
+            "timer": "counting",
+            "planet_layer": "valid toggles enabled"
+          },
+          "interaction_overrides": {
+            "toggle_gravity": "enabled"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "World judgements use stage coordinates; UI boxes never alter numeric/spatial rules."
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Pause Overlay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "modal",
+            "box": {
+              "h": 60,
+              "w": 44,
+              "x": 28,
+              "y": 20
+            }
+          }
+        ]
+      },
+      "states": [
+        "PAUSED"
+      ],
+      "purpose": "Freeze and recover.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 10,
+            "w": 30,
+            "x": 35,
+            "y": 38
+          },
+          "type": "button"
+        },
+        {
+          "id": "retry_button",
+          "box": {
+            "h": 10,
+            "w": 30,
+            "x": 35,
+            "y": 52
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [
+        "No timer or physics advancement"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "resume/retry"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "R7"
+          ],
+          "precondition": "PAUSED",
+          "state_change": "same PLAYING state resumes",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry_button",
+          "feedback": "world resets",
+          "source_refs": [
+            "R7"
+          ],
+          "precondition": "PAUSED",
+          "state_change": "initial snapshot; OBSERVE",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S4",
+      "name": "Result / Success",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "result",
+            "box": {
+              "h": 64,
+              "w": 50,
+              "x": 25,
+              "y": 18
+            }
+          }
+        ]
+      },
+      "states": [
+        "SUCCESS"
+      ],
+      "purpose": "Confirm success and continue/replay/return.",
+      "feedback": [
+        "arrived_count/K success summary"
+      ],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 22,
+            "w": 40,
+            "x": 30,
+            "y": 23
+          },
+          "type": "summary"
+        },
+        {
+          "id": "next_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 50
+          },
+          "type": "button"
+        },
+        {
+          "id": "retry_button",
+          "box": {
+            "h": 9,
+            "w": 19,
+            "x": 30,
+            "y": 61
+          },
+          "type": "button"
+        },
+        {
+          "id": "stage_select_button",
+          "box": {
+            "h": 9,
+            "w": 19,
+            "x": 51,
+            "y": 61
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [
+        "No stars/economy"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "next/retry"
+        },
+        {
+          "to": "S1",
+          "guard": "select"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next_button",
+          "feedback": "next begins",
+          "source_refs": [
+            "Progression",
+            "R5"
+          ],
+          "precondition": "next exists",
+          "state_change": "next stage initial snapshot; OBSERVE",
+          "invalid_input": "disabled if absent",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry_button",
+          "feedback": "restart",
+          "source_refs": [
+            "R5"
+          ],
+          "precondition": "SUCCESS",
+          "state_change": "same initial snapshot; OBSERVE",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "stage_select_button",
+          "feedback": "unlocks visible",
+          "source_refs": [
+            "Progression"
+          ],
+          "precondition": "SUCCESS",
+          "state_change": "STAGE_SELECT",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S5",
+      "name": "Result / Failure",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "result",
+            "box": {
+              "h": 64,
+              "w": 50,
+              "x": 25,
+              "y": 18
+            }
+          }
+        ]
+      },
+      "states": [
+        "FAILURE"
+      ],
+      "purpose": "Explain terminal failure and recover.",
+      "feedback": [
+        "failure reason explicit"
+      ],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 24,
+            "w": 40,
+            "x": 30,
+            "y": 23
+          },
+          "type": "summary"
+        },
+        {
+          "id": "retry_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 54
+          },
+          "type": "button"
+        },
+        {
+          "id": "stage_select_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 65
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "retry"
+        },
+        {
+          "to": "S1",
+          "guard": "select"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry_button",
+          "feedback": "reset",
+          "source_refs": [
+            "R6"
+          ],
+          "precondition": "FAILURE",
+          "state_change": "initial snapshot; OBSERVE",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "stage_select_button",
+          "feedback": "select opens",
+          "source_refs": [
+            "R6",
+            "Progression"
+          ],
+          "precondition": "FAILURE",
+          "state_change": "STAGE_SELECT; unlocks preserved",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "timeout",
+          "name": "Time Expired",
+          "notes": "",
+          "condition": "timer<=0",
+          "source_refs": [
+            "R6"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "summary": "cause explicit"
+          },
+          "component_overrides": {
+            "summary": "timeout cause"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "losses",
+          "name": "Insufficient Remaining Creatures",
+          "notes": "",
+          "condition": "lost_count>N-K",
+          "source_refs": [
+            "R6"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "summary": "cause explicit"
+          },
+          "component_overrides": {
+            "summary": "unrecoverable loss cause"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "f40804ba-b9fb-4fee-b1ad-26532a1d9400",
+  "input_map": {
+    "tap": {
+      "conflict": "world/creature taps never directly manipulate creatures",
+      "priority": [
+        "modal controls",
+        "pause button",
+        "toggleable planet",
+        "other world"
+      ]
+    },
+    "source_refs": [
+      "Interaction Spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T20:27:42.644008+00:00",
+  "edge_cases": {
+    "cases": [
+      "OBSERVE cannot toggle gravity",
+      "non-toggleable tap changes nothing",
+      "result world taps change nothing",
+      "over-speed target entry is not arrival",
+      "lost is unrecoverable until retry",
+      "retry restores complete initial snapshot"
+    ],
+    "source_refs": [
+      "R1",
+      "R3",
+      "R4",
+      "Test Scenarios"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T20:27:42.644008+00:00",
+  "core_screen": "S2",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "S1",
+    "paths": [
+      {
+        "to": "S2",
+        "from": "S1",
+        "guard": "unlocked stage selected"
+      },
+      {
+        "to": "S3",
+        "from": "S2",
+        "guard": "PLAYING pause"
+      },
+      {
+        "to": "S2",
+        "from": "S3",
+        "guard": "resume or retry"
+      },
+      {
+        "to": "S4",
+        "from": "S2",
+        "guard": "arrived_count>=K"
+      },
+      {
+        "to": "S5",
+        "from": "S2",
+        "guard": "timer<=0 or lost_count>N-K"
+      },
+      {
+        "to": "S2",
+        "from": "S4",
+        "guard": "next or retry"
+      },
+      {
+        "to": "S1",
+        "from": "S4",
+        "guard": "stage select"
+      },
+      {
+        "to": "S2",
+        "from": "S5",
+        "guard": "retry"
+      },
+      {
+        "to": "S1",
+        "from": "S5",
+        "guard": "stage select"
+      }
+    ],
+    "source_refs": [
+      "Screen Flow",
+      "State Model",
+      "R5",
+      "R6",
+      "R7"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 11,
+  "screen_count": 5,
+  "global_states": {
+    "planet": [
+      "ACTIVE_GRAVITY",
+      "INACTIVE_GRAVITY"
+    ],
+    "session": [
+      "STAGE_SELECT",
+      "OBSERVE",
+      "PLAYING",
+      "PAUSED",
+      "SUCCESS",
+      "FAILURE"
+    ],
+    "creature": [
+      "ACTIVE",
+      "ARRIVED",
+      "LOST"
+    ],
+    "source_refs": [
+      "State Model"
+    ],
+    "decision_origin": "game_design"
+  },
+  "pack_markdown": "Orbit Shepherd Interaction Wireframe Pack v0.3. Fun promise: 탭 한 번으로 궤도가 크게 바뀌되 변화를 읽고 다음 토글로 수정하는 우주 목축. Flow: Stage Select → Observe(3s) → Playing → Success/Failure; Playing ↔ Pause. Core world is dominant, HUD peripheral. Planet taps are the only world-changing player input. Prediction and actual trail are distinct; target requires radius plus allowed speed. Retry restores full initial snapshot. Variation remains stage-data driven with no new mechanics.",
+  "source_run_at": "2026-09-30T20:27:42.644008+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "feedback": "planet body + influence field communicate gravity state",
+    "source_refs": [
+      "Visual Direction Brief",
+      "Feedback System"
+    ],
+    "world_priority": "fixed 2D playfield dominates",
+    "decision_origin": "wireframe_layout"
+  },
+  "developer_handoff": {
+    "fun_promise": "탭 한 번으로 궤도가 크게 바뀌되, 플레이어가 그 변화를 읽고 다음 토글로 수정할 수 있는 우주 목축.",
+    "source_refs": [
+      "Wireframe Handoff",
+      "Content Model"
+    ],
+    "data_boundary": "Stage data owns numeric/spatial rules; wireframe boxes are presentation only.",
+    "decision_note": "UX completion only; no game-rule change.",
+    "decision_origin": "wireframe_completion",
+    "upstream_issues": [],
+    "content_variation": "Same gameplay template represents planet count/layout/strength, flock starts, target constraints, time and bounds.",
+    "architecture_boundary": "Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "Stage Select maps locked/unlocked progression",
+    "Gameplay covers 3-second OBSERVE and PLAYING",
+    "Valid planet tap changes gravity and immediately refreshes prediction",
+    "HUD exposes arrived/K, time and arrival-speed condition",
+    "Prediction, actual trail, gravity state and creature states remain distinguishable",
+    "Pause freezes simulation and resume preserves exact state",
+    "Retry restores complete initial snapshot and OBSERVE",
+    "Success triggers at arrived_count>=K",
+    "Failure triggers at timer<=0 or lost_count>N-K",
+    "No direct creature control, planet movement, economy, upgrades or stars"
+  ],
+  "primary_interaction": "행성을 탭해 중력을 실시간 ON/OFF하며 생물 무리의 궤도를 수정",
+  "interaction_principles": [
+    "Tap planets; never directly manipulate creatures",
+    "Keep prediction and actual trails distinct",
+    "Observe is read-only; Playing applies valid taps on next physics tick"
+  ]
+}

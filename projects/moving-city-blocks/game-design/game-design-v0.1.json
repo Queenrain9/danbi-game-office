@@ -1,0 +1,271 @@
+{
+  "id": "25a2fb8e-5b99-477f-a37a-492e7c145fe7",
+  "title": "Moving City Blocks",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Repair is a per-day tactical allowance, not currency.",
+  "idea_id": "834b33c8-0026-444d-af0d-3fc7d7118f42",
+  "version": "v0.1",
+  "one_line": "매일 밤 도시의 건물들이 한 칸씩 이동하는 세계에서 도로와 서비스망이 끊기기 전에 건물 이동 순서를 설계하는 도시 전략 게임.",
+  "core_loop": "Forecast the next night rule → inspect dependencies → order eligible building moves → commit → watch sequential moves alter roads/power/resident access → if still viable, optionally spend the single repair move to restore a broken critical link → evaluate city viability → advance to a harder rule/day. The fun is prediction plus watching a planned sequence create cascading disconnections/reconnections, not freeform city building.",
+  "mvp_scope": "One complete five-day run; deterministic orthogonal grid; 7 building/content classes; forecasted nightly one-cell movement rules; player move ordering; road + power + residence service simulation; one optional repair per day; pass/fail/retry/session result; pause/resume and pre-day persistence.",
+  "created_at": "2026-09-30T19:09:29.322062+00:00",
+  "game_rules": {
+    "grid": "Orthogonal square grid. Each cell is empty or holds exactly one building. Network adjacency is orthogonal only; diagonal contact never connects.",
+    "pause": "Pause is available in planning and repair; it freezes input/resolution state and can resume. During night resolution pause may stop animation but not alter queue. Exit during a day resumes from pre-planning snapshot, never mid-resolution.",
+    "queue": "Every eligible building receives exactly one night action. Player orders any subset; unscheduled eligible buildings resolve afterward in stable reading order top-to-bottom then left-to-right. Reordering therefore changes occupancy and network outcomes without inventing extra movement.",
+    "repair": "One repair charge per day, non-bankable. During repair, relocate exactly one non-critical building one orthogonal cell into an empty in-bounds cell; destination must be legal. It cannot move civic hub, clinic, or power source. Repair is optional and then consumed.",
+    "failure": "If success condition is false after repair or player chooses Evaluate with no repair, day fails. Retry restores exact pre-planning snapshot including rule and repair charge. After 3 failed attempts on one day, session fails.",
+    "success": "After repair, day succeeds when at least 70% of residences are served and every critical building (civic hub, clinic, power source) is road-connected to the civic hub; power source itself need not be powered.",
+    "networks": "Road connectivity is a graph of road-bearing cells by orthogonal adjacency. Power flows from each power source through power-link cells/buildings. A residence is served only if it has orthogonal access to the road network containing a civic hub AND is powered through the power graph.",
+    "night_move": "Each night rule defines eligible building classes, direction vector, and move count (MVP count=1 cell). Scheduled buildings move sequentially. A move is legal only if destination is in bounds and empty at that exact resolution step. Illegal queued moves are skipped and marked blocked; they still consume that building's scheduled action.",
+    "progression": "Day completion unlocks the next day. Session day 1 uses one moving class and simple vector; later days combine building classes, blockers, denser dependencies, and alternating direction rules. No permanent stat upgrades."
+  },
+  "not_in_mvp": [
+    "freeform construction",
+    "economy/currency",
+    "procedural infinite city",
+    "citizen simulation",
+    "combat",
+    "online features",
+    "cosmetic shop",
+    "meta upgrades",
+    "diagonal networks",
+    "multi-cell nightly movement"
+  ],
+  "updated_at": "2026-09-30T19:27:27.032638+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "Move-order consequences may be hard to predict if previews do not clearly distinguish current versus projected topology.",
+    "Two overlapping networks can create visual clutter; road, power, and service status need distinct readable channels.",
+    "Authored day content can accidentally be unsolvable; every day instance requires solvability validation against the one-repair rule.",
+    "Automatic tail order must remain visible or players may misread unscheduled buildings as stationary."
+  ],
+  "progression": "Five-day run. Clearing a day records best result (served residence ratio, repair unused, blocked moves) for feedback only. Next day unlocks linearly. No grind, XP, unlock currency, or meta-upgrades in MVP.",
+  "screen_flow": "Session Select → Planning Board → Commit → Night Resolution → (Repair Phase if available/desired) → Evaluation → Day Result. Success → next Planning Board or Session Result after Day 5. Failure → Retry same day from snapshot or, after third failure, Session Result. Pause overlays Planning/Resolution/Repair and returns to the exact prior state.",
+  "state_model": [
+    {
+      "id": "session_setup",
+      "to": [
+        "planning"
+      ]
+    },
+    {
+      "id": "planning",
+      "to": [
+        "night_resolution",
+        "paused"
+      ]
+    },
+    {
+      "id": "night_resolution",
+      "to": [
+        "repair",
+        "evaluation",
+        "paused"
+      ]
+    },
+    {
+      "id": "repair",
+      "to": [
+        "evaluation",
+        "paused"
+      ]
+    },
+    {
+      "id": "evaluation",
+      "to": [
+        "day_result"
+      ]
+    },
+    {
+      "id": "day_result",
+      "to": [
+        "planning",
+        "session_result"
+      ]
+    },
+    {
+      "id": "paused",
+      "to": [
+        "planning",
+        "repair",
+        "night_resolution"
+      ]
+    },
+    {
+      "id": "session_result",
+      "to": [
+        "session_setup"
+      ]
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "One day scenario = starting grid + building instances + night rule + solvability-valid topology.",
+  "content_model": {
+    "classes": [
+      "residence",
+      "road segment",
+      "civic hub",
+      "clinic",
+      "power source",
+      "power-link building",
+      "neutral blocker"
+    ],
+    "topology": {
+      "grid": "finite orthogonal",
+      "service": "residence requires hub-road component + power",
+      "occupancy": "one building per cell",
+      "road_edges": "orthogonal road-bearing adjacency",
+      "power_edges": "orthogonal power-compatible adjacency"
+    },
+    "constraint": "Generated/authored day must have at least one legal plan that can satisfy success after at most one repair.",
+    "variation_axes": [
+      "grid shape/size",
+      "starting occupancy",
+      "eligible class set",
+      "movement direction",
+      "critical-building placement",
+      "road/power overlap",
+      "neutral blockers",
+      "residence count"
+    ],
+    "night_rule_schema": {
+      "direction": "N/E/S/W",
+      "distance_cells": 1,
+      "automatic_order": "row-major",
+      "eligible_classes": "1+ building classes"
+    }
+  },
+  "source_run_at": "2026-09-30T19:09:29.322062+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "매일 밤 도시 자체가 움직이는 불안정한 세계에서, 내일의 이동 규칙을 읽고 건물의 이동 순서를 설계해 필수 서비스망을 살아 있게 만드는 야간 도시 조정관.",
+  "session_length": "10–20 minutes for a five-day MVP run; individual day 2–4 minutes.",
+  "test_scenarios": [
+    "Success dry run: 10 residences start served; after ordered moves 8 remain served, all civic hub/clinic/power source road-connected; player skips repair; 80%≥70%, day succeeds and next day loads.",
+    "Repair success: after night 6/10 residences served because one movable neutral building breaks a road gap; repair relocates that non-critical building to an adjacent empty cell, road reconnects, 8/10 served and critical buildings connected; day succeeds and repair is consumed.",
+    "Failure/retry: after night 5/10 residences served and clinic disconnected; repair cannot produce both conditions; evaluation fails. Retry restores exact initial board/rule, attempt becomes 2; third failed attempt ends session.",
+    "Order conflict: A and B target cells affected by occupancy. A-first opens B destination and both move; B-first finds its destination occupied and is blocked. Network recomputes after each resolved action.",
+    "Pause/exit: pause during planning returns unchanged; exit during repair and reopen restores the day's pre-planning snapshot, not partial resolution."
+  ],
+  "design_markdown": "# Moving City Blocks — Playable Game Design Spec v0.1\n\n## 1. Product Definition\n매일 밤 도시의 건물들이 한 칸씩 이동하는 세계에서 도로와 서비스망이 끊기기 전에 건물 이동 순서를 설계하는 도시 전략 게임. A deterministic mobile strategy/puzzle MVP about ordering forecasted building movement so a city's road, power, and resident-service networks survive nightly topology changes. The core promise is planning a sequence, then watching the city visibly break and reconnect because of that sequence.\n\n## 2. Player Fantasy\n매일 밤 도시 자체가 움직이는 불안정한 세계에서, 내일의 이동 규칙을 읽고 건물의 이동 순서를 설계해 필수 서비스망을 살아 있게 만드는 야간 도시 조정관.\n\n## 3. Core Player Verbs\n- **inspect** — input: tap/select; target: next-night rule and building; condition: planning; state_change: reveals legal destination and dependency impact preview; feedback: affected links and service coverage preview.\n- **schedule** — input: select building then order slot; target: movable building; condition: planning and unused order slot; state_change: adds/reorders building in move queue; feedback: ghost destination and projected network changes.\n- **commit** — input: confirm; target: move queue; condition: all mandatory movers scheduled or explicitly left to automatic rule order; state_change: planning→night_resolution; feedback: queue locks and moves resolve one by one.\n- **repair** — input: select one eligible building and adjacent legal cell; target: disconnected city; condition: repair state and repair charge available; state_change: one post-night adjacent relocation; feedback: network recomputes immediately.\n- **advance** — input: continue; target: resolved day; condition: success evaluation complete; state_change: day index advances and next rule loads; feedback: day result and next-night forecast.\n\n## 4. Core Loop\nForecast the next night rule → inspect dependencies → order eligible building moves → commit → watch sequential moves alter roads/power/resident access → if still viable, optionally spend the single repair move to restore a broken critical link → evaluate city viability → advance to a harder rule/day. The fun is prediction plus watching a planned sequence create cascading disconnections/reconnections, not freeform city building.\n\n## 5. Round / Session Structure\nOne day is one planning/resolution cycle. Planning has no timer. Commit resolves the queued legal moves in order. Then a single repair phase occurs only if a repair can change topology. Evaluation ends the day. An MVP session is 5 days; clearing at least 4 days and the final day wins the session. A failed day may be retried from that day's pre-planning snapshot; three failed day attempts end the session.\n\n## 6. Game Rules\n- **Grid:** Orthogonal square grid. Each cell is empty or holds exactly one building. Network adjacency is orthogonal only; diagonal contact never connects.\n- **Night move:** Each night rule defines eligible building classes, direction vector, and move count (MVP count=1 cell). Scheduled buildings move sequentially. A move is legal only if destination is in bounds and empty at that exact resolution step. Illegal queued moves are skipped and marked blocked; they still consume that building's scheduled action.\n- **Queue:** Every eligible building receives exactly one night action. Player orders any subset; unscheduled eligible buildings resolve afterward in stable reading order top-to-bottom then left-to-right. Reordering therefore changes occupancy and network outcomes without inventing extra movement.\n- **Networks:** Road connectivity is a graph of road-bearing cells by orthogonal adjacency. Power flows from each power source through power-link cells/buildings. A residence is served only if it has orthogonal access to the road network containing a civic hub AND is powered through the power graph.\n- **Success:** After repair, day succeeds when at least 70% of residences are served and every critical building (civic hub, clinic, power source) is road-connected to the civic hub; power source itself need not be powered.\n- **Failure/recovery:** If success condition is false after repair or player chooses Evaluate with no repair, day fails. Retry restores exact pre-planning snapshot including rule and repair charge. After 3 failed attempts on one day, session fails.\n- **Repair:** One repair charge per day, non-bankable. During repair, relocate exactly one non-critical building one orthogonal cell into an empty in-bounds cell; destination must be legal. It cannot move civic hub, clinic, or power source. Repair is optional and then consumed.\n- **Pause/persistence:** Pause is available in planning and repair; it freezes input/resolution state and can resume. During night resolution pause may stop animation but not alter queue. Exit during a day resumes from pre-planning snapshot, never mid-resolution.\n- **Progression rule:** Day completion unlocks the next day. Session day 1 uses one moving class and simple vector; later days combine building classes, blockers, denser dependencies, and alternating direction rules. No permanent stat upgrades.\n\n## 7. State Model\n- session_setup → planning\n- planning → night_resolution, paused\n- night_resolution → repair, evaluation, paused\n- repair → evaluation, paused\n- evaluation → day_result\n- day_result → planning, session_result\n- paused → planning, repair, night_resolution\n- session_result → session_setup\n\n## 8. Interaction Spec\n- **forecast inspection:** Selecting rule/building previews only deterministic effects of current queue; it never changes state.\n- **queue editing:** Tap eligible building to add; drag/order controls reorder scheduled actions; remove returns it to automatic tail.\n- **commit:** Explicit confirmation required; queue editing disabled until resolution completes.\n- **repair relocation:** Select eligible building then one highlighted adjacent empty cell; confirm consumes charge.\n- **retry:** From failed day result, Retry restores pre-planning snapshot and increments failed-attempt count.\n\n## 9. Content Model\nContent classes: residence, road segment, civic hub, clinic, power source, power-link building, neutral blocker. Night rule schema: eligible class set + cardinal direction + one-cell distance + row-major automatic tail. Topology: finite orthogonal grid, one occupant per cell, orthogonal road and power edges, residence service requires both hub-road access and power. Variation axes: grid shape/size, starting occupancy, eligible class set, movement direction, critical-building placement, road/power overlap, neutral blockers, residence count. Every authored scenario must be solvable under the one-repair limit.\n\n## 10. Difficulty / Variation\nDays escalate by dependency density rather than faster input: Day 1 single moving class and spare cells; Day 2 tighter road continuity; Day 3 power and road interactions; Day 4 two eligible classes and occupancy-order conflicts; Day 5 combines dense critical links and alternating forecast rule. Exact maps and numeric content instances remain content-authoring choices subject to solvability constraint.\n\n## 11. Progression\nFive-day run. Clearing a day records best result (served residence ratio, repair unused, blocked moves) for feedback only. Next day unlocks linearly. No grind, XP, unlock currency, or meta-upgrades in MVP.\n\n## 12. Economy\nNot required. Repair is a per-day tactical allowance, not currency.\n\n## 13. Screen Inventory\n- Session Select / Day Map\n- Planning Board\n- Night Resolution\n- Repair Phase\n- Day Result\n- Session Result\n- Pause Overlay\n\n## 14. Screen Flow\nSession Select → Planning Board → Commit → Night Resolution → (Repair Phase if available/desired) → Evaluation → Day Result. Success → next Planning Board or Session Result after Day 5. Failure → Retry same day from snapshot or, after third failure, Session Result. Pause overlays Planning/Resolution/Repair and returns to the exact prior state.\n\n## 15. Feedback System\n- **queue change:** numbered move order, ghost destination, projected broken/formed network links\n- **move resolves:** building slides one cell; affected road/power edges switch immediately\n- **blocked move:** move stops, blocked marker and reason shown\n- **service change:** residence served/unserved state changes immediately after each move\n- **repair:** eligible cells highlight; confirmed relocation recomputes networks\n- **evaluation:** served ratio, critical connectivity, pass/fail reasons\n- **retry:** board visibly restores to exact start-of-day snapshot and attempt counter increments\n\n## 16. Visual Direction Brief\nReadable top-down/near-top-down city board with persistent grid topology. Buildings must read primarily by silhouette/icon class, while road/power links remain legible above decorative art. Night resolution emphasizes one move at a time and cascading link changes. UI supports the world board rather than obscuring it; no fixed coordinates are prescribed.\n\n## 17. MVP Scope + NOT IN MVP\n**MVP:** One complete five-day run; deterministic orthogonal grid; 7 building/content classes; forecasted nightly one-cell movement rules; player move ordering; road + power + residence service simulation; one optional repair per day; pass/fail/retry/session result; pause/resume and pre-day persistence.\n**NOT IN MVP:** freeform construction, economy/currency, procedural infinite city, citizen simulation, combat, online features, cosmetic shop, meta upgrades, diagonal networks, multi-cell nightly movement.\n\n## 18. Test Scenarios\n- Success dry run: 10 residences start served; after ordered moves 8 remain served, all civic hub/clinic/power source road-connected; player skips repair; 80%≥70%, day succeeds and next day loads.\n- Repair success: after night 6/10 residences served because one movable neutral building breaks a road gap; repair relocates that non-critical building to an adjacent empty cell, road reconnects, 8/10 served and critical buildings connected; day succeeds and repair is consumed.\n- Failure/retry: after night 5/10 residences served and clinic disconnected; repair cannot produce both conditions; evaluation fails. Retry restores exact initial board/rule, attempt becomes 2; third failed attempt ends session.\n- Order conflict: A and B target cells affected by occupancy. A-first opens B destination and both move; B-first finds its destination occupied and is blocked. Network recomputes after each resolved action.\n- Pause/exit: pause during planning returns unchanged; exit during repair and reopen restores the day's pre-planning snapshot, not partial resolution.\n\n## 19. Known Risks\n- Move-order consequences may be hard to predict if previews do not clearly distinguish current versus projected topology.\n- Two overlapping networks can create visual clutter; road, power, and service status need distinct readable channels.\n- Authored day content can accidentally be unsolvable; every day instance requires solvability validation against the one-repair rule.\n- Automatic tail order must remain visible or players may misread unscheduled buildings as stationary.\n\n## 20. Wireframe Handoff\n- fun_promise: The player should enjoy predicting and then watching a chosen building-move order break and reconnect a living city network; ordering consequences are the center of play.\n- Represent all seven screen types and planning/resolution/repair/evaluation/result/pause states; do not collapse later-day two-class/order-conflict variations into the tutorial case.\n- Planning must expose next-night eligible classes, direction, automatic tail order, current queue, deterministic destination previews, and projected network/service changes.\n- Resolution must show sequential occupancy changes and immediate road/power/service recomputation; blocked actions remain visible with reason.\n- Repair must permit exactly one optional adjacent relocation of a non-critical building into an empty legal cell, then evaluation.\n- Day Result must state served ratio, critical connectivity, repair use, blocked moves, attempt count, and retry/continue availability.\n- Wireframes may choose layout and control placement, but may not alter orthogonal topology, movement legality, success threshold, retry snapshot semantics, or five-day session structure.\n\n### Card Fields\n- primary_interaction: Inspect forecast, order building moves, commit, then optionally relocate one building to repair network continuity.\n- session_length: 10–20 minutes for a five-day MVP run; individual day 2–4 minutes.\n- content_unit: One day scenario = starting grid + building instances + night rule + solvability-valid topology.\n- mvp_scope: One complete five-day run; deterministic orthogonal grid; 7 building/content classes; forecasted nightly one-cell movement rules; player move ordering; road + power + residence service simulation; one optional repair per day; pass/fail/retry/session result; pause/resume and pre-day persistence.\n- screen_inventory: Session Select / Day Map, Planning Board, Night Resolution, Repair Phase, Day Result, Session Result, Pause Overlay\n- known_risks: Move-order consequences may be hard to predict if previews do not clearly distinguish current versus projected topology. | Two overlapping networks can create visual clutter; road, power, and service status need distinct readable channels. | Authored day content can accidentally be unsolvable; every day instance requires solvability validation against the one-repair rule. | Automatic tail order must remain visible or players may misread unscheduled buildings as stationary.\n",
+  "feedback_system": [
+    {
+      "event": "queue change",
+      "feedback": "numbered move order, ghost destination, projected broken/formed network links"
+    },
+    {
+      "event": "move resolves",
+      "feedback": "building slides one cell; affected road/power edges switch immediately"
+    },
+    {
+      "event": "blocked move",
+      "feedback": "move stops, blocked marker and reason shown"
+    },
+    {
+      "event": "service change",
+      "feedback": "residence served/unserved state changes immediately after each move"
+    },
+    {
+      "event": "repair",
+      "feedback": "eligible cells highlight; confirmed relocation recomputes networks"
+    },
+    {
+      "event": "evaluation",
+      "feedback": "served ratio, critical connectivity, pass/fail reasons"
+    },
+    {
+      "event": "retry",
+      "feedback": "board visibly restores to exact start-of-day snapshot and attempt counter increments"
+    }
+  ],
+  "round_structure": "One day is one planning/resolution cycle. Planning has no timer. Commit resolves the queued legal moves in order. Then a single repair phase occurs only if a repair can change topology. Evaluation ends the day. An MVP session is 5 days; clearing at least 4 days and the final day wins the session. A failed day may be retried from that day's pre-planning snapshot; three failed day attempts end the session.",
+  "interaction_spec": [
+    {
+      "rule": "Selecting rule/building previews only deterministic effects of current queue; it never changes state.",
+      "pattern": "forecast inspection"
+    },
+    {
+      "rule": "Tap eligible building to add; drag/order controls reorder scheduled actions; remove returns it to automatic tail.",
+      "pattern": "queue editing"
+    },
+    {
+      "rule": "Explicit confirmation required; queue editing disabled until resolution completes.",
+      "pattern": "commit"
+    },
+    {
+      "rule": "Select eligible building then one highlighted adjacent empty cell; confirm consumes charge.",
+      "pattern": "repair relocation"
+    },
+    {
+      "rule": "From failed day result, Retry restores pre-planning snapshot and increments failed-attempt count.",
+      "pattern": "retry"
+    }
+  ],
+  "screen_inventory": [
+    "Session Select / Day Map",
+    "Planning Board",
+    "Night Resolution",
+    "Repair Phase",
+    "Day Result",
+    "Session Result",
+    "Pause Overlay"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "inspect",
+      "input": "tap/select",
+      "target": "next-night rule and building",
+      "feedback": "affected links and service coverage preview",
+      "condition": "planning",
+      "state_change": "reveals legal destination and dependency impact preview"
+    },
+    {
+      "verb": "schedule",
+      "input": "select building then order slot",
+      "target": "movable building",
+      "feedback": "ghost destination and projected network changes",
+      "condition": "planning and unused order slot",
+      "state_change": "adds/reorders building in move queue"
+    },
+    {
+      "verb": "commit",
+      "input": "confirm",
+      "target": "move queue",
+      "feedback": "queue locks and moves resolve one by one",
+      "condition": "all mandatory movers scheduled or explicitly left to automatic rule order",
+      "state_change": "planning→night_resolution"
+    },
+    {
+      "verb": "repair",
+      "input": "select one eligible building and adjacent legal cell",
+      "target": "disconnected city",
+      "feedback": "network recomputes immediately",
+      "condition": "repair state and repair charge available",
+      "state_change": "one post-night adjacent relocation"
+    },
+    {
+      "verb": "advance",
+      "input": "continue",
+      "target": "resolved day",
+      "feedback": "day result and next-night forecast",
+      "condition": "success evaluation complete",
+      "state_change": "day index advances and next rule loads"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: The player should enjoy predicting and then watching a chosen building-move order break and reconnect a living city network; ordering consequences are the center of play.",
+    "Represent all seven screen types and planning/resolution/repair/evaluation/result/pause states; do not collapse later-day two-class/order-conflict variations into the tutorial case.",
+    "Planning must expose next-night eligible classes, direction, automatic tail order, current queue, deterministic destination previews, and projected network/service changes.",
+    "Resolution must show sequential occupancy changes and immediate road/power/service recomputation; blocked actions remain visible with reason.",
+    "Repair must permit exactly one optional adjacent relocation of a non-critical building into an empty legal cell, then evaluation.",
+    "Day Result must state served ratio, critical connectivity, repair use, blocked moves, attempt count, and retry/continue availability.",
+    "Wireframes may choose layout and control placement, but may not alter orthogonal topology, movement legality, success threshold, retry snapshot semantics, or five-day session structure."
+  ],
+  "primary_interaction": "Inspect forecast, order building moves, commit, then optionally relocate one building to repair network continuity.",
+  "difficulty_variation": "Days escalate by dependency density rather than faster input: Day 1 single moving class and spare cells; Day 2 tighter road continuity; Day 3 power and road interactions; Day 4 two eligible classes and occupancy-order conflicts; Day 5 combines dense critical links and alternating forecast rule. Exact maps and numeric content instances remain content-authoring choices subject to solvability constraint.",
+  "visual_direction_brief": "Readable top-down/near-top-down city board with persistent grid topology. Buildings must read primarily by silhouette/icon class, while road/power links remain legible above decorative art. Night resolution emphasizes one move at a time and cascading link changes. UI supports the world board rather than obscuring it; no fixed coordinates are prescribed."
+}

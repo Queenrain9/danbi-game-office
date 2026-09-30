@@ -1,0 +1,1035 @@
+{
+  "id": "71e423cd-09e0-4101-bb08-2b76178d5d85",
+  "title": "One Room Time Loop",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "97f1c1f8-400d-4cfe-b298-dcb91577614f",
+  "screens": [
+    {
+      "id": "L1",
+      "name": "Level Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 78,
+            "w": 92,
+            "x": 4,
+            "y": 8,
+            "id": "grid",
+            "role": "selection",
+            "label": "Level grid",
+            "source_refs": [
+              "screen_inventory[0]"
+            ],
+            "decision_note": "Landscape card grid keeps progression readable.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Select"
+      ],
+      "purpose": "Choose unlocked room and inspect stars/best loops.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "levels",
+          "box": {
+            "h": 65,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          },
+          "type": "card_grid",
+          "label": "10 level cards",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "unlock, stars, best_loops_used",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 70,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Open Brief",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "L2",
+          "from": "L1",
+          "trigger": "open",
+          "condition": "selected unlocked",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select_level",
+          "input": "tap",
+          "target": "levels",
+          "feedback": "selected card emphasis",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "card unlocked",
+          "state_change": "selected_level changes",
+          "invalid_input": "locked card explains lock",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "L2",
+      "name": "Level Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 88,
+            "w": 92,
+            "x": 4,
+            "y": 5,
+            "id": "brief",
+            "role": "preview",
+            "label": "Brief content",
+            "source_refs": [
+              "screen_inventory[1]"
+            ],
+            "decision_note": "Goal and topology preview precede Start.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Brief"
+      ],
+      "purpose": "Explain authored goal, loop budget and room dependencies without revealing solution.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "goal",
+          "box": {
+            "h": 30,
+            "w": 42,
+            "x": 5,
+            "y": 8
+          },
+          "type": "panel",
+          "label": "Goal predicates",
+          "source_refs": [
+            "game_rules.goal"
+          ],
+          "state_binding": "authored boolean goal",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "room",
+          "box": {
+            "h": 52,
+            "w": 45,
+            "x": 50,
+            "y": 8
+          },
+          "type": "map_preview",
+          "label": "Room preview",
+          "source_refs": [
+            "content_model.topology"
+          ],
+          "state_binding": "walkable/solid, anchors, links, goal zones",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "budget",
+          "box": {
+            "h": 18,
+            "w": 42,
+            "x": 5,
+            "y": 42
+          },
+          "type": "summary",
+          "label": "Loop budget / par",
+          "source_refs": [
+            "round_structure",
+            "progression"
+          ],
+          "state_binding": "budget 2-4, par_loops",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 20,
+            "x": 5,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Back",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 70,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "loaded",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "L3",
+          "from": "L2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "transition": "fade",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "room enters live",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "precondition": "level loaded",
+          "state_change": "world initialized at loop1 t0",
+          "invalid_input": "disabled while loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "L3",
+      "name": "Time-Loop Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 76,
+            "x": 2,
+            "y": 4,
+            "id": "room",
+            "role": "playfield",
+            "label": "Whole authored room",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Whole rule-relevant room remains visible without scrolling.",
+            "decision_origin": "wireframe_layout"
+          },
+          {
+            "h": 70,
+            "w": 19,
+            "x": 79,
+            "y": 4,
+            "id": "hud",
+            "role": "status/actions",
+            "label": "Loop HUD",
+            "source_refs": [
+              "round_structure"
+            ],
+            "decision_note": "Actions remain reachable while room dominates.",
+            "decision_origin": "wireframe_layout"
+          },
+          {
+            "h": 22,
+            "w": 96,
+            "x": 2,
+            "y": 76,
+            "id": "timeline",
+            "role": "causality",
+            "label": "0-60s causal timeline",
+            "source_refs": [
+              "feedback_system.timeline"
+            ],
+            "decision_note": "Timeline supports causality, never editing.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Live Loop",
+        "Loop Reset",
+        "Pause",
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Directly perform actions, commit immutable past selves, and coordinate causal timing.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "world",
+          "box": {
+            "h": 70,
+            "w": 76,
+            "x": 2,
+            "y": 4
+          },
+          "type": "world_view",
+          "label": "Room / current self / ghosts",
+          "source_refs": [
+            "game_rules",
+            "wireframe_handoff"
+          ],
+          "state_binding": "current+0..3 immutable ghosts; objects",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "goal",
+          "box": {
+            "h": 16,
+            "w": 17,
+            "x": 80,
+            "y": 5
+          },
+          "type": "predicate_panel",
+          "label": "Goal predicates",
+          "source_refs": [
+            "game_rules.goal"
+          ],
+          "state_binding": "live authored predicate truth",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "loop",
+          "box": {
+            "h": 8,
+            "w": 17,
+            "x": 80,
+            "y": 23
+          },
+          "type": "counter",
+          "label": "Loop budget",
+          "source_refs": [
+            "round_structure"
+          ],
+          "state_binding": "loop index / budget2-4",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "interact",
+          "box": {
+            "h": 13,
+            "w": 17,
+            "x": 80,
+            "y": 34
+          },
+          "type": "button",
+          "label": "Interact",
+          "source_refs": [
+            "interaction_spec.interact"
+          ],
+          "state_binding": "eligible target within .8",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "end",
+          "box": {
+            "h": 11,
+            "w": 17,
+            "x": 80,
+            "y": 50
+          },
+          "type": "button",
+          "label": "End Loop",
+          "source_refs": [
+            "interaction_spec.end_loop"
+          ],
+          "state_binding": "goal false; final causes failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 9,
+            "w": 8,
+            "x": 80,
+            "y": 63
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "interaction_spec.pause"
+          ],
+          "state_binding": "always Live",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "reset",
+          "box": {
+            "h": 9,
+            "w": 8,
+            "x": 89,
+            "y": 63
+          },
+          "type": "button",
+          "label": "Reset",
+          "source_refs": [
+            "interaction_spec.reset"
+          ],
+          "decision_note": "Confirmation prevents accidental destructive reset without changing reset semantics.",
+          "state_binding": "Live/Pause via confirmation",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "stick",
+          "box": {
+            "h": 18,
+            "w": 18,
+            "x": 4,
+            "y": 51
+          },
+          "type": "virtual_stick",
+          "label": "Move stick",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "state_binding": "Live Loop current self",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "target",
+          "box": {
+            "h": 10,
+            "w": 12,
+            "x": 24,
+            "y": 52
+          },
+          "type": "world_overlay",
+          "label": "Nearest eligible target cue",
+          "source_refs": [
+            "game_rules.targeting"
+          ],
+          "state_binding": "range<=0.8 targeting tie rule",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "timer",
+          "box": {
+            "h": 7,
+            "w": 14,
+            "x": 42,
+            "y": 77
+          },
+          "type": "timer",
+          "label": "60s clock",
+          "source_refs": [
+            "game_rules.clock"
+          ],
+          "state_binding": "0..60",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "lanes",
+          "box": {
+            "h": 11,
+            "w": 92,
+            "x": 4,
+            "y": 85
+          },
+          "type": "timeline",
+          "label": "Track lanes + action markers",
+          "source_refs": [
+            "feedback_system.timeline"
+          ],
+          "state_binding": "current recording + committed tracks",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "L3",
+          "from": "L3",
+          "trigger": "nonfinal End Loop or 60s",
+          "condition": "goal false and loop remains",
+          "transition": "Loop Reset rewind then Live t0",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L4",
+          "from": "L3",
+          "trigger": "goal true tick",
+          "condition": "any loop",
+          "transition": "immediate causal freeze",
+          "source_refs": [
+            "game_rules.goal"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L4",
+          "from": "L3",
+          "trigger": "final 60s or final End Loop",
+          "condition": "goal false",
+          "transition": "failure",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "move",
+          "input": "virtual stick drag",
+          "target": "stick/current self",
+          "feedback": "movement + timeline cursor",
+          "priority": 3,
+          "source_refs": [
+            "core_player_verbs[0]",
+            "game_rules.space"
+          ],
+          "precondition": "Live Loop",
+          "state_change": "current position changes at 2.4 room-units/sec; movement sampled 20Hz",
+          "invalid_input": "release stops",
+          "cancel_behavior": "release stops",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "interact",
+          "input": "tap",
+          "target": "interact / nearest eligible anchor",
+          "feedback": "target cue, object response, action marker",
+          "priority": 2,
+          "source_refs": [
+            "core_player_verbs[1]",
+            "interaction_spec.interact"
+          ],
+          "precondition": "Live Loop; eligible target <=0.8",
+          "state_change": "deterministic object action + timestamp event",
+          "invalid_input": "no eligible target => no event/state change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "carry",
+          "input": "tap",
+          "target": "interact on carryable/socket context",
+          "feedback": "owner badge / snap pulse",
+          "source_refs": [
+            "core_player_verbs[2]",
+            "game_rules.objects.carryable",
+            "game_rules.objects.socket"
+          ],
+          "precondition": "hands free/unowned/in range or valid pickup",
+          "state_change": "ownership/position changes; drop at actor center; socket snap within .6",
+          "invalid_input": "failed precondition => no change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "commit",
+          "input": "tap",
+          "target": "end",
+          "feedback": "rewind then new stable ghost lane/tint",
+          "priority": 2,
+          "source_refs": [
+            "core_player_verbs[3]",
+            "interaction_spec.end_loop"
+          ],
+          "precondition": "goal false; loop nonfinal",
+          "state_change": "track immutable; world authored reset; next loop t0 with ghost",
+          "invalid_input": "on final loop => immediate failure Result, not commit",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "reset",
+          "input": "tap confirm",
+          "target": "reset",
+          "feedback": "room reset",
+          "source_refs": [
+            "core_player_verbs[4]",
+            "interaction_spec.reset"
+          ],
+          "precondition": "Live/Pause",
+          "state_change": "all tracks/world/loop index reset; progression unchanged",
+          "invalid_input": "cancel confirmation => no change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "pause overlay",
+          "priority": 1,
+          "source_refs": [
+            "game_rules.clock.pause"
+          ],
+          "precondition": "Live Loop",
+          "state_change": "enter Pause; freeze clock/ghosts/timers/recording",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "sim_hold",
+          "name": "Simultaneous Hold",
+          "notes": "2-3 continuous conditions overlap.",
+          "condition": "level class Simultaneous Hold",
+          "source_refs": [
+            "content_model.classes[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "linked_state": "pulse at exact tick"
+          },
+          "component_overrides": {
+            "world": {
+              "state_binding": "plate circles + linked outputs emphasized"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "door_relay",
+          "name": "Door Relay",
+          "notes": "Ghosts ignore actor collision; current uses door condition.",
+          "condition": "level class Door Relay",
+          "source_refs": [
+            "content_model.classes[1]",
+            "game_rules.objects.door"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "door_grace": "closing overlap stays open until current exits"
+          },
+          "component_overrides": {
+            "world": {
+              "state_binding": "door link and current collision/grace readable"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "handoff",
+          "name": "Object Handoff",
+          "notes": "Ownership timing is explicit.",
+          "condition": "level class Object Handoff",
+          "source_refs": [
+            "content_model.classes[2]",
+            "game_rules.objects.carryable"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "ghost_miss": "miss pulse if replay pickup precondition fails"
+          },
+          "component_overrides": {
+            "world": {
+              "state_binding": "carry owner + socket radius/snap state"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "timed",
+          "name": "Timed Overlap",
+          "notes": "Another valid press restarts authored duration.",
+          "condition": "level class Timed Overlap",
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "timer": "linked output countdown"
+          },
+          "component_overrides": {
+            "world": {
+              "state_binding": "3-8s output countdown on timed button"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "composite",
+          "name": "Composite Chain",
+          "notes": "No new interaction rules.",
+          "condition": "level class Composite Chain",
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "causality": "retain stable ghost identity and exact tick pulses"
+          },
+          "component_overrides": {
+            "world": {
+              "state_binding": "combine prior object cues without new controls"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "L4",
+      "name": "Level Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "result",
+            "role": "summary",
+            "label": "Result",
+            "source_refs": [
+              "screen_inventory[3]"
+            ],
+            "decision_note": "Single result panel.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Report success/failure, causal outcome, stars and navigation.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 10
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "source_refs": [
+            "game_rules.goal",
+            "game_rules.failure"
+          ],
+          "state_binding": "success/failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "causal",
+          "box": {
+            "h": 25,
+            "w": 80,
+            "x": 10,
+            "y": 25
+          },
+          "type": "summary",
+          "label": "Satisfied/false predicates",
+          "source_refs": [
+            "feedback_system.success",
+            "feedback_system.failure"
+          ],
+          "state_binding": "freeze moment or false predicates; no solution reveal",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 53
+          },
+          "type": "summary",
+          "label": "Stars / loops / misses",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1 success;2 par;3 par+0 misses",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 10,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 24,
+            "x": 38,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Select",
+          "source_refs": [
+            "state_model[5]"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 65,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Next",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "success+next unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "L2",
+          "from": "L4",
+          "trigger": "Next",
+          "condition": "success+next",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "L3",
+          "from": "L4",
+          "trigger": "Retry",
+          "condition": "always",
+          "transition": "reset",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "precondition": "always",
+          "state_change": "tracks cleared; same level loop1",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next",
+          "feedback": "unlock feedback",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "success and next exists",
+          "state_change": "next level Brief",
+          "invalid_input": "hidden/disabled otherwise",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "e59e61e0-5f8b-421a-b39a-1fec306a0072",
+  "input_map": {
+    "cancel": "release Move stops; invalid Interact no event",
+    "priority": [
+      "Pause",
+      "active Move",
+      "Interact/End/Reset"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "simultaneous": "Move may coexist with one Interact in same tick",
+    "decision_note": "Defines touch conflict while preserving same-tick Move+Interact rule.",
+    "single_pointer": "UI action tap may occur while stick held if platform supports; otherwise Interact wins current action tick without altering recorded movement samples",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T10:35:09.671388+00:00",
+  "edge_cases": {
+    "items": [
+      "ghost actions resolve track_id ascending before current action",
+      "ghost action miss continues replay",
+      "door closing overlapping current waits for exit",
+      "success freezes first true tick",
+      "final false fails"
+    ],
+    "source_refs": [
+      "game_rules.tick_order",
+      "test_scenarios"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T10:35:09.671388+00:00",
+  "core_screen": "L3",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "L1",
+    "paths": [
+      "L1->L2->L3",
+      "L3 nonfinal commit/60s -> Loop Reset -> L3 t0",
+      "L3 goal true -> L4 success",
+      "L3 final false -> L4 failure",
+      "Pause -> exact L3 return",
+      "L4 Retry -> L3; success Next -> L2"
+    ],
+    "guards": [
+      "End Loop final fails immediately",
+      "Next only after success"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 7,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "freeze": "clock, ghosts, timers, recording",
+      "return": "exact Live state",
+      "source_refs": [
+        "game_rules.clock.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "LoopReset": {
+      "effect": "rewind/world authored reset; committed tracks persist; early end pads idle to60",
+      "source_refs": [
+        "game_rules.reset",
+        "game_rules.recording.early_end"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — One Room Time Loop\n\nFun promise: Directly act, then cooperate with immutable recordings of yourself to solve simultaneous conditions.\n\nWhole-MVP coverage: Level Select, Level Brief, Time-Loop Gameplay, Level Result. Core screen: L3. Structured decision trace is embedded in JSON. Implementation architecture remains downstream responsibility.",
+  "source_run_at": "2026-09-30T10:33:50+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "Directly act, then cooperate with immutable recordings of yourself to solve simultaneous conditions.",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Safe-area and hierarchy choices do not alter rules.",
+    "decision_origin": "wireframe_layout",
+    "coordinate_system": "0..100 screen-percent",
+    "safe_area_percent": 2
+  },
+  "developer_handoff": {
+    "fun_promise": "Directly act, then cooperate with immutable recordings of yourself; never present timeline as editable.",
+    "source_refs": [
+      "wireframe_handoff",
+      "progression"
+    ],
+    "required_data": [
+      "10 rooms",
+      "polygons/anchors/links/goals",
+      "budget/par",
+      "20Hz tracks/events",
+      "five content classes"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "level unlock/stars/best loops persistent",
+      "tracks/world/loop local"
+    ],
+    "upstream_issues": [],
+    "architecture_boundary": "Implementation Blueprint chooses Godot nodes/scripts."
+  },
+  "acceptance_criteria": [
+    "All four inventory screens exist and L3 contains Live/Reset/Pause plus terminal paths.",
+    "Move, Interact, Carry, Commit, Reset and Pause have structured valid/invalid behavior.",
+    "All five content classes alter visible state/feedback without inventing rules.",
+    "Timeline is read-only with 0-60s cursor, current lane, up to 3 ghost lanes and action success/miss markers.",
+    "Pause freezes all simulation; early End pads idle; final End fails; Retry clears tracks.",
+    "Immediate success freeze and stars/unlock/best-loops progression are observable."
+  ],
+  "primary_interaction": "perform 60s actions, commit immutable ghost, coordinate with past selves",
+  "interaction_principles": [
+    "Past actions are immutable teammates, never editable automation",
+    "Keep whole rule-relevant room visible while timeline explains causality",
+    "Stable ghost identity and exact-tick success/miss feedback",
+    "Direct movement/interact dominates; timeline is read-only"
+  ]
+}

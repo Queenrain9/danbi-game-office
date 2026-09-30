@@ -1,0 +1,195 @@
+{
+  "id": "2a47f07e-e719-4c64-862f-b0ba3156b4c4",
+  "title": "Assembly Line Orchestra",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. 구매 통화·소모 자원·상점 없음.",
+  "idea_id": "3551bec5-a3d6-4800-995d-7cf88375223e",
+  "version": "v0.1",
+  "one_line": "공장 기계의 생산 동작 자체를 박자로 엮어 제품을 만들면서 동시에 음악을 완성하는 리듬 자동화 게임.",
+  "core_loop": "계약 선택 → 모듈 배치 → 8-beat activation phase 설정 → 32-beat 가동 → 제품 흐름·음악 관찰 → jam/miss 진단 → 안전 정지·수정 → 생산량과 리듬 조건 동시 충족 → 다음 계약.",
+  "mvp_scope": "계약 선택, setup/edit, directed line, 8-beat scheduling, 32-beat simulation, item flow/transform, jam/scrap, 생산+리듬 동시 판정, pause/safe edit, diagnostics/retry, tutorial, 3-tier progression, 12 templates.",
+  "created_at": "2026-09-30T21:04:21.356463+00:00",
+  "game_rules": {
+    "flow": "activation beat에 호환 input이 있고 output이 비면 변환/이동; 아니면 wait, 2 beats 초과 시 jam/scrap",
+    "pause": "항상 가능; beat와 item 상태를 동결",
+    "rhythm": "성공 activation을 role별 target beat mask와 비교해 hit/miss",
+    "success": "32 beats 뒤 good_output>=quota AND accuracy>=threshold AND jams<=limit",
+    "failure_recovery": "실패 시 progression 손실 없이 Edit Retry 또는 starter layout Reset"
+  },
+  "not_in_mvp": [
+    "freeform factory",
+    "live rhythm tapping",
+    "song authoring",
+    "online/leaderboards",
+    "shop/monetization",
+    "procedural infinite contracts",
+    "narrative campaign"
+  ],
+  "updated_at": "2026-09-30T21:33:04.302961+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "생산 최적과 리듬 최적이 같은 해답으로 수렴할 위험",
+    "audio latency",
+    "동시 item 모바일 가독성",
+    "diagnostics 과설명"
+  ],
+  "progression": "튜토리얼 2개 완료 후 일반 계약군 해금. Mastery stars로 3 tiers를 열며 MVP는 12 contract templates. 실패 시 별 감소 없음.",
+  "screen_flow": "Select → Edit → Running ↔ Pause. Edit 요청은 cycle boundary → Edit. 32 beats 종료 → Success/Failure Result. Success: Next/Replay/Select. Failure: Edit Retry/Reset/Select.",
+  "state_model": [
+    {
+      "state": "select"
+    },
+    {
+      "state": "edit"
+    },
+    {
+      "state": "running"
+    },
+    {
+      "state": "paused"
+    },
+    {
+      "state": "success"
+    },
+    {
+      "state": "failure"
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "1 contract = topology + modules + recipe + quota + rhythm target",
+  "content_model": {
+    "topology": "directed graph; segment당 item 1개; spatial proximity는 판정에 영향 없음",
+    "variation": [
+      "tutorial",
+      "single-route",
+      "branch-route",
+      "syncopated",
+      "mixed-processor"
+    ],
+    "module_classes": [
+      "source",
+      "processor",
+      "router",
+      "output"
+    ],
+    "contract_fields": [
+      "bpm",
+      "available_modules",
+      "directed_socket_topology",
+      "recipe",
+      "quota",
+      "target_masks",
+      "rhythm_threshold",
+      "jam_limit"
+    ]
+  },
+  "source_run_at": "2026-09-30T21:04:21.356463+00:00",
+  "archive_commit": "3611747c8a85605e270d3c2db712b336cf20b930",
+  "human_priority": false,
+  "player_fantasy": "생산 감독이자 지휘자가 되어 같은 기계 동작을 생산 공정과 음악의 음표로 동시에 조율한다.",
+  "session_length": "8–15 minutes",
+  "test_scenarios": [
+    "성공: quota4 threshold.75 jam0에서 output4 hit6 miss2 jam0 → clear",
+    "실패: output3 hit5 miss3 jam1 → fail 후 Edit Retry",
+    "beat5 Edit 요청 → beat8 뒤 정지",
+    "Pause 중 beat/item 불변",
+    "invalid drop 원위치",
+    "branch는 configured edge만 사용"
+  ],
+  "design_markdown": "# Assembly Line Orchestra — Playable Game Design Spec v0.1\n\n## 1. Product Definition\n생산 자동화와 리듬 작곡을 동일한 기계 동작으로 결합한 모바일 리듬 자동화 게임.\n\n## 2. Player Fantasy\n생산 감독이자 지휘자로서 공장 라인의 실제 동작을 음악으로 조율한다.\n\n## 3. Core Player Verbs\nPlace, set phase, run, observe, safe-stop, reconfigure. 각 입력은 Edit/Running 상태 규칙을 따른다.\n\n## 4. Core Loop\n계약 → 배치/phase → 가동 → 관찰/진단 → 수정 → 생산+리듬 동시 달성.\n\n## 5. Round / Session Structure\n8-beat cycle 4회가 한 Run. Edit 요청은 cycle boundary에 적용. 2–4 contracts가 한 세션.\n\n## 6. Game Rules\nDirected graph만 따라 item 이동. Activation beat에 input/compatibility/free output이 성립하면 처리, 아니면 wait; 2 beats 초과는 jam/scrap. 성공 activation을 target mask와 비교한다. 32 beats 후 quota, rhythm threshold, jam limit를 모두 만족해야 clear. 실패는 무료 Edit Retry/Reset.\n\n## 7. State Model\nSelect, Edit, Running, Paused, Success, Failure. 모든 실패 상태는 복구 행동을 가진다.\n\n## 8. Interaction Spec\nEdit에서 배치·route·phase·preview. Running에서는 pause와 queued edit만. Result timeline은 사건 원인을 보존한다.\n\n## 9. Content Model\nSource/Processor/Router/Output 모듈. Contract는 BPM, module set, directed topology, recipe, quota, target masks, threshold, jam limit. Variation은 tutorial/single-route/branch-route/syncopated/mixed-processor.\n\n## 10. Difficulty / Variation\n느린 단일 경로에서 분기·긴 recipe·복수 role mask·높은 quota로 확장. 생산 효율과 음악 타이밍의 충돌이 난도 원천.\n\n## 11. Progression\n튜토리얼 2개 후 일반 계약. Mastery stars로 3 tiers, 12 templates 해금. 실패 페널티 없음.\n\n## 12. Economy\nNot required.\n\n## 13. Screen Inventory\nContract Select; Factory Setup/Edit; Running Factory; Pause Overlay; Run Result/Diagnostic.\n\n## 14. Screen Flow\nSelect → Edit → Running ↔ Pause → Result. Failure → Edit/Reset/Select. Success → Next/Replay/Select.\n\n## 15. Feedback System\nPlayhead tick, mechanical role sound, target hit marker, wait/jam warning, output accent, 조건별 result verdict.\n\n## 16. Visual Direction Brief\n한 화면에서 라인 전체가 읽히는 2D/2.5D. 기계 motion과 beat rail로 timing을 표현하고 모바일 판독성을 우선.\n\n## 17. MVP Scope + NOT IN MVP\nMVP는 전체 core loop, 5 variation classes, progression을 포함. Live tapping, economy, online, procedural infinity, narrative는 제외.\n\n## 18. Test Scenarios\nSuccess: quota4/.75/0에서 4 outputs, 6/2 hits, 0 jams. Failure: 3 outputs, 5/3 hits, 1 jam. Safe edit, pause, invalid drop, branch routing도 검증.\n\n## 19. Known Risks\n최적해 수렴, audio latency, 동시 item 가독성, 과도한 diagnostics.\n\n## 20. Wireframe Handoff\nfun_promise: 생산 최적화와 리듬 연주가 같은 배치·타이밍 행동에서 충돌하고 합쳐져야 한다. Wireframe은 전체 screen/state/gesture/feedback/transition/variation을 표현하되 새 게임 규칙을 추가하지 않는다.",
+  "feedback_system": [
+    {
+      "event": "beat",
+      "feedback": "playhead tick"
+    },
+    {
+      "event": "activation",
+      "feedback": "mechanical motion + role sound + target hit marker"
+    },
+    {
+      "event": "jam",
+      "feedback": "wait warning then scrap"
+    },
+    {
+      "event": "output",
+      "feedback": "counter + chord accent"
+    },
+    {
+      "event": "result",
+      "feedback": "production/rhythm/jam achieved vs required"
+    }
+  ],
+  "round_structure": "계약은 Setup/Edit ↔ Run → Result. Run은 8 beats × 4 cycles. Edit 요청은 현재 cycle 끝에 정지한다. 성공은 다음 계약, 실패는 현재 구성의 Edit로 복귀한다. Pause는 전체 simulation을 동결한다.",
+  "interaction_spec": [
+    {
+      "rule": "compatible socket에만 snap; invalid drop은 원위치",
+      "pattern": "placement"
+    },
+    {
+      "rule": "module마다 activation beat 1-8 하나",
+      "pattern": "phase"
+    },
+    {
+      "rule": "직접 기계 조작 금지; pause와 queued edit만",
+      "pattern": "running"
+    },
+    {
+      "rule": "32 beats의 hit/miss/wait/jam/output 원인을 표시",
+      "pattern": "diagnostic"
+    }
+  ],
+  "screen_inventory": [
+    "Contract Select",
+    "Factory Setup/Edit",
+    "Running Factory",
+    "Pause Overlay",
+    "Run Result / Diagnostic"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "place",
+      "input": "drag",
+      "target": "compatible socket",
+      "feedback": "snap/preview",
+      "condition": "edit",
+      "state_change": "route changes"
+    },
+    {
+      "verb": "phase",
+      "input": "tap",
+      "target": "module",
+      "feedback": "beat marker",
+      "condition": "edit",
+      "state_change": "activation beat 1-8 changes"
+    },
+    {
+      "verb": "run",
+      "input": "tap",
+      "target": "line",
+      "feedback": "playhead and motion",
+      "condition": "connected source-to-output",
+      "state_change": "running"
+    },
+    {
+      "verb": "edit",
+      "input": "tap",
+      "target": "running line",
+      "feedback": "queued stop",
+      "condition": "running",
+      "state_change": "stop at cycle boundary"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 생산 최적화와 리듬 연주가 같은 배치·타이밍 행동에서 충돌하고 합쳐져야 한다.",
+    "모든 screen/state와 safe-stop Edit, failure recovery를 표현",
+    "8-beat playhead, activation, wait/jam/output, target-match feedback 표현",
+    "새 live tapping/currency/scoring rule 추가 금지",
+    "single-route/branch-route/syncopated/mixed-processor variation 포함"
+  ],
+  "primary_interaction": "모듈 배치 + 8-beat activation phase 조율",
+  "difficulty_variation": "단일 경로·느린 BPM에서 시작해 분기, 긴 recipe, 복수 role mask, 높은 quota를 조합한다. 핵심 난도는 생산 효율과 목표 리듬 타이밍의 충돌이며 모든 계약은 최소 한 개 검증 해답을 가진다.",
+  "visual_direction_brief": "전체 활성 라인이 한 화면에서 읽히는 2D/약한 2.5D 공장. 기계 silhouette와 동기화 motion 중심. 음악 timing은 별도 note highway가 아니라 기계 움직임과 compact beat rail로 표현. 모바일 판독성 우선."
+}

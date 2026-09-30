@@ -1,0 +1,1085 @@
+{
+  "id": "0e37ef78-7df8-4bf6-9b8c-38da86d71e9a",
+  "title": "Tiny Rival Restaurant",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "dda6a9f1-af8f-45cb-98a9-ebbc4b3c8ac3",
+  "screens": [
+    {
+      "id": "R1",
+      "name": "Day Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 15,
+            "id": "days",
+            "role": "selection",
+            "label": "Days"
+          }
+        ]
+      },
+      "states": [
+        "Day Select"
+      ],
+      "purpose": "Choose unlocked day",
+      "feedback": [],
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "card_grid",
+          "label": "Day cards",
+          "state_binding": "unlock/best score"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 58,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Open Day",
+          "state_binding": "selected unlocked"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "R2 Prep",
+          "from": "R1",
+          "trigger": "R1_OPEN_DAY",
+          "condition": "selected day unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "R1_SELECT_DAY",
+          "input": "tap",
+          "target": "cards",
+          "feedback": "selected day card highlights",
+          "source_refs": [
+            "progression",
+            "screen_inventory[0]"
+          ],
+          "precondition": "day is unlocked",
+          "state_change": "sets selected day",
+          "invalid_input": "locked day does not select",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "R1_OPEN_DAY",
+          "input": "tap",
+          "target": "start",
+          "feedback": "restaurant opens in Prep",
+          "source_refs": [
+            "screen_flow",
+            "progression"
+          ],
+          "precondition": "an unlocked day is selected",
+          "state_change": "R1 -> R2 Prep with authored day seed/state",
+          "decision_note": "Makes the authored Select→Prep transition explicit.",
+          "invalid_input": "disabled without valid selected day",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "R2",
+      "name": "Restaurant Gameplay",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 8,
+            "w": 94,
+            "x": 3,
+            "y": 3,
+            "id": "hud",
+            "role": "cash/wave/time/reputation",
+            "label": "HUD"
+          },
+          {
+            "h": 39,
+            "w": 94,
+            "x": 3,
+            "y": 13,
+            "id": "street",
+            "role": "party routes and aroma zones",
+            "label": "Shared Street"
+          },
+          {
+            "h": 33,
+            "w": 62,
+            "x": 3,
+            "y": 54,
+            "id": "restaurant",
+            "role": "queue and four tables",
+            "label": "Player Restaurant"
+          },
+          {
+            "h": 43,
+            "w": 29,
+            "x": 68,
+            "y": 54,
+            "id": "controls",
+            "role": "menu/aroma/special",
+            "label": "Service Controls"
+          }
+        ]
+      },
+      "states": [
+        "Prep",
+        "Service",
+        "Waiting",
+        "Dining",
+        "Dirty",
+        "Cleaning"
+      ],
+      "purpose": "Prep menu then manage shared-street service",
+      "feedback": [
+        "route turn",
+        "seat snap",
+        "patience break",
+        "wipe",
+        "rival bell"
+      ],
+      "components": [
+        {
+          "id": "cash",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 3,
+            "y": 3
+          },
+          "type": "counter",
+          "label": "Cash",
+          "state_binding": "cash"
+        },
+        {
+          "id": "wave",
+          "box": {
+            "h": 7,
+            "w": 30,
+            "x": 26,
+            "y": 3
+          },
+          "type": "timer",
+          "label": "Wave/Timer",
+          "state_binding": "wave 1..4 / 45s"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 87,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "active"
+        },
+        {
+          "id": "street_flow",
+          "box": {
+            "h": 39,
+            "w": 94,
+            "x": 3,
+            "y": 13
+          },
+          "type": "simulation_view",
+          "label": "Parties and both entrances",
+          "state_binding": "choice/routes/rival"
+        },
+        {
+          "id": "queue",
+          "box": {
+            "h": 33,
+            "w": 20,
+            "x": 3,
+            "y": 54
+          },
+          "type": "party_queue",
+          "label": "Player Queue",
+          "state_binding": "Waiting patience"
+        },
+        {
+          "id": "tables",
+          "box": {
+            "h": 33,
+            "w": 39,
+            "x": 26,
+            "y": 54
+          },
+          "type": "table_grid",
+          "label": "Tables 1-4",
+          "state_binding": "Free/Dining/Dirty/Cleaning"
+        },
+        {
+          "id": "menu",
+          "box": {
+            "h": 14,
+            "w": 29,
+            "x": 68,
+            "y": 54
+          },
+          "type": "menu_panel",
+          "label": "Menu / Price",
+          "state_binding": "Prep offer"
+        },
+        {
+          "id": "aroma",
+          "box": {
+            "h": 11,
+            "w": 29,
+            "x": 68,
+            "y": 71
+          },
+          "type": "drag_marker",
+          "label": "Aroma Marker / 3 Zones",
+          "state_binding": "Service; 5s cooldown"
+        },
+        {
+          "id": "special",
+          "box": {
+            "h": 10,
+            "w": 29,
+            "x": 68,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Special",
+          "state_binding": "once per wave"
+        }
+      ],
+      "edge_cases": [
+        "patience0 removes party and reputation-1",
+        "meal end adds price and table becomes Dirty",
+        "cash<0 immediately ends day"
+      ],
+      "source_refs": [
+        "screen_inventory[1]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "R2 Service",
+          "from": "R2 Prep",
+          "trigger": "R2_START_SERVICE or 10s elapsed",
+          "condition": "Prep active",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R3 Wave Result Overlay",
+          "from": "R2 Service",
+          "trigger": "45s wave timer elapsed",
+          "condition": "cash>=0",
+          "source_refs": [
+            "game_rules.wave_seconds",
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R4 Day Result Bankruptcy Failure",
+          "from": "R2 Service",
+          "trigger": "cash<0",
+          "condition": "failure rule",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R5 Pause",
+          "from": "R2",
+          "trigger": "R2_PAUSE",
+          "condition": "active simulation",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "I_OFFER",
+          "input": "tap",
+          "target": "menu",
+          "feedback": "board updates",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "precondition": "Prep",
+          "state_change": "menu/price changes within authored options",
+          "invalid_input": "service locks menu",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "I_AROMA",
+          "input": "drag",
+          "target": "aroma marker to one of 3 zones",
+          "feedback": "plume snaps to zone",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "interaction_spec.aroma"
+          ],
+          "precondition": "Service and cooldown=0",
+          "state_change": "scent zone changes; cooldown 5s",
+          "invalid_input": "returns prior zone",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "I_SEAT",
+          "input": "drag",
+          "target": "waiting party to free compatible table",
+          "feedback": "chair + snap pulse",
+          "priority": "party drag > aroma drag > inspection",
+          "source_refs": [
+            "core_player_verbs[2]",
+            "interaction_spec.seat"
+          ],
+          "precondition": "Waiting and compatible Free table",
+          "state_change": "Waiting -> Dining; patience stops",
+          "invalid_input": "party returns queue",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "I_CLEAR",
+          "input": "swipe",
+          "target": "dirty table",
+          "feedback": "wipe",
+          "source_refs": [
+            "core_player_verbs[3]",
+            "interaction_spec.clear"
+          ],
+          "precondition": "Dirty",
+          "state_change": "Dirty -> Cleaning for 3s -> Free",
+          "invalid_input": "other table states ignore",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "I_SPECIAL",
+          "input": "tap",
+          "target": "special",
+          "feedback": "button consumed state",
+          "source_refs": [
+            "interaction_spec.special"
+          ],
+          "precondition": "Service and unused this wave",
+          "state_change": "authored once-per-wave special consumed",
+          "invalid_input": "second attempt disabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "R2_START_SERVICE",
+          "input": "tap",
+          "target": "menu start action",
+          "feedback": "service begins and menu locks",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "precondition": "Prep",
+          "state_change": "Prep -> Service before the 10s auto-start",
+          "timing_rules": {
+            "auto_start_seconds": 10
+          },
+          "decision_note": "Exposes the authored start/10s exit without adding a new rule.",
+          "invalid_input": "ignored after Service starts",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "R2_PAUSE",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "all timers/rival triggers freeze and pause overlay opens",
+          "source_refs": [
+            "game_rules.pause",
+            "interaction_spec.pause"
+          ],
+          "precondition": "active Prep or Service simulation",
+          "state_change": "R2 -> R5 while preserving exact simulation state",
+          "invalid_input": "ignored during terminal day transition",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "R2_PREP",
+          "name": "Prep",
+          "notes": "10s or Start exits Prep",
+          "condition": "state=Prep",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "menu": "board updates"
+          },
+          "component_overrides": {
+            "menu": {
+              "enabled": true
+            },
+            "aroma": {
+              "enabled": false
+            }
+          },
+          "interaction_overrides": {
+            "I_OFFER": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "id": "R2_SERVICE",
+          "name": "Service",
+          "notes": "Party drag priority over aroma drag",
+          "condition": "state=Service",
+          "source_refs": [
+            "state_model[1]",
+            "interaction_spec.priority"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "rival": "bell + sign/plume",
+            "choice": "route turn"
+          },
+          "component_overrides": {
+            "menu": {
+              "enabled": false
+            },
+            "aroma": {
+              "enabled": "cooldown=0"
+            },
+            "tables": {
+              "state_binding": "Free/Dining/Dirty/Cleaning"
+            }
+          },
+          "interaction_overrides": {
+            "I_SEAT": {
+              "enabled": "waiting+compatible free table"
+            },
+            "I_AROMA": {
+              "enabled": "cooldown=0"
+            },
+            "I_CLEAR": {
+              "enabled": "dirty table"
+            }
+          }
+        },
+        {
+          "id": "R2_DAY2",
+          "name": "Day 2 Mix",
+          "notes": "Same verbs; different authored party composition",
+          "condition": "day=2",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "choice": "taste/budget/queue cues remain readable"
+          },
+          "component_overrides": {
+            "street_flow": {
+              "state_binding": "group size + budget-sensitive mix"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "R2_DAY3",
+          "name": "Day 3 Rival Counter",
+          "notes": "Same rules; stronger authored counter pattern",
+          "condition": "day=3",
+          "source_refs": [
+            "difficulty_variation",
+            "game_rules.rival"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "rival": "counter telegraphed by bell/sign/plume"
+          },
+          "component_overrides": {
+            "street_flow": {
+              "state_binding": "peak composition + rival scripted counter"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "Choice formula remains data/rule-owned; UI only explains visible factors."
+      ]
+    },
+    {
+      "id": "R3",
+      "name": "Wave Result Overlay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 60,
+            "w": 76,
+            "x": 12,
+            "y": 20,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Wave Tally"
+          }
+        ]
+      },
+      "states": [
+        "Wave Result"
+      ],
+      "purpose": "Tally wave and continue to next Prep",
+      "feedback": [
+        "register tally"
+      ],
+      "components": [
+        {
+          "id": "tally",
+          "box": {
+            "h": 30,
+            "w": 64,
+            "x": 18,
+            "y": 27
+          },
+          "type": "summary",
+          "label": "Wave Tally",
+          "state_binding": "cash/served/walkouts"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 11,
+            "w": 50,
+            "x": 25,
+            "y": 63
+          },
+          "type": "button",
+          "label": "Continue",
+          "state_binding": "wave<4"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]"
+      ],
+      "transitions": [
+        {
+          "to": "R2 Prep",
+          "from": "R3",
+          "trigger": "R3_CONTINUE",
+          "condition": "wave<4",
+          "source_refs": [
+            "screen_flow",
+            "game_rules.waves"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R4 Day Result",
+          "from": "R3",
+          "trigger": "wave tally complete",
+          "condition": "wave=4 and cash>=0",
+          "source_refs": [
+            "game_rules.success",
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "R3_CONTINUE",
+          "input": "tap",
+          "target": "continue",
+          "feedback": "next wave Prep loads with day state preserved",
+          "source_refs": [
+            "screen_flow",
+            "game_rules.waves"
+          ],
+          "precondition": "Wave Result and wave<4",
+          "state_change": "R3 -> R2 Prep for next wave",
+          "invalid_input": "disabled after wave 4",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "R4",
+      "name": "Day Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 84,
+            "x": 8,
+            "y": 10,
+            "id": "result",
+            "role": "summary",
+            "label": "Day Result"
+          }
+        ]
+      },
+      "states": [
+        "Day Success",
+        "Bankruptcy Failure"
+      ],
+      "purpose": "Success/failure, unlock and retry/select",
+      "feedback": [
+        "register"
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "state_binding": "success/failure"
+        },
+        {
+          "id": "summary",
+          "box": {
+            "h": 25,
+            "w": 84,
+            "x": 8,
+            "y": 28
+          },
+          "type": "summary",
+          "label": "Cash / score",
+          "state_binding": "day result/best"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 65
+          },
+          "type": "button",
+          "label": "Retry Day",
+          "state_binding": "always"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 65
+          },
+          "type": "button",
+          "label": "Next Day",
+          "state_binding": "success+next"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Day Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Navigation-only control for the authored Result→Select path.",
+          "state_binding": "always",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "R2 Prep",
+          "from": "R4",
+          "trigger": "R4_RETRY",
+          "condition": "retry same day",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R2 Prep",
+          "from": "R4 Day Success",
+          "trigger": "R4_NEXT",
+          "condition": "next day exists",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R1",
+          "from": "R4",
+          "trigger": "R4_SELECT",
+          "condition": "Day Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "R4_RETRY",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "day restarts from clean Prep",
+          "source_refs": [
+            "wireframe_handoff",
+            "screen_flow"
+          ],
+          "precondition": "Day Result",
+          "state_change": "restart same day at R2 Prep with the authored day seed/state restored",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "R4_NEXT",
+          "input": "tap",
+          "target": "next",
+          "feedback": "next day opens with newly unlocked menu if applicable",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "Day Success and next day exists",
+          "state_change": "unlock/advance to next day and open R2 Prep",
+          "invalid_input": "disabled on bankruptcy or final day",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "R4_SELECT",
+          "input": "tap",
+          "target": "select",
+          "feedback": "Day Select opens with best score/unlocks",
+          "source_refs": [
+            "screen_flow",
+            "progression"
+          ],
+          "precondition": "Day Result",
+          "state_change": "R4 -> R1",
+          "decision_note": "Makes the authored Day Result→Select navigation explicit.",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "R5",
+      "name": "Pause",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 56,
+            "w": 70,
+            "x": 15,
+            "y": 22,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        "Pause"
+      ],
+      "purpose": "Freeze and resume exact simulation",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 12,
+            "w": 54,
+            "x": 23,
+            "y": 38
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 54,
+            "x": 23,
+            "y": 56
+          },
+          "type": "button",
+          "label": "Day Select",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "exact prior R2 state",
+          "from": "R5",
+          "trigger": "R5_RESUME",
+          "condition": "resume",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "R1",
+          "from": "R5",
+          "trigger": "R5_SELECT",
+          "condition": "abandon day",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "R5_RESUME",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "simulation/timers/rival triggers resume from frozen values",
+          "source_refs": [
+            "game_rules.pause",
+            "interaction_spec.pause"
+          ],
+          "precondition": "Pause",
+          "state_change": "R5 -> exact prior R2 Prep/Service state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "R5_SELECT",
+          "input": "tap",
+          "target": "select",
+          "feedback": "Day Select opens",
+          "source_refs": [
+            "game_rules.pause",
+            "progression"
+          ],
+          "precondition": "Pause",
+          "state_change": "abandon active day and return R1 without granting day completion progression",
+          "decision_note": "Navigation-only abandon path; does not alter success/progression rules.",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "f834d383-afee-459a-8ba6-e1aab916dd6c",
+  "input_map": {
+    "cancel": "invalid party release returns queue; invalid aroma release returns prior zone",
+    "conflict": "party drag wins if hit areas overlap",
+    "priority": [
+      "Pause",
+      "party drag",
+      "aroma drag",
+      "inspection"
+    ],
+    "source_refs": [
+      "interaction_spec.priority",
+      "interaction_spec.seat",
+      "interaction_spec.aroma"
+    ],
+    "single_pointer": true,
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T07:34:38.78706+00:00",
+  "edge_cases": {
+    "items": [
+      "patience decreases only Waiting",
+      "chosen queue is final",
+      "meal completion pays price then Dirty",
+      "cleaning lasts 3s",
+      "rival acts once per wave",
+      "cash<0 terminal",
+      "Retry restores day seed and all state"
+    ],
+    "source_refs": [
+      "game_rules",
+      "round_structure"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T07:34:38.78706+00:00",
+  "core_screen": "R2 Restaurant Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "R1",
+    "guards": [
+      "Seat only free compatible table",
+      "Aroma only 3 zones",
+      "Clear only Dirty",
+      "Special once per wave"
+    ],
+    "normal": [
+      "R1",
+      "R2 Prep",
+      "R2 Service",
+      "R3 Wave Result",
+      "repeat through wave 4",
+      "R4 Day Result"
+    ],
+    "branches": [
+      "R2 Prep -> R2 Service on Start or 10s",
+      "R2 Service -> R3 on 45s wave end when cash>=0",
+      "R3 -> R2 Prep when wave<4",
+      "R3 -> R4 Day Result after wave4 tally",
+      "cash<0 -> R4 Bankruptcy Failure",
+      "R2 -> R5 Pause -> exact prior R2 state",
+      "walkout -> party removed and reputation-1"
+    ],
+    "source_refs": [
+      "screen_flow",
+      "game_rules",
+      "state_model"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 11,
+  "screen_count": 5,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze all timers and rival triggers; preserve exact state",
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InputLock": {
+      "effect": "Wave Result blocks gameplay beneath overlay",
+      "source_refs": [
+        "screen_flow"
+      ],
+      "decision_note": "Prevents accidental simulation input during tally.",
+      "decision_origin": "wireframe_completion"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Tiny Rival Restaurant\nFun promise: compete over a visible living street, not a hidden spreadsheet. Full MVP coverage includes 3 days, 4 waves/day, party/table lifecycle, rival action, recovery, result and pause. Core interactions and content variants are structured in screens JSON.\n\n## Structural repair 2026-09-30\nAdded explicit Day Select, Wave Result, Day Result and Pause interactions/transitions; added Prep Start/Pause flow to the core Restaurant Gameplay screen. No authored economy, timing, party-choice, rival, success or failure rule was changed.",
+  "source_run_at": "2026-09-30T07:34:38.78706+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": 4,
+    "coordinates": "0..100 screen-percent",
+    "fun_promise": "Read a living street and outmaneuver one rival by redirecting customer flow through menu, aroma, seating and table turnover.",
+    "source_refs": [
+      "product_definition",
+      "player_fantasy",
+      "wireframe_handoff"
+    ],
+    "decision_note": "Layout centers NPC flow without changing simulation.",
+    "decision_origin": "wireframe_layout",
+    "coverage_summary": [
+      "Day Select",
+      "Prep",
+      "Service",
+      "Waiting",
+      "Dining",
+      "Dirty/Cleaning",
+      "Wave Result",
+      "Day Result",
+      "Pause",
+      "Days1-3 variations"
+    ]
+  },
+  "developer_handoff": {
+    "fun_promise": "The player should feel they are competing over a visible stream of people, not optimizing hidden spreadsheets.",
+    "source_refs": [
+      "content_model",
+      "difficulty_variation",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "3 authored days",
+      "5 dishes",
+      "4 party archetypes",
+      "4 waves/day",
+      "rival script per wave",
+      "best score/unlock"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "day unlock/best persistent",
+      "cash/tables/parties/aroma/special/wave day-local"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "Day1 taste",
+      "Day2 group/budget",
+      "Day3 rival counter/peak"
+    ],
+    "architecture_boundary": "Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "All five screen inventory items are reachable.",
+    "Prep, Service, Waiting, Dining, Dirty, Cleaning, Wave Result, Day Result and Pause are observable.",
+    "Party drag, aroma snap and dirty-table swipe expose valid and invalid behavior.",
+    "Party choice remains final and visible route feedback reflects the authored choice formula.",
+    "All timers freeze under Pause and Retry restores the day seed/state.",
+    "Days 1-3 vary composition/rival behavior without inventing new verbs."
+  ],
+  "primary_interaction": "손님 흐름 관찰 + 드래그 착석 + 아로마 재배치",
+  "interaction_principles": [
+    "Keep shared street and both restaurants readable at once",
+    "NPC flow is primary; HUD stays thin",
+    "Directly drag waiting parties and aroma marker",
+    "Expose why parties choose without changing the choice formula"
+  ]
+}

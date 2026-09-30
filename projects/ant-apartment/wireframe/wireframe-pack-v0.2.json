@@ -1,0 +1,1326 @@
+{
+  "id": "5605e8e9-66a7-4aca-b082-ed4984bde157",
+  "title": "Ant Apartment",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "e7b2b26d-1a16-4ccd-840c-857644844bc8",
+  "screens": [
+    {
+      "id": "mission_select",
+      "name": "Mission Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 14,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "header",
+            "role": "title/progress",
+            "label": "Mission Header"
+          },
+          {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 16,
+            "id": "list",
+            "role": "mission cards",
+            "label": "Mission List"
+          },
+          {
+            "h": 8,
+            "w": 90,
+            "x": 5,
+            "y": 90,
+            "id": "footer",
+            "role": "navigation",
+            "label": "Footer"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "mission_select",
+          "condition": "screen entered"
+        }
+      ],
+      "purpose": "MVP에서 제공되는 mission entry를 선택하고 Brief로 이동.",
+      "feedback": [
+        "card press"
+      ],
+      "components": [
+        {
+          "id": "title",
+          "box": {
+            "h": 6,
+            "w": 70,
+            "x": 5,
+            "y": 4
+          },
+          "type": "label",
+          "label": "Ant Apartment",
+          "state_binding": "static"
+        },
+        {
+          "id": "mission_list",
+          "box": {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 16
+          },
+          "type": "list",
+          "label": "Mission Cards",
+          "state_binding": "missions",
+          "interaction_role": "tap available mission"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 6,
+            "w": 19,
+            "x": 76,
+            "y": 4
+          },
+          "type": "counter",
+          "label": "Stars",
+          "state_binding": "progress.stars"
+        }
+      ],
+      "edge_cases": [
+        "MVP content may expose only configured missions; UI must not invent extra rooms"
+      ],
+      "transitions": [
+        {
+          "to": "mission_brief",
+          "from": "mission_select",
+          "trigger": "tap mission",
+          "animation": "push",
+          "condition": "available"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select mission",
+          "target": "available mission card",
+          "feedback": "pressed state",
+          "precondition": "mission available",
+          "state_change": "selected_mission=id",
+          "invalid_input": "unavailable card: inert"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "List is data-driven."
+      ]
+    },
+    {
+      "id": "mission_brief",
+      "name": "Mission Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 24,
+            "w": 90,
+            "x": 5,
+            "y": 8,
+            "id": "goal",
+            "role": "objective",
+            "label": "Goal"
+          },
+          {
+            "h": 24,
+            "w": 90,
+            "x": 5,
+            "y": 34,
+            "id": "risk",
+            "role": "hazard brief",
+            "label": "Hazard"
+          },
+          {
+            "h": 22,
+            "w": 90,
+            "x": 5,
+            "y": 60,
+            "id": "preview",
+            "role": "preview",
+            "label": "Room Preview"
+          },
+          {
+            "h": 11,
+            "w": 90,
+            "x": 5,
+            "y": 85,
+            "id": "actions",
+            "role": "start",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "condition": "mission selected"
+        }
+      ],
+      "purpose": "목표와 위험 정보를 읽고 Scout 시작.",
+      "feedback": [
+        "start cue"
+      ],
+      "components": [
+        {
+          "id": "goal",
+          "box": {
+            "h": 24,
+            "w": 90,
+            "x": 5,
+            "y": 8
+          },
+          "type": "goal_card",
+          "label": "Deliver 8 food",
+          "state_binding": "mission.goal"
+        },
+        {
+          "id": "hazard",
+          "box": {
+            "h": 24,
+            "w": 90,
+            "x": 5,
+            "y": 34
+          },
+          "type": "risk_card",
+          "label": "Hazard Brief",
+          "state_binding": "mission.hazard"
+        },
+        {
+          "id": "preview",
+          "box": {
+            "h": 22,
+            "w": 90,
+            "x": 5,
+            "y": 60
+          },
+          "type": "diagram",
+          "label": "Room Preview",
+          "state_binding": "mission.preview"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 55,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Start Scout",
+          "enabled_when": "mission loaded",
+          "state_binding": "brief.ready",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 9,
+            "w": 30,
+            "x": 5,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "nav",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "apartment_room",
+          "from": "mission_brief",
+          "trigger": "Start",
+          "animation": "push",
+          "condition": "loaded"
+        },
+        {
+          "to": "mission_select",
+          "from": "mission_brief",
+          "trigger": "Back",
+          "animation": "pop",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "enter apartment room",
+          "target": "Start Scout",
+          "feedback": "short cue",
+          "precondition": "mission loaded",
+          "state_change": "phase=Scout",
+          "invalid_input": "disabled while loading"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Hazard semantics are displayed from Game Design mission data, not invented here."
+      ]
+    },
+    {
+      "id": "apartment_room",
+      "core": true,
+      "name": "Apartment Room",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "hud",
+            "role": "persistent HUD",
+            "label": "Goal / Time / Status"
+          },
+          {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12,
+            "id": "world",
+            "role": "top-down playfield",
+            "label": "Room World"
+          },
+          {
+            "h": 12,
+            "w": 100,
+            "x": 0,
+            "y": 88,
+            "id": "controls",
+            "role": "dispatch/pause",
+            "label": "Primary Controls"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "scout",
+          "condition": "phase=Scout"
+        },
+        {
+          "id": "route_edit",
+          "condition": "food found and route gesture begins"
+        },
+        {
+          "id": "haul",
+          "condition": "valid route dispatched"
+        },
+        {
+          "id": "haul_warning",
+          "condition": "hazard warning active"
+        },
+        {
+          "id": "route_blocked",
+          "condition": "active route blocked"
+        }
+      ],
+      "purpose": "Scout→RouteEdit→Haul의 핵심 플레이를 한 world screen에서 수행.",
+      "feedback": [
+        "fog reveal",
+        "pheromone trail",
+        "snap haptic",
+        "danger pulse",
+        "delivery absorb",
+        "local loss cue"
+      ],
+      "components": [
+        {
+          "id": "goal_counter",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 3,
+            "y": 2
+          },
+          "type": "counter",
+          "label": "Food 0/8",
+          "state_binding": "round.delivered"
+        },
+        {
+          "id": "time",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 39,
+            "y": 2
+          },
+          "type": "timer",
+          "label": "150s",
+          "state_binding": "round.time"
+        },
+        {
+          "id": "survivors",
+          "box": {
+            "h": 7,
+            "w": 27,
+            "x": 70,
+            "y": 2
+          },
+          "type": "counter",
+          "label": "Workers 12",
+          "state_binding": "round.survivors"
+        },
+        {
+          "id": "world",
+          "box": {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12
+          },
+          "type": "world_view",
+          "label": "Apartment World / Fog",
+          "state_binding": "world.reveal",
+          "interaction_role": "tap destination / pan"
+        },
+        {
+          "id": "scout",
+          "box": {
+            "h": 58,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "world_entity",
+          "label": "Scout Ant",
+          "enabled_when": "phase in Scout,Haul",
+          "state_binding": "scout.position",
+          "interaction_role": "tap destination"
+        },
+        {
+          "id": "nest",
+          "box": {
+            "h": 16,
+            "w": 20,
+            "x": 6,
+            "y": 68
+          },
+          "type": "world_entity",
+          "label": "Nest Endpoint",
+          "state_binding": "world.nest"
+        },
+        {
+          "id": "food",
+          "box": {
+            "h": 18,
+            "w": 22,
+            "x": 72,
+            "y": 20
+          },
+          "type": "world_entity",
+          "label": "Food Endpoint",
+          "state_binding": "world.food"
+        },
+        {
+          "id": "route_layer",
+          "box": {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 16
+          },
+          "type": "editable_path",
+          "label": "Pheromone Route",
+          "enabled_when": "phase in RouteEdit or Haul paused/editable",
+          "state_binding": "route.state",
+          "interaction_role": "draw/edit/delete"
+        },
+        {
+          "id": "waypoints",
+          "box": {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 16
+          },
+          "type": "hit_targets",
+          "label": "Route Waypoints",
+          "enabled_when": "route exists && route editing",
+          "state_binding": "route.waypoints",
+          "interaction_role": "drag waypoint"
+        },
+        {
+          "id": "hazard_layer",
+          "box": {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 16
+          },
+          "type": "world_overlay",
+          "label": "Hazard / Warning",
+          "state_binding": "hazard.state"
+        },
+        {
+          "id": "convoy",
+          "box": {
+            "h": 66,
+            "w": 92,
+            "x": 4,
+            "y": 16
+          },
+          "type": "world_entities",
+          "label": "Worker Convoy",
+          "state_binding": "convoy.state"
+        },
+        {
+          "id": "route_budget",
+          "box": {
+            "h": 6,
+            "w": 35,
+            "x": 3,
+            "y": 80
+          },
+          "type": "meter",
+          "label": "Pheromone 100",
+          "state_binding": "route.budget"
+        },
+        {
+          "id": "eta_risk",
+          "box": {
+            "h": 6,
+            "w": 32,
+            "x": 41,
+            "y": 80
+          },
+          "type": "status",
+          "label": "ETA / Risk",
+          "state_binding": "route.metrics"
+        },
+        {
+          "id": "dispatch",
+          "box": {
+            "h": 8,
+            "w": 22,
+            "x": 75,
+            "y": 89
+          },
+          "type": "button",
+          "label": "Dispatch",
+          "enabled_when": "phase=RouteEdit && route valid && !blocked && !over_budget",
+          "state_binding": "route.valid",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 22,
+            "x": 3,
+            "y": 89
+          },
+          "type": "button",
+          "label": "Pause",
+          "enabled_when": "phase=Haul",
+          "state_binding": "convoy.paused",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "warning_banner",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 25,
+            "y": 13
+          },
+          "type": "banner",
+          "label": "Hazard Warning",
+          "state_binding": "hazard.warning"
+        }
+      ],
+      "edge_cases": [
+        "input priority UI > waypoint > path > world",
+        "no automatic reroute on blocked route",
+        "dispatch remains disabled for invalid route",
+        "camera pan must not steal waypoint/path drag"
+      ],
+      "transitions": [
+        {
+          "to": "pause_route_overlay",
+          "from": "apartment_room",
+          "trigger": "tap Pause",
+          "animation": "overlay",
+          "condition": "phase=Haul"
+        },
+        {
+          "to": "result",
+          "from": "apartment_room",
+          "trigger": "target food delivered",
+          "animation": "push",
+          "condition": "success"
+        },
+        {
+          "to": "result",
+          "from": "apartment_room",
+          "trigger": "time expires or no transport-capable ants",
+          "animation": "push",
+          "condition": "failure"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "set scout destination",
+          "target": "walkable floor destination",
+          "feedback": "reveal ring + discovery ping",
+          "precondition": "scout available",
+          "state_change": "scout moves; nearby map reveals",
+          "invalid_input": "invalid/unwalkable destination does not move scout"
+        },
+        {
+          "input": "drag",
+          "action": "sample waypoints every 12px and preview path",
+          "target": "route layer from nest or food",
+          "feedback": "pheromone trail + live budget",
+          "precondition": "food found / RouteEdit",
+          "state_change": "route geometry/budget update",
+          "invalid_input": "blocked segment becomes broken preview; dispatch disabled"
+        },
+        {
+          "input": "tap path then drag",
+          "action": "move waypoint",
+          "target": "waypoint",
+          "feedback": "direction arrows + snap haptic",
+          "precondition": "route exists and editing allowed",
+          "state_change": "followers switch at next node when applicable",
+          "invalid_input": "invalid placement remains broken preview"
+        },
+        {
+          "input": "long press",
+          "action": "delete segment",
+          "target": "route segment",
+          "feedback": "segment fade",
+          "precondition": "route exists and editing allowed",
+          "state_change": "route becomes incomplete",
+          "invalid_input": "dispatch disabled until reconnected"
+        },
+        {
+          "input": "tap",
+          "action": "start workers hauling",
+          "target": "Dispatch",
+          "feedback": "nest pulse + short cue",
+          "precondition": "route valid",
+          "state_change": "phase=Haul",
+          "invalid_input": "disabled for incomplete/blocked/over-budget route"
+        },
+        {
+          "input": "tap",
+          "action": "enter pause/route edit overlay",
+          "target": "Pause",
+          "feedback": "warning pulse",
+          "precondition": "phase=Haul",
+          "state_change": "convoy.paused=true",
+          "invalid_input": "disabled outside Haul"
+        },
+        {
+          "input": "two-finger pan",
+          "action": "pan camera",
+          "target": "world",
+          "feedback": "direct manipulation",
+          "precondition": "always in room",
+          "state_change": "camera offset changes",
+          "invalid_input": "gesture wins over one-finger route edit"
+        },
+        {
+          "input": "one-finger pan",
+          "action": "pan camera",
+          "target": "world background",
+          "feedback": "direct manipulation",
+          "precondition": "outside route edit",
+          "state_change": "camera offset changes",
+          "invalid_input": "ignored during route editing to protect path gesture"
+        },
+        {
+          "input": "two-finger tap",
+          "action": "cancel gesture",
+          "target": "active route gesture",
+          "feedback": "preview retracts",
+          "precondition": "gesture active",
+          "state_change": "restore pre-gesture route",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "scout_reveal",
+          "name": "Scout Reveal",
+          "notes": "Tap walkable revealed floor to scout; discovery reveals nearby map.",
+          "condition": "phase=Scout",
+          "components": [],
+          "hide_components": [
+            "route_layer",
+            "waypoints",
+            "dispatch",
+            "pause",
+            "convoy"
+          ],
+          "component_overrides": {
+            "scout": {
+              "state_binding": "scout.position"
+            },
+            "world": {
+              "state_binding": "fog + reveal ring"
+            }
+          }
+        },
+        {
+          "id": "route_incomplete",
+          "name": "Route Incomplete",
+          "notes": "Live path and budget visible.",
+          "condition": "phase=RouteEdit && route incomplete",
+          "components": [],
+          "hide_components": [
+            "pause",
+            "convoy"
+          ],
+          "component_overrides": {
+            "dispatch": {
+              "state_binding": "disabled"
+            },
+            "route_layer": {
+              "state_binding": "route.incomplete"
+            }
+          }
+        },
+        {
+          "id": "route_valid",
+          "name": "Route Valid",
+          "notes": "Endpoint snap feedback.",
+          "condition": "route connected && within budget && unblocked",
+          "components": [],
+          "hide_components": [
+            "pause",
+            "convoy"
+          ],
+          "component_overrides": {
+            "dispatch": {
+              "state_binding": "enabled"
+            },
+            "route_layer": {
+              "state_binding": "route.valid"
+            }
+          }
+        },
+        {
+          "id": "route_invalid",
+          "name": "Blocked / Over Budget",
+          "notes": "Invalid segment is broken preview.",
+          "condition": "route blocked or over budget",
+          "components": [],
+          "hide_components": [
+            "pause",
+            "convoy"
+          ],
+          "component_overrides": {
+            "dispatch": {
+              "state_binding": "disabled"
+            },
+            "route_layer": {
+              "state_binding": "broken preview"
+            }
+          }
+        },
+        {
+          "id": "haul_active",
+          "name": "Haul Active",
+          "notes": "Workers spawn at Game Design interval and follow active path.",
+          "condition": "phase=Haul && !paused",
+          "components": [],
+          "hide_components": [
+            "dispatch",
+            "waypoints"
+          ],
+          "component_overrides": {
+            "pause": {
+              "label": "Pause"
+            },
+            "convoy": {
+              "state_binding": "convoy moving"
+            }
+          }
+        },
+        {
+          "id": "haul_warning",
+          "name": "Hazard Warning",
+          "notes": "Direction pulse + medium haptic; no automatic reroute.",
+          "condition": "hazard warning active",
+          "components": [],
+          "hide_components": [
+            "dispatch"
+          ],
+          "component_overrides": {
+            "hazard_layer": {
+              "state_binding": "hazard.warning"
+            },
+            "warning_banner": {
+              "state_binding": "2-second warning"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "World entity boxes are touch/display envelopes; actual positions come from room coordinates.",
+        "Hazard visual binds to source mission hazard state; wireframe does not define a new hazard type."
+      ]
+    },
+    {
+      "id": "pause_route_overlay",
+      "name": "Pause / Route Edit Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "scrim",
+            "role": "paused context",
+            "label": "World Scrim"
+          },
+          {
+            "h": 28,
+            "w": 100,
+            "x": 0,
+            "y": 72,
+            "id": "edit",
+            "role": "edit/restart",
+            "label": "Route Edit Controls"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused_edit",
+          "condition": "Pause entered"
+        },
+        {
+          "id": "paused_invalid",
+          "condition": "edited route invalid"
+        }
+      ],
+      "purpose": "Haul 중 convoy pause 상태에서 경로를 수정하고 재개.",
+      "feedback": [
+        "route arrows",
+        "budget update",
+        "warning pulse"
+      ],
+      "components": [
+        {
+          "id": "paused_world",
+          "box": {
+            "h": 72,
+            "w": 100,
+            "x": 0,
+            "y": 0
+          },
+          "type": "context",
+          "label": "Paused Room",
+          "state_binding": "convoy.paused"
+        },
+        {
+          "id": "route_edit_proxy",
+          "box": {
+            "h": 58,
+            "w": 92,
+            "x": 4,
+            "y": 12
+          },
+          "type": "editable_path",
+          "label": "Editable Route",
+          "state_binding": "route.state",
+          "interaction_role": "drag waypoint / long press segment"
+        },
+        {
+          "id": "budget",
+          "box": {
+            "h": 7,
+            "w": 40,
+            "x": 4,
+            "y": 75
+          },
+          "type": "meter",
+          "label": "Route Budget",
+          "state_binding": "route.budget"
+        },
+        {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 37,
+            "x": 58,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Resume",
+          "enabled_when": "route valid",
+          "state_binding": "route.valid",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "cancel",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 5,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Cancel Changes",
+          "state_binding": "overlay",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "route must be valid before resume"
+      ],
+      "transitions": [
+        {
+          "to": "apartment_room",
+          "from": "pause_route_overlay",
+          "trigger": "Resume",
+          "animation": "fade",
+          "condition": "route valid"
+        },
+        {
+          "to": "apartment_room",
+          "from": "pause_route_overlay",
+          "trigger": "Cancel Changes",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag/long press",
+          "action": "apply same route edit semantics",
+          "target": "route edit proxy",
+          "feedback": "same route feedback",
+          "precondition": "paused",
+          "state_change": "route changes",
+          "invalid_input": "invalid route disables Resume"
+        },
+        {
+          "input": "tap",
+          "action": "close overlay and resume haul",
+          "target": "Resume",
+          "feedback": "short cue",
+          "precondition": "route valid",
+          "state_change": "convoy.paused=false",
+          "invalid_input": "disabled if invalid"
+        },
+        {
+          "input": "tap",
+          "action": "restore overlay-entry route and resume/return",
+          "target": "Cancel Changes",
+          "feedback": "preview retracts",
+          "precondition": "always",
+          "state_change": "route restored",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "invalid_edit",
+          "name": "Invalid Edit",
+          "notes": "Cannot resume onto invalid route.",
+          "condition": "route invalid",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "resume": {
+              "state_binding": "disabled"
+            },
+            "route_edit_proxy": {
+              "state_binding": "broken preview"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Preserve Game Design pause semantics; overlay only exposes route editing."
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "status",
+            "role": "success/failure",
+            "label": "Outcome"
+          },
+          {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 28,
+            "id": "score",
+            "role": "breakdown",
+            "label": "Score"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 75,
+            "id": "actions",
+            "role": "retry/next",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result_success",
+          "condition": "target food delivered"
+        },
+        {
+          "id": "result_failure",
+          "condition": "time expired or no transport-capable ants"
+        }
+      ],
+      "purpose": "성공/실패와 음식·생존·시간·예산 기반 정산을 보여주고 다음 행동 제공.",
+      "feedback": [
+        "score count-up",
+        "loss/efficiency breakdown"
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 12,
+            "w": 70,
+            "x": 15,
+            "y": 10
+          },
+          "type": "status",
+          "label": "Success / Failure",
+          "state_binding": "result.outcome"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 28
+          },
+          "type": "large_number",
+          "label": "Score",
+          "state_binding": "result.score"
+        },
+        {
+          "id": "breakdown",
+          "box": {
+            "h": 24,
+            "w": 76,
+            "x": 12,
+            "y": 43
+          },
+          "type": "list",
+          "label": "Food / Survivors / Time / Budget",
+          "state_binding": "result.breakdown"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "result",
+          "interaction_role": "tap"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Next",
+          "enabled_when": "next available",
+          "state_binding": "progress.next",
+          "interaction_role": "tap"
+        }
+      ],
+      "edge_cases": [
+        "Next disabled if no configured next mission"
+      ],
+      "transitions": [
+        {
+          "to": "mission_brief",
+          "from": "result",
+          "trigger": "Retry",
+          "animation": "push",
+          "condition": "always"
+        },
+        {
+          "to": "mission_brief",
+          "from": "result",
+          "trigger": "Next",
+          "animation": "push",
+          "condition": "next available"
+        },
+        {
+          "to": "mission_select",
+          "from": "result",
+          "trigger": "back",
+          "animation": "pop",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "restart selected mission at Brief",
+          "target": "Retry",
+          "feedback": "button press",
+          "precondition": "result",
+          "state_change": "round reset",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "select next mission",
+          "target": "Next",
+          "feedback": "button press",
+          "precondition": "next available",
+          "state_change": "selected mission changes",
+          "invalid_input": "disabled if unavailable"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure",
+          "name": "Failure Result",
+          "notes": "Retry remains available.",
+          "condition": "result failure",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "outcome": {
+              "label": "Mission Failed"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Score binds food=100, survivor=20, time/sec=2, unused route budget=1 and combo state."
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "fb1c3353-f060-45be-9153-84b090faac8c",
+  "input_map": {
+    "cancel": "two-finger tap or return gesture to start",
+    "gestures": {
+      "tap": [
+        "scout destination",
+        "Dispatch",
+        "Pause"
+      ],
+      "drag": [
+        "draw route",
+        "drag waypoint"
+      ],
+      "long_press": [
+        "delete route segment"
+      ],
+      "one_finger_pan": [
+        "camera outside route edit"
+      ],
+      "two_finger_pan": [
+        "camera always"
+      ],
+      "two_finger_tap": [
+        "cancel active route gesture"
+      ]
+    },
+    "priority": [
+      "UI",
+      "waypoint",
+      "path",
+      "world"
+    ],
+    "conflicts": "two-finger camera gesture overrides single-finger world/path recognition; waypoint hit wins over path",
+    "multitouch": "camera pan supported; path editing remains single-touch"
+  },
+  "created_at": "2026-09-29T17:33:26.657526+00:00",
+  "edge_cases": {
+    "pause_edit": "Resume disabled until route valid",
+    "blocked_route": "warning; no automatic reroute",
+    "invalid_route": "broken preview; Dispatch disabled",
+    "round_failure": "time expiry or no transport-capable ants transitions to Result",
+    "camera_vs_edit": "one-finger pan disabled during route edit"
+  },
+  "updated_at": "2026-09-29T17:33:26.657526+00:00",
+  "core_screen": "apartment_room",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "Dispatch only when route connected, unblocked and within budget",
+      "Resume only with valid route"
+    ],
+    "normal": [
+      "mission_select",
+      "mission_brief",
+      "apartment_room",
+      "result"
+    ],
+    "branches": [
+      {
+        "to": "pause_route_overlay",
+        "from": "apartment_room",
+        "when": "Pause during Haul"
+      },
+      {
+        "to": "apartment_room",
+        "from": "pause_route_overlay",
+        "when": "Resume/Cancel"
+      },
+      {
+        "to": "mission_brief",
+        "from": "result",
+        "when": "Retry/Next"
+      }
+    ],
+    "phase_flow": [
+      "Scout",
+      "RouteEdit",
+      "Haul"
+    ]
+  },
+  "state_count": 14,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "hazard_warning",
+      "effect": "warning banner + direction pulse + medium haptic",
+      "condition": "source hazard warning active"
+    },
+    {
+      "id": "route_invalid",
+      "effect": "broken preview + Dispatch disabled",
+      "condition": "blocked/over-budget/incomplete"
+    },
+    {
+      "id": "round_end",
+      "effect": "input locks then Result",
+      "condition": "target delivered OR time expired OR no transport-capable ants"
+    }
+  ],
+  "pack_markdown": "# Ant Apartment — Interaction Wireframe Pack v0.2\n\n## Pack Overview\n- Device: mobile phone\n- Orientation: portrait\n- Core Screen: apartment_room\n- Primary Interaction: 정찰 탭 + 페로몬 경로 드래그/waypoint 수정\n\n## Interaction Principles\n- 세계 직접 조작 우선\n- UI > waypoint > path > world 입력 우선순위 보존\n- route validity를 즉시 시각화\n- 카메라 제스처와 경로 편집 제스처 충돌 방지\n- 위험 의미는 원본 mission data를 표시하고 새 규칙을 발명하지 않음\n\n## Screen Flow\n- Normal: mission_select → mission_brief → apartment_room → result\n\n## Screens\n### 1. Mission Select\nMVP에서 제공되는 mission entry를 선택하고 Brief로 이동.\n\nComponents:\n- title: Ant Apartment [label] box(5,4,70,6) · static\n- mission_list: Mission Cards [list] box(5,16,90,72) · missions\n- stars: Stars [counter] box(76,4,19,6) · progress.stars\nInteractions:\n- tap → available mission card: select mission; state=selected_mission=id; invalid=unavailable card: inert\n\n### 2. Mission Brief\n목표와 위험 정보를 읽고 Scout 시작.\n\nComponents:\n- goal: Deliver 8 food [goal_card] box(5,8,90,24) · mission.goal\n- hazard: Hazard Brief [risk_card] box(5,34,90,24) · mission.hazard\n- preview: Room Preview [diagram] box(5,60,90,22) · mission.preview\n- start: Start Scout [button] box(55,86,40,9) · brief.ready\n- back: Back [button] box(5,86,30,9) · nav\nInteractions:\n- tap → Start Scout: enter apartment room; state=phase=Scout; invalid=disabled while loading\n\n### 3. Apartment Room\nScout→RouteEdit→Haul의 핵심 플레이를 한 world screen에서 수행.\n\nComponents:\n- goal_counter: Food 0/8 [counter] box(3,2,25,7) · round.delivered\n- time: 150s [timer] box(39,2,22,7) · round.time\n- survivors: Workers 12 [counter] box(70,2,27,7) · round.survivors\n- world: Apartment World / Fog [world_view] box(0,12,100,76) · world.reveal\n- scout: Scout Ant [world_entity] box(8,18,84,58) · scout.position\n- nest: Nest Endpoint [world_entity] box(6,68,20,16) · world.nest\n- food: Food Endpoint [world_entity] box(72,20,22,18) · world.food\n- route_layer: Pheromone Route [editable_path] box(4,16,92,66) · route.state\n- waypoints: Route Waypoints [hit_targets] box(4,16,92,66) · route.waypoints\n- hazard_layer: Hazard / Warning [world_overlay] box(4,16,92,66) · hazard.state\n- convoy: Worker Convoy [world_entities] box(4,16,92,66) · convoy.state\n- route_budget: Pheromone 100 [meter] box(3,80,35,6) · route.budget\n- eta_risk: ETA / Risk [status] box(41,80,32,6) · route.metrics\n- dispatch: Dispatch [button] box(75,89,22,8) · route.valid\n- pause: Pause [button] box(3,89,22,8) · convoy.paused\n- warning_banner: Hazard Warning [banner] box(25,13,50,8) · hazard.warning\nState variants:\n- Scout Reveal: phase=Scout — Tap walkable revealed floor to scout; discovery reveals nearby map.\n- Route Incomplete: phase=RouteEdit && route incomplete — Live path and budget visible.\n- Route Valid: route connected && within budget && unblocked — Endpoint snap feedback.\n- Blocked / Over Budget: route blocked or over budget — Invalid segment is broken preview.\n- Haul Active: phase=Haul && !paused — Workers spawn at Game Design interval and follow active path.\n- Hazard Warning: hazard warning active — Direction pulse + medium haptic; no automatic reroute.\nInteractions:\n- tap → walkable floor destination: set scout destination; state=scout moves; nearby map reveals; invalid=invalid/unwalkable destination does not move scout\n- drag → route layer from nest or food: sample waypoints every 12px and preview path; state=route geometry/budget update; invalid=blocked segment becomes broken preview; dispatch disabled\n- tap path then drag → waypoint: move waypoint; state=followers switch at next node when applicable; invalid=invalid placement remains broken preview\n- long press → route segment: delete segment; state=route becomes incomplete; invalid=dispatch disabled until reconnected\n- tap → Dispatch: start workers hauling; state=phase=Haul; invalid=disabled for incomplete/blocked/over-budget route\n- tap → Pause: enter pause/route edit overlay; state=convoy.paused=true; invalid=disabled outside Haul\n- two-finger pan → world: pan camera; state=camera offset changes; invalid=gesture wins over one-finger route edit\n- one-finger pan → world background: pan camera; state=camera offset changes; invalid=ignored during route editing to protect path gesture\n- two-finger tap → active route gesture: cancel gesture; state=restore pre-gesture route; invalid=none\n\n### 4. Pause / Route Edit Overlay\nHaul 중 convoy pause 상태에서 경로를 수정하고 재개.\n\nComponents:\n- paused_world: Paused Room [context] box(0,0,100,72) · convoy.paused\n- route_edit_proxy: Editable Route [editable_path] box(4,12,92,58) · route.state\n- budget: Route Budget [meter] box(4,75,40,7) · route.budget\n- resume: Resume [button] box(58,86,37,9) · route.valid\n- cancel: Cancel Changes [button] box(5,86,42,9) · overlay\nState variants:\n- Invalid Edit: route invalid — Cannot resume onto invalid route.\nInteractions:\n- drag/long press → route edit proxy: apply same route edit semantics; state=route changes; invalid=invalid route disables Resume\n- tap → Resume: close overlay and resume haul; state=convoy.paused=false; invalid=disabled if invalid\n- tap → Cancel Changes: restore overlay-entry route and resume/return; state=route restored; invalid=none\n\n### 5. Result\n성공/실패와 음식·생존·시간·예산 기반 정산을 보여주고 다음 행동 제공.\n\nComponents:\n- outcome: Success / Failure [status] box(15,10,70,12) · result.outcome\n- score: Score [large_number] box(20,28,60,12) · result.score\n- breakdown: Food / Survivors / Time / Budget [list] box(12,43,76,24) · result.breakdown\n- retry: Retry [button] box(8,78,38,10) · result\n- next: Next [button] box(54,78,38,10) · progress.next\nState variants:\n- Failure Result: result failure — Retry remains available.\nInteractions:\n- tap → Retry: restart selected mission at Brief; state=round reset; invalid=none\n- tap → Next: select next mission; state=selected mission changes; invalid=disabled if unavailable\n\n## Global States\n- hazard_warning: source hazard warning active → warning banner + direction pulse + medium haptic\n- route_invalid: blocked/over-budget/incomplete → broken preview + Dispatch disabled\n- round_end: target delivered OR time expired OR no transport-capable ants → input locks then Result\n\n## Input Map\n```json\n{\n  \"priority\": [\n    \"UI\",\n    \"waypoint\",\n    \"path\",\n    \"world\"\n  ],\n  \"gestures\": {\n    \"tap\": [\n      \"scout destination\",\n      \"Dispatch\",\n      \"Pause\"\n    ],\n    \"drag\": [\n      \"draw route\",\n      \"drag waypoint\"\n    ],\n    \"long_press\": [\n      \"delete route segment\"\n    ],\n    \"two_finger_pan\": [\n      \"camera always\"\n    ],\n    \"one_finger_pan\": [\n      \"camera outside route edit\"\n    ],\n    \"two_finger_tap\": [\n      \"cancel active route gesture\"\n    ]\n  },\n  \"conflicts\": \"two-finger camera gesture overrides single-finger world/path recognition; waypoint hit wins over path\",\n  \"cancel\": \"two-finger tap or return gesture to start\",\n  \"multitouch\": \"camera pan supported; path editing remains single-touch\"\n}\n```\n\n## Global Edge Cases\n```json\n{\n  \"invalid_route\": \"broken preview; Dispatch disabled\",\n  \"blocked_route\": \"warning; no automatic reroute\",\n  \"camera_vs_edit\": \"one-finger pan disabled during route edit\",\n  \"pause_edit\": \"Resume disabled until route valid\",\n  \"round_failure\": \"time expiry or no transport-capable ants transitions to Result\"\n}\n```\n\n## Developer Handoff\n```json\n{\n  \"scene_hierarchy\": [\n    \"App\",\n    \"MissionSelect\",\n    \"MissionBrief\",\n    \"ApartmentRoom{HUD,World,RouteLayer,HazardLayer,ConvoyLayer,Controls}\",\n    \"PauseRouteOverlay\",\n    \"Result\"\n  ],\n  \"reusable_components\": [\n    \"MissionCard\",\n    \"GoalHUD\",\n    \"WorldEntity\",\n    \"EditablePath\",\n    \"WaypointHandle\",\n    \"HazardOverlay\",\n    \"ConvoyAgent\",\n    \"PrimaryAction\",\n    \"ResultStat\"\n  ],\n  \"required_data\": [\n    \"room mission layout\",\n    \"nest/food positions\",\n    \"walkable floor/reveal data\",\n    \"hazard state/pattern from Game Design content\",\n    \"route budget\",\n    \"12 worker agents\",\n    \"timer/score/combo\"\n  ],\n  \"state_ownership\": {\n    \"round\": \"RoundController\",\n    \"phase\": \"PhaseState\",\n    \"route\": \"RouteController\",\n    \"camera\": \"CameraController\",\n    \"convoy\": \"ConvoyController\",\n    \"hazard\": \"HazardController\"\n  },\n  \"persistence\": [\n    \"mission unlock/star progression if configured\"\n  ],\n  \"implementation_order\": [\n    \"room + fog/reveal\",\n    \"route drawing/edit/validity\",\n    \"camera/input arbitration\",\n    \"convoy path following + delivery\",\n    \"hazard state visualization + pause edit\",\n    \"score/result\",\n    \"selection/brief\"\n  ],\n  \"notes\": [\n    \"Do not invent hazard collision/loss semantics absent from source; HazardController consumes mission-defined rule data.\",\n    \"Use lightweight agent following to target 12 agents at 60fps.\"\n  ]\n}\n```\n\n## Acceptance Criteria\n- 첫 사용자가 30초 내 Scout에서 food를 발견하고 유효 route 생성 흐름을 이해할 수 있다.\n- 경로 draw/edit/delete가 UI > waypoint > path > world 우선순위대로 충돌 없이 동작한다.\n- 불완전/blocked/over-budget 경로는 시각적으로 구분되고 Dispatch가 비활성화된다.\n- 유효 경로 Dispatch 후 12 workers가 설정된 경로를 따라 운반 상태에 들어간다.\n- Haul 중 Pause에서 route를 수정할 수 있고 invalid route에서는 Resume할 수 없다.\n- 2초 hazard warning 상태는 banner/direction pulse/haptic으로 표시되며 자동 reroute하지 않는다.\n- 성공/실패 조건이 Result로 연결되고 Retry/Next 흐름에 막다른 지점이 없다.\n- 모바일에서 12 agents 기준 목표 60fps 검증이 가능하다.",
+  "source_run_at": "2026-09-29T17:33:24.217+00:00",
+  "target_device": "mobile phone",
+  "global_ui_rules": {
+    "hud": "top goal/time/survivors; bottom primary action only",
+    "camera": "two-finger pan always; one-finger pan only outside route edit",
+    "safe_area": "respect mobile safe areas",
+    "touch_min": "44pt for small route targets",
+    "input_priority": [
+      "UI",
+      "waypoint",
+      "path",
+      "world"
+    ],
+    "world_visibility": "show roughly 35–45% of room at once"
+  },
+  "developer_handoff": {
+    "notes": [
+      "Do not invent hazard collision/loss semantics absent from source; HazardController consumes mission-defined rule data.",
+      "Use lightweight agent following to target 12 agents at 60fps."
+    ],
+    "persistence": [
+      "mission unlock/star progression if configured"
+    ],
+    "required_data": [
+      "room mission layout",
+      "nest/food positions",
+      "walkable floor/reveal data",
+      "hazard state/pattern from Game Design content",
+      "route budget",
+      "12 worker agents",
+      "timer/score/combo"
+    ],
+    "scene_hierarchy": [
+      "App",
+      "MissionSelect",
+      "MissionBrief",
+      "ApartmentRoom{HUD,World,RouteLayer,HazardLayer,ConvoyLayer,Controls}",
+      "PauseRouteOverlay",
+      "Result"
+    ],
+    "state_ownership": {
+      "phase": "PhaseState",
+      "round": "RoundController",
+      "route": "RouteController",
+      "camera": "CameraController",
+      "convoy": "ConvoyController",
+      "hazard": "HazardController"
+    },
+    "reusable_components": [
+      "MissionCard",
+      "GoalHUD",
+      "WorldEntity",
+      "EditablePath",
+      "WaypointHandle",
+      "HazardOverlay",
+      "ConvoyAgent",
+      "PrimaryAction",
+      "ResultStat"
+    ],
+    "implementation_order": [
+      "room + fog/reveal",
+      "route drawing/edit/validity",
+      "camera/input arbitration",
+      "convoy path following + delivery",
+      "hazard state visualization + pause edit",
+      "score/result",
+      "selection/brief"
+    ]
+  },
+  "acceptance_criteria": [
+    "첫 사용자가 30초 내 Scout에서 food를 발견하고 유효 route 생성 흐름을 이해할 수 있다.",
+    "경로 draw/edit/delete가 UI > waypoint > path > world 우선순위대로 충돌 없이 동작한다.",
+    "불완전/blocked/over-budget 경로는 시각적으로 구분되고 Dispatch가 비활성화된다.",
+    "유효 경로 Dispatch 후 12 workers가 설정된 경로를 따라 운반 상태에 들어간다.",
+    "Haul 중 Pause에서 route를 수정할 수 있고 invalid route에서는 Resume할 수 없다.",
+    "2초 hazard warning 상태는 banner/direction pulse/haptic으로 표시되며 자동 reroute하지 않는다.",
+    "성공/실패 조건이 Result로 연결되고 Retry/Next 흐름에 막다른 지점이 없다.",
+    "모바일에서 12 agents 기준 목표 60fps 검증이 가능하다."
+  ],
+  "primary_interaction": "정찰 탭 + 페로몬 경로 드래그/waypoint 수정",
+  "interaction_principles": [
+    "세계 직접 조작 우선",
+    "UI > waypoint > path > world 입력 우선순위 보존",
+    "route validity를 즉시 시각화",
+    "카메라 제스처와 경로 편집 제스처 충돌 방지",
+    "위험 의미는 원본 mission data를 표시하고 새 규칙을 발명하지 않음"
+  ]
+}

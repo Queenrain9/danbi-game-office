@@ -1,0 +1,1195 @@
+{
+  "id": "d794507b-5a40-4fdf-a2ae-0e719f8b7272",
+  "title": "Pocket Weather Clerk",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "b05bf62b-6849-434c-82a4-6787557d18ef",
+  "screens": [
+    {
+      "id": "shift_board",
+      "name": "Shift Board",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "title",
+            "role": "status",
+            "label": "shift header"
+          },
+          {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 18,
+            "id": "orders",
+            "role": "selection",
+            "label": "order list"
+          },
+          {
+            "h": 8,
+            "w": 88,
+            "x": 6,
+            "y": 88,
+            "id": "footer",
+            "role": "status",
+            "label": "progress"
+          }
+        ]
+      },
+      "states": [
+        "ready",
+        "locked"
+      ],
+      "purpose": "select current unlocked order and see shift progress",
+      "feedback": [
+        "progress updates after resolved order"
+      ],
+      "components": [
+        {
+          "id": "order_cards",
+          "box": {
+            "h": 62,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "list",
+          "label": "Order cards",
+          "state_binding": "orders/unlocks",
+          "interaction_role": "tap order"
+        },
+        {
+          "id": "shift_progress",
+          "box": {
+            "h": 5,
+            "w": 60,
+            "x": 8,
+            "y": 89
+          },
+          "type": "progress",
+          "label": "Shift progress",
+          "state_binding": "resolved_count"
+        },
+        {
+          "id": "hard_lock",
+          "box": {
+            "h": 5,
+            "w": 20,
+            "x": 72,
+            "y": 89
+          },
+          "type": "status",
+          "label": "Hard Orders lock",
+          "state_binding": "hard_unlocked"
+        }
+      ],
+      "edge_cases": [
+        "no unlocked order: first order forced unlocked"
+      ],
+      "transitions": [
+        {
+          "to": "order_brief",
+          "from": "shift_board",
+          "trigger": "unlocked order tap",
+          "animation": "push",
+          "condition": "order unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select order",
+          "target": "order_cards",
+          "feedback": "card press",
+          "precondition": "order unlocked",
+          "state_change": "selected_order=id",
+          "invalid_input": "locked card pulses"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "hard_locked",
+          "name": "Hard Locked",
+          "notes": "tap locked card gives lock pulse",
+          "condition": "shift not completed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "hard_lock": {
+              "label": "Locked"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "data-driven cards from order dataset"
+      ]
+    },
+    {
+      "id": "order_brief",
+      "name": "Order Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 45,
+            "w": 86,
+            "x": 7,
+            "y": 12,
+            "id": "map",
+            "role": "preview",
+            "label": "district preview"
+          },
+          {
+            "h": 22,
+            "w": 86,
+            "x": 7,
+            "y": 60,
+            "id": "targets",
+            "role": "rules",
+            "label": "targets"
+          },
+          {
+            "h": 10,
+            "w": 86,
+            "x": 7,
+            "y": 85,
+            "id": "actions",
+            "role": "navigation",
+            "label": "actions"
+          }
+        ]
+      },
+      "states": [
+        "brief"
+      ],
+      "purpose": "show targets and constraints before play",
+      "feedback": [
+        "constraints use icons plus short labels"
+      ],
+      "components": [
+        {
+          "id": "district_preview",
+          "box": {
+            "h": 41,
+            "w": 82,
+            "x": 9,
+            "y": 14
+          },
+          "type": "map",
+          "label": "District Preview",
+          "state_binding": "order.layout"
+        },
+        {
+          "id": "target_chips",
+          "box": {
+            "h": 12,
+            "w": 82,
+            "x": 9,
+            "y": 62
+          },
+          "type": "chips",
+          "label": "Target chips",
+          "state_binding": "order.targets"
+        },
+        {
+          "id": "constraint_chips",
+          "box": {
+            "h": 6,
+            "w": 82,
+            "x": 9,
+            "y": 76
+          },
+          "type": "chips",
+          "label": "Constraints",
+          "state_binding": "locks/forbidden/budget"
+        },
+        {
+          "id": "start_btn",
+          "box": {
+            "h": 8,
+            "w": 39,
+            "x": 52,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "ready"
+        },
+        {
+          "id": "back_btn",
+          "box": {
+            "h": 8,
+            "w": 25,
+            "x": 9,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "ready"
+        }
+      ],
+      "edge_cases": [
+        "missing order data blocks Start"
+      ],
+      "transitions": [
+        {
+          "to": "weather_desk",
+          "from": "order_brief",
+          "trigger": "start_btn",
+          "animation": "fade",
+          "condition": "loaded"
+        },
+        {
+          "to": "shift_board",
+          "from": "order_brief",
+          "trigger": "back_btn",
+          "animation": "pop",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "initialize order",
+          "target": "start_btn",
+          "feedback": "press",
+          "precondition": "order loaded",
+          "state_change": "adjusting",
+          "invalid_input": "disabled until loaded"
+        },
+        {
+          "input": "tap",
+          "action": "return board",
+          "target": "back_btn",
+          "feedback": "press",
+          "precondition": "true",
+          "state_change": "none",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "brief is read-only"
+      ]
+    },
+    {
+      "id": "weather_desk",
+      "name": "Weather Desk",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "targets/status"
+          },
+          {
+            "h": 25,
+            "w": 90,
+            "x": 5,
+            "y": 18,
+            "id": "sky",
+            "role": "direct manipulation",
+            "label": "cloud manipulation sky"
+          },
+          {
+            "h": 29,
+            "w": 90,
+            "x": 5,
+            "y": 44,
+            "id": "town",
+            "role": "world feedback",
+            "label": "district diorama"
+          },
+          {
+            "h": 20,
+            "w": 90,
+            "x": 5,
+            "y": 75,
+            "id": "controls",
+            "role": "input",
+            "label": "hardware controls"
+          }
+        ]
+      },
+      "states": [
+        "adjusting",
+        "dragging_cloud",
+        "rotating_wind",
+        "dragging_humidity",
+        "settling",
+        "evaluating",
+        "locked_control"
+      ],
+      "purpose": "core tactile weather manipulation and evaluation entry",
+      "feedback": [
+        "world lighting/shadow/haze/rain are primary",
+        "target satisfied preview glow does not award score"
+      ],
+      "components": [
+        {
+          "id": "target_strip",
+          "box": {
+            "h": 8,
+            "w": 57,
+            "x": 6,
+            "y": 5
+          },
+          "type": "status",
+          "label": "Target chips",
+          "state_binding": "order.targets"
+        },
+        {
+          "id": "adjust_count",
+          "box": {
+            "h": 8,
+            "w": 14,
+            "x": 66,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Adjustments",
+          "state_binding": "adjustments/8"
+        },
+        {
+          "id": "pause_btn",
+          "box": {
+            "h": 8,
+            "w": 11,
+            "x": 83,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "enabled_when": "state in adjusting,settling",
+          "state_binding": "not evaluating"
+        },
+        {
+          "id": "cloud_bank",
+          "box": {
+            "h": 18,
+            "w": 46,
+            "x": 14,
+            "y": 21
+          },
+          "type": "draggable",
+          "label": "Cloud Bank",
+          "enabled_when": "adjusting && !cloud_locked",
+          "state_binding": "cloud.position,cover,altitude",
+          "interaction_role": "drag start + live footprint"
+        },
+        {
+          "id": "district_world",
+          "box": {
+            "h": 27,
+            "w": 86,
+            "x": 7,
+            "y": 45
+          },
+          "type": "world_view",
+          "label": "Town districts",
+          "state_binding": "derived_weather,district current",
+          "interaction_role": "gesture result feedback"
+        },
+        {
+          "id": "wind_nozzle",
+          "box": {
+            "h": 16,
+            "w": 23,
+            "x": 7,
+            "y": 77
+          },
+          "type": "rotary",
+          "label": "Wind Nozzle",
+          "enabled_when": "adjusting && !wind_locked",
+          "state_binding": "wind_direction,wind_strength",
+          "interaction_role": "circular drag"
+        },
+        {
+          "id": "humidity_valve",
+          "box": {
+            "h": 16,
+            "w": 18,
+            "x": 34,
+            "y": 77
+          },
+          "type": "vertical_slider",
+          "label": "Humidity Valve",
+          "enabled_when": "adjusting && !humidity_locked",
+          "state_binding": "humidity",
+          "interaction_role": "vertical drag"
+        },
+        {
+          "id": "observe_btn",
+          "box": {
+            "h": 14,
+            "w": 17,
+            "x": 57,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Observe",
+          "enabled_when": "adjusting",
+          "state_binding": "state",
+          "interaction_role": "settle trigger"
+        },
+        {
+          "id": "submit_btn",
+          "box": {
+            "h": 14,
+            "w": 17,
+            "x": 77,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Submit",
+          "enabled_when": "adjustments>0 && state=adjusting",
+          "state_binding": "adjustments,state",
+          "interaction_role": "evaluation trigger"
+        },
+        {
+          "id": "settle_meter",
+          "box": {
+            "h": 3,
+            "w": 37,
+            "x": 57,
+            "y": 73
+          },
+          "type": "progress",
+          "label": "Settle progress",
+          "enabled_when": "settling",
+          "state_binding": "settle_time"
+        }
+      ],
+      "edge_cases": [
+        "multi-touch ignored after first pointer ownership",
+        "budget 8 reached disables further device commits and enables submit",
+        "locked device never increments adjustment"
+      ],
+      "transitions": [
+        {
+          "to": "order_result",
+          "from": "weather_desk",
+          "trigger": "evaluation complete",
+          "animation": "result sheet up",
+          "condition": "success or failure"
+        },
+        {
+          "to": "pause_overlay",
+          "from": "weather_desk",
+          "trigger": "pause_btn",
+          "animation": "overlay",
+          "condition": "not evaluating"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "move cloud within sky; derive footprint",
+          "target": "cloud_bank",
+          "feedback": "shadow/footprint + altitude haptic",
+          "precondition": "adjusting && !cloud_locked",
+          "state_change": "cloud position; on release adjustments+1 then settling",
+          "invalid_input": "locked shake; out-of-sky clamps/last valid"
+        },
+        {
+          "input": "circular_drag",
+          "action": "snap 8-way direction and strength band",
+          "target": "wind_nozzle",
+          "feedback": "streamers/arrows + detent",
+          "precondition": "adjusting && !wind_locked",
+          "state_change": "wind; on release adjustments+1 then settling",
+          "invalid_input": "cap haptic/no overflow"
+        },
+        {
+          "input": "vertical_drag",
+          "action": "snap 5 percent",
+          "target": "humidity_valve",
+          "feedback": "gauge/haze + 25% haptic",
+          "precondition": "adjusting && !humidity_locked",
+          "state_change": "humidity; on release adjustments+1 then settling",
+          "invalid_input": "clamp/error pulse"
+        },
+        {
+          "input": "tap",
+          "action": "settle simulation",
+          "target": "observe_btn",
+          "feedback": "controls dim/world animates",
+          "precondition": "adjusting",
+          "state_change": "settling 1.2s then adjusting",
+          "invalid_input": "ignored while settling"
+        },
+        {
+          "input": "tap",
+          "action": "evaluate districts",
+          "target": "submit_btn",
+          "feedback": "stamp + district compare",
+          "precondition": "adjustments>0 && adjusting",
+          "state_change": "evaluating then result",
+          "invalid_input": "disabled pulse"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "cloud_drag",
+          "name": "Cloud Dragging",
+          "notes": "town shadow updates live; adjustment commits on release once",
+          "condition": "pointer owns cloud_bank",
+          "components": [
+            {
+              "id": "cloud_hit_outline",
+              "box": {
+                "h": 25,
+                "w": 55,
+                "x": 10,
+                "y": 18
+              },
+              "type": "overlay",
+              "label": "Cloud hit/footprint",
+              "state_binding": "drag candidate"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "settling_variant",
+          "name": "Settling",
+          "notes": "world becomes visual priority",
+          "condition": "state=settling",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "cloud_bank": {
+              "state_binding": "dim/input_locked"
+            },
+            "wind_nozzle": {
+              "state_binding": "dim/input_locked"
+            },
+            "settle_meter": {
+              "state_binding": "1.2s progress"
+            },
+            "humidity_valve": {
+              "state_binding": "dim/input_locked"
+            }
+          }
+        },
+        {
+          "id": "evaluating_variant",
+          "name": "Evaluating",
+          "notes": "all input locked",
+          "condition": "state=evaluating",
+          "components": [
+            {
+              "id": "district_compare",
+              "box": {
+                "h": 27,
+                "w": 84,
+                "x": 8,
+                "y": 45
+              },
+              "type": "overlay",
+              "label": "Target/current compare",
+              "state_binding": "evaluation"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {
+            "submit_btn": {
+              "state_binding": "disabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "single WeatherSession owns variables",
+        "debounce continuous drag into one commit",
+        "derived weather recalculates after settle"
+      ]
+    },
+    {
+      "id": "pause_overlay",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 70,
+            "x": 15,
+            "y": 25,
+            "id": "modal",
+            "role": "overlay",
+            "label": "pause modal"
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "freeze and resume/restart/exit",
+      "feedback": [
+        "simulation fully frozen"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 38
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        {
+          "id": "restart",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 51
+          },
+          "type": "button",
+          "label": "Restart Order",
+          "state_binding": "paused"
+        },
+        {
+          "id": "exit",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 64
+          },
+          "type": "button",
+          "label": "Exit to Shift",
+          "state_binding": "paused"
+        }
+      ],
+      "edge_cases": [
+        "pause unavailable evaluating"
+      ],
+      "transitions": [
+        {
+          "to": "weather_desk",
+          "from": "pause_overlay",
+          "trigger": "resume/restart",
+          "animation": "fade",
+          "condition": "true"
+        },
+        {
+          "to": "shift_board",
+          "from": "pause_overlay",
+          "trigger": "exit",
+          "animation": "pop",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume",
+          "target": "resume",
+          "feedback": "overlay closes",
+          "precondition": "paused",
+          "state_change": "previous desk state",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "reset current order",
+          "target": "restart",
+          "feedback": "reset cue",
+          "precondition": "paused",
+          "state_change": "adjusting",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "discard current order",
+          "target": "exit",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "board",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "overlay scene; do not duplicate desk"
+      ]
+    },
+    {
+      "id": "order_result",
+      "name": "Order Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 10,
+            "id": "summary",
+            "role": "evaluation",
+            "label": "result"
+          },
+          {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 70,
+            "id": "actions",
+            "role": "navigation",
+            "label": "actions"
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "show district evaluation, stars, retry/next",
+      "feedback": [
+        "district rows reveal before stars"
+      ],
+      "components": [
+        {
+          "id": "result_title",
+          "box": {
+            "h": 10,
+            "w": 76,
+            "x": 12,
+            "y": 14
+          },
+          "type": "status",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        {
+          "id": "district_rows",
+          "box": {
+            "h": 25,
+            "w": 76,
+            "x": 12,
+            "y": 27
+          },
+          "type": "list",
+          "label": "District compare",
+          "state_binding": "targets,current"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 25,
+            "y": 55
+          },
+          "type": "rating",
+          "label": "Stars",
+          "state_binding": "score"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 36,
+            "x": 10,
+            "y": 74
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "result"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 36,
+            "x": 54,
+            "y": 74
+          },
+          "type": "button",
+          "label": "Next Order",
+          "enabled_when": "success or failure resolved",
+          "state_binding": "result"
+        }
+      ],
+      "edge_cases": [
+        "retry does not double-count resolved order"
+      ],
+      "transitions": [
+        {
+          "to": "weather_desk",
+          "from": "order_result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "true"
+        },
+        {
+          "to": "order_brief",
+          "from": "order_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "resolved_count<5"
+        },
+        {
+          "to": "shift_complete",
+          "from": "order_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "resolved_count=5"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset same order",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "brief or desk initialized",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "mark resolved and advance",
+          "target": "next",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "next brief or shift complete",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure_result",
+          "name": "Failure",
+          "notes": "failed conditions emphasized",
+          "condition": "!success",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "result_title": {
+              "label": "Order Missed"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "result data immutable until action"
+      ]
+    },
+    {
+      "id": "shift_complete",
+      "name": "Shift Complete",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 15,
+            "id": "summary",
+            "role": "summary",
+            "label": "shift summary"
+          },
+          {
+            "h": 15,
+            "w": 84,
+            "x": 8,
+            "y": 75,
+            "id": "action",
+            "role": "navigation",
+            "label": "continue"
+          }
+        ]
+      },
+      "states": [
+        "complete",
+        "first_unlock"
+      ],
+      "purpose": "summarize five orders and unlock hard orders",
+      "feedback": [
+        "unlock pulse on first completion"
+      ],
+      "components": [
+        {
+          "id": "shift_stats",
+          "box": {
+            "h": 35,
+            "w": 76,
+            "x": 12,
+            "y": 22
+          },
+          "type": "summary",
+          "label": "Order results",
+          "state_binding": "shift_results"
+        },
+        {
+          "id": "unlock",
+          "box": {
+            "h": 9,
+            "w": 76,
+            "x": 12,
+            "y": 60
+          },
+          "type": "status",
+          "label": "Unlock notice",
+          "state_binding": "hard_unlocked"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Continue",
+          "state_binding": "complete"
+        }
+      ],
+      "edge_cases": [
+        "unlock persistence idempotent"
+      ],
+      "transitions": [
+        {
+          "to": "shift_board",
+          "from": "shift_complete",
+          "trigger": "continue",
+          "animation": "pop",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "persist unlock and return",
+          "target": "continue",
+          "feedback": "press",
+          "precondition": "complete",
+          "state_change": "board",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "unlock_variant",
+          "name": "First Unlock",
+          "notes": "one-time progression notice",
+          "condition": "first shift completion",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "unlock": {
+              "label": "Hard Orders Unlocked"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "persist only unlock/progress, not live weather session"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
+  "input_map": {
+    "tap": [
+      "observe",
+      "submit",
+      "pause",
+      "navigation"
+    ],
+    "drag": {
+      "cloud": "capture pointer until release"
+    },
+    "cancel": "pointer cancellation restores last committed device state; no adjustment increment",
+    "rotate": {
+      "wind": "annulus circular delta; snap 8-way"
+    },
+    "priority": [
+      "active device gesture",
+      "overlay buttons",
+      "core buttons",
+      "background"
+    ],
+    "multitouch": "second pointer ignored while a gesture owns input",
+    "vertical_drag": {
+      "humidity": "5% snap"
+    },
+    "single_pointer": true
+  },
+  "created_at": "2026-09-29T13:28:56.204346+00:00",
+  "edge_cases": {
+    "rapid_submit": "first tap owns evaluating lock",
+    "stale_session": "new order initialization clears derived/weather transient state",
+    "app_background": "pause without committing active gesture",
+    "gesture_cancel": "restore last committed state",
+    "missing_order_data": "block start and return to board",
+    "orientation_change": "portrait locked"
+  },
+  "updated_at": "2026-09-29T13:28:56.204346+00:00",
+  "core_screen": "weather_desk",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      {
+        "to": "order_result",
+        "from": "weather_desk",
+        "trigger": "submit",
+        "condition": "adjustments>0 && state=adjusting"
+      }
+    ],
+    "normal": [
+      "shift_board",
+      "order_brief",
+      "weather_desk",
+      "order_result",
+      "order_brief",
+      "shift_complete",
+      "shift_board"
+    ],
+    "branches": [
+      {
+        "to": "weather_desk",
+        "from": "order_result",
+        "trigger": "retry"
+      },
+      {
+        "to": "pause_overlay",
+        "from": "weather_desk",
+        "trigger": "pause"
+      },
+      {
+        "to": "weather_desk",
+        "from": "pause_overlay",
+        "trigger": "resume"
+      }
+    ],
+    "exception_return": "invalid control input remains on weather_desk without state commit"
+  },
+  "state_count": 13,
+  "screen_count": 6,
+  "global_states": {
+    "pause": {
+      "overlay": true,
+      "freeze_simulation": true
+    },
+    "retry": {
+      "reset": "current order variables and adjustment count"
+    },
+    "failure": {
+      "owner": "order_result"
+    },
+    "loading": {
+      "input_lock": true
+    },
+    "success": {
+      "owner": "order_result"
+    },
+    "input_lock": {
+      "active_during": [
+        "settling",
+        "evaluating"
+      ]
+    }
+  },
+  "pack_markdown": " # Pocket Weather Clerk — Interaction Wireframe Pack v0.2\nCore: Weather Desk. Portrait mobile, 0–100 coordinates, direct-manipulation first. Six inventory surfaces are represented: Shift Board, Order Brief, Weather Desk, Pause Overlay, Order Result, Shift Complete. Weather Desk exposes target strip, adjustment counter, cloud hit area, town feedback, wind rotary, humidity valve, Observe, Submit and settle progress. Gesture ownership is single-pointer; continuous motion commits once on release. Adjusting → settling → adjusting is the main micro-loop; Submit enters evaluating and then Result. Invalid/locked inputs never mutate game state. Data is five weather orders. Godot ownership: AppRoot for shift progression; WeatherSession for order variables/rules; UI is presentation. Acceptance requires complete five-order replay loop, no stale state, and all three gestures affecting the same state evaluated at result. ",
+  "source_run_at": "2026-09-29T13:28:56.204346+00:00",
+  "target_device": "mobile phone",
+  "global_ui_rules": {
+    "overlays": "pause/result may cover board; normal controls do not overlap",
+    "core_rule": "town remains visible while controls are manipulated",
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "min_hit_dp": 44,
+    "coordinate_system": "0-100 percent"
+  },
+  "developer_handoff": {
+    "hints": [
+      "do not count pointer move events as adjustments",
+      "do not use physics fluid simulation",
+      "world feedback derives from same state used by evaluator"
+    ],
+    "persistence": [
+      "hard order unlock",
+      "resolved progression if desired"
+    ],
+    "required_data": [
+      "5 weather orders",
+      "district geometry",
+      "target tags",
+      "initial variables",
+      "device locks",
+      "forbidden conditions",
+      "budget"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "ShiftBoard",
+      "OrderBrief",
+      "WeatherDesk",
+      "PauseOverlay",
+      "OrderResult",
+      "ShiftComplete"
+    ],
+    "state_ownership": {
+      "UI": "presentation only",
+      "AppRoot": "shift progression/unlocks",
+      "WeatherSession": "order variables, derived weather, adjustment count, settle/evaluation"
+    },
+    "reusable_components": [
+      "TargetChip",
+      "DeviceControl",
+      "DistrictView",
+      "ActionButton",
+      "ResultRow"
+    ],
+    "implementation_order": [
+      "data schema",
+      "WeatherSession/rules",
+      "WeatherDesk direct manipulation",
+      "settle/evaluate",
+      "result loop",
+      "remaining screens",
+      "persistence"
+    ]
+  },
+  "acceptance_criteria": [
+    "All six inventory screens/overlay exist and are reachable",
+    "Cloud drag, wind circular drag and humidity vertical drag each change WeatherSession through their defined hit areas",
+    "Continuous gesture commits exactly one adjustment on release",
+    "Settling locks device input for 1.2 seconds and returns to adjusting",
+    "Submit is disabled before any adjustment and during settling/evaluating",
+    "District evaluation uses the same derived weather shown in the town",
+    "Locked/invalid input never increments adjustment or corrupts state",
+    "Five data-driven orders can complete a Shift; retry and a second Shift start without stale state",
+    "First Shift completion unlocks Hard Orders exactly once"
+  ],
+  "primary_interaction": "구름 드래그 + 바람 회전 + 습도 밸브 직접조작",
+  "interaction_principles": [
+    "World feedback precedes numeric explanation",
+    "All three weather controls are direct manipulation",
+    "One committed gesture counts once",
+    "Core desk stays readable with one-thumb reach"
+  ]
+}

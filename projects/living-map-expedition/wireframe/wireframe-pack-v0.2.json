@@ -1,0 +1,831 @@
+{
+  "id": "3efec995-f494-4ff1-b942-67c8f7b50cc7",
+  "title": "Living Map Expedition",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "3ea61de4-5f0b-408c-8b07-a50c8a95cb9c",
+  "screens": [
+    {
+      "id": "brief",
+      "name": "Expedition Brief",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "goal",
+            "role": "context",
+            "label": "Goal"
+          },
+          {
+            "h": 43,
+            "w": 88,
+            "x": 6,
+            "y": 19,
+            "id": "preview",
+            "role": "map preview",
+            "label": "Island Preview"
+          },
+          {
+            "h": 21,
+            "w": 88,
+            "x": 6,
+            "y": 64,
+            "id": "legend",
+            "role": "legend",
+            "label": "Rules"
+          },
+          {
+            "h": 9,
+            "w": 88,
+            "x": 6,
+            "y": 87,
+            "id": "actions",
+            "role": "action",
+            "label": "Start"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "ready",
+          "condition": "brief open"
+        }
+      ],
+      "purpose": "Mission goal, deterministic shift rule, resources and terrain legend.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "map_preview",
+          "box": {
+            "h": 38,
+            "w": 80,
+            "x": 10,
+            "y": 21
+          },
+          "type": "grid_preview",
+          "label": "4x4 island",
+          "state_binding": "authored mission"
+        },
+        {
+          "id": "resource_preview",
+          "box": {
+            "h": 7,
+            "w": 80,
+            "x": 10,
+            "y": 64
+          },
+          "type": "resource_row",
+          "label": "Stamina9/10 Ink4",
+          "state_binding": "mission defaults"
+        },
+        {
+          "id": "rule_legend",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 72
+          },
+          "type": "legend",
+          "label": "Scout Record Shift terrain"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 9,
+            "w": 80,
+            "x": 10,
+            "y": 87
+          },
+          "type": "button",
+          "label": "Begin Expedition"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "gameplay",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "map focus",
+          "condition": "ready"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "start",
+          "target": "start",
+          "feedback": "map activates",
+          "precondition": "ready",
+          "state_change": "Turn Planning at Camp",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No hidden/random terrain outcome language."
+      ]
+    },
+    {
+      "id": "gameplay",
+      "name": "Living Map Gameplay",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "Turn/Resources"
+          },
+          {
+            "h": 58,
+            "w": 90,
+            "x": 5,
+            "y": 16,
+            "id": "map",
+            "role": "primary control",
+            "label": "4x4 Living Map"
+          },
+          {
+            "h": 15,
+            "w": 90,
+            "x": 5,
+            "y": 77,
+            "id": "tools",
+            "role": "actions",
+            "label": "Scout/Record/Wait"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "turn_planning",
+          "condition": "mission active after shift/start"
+        },
+        {
+          "id": "move_resolution",
+          "condition": "valid Move accepted"
+        },
+        {
+          "id": "wait_resolution",
+          "condition": "Wait accepted"
+        },
+        {
+          "id": "world_shift",
+          "condition": "resolved move/wait and mission active"
+        },
+        {
+          "id": "pause",
+          "condition": "pause tapped"
+        }
+      ],
+      "purpose": "Scout, Record, Move/Wait and observe deterministic World Shift across full mission.",
+      "feedback": [
+        "valid adjacent target outline",
+        "terrain cost preview",
+        "record stamp",
+        "Scout A/B reveal",
+        "global shift pulse",
+        "Spring recovery"
+      ],
+      "components": [
+        {
+          "id": "turn",
+          "box": {
+            "h": 7,
+            "w": 17,
+            "x": 5,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Turn",
+          "state_binding": "turn_count"
+        },
+        {
+          "id": "stamina",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 24,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Stamina",
+          "state_binding": "stamina/10"
+        },
+        {
+          "id": "ink",
+          "box": {
+            "h": 7,
+            "w": 17,
+            "x": 52,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Ink",
+          "state_binding": "ink/4"
+        },
+        {
+          "id": "limits",
+          "box": {
+            "h": 7,
+            "w": 14,
+            "x": 71,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Scout/Record limits",
+          "state_binding": "scouts_left,record_used"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 8,
+            "x": 87,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause"
+        },
+        {
+          "id": "grid",
+          "box": {
+            "h": 54,
+            "w": 86,
+            "x": 7,
+            "y": 18
+          },
+          "type": "grid",
+          "label": "4x4 Tile Grid",
+          "state_binding": "16 cell states"
+        },
+        {
+          "id": "party",
+          "box": {
+            "h": 9,
+            "w": 14,
+            "x": 10,
+            "y": 61
+          },
+          "type": "draggable_token",
+          "label": "Expedition Token",
+          "state_binding": "party_position",
+          "interaction_role": "move drag; rendered inside occupied tile"
+        },
+        {
+          "id": "record_seal",
+          "box": {
+            "h": 11,
+            "w": 25,
+            "x": 8,
+            "y": 79
+          },
+          "type": "draggable_tool",
+          "label": "Record Seal",
+          "enabled_when": "ink>0 and record_used=false"
+        },
+        {
+          "id": "scout_mode",
+          "box": {
+            "h": 11,
+            "w": 25,
+            "x": 37,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Scout",
+          "enabled_when": "scouts_left>0"
+        },
+        {
+          "id": "wait",
+          "box": {
+            "h": 11,
+            "w": 25,
+            "x": 66,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Wait",
+          "enabled_when": "stamina>=1"
+        }
+      ],
+      "edge_cases": [
+        "Shrine success wins over stamina exhaustion.",
+        "Occupied mutable tile does not shift.",
+        "Unrevealed tile begins A only when first scouted.",
+        "Recording Ridge is legal and permanently blocks cell."
+      ],
+      "transitions": [
+        {
+          "to": "move_resolution",
+          "from": "turn_planning",
+          "trigger": "valid move",
+          "animation": "short traverse",
+          "condition": "valid"
+        },
+        {
+          "to": "wait_resolution",
+          "from": "turn_planning",
+          "trigger": "wait",
+          "animation": "hold",
+          "condition": "stamina>=1"
+        },
+        {
+          "to": "result",
+          "from": "move_resolution",
+          "trigger": "Shrine entered",
+          "animation": "goal",
+          "condition": "goal priority even stamina=0"
+        },
+        {
+          "to": "result",
+          "from": "move_resolution",
+          "trigger": "resolution",
+          "animation": "exhaust",
+          "condition": "non-Shrine stamina=0"
+        },
+        {
+          "to": "result",
+          "from": "wait_resolution",
+          "trigger": "resolution",
+          "animation": "exhaust",
+          "condition": "stamina=0"
+        },
+        {
+          "to": "world_shift",
+          "from": "move_resolution",
+          "trigger": "resolution",
+          "animation": "world pulse",
+          "condition": "active"
+        },
+        {
+          "to": "world_shift",
+          "from": "wait_resolution",
+          "trigger": "resolution",
+          "animation": "world pulse",
+          "condition": "active"
+        },
+        {
+          "to": "turn_planning",
+          "from": "world_shift",
+          "trigger": "toggle complete",
+          "animation": "settle",
+          "condition": "all eligible toggled once"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "Scout",
+          "target": "adjacent fog mutable tile",
+          "feedback": "fog clears; A and B shown",
+          "precondition": "Turn Planning; scouts_left>0",
+          "state_change": "revealed=true,current=A,scouts_left-1",
+          "invalid_input": "nonadjacent/special/revealed/limit: reject no change"
+        },
+        {
+          "input": "drag",
+          "action": "Record current form",
+          "target": "record_seal→revealed mutable tile",
+          "feedback": "stamp locks tile",
+          "precondition": "Turn Planning; ink>0; record_unused",
+          "state_change": "ink-1,recorded=true,record_used=true",
+          "invalid_input": "fog/special/recorded/second record/outside: seal returns; no ink"
+        },
+        {
+          "input": "drag",
+          "action": "Move",
+          "target": "party→orthogonally adjacent tile",
+          "feedback": "target validity + terrain cost",
+          "precondition": "revealed,passable,affordable",
+          "state_change": "atomic cost→position→Spring effect→goal/failure/shift",
+          "invalid_input": "diagonal/fog/Ridge/unaffordable/outside: token returns; no cost"
+        },
+        {
+          "input": "tap",
+          "action": "Wait",
+          "target": "wait",
+          "feedback": "wait cue",
+          "precondition": "Turn Planning stamina>=1",
+          "state_change": "stamina-1→failure or shift",
+          "invalid_input": "disabled at invalid state"
+        },
+        {
+          "input": "tap",
+          "action": "Pause",
+          "target": "pause",
+          "feedback": "overlay",
+          "precondition": "gameplay active",
+          "state_change": "freeze exact state",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "fog",
+          "name": "Fog Tile",
+          "notes": "eligible Scout target only if orthogonally adjacent",
+          "condition": "mutable unrevealed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "revealed_pair",
+          "name": "Revealed A/B",
+          "notes": "tile shows current form dominant and alternate form preview",
+          "condition": "revealed and unrecorded",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "recorded",
+          "name": "Recorded",
+          "notes": "permanent stamp; no shift preview animation",
+          "condition": "recorded=true",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "occupied_freeze",
+          "name": "Occupied Freeze",
+          "notes": "explicit freeze marker during World Shift",
+          "condition": "party on mutable tile",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "spring_consumed",
+          "name": "Consumed Spring",
+          "notes": "no future +2 recovery",
+          "condition": "spring_consumed=true",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "shift",
+          "name": "World Shift",
+          "notes": "recorded, occupied, unrevealed, Camp, Shrine visibly remain unchanged",
+          "condition": "state=World Shift",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "grid": {
+              "state_binding": "eligible revealed unrecorded unoccupied mutable cells toggle once"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Each of 16 tile hit areas derives from grid box; use equal 21.5% grid-width cells with internal gutters.",
+        "Logical orthogonal adjacency comes from grid coordinates, never pixel proximity.",
+        "Move resolution is atomic before Pause can interrupt."
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Expedition Result",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 10,
+            "id": "outcome",
+            "role": "status",
+            "label": "Outcome"
+          },
+          {
+            "h": 40,
+            "w": 84,
+            "x": 8,
+            "y": 31,
+            "id": "summary",
+            "role": "score",
+            "label": "Run Summary"
+          },
+          {
+            "h": 16,
+            "w": 84,
+            "x": 8,
+            "y": 77,
+            "id": "actions",
+            "role": "actions",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result_success",
+          "condition": "Shrine entered"
+        },
+        {
+          "id": "result_failure",
+          "condition": "stamina=0 outside Shrine"
+        }
+      ],
+      "purpose": "Success/failure, score and full retry.",
+      "feedback": [
+        "distinct goal/exhaustion"
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 12
+          },
+          "type": "headline",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 32,
+            "w": 80,
+            "x": 10,
+            "y": 34
+          },
+          "type": "summary",
+          "label": "Score",
+          "state_binding": "score,turn_count,stamina,ink"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 10,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Retry"
+        },
+        {
+          "id": "finish",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 52,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Finish"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "gameplay",
+          "from": "result",
+          "trigger": "retry",
+          "animation": "reset",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "full reset",
+          "target": "retry",
+          "feedback": "clean map",
+          "precondition": "Result",
+          "state_change": "Camp Turn Planning; all tile/resource state reset",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "exit",
+          "target": "finish",
+          "feedback": "close",
+          "precondition": "Result",
+          "state_change": "session exit",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure",
+          "name": "Failure",
+          "notes": "exhaustion explicit",
+          "condition": "result_failure",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "score": {
+              "label": "Score 0"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Persist success and best Score only."
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "b139a820-6ca7-4b1d-89f1-ee90b99530de",
+  "input_map": {
+    "tap": {
+      "Wait": "button",
+      "Pause": "button",
+      "Scout": "adjacent fog tile"
+    },
+    "drag": {
+      "Move": "party token→adjacent tile",
+      "Record": "seal→revealed mutable tile"
+    },
+    "cancel": "drag release outside valid target returns source with no resource change",
+    "priority": [
+      "active Move drag blocks Scout/Record",
+      "active Record drag blocks Scout/Move"
+    ],
+    "multitouch": "single active gameplay drag; secondary gameplay input ignored until release"
+  },
+  "created_at": "2026-09-29T19:35:18.732342+00:00",
+  "edge_cases": {
+    "retry": "reset reveal,forms,recorded,Spring consumed,position,Stamina,Ink,turn.",
+    "invalid": "No state/resource change.",
+    "goal_priority": "Shrine at stamina0 succeeds.",
+    "pause_resolution": "Pause only after atomic move resource/position update; World Shift may freeze/resume."
+  },
+  "updated_at": "2026-09-29T19:35:18.732342+00:00",
+  "core_screen": "Living Map Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "loop": [
+      "turn_planning→move_resolution→world_shift→turn_planning",
+      "turn_planning→wait_resolution→world_shift→turn_planning"
+    ],
+    "entry": "brief→gameplay.turn_planning",
+    "failure": "non-Shrine/Wait stamina 0→result_failure",
+    "success": "move into Shrine→result_success",
+    "recovery": [
+      "pause→exact prior state",
+      "result retry→clean mission"
+    ]
+  },
+  "state_count": 10,
+  "screen_count": 3,
+  "global_states": {
+    "pause": {
+      "resume": "exact prior state",
+      "freezes": [
+        "shift animation",
+        "automatic resolution"
+      ],
+      "overlay": true
+    },
+    "failure": {
+      "trigger": "stamina0 after non-Shrine entry or Wait"
+    },
+    "success": {
+      "trigger": "Shrine entry after cost; priority over exhaustion"
+    },
+    "input_lock": {
+      "active_during": [
+        "Move Resolution atomic update",
+        "Wait Resolution atomic update",
+        "World Shift toggle"
+      ]
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.2 — Living Map Expedition\nWhole-MVP coverage: Expedition Brief, Living Map Gameplay, Expedition Result; Turn Planning, Move Resolution, Wait Resolution, World Shift, Pause and success/failure Result; fog/reveal/current/alternate/recorded/occupied/Spring-consumed lifecycle; all four terrain pair classes; Scout, Record, Move, Wait and Retry. The 4×4 map is the control surface. TileCell is a reusable template whose variants preserve Path/Marsh/Ridge/Spring, A/B preview, record lock, occupied freeze and consumed Spring. HUD exposes Stamina, Ink, turn and per-turn Scout/Record limits. Invalid inputs never mutate state. World Shift visually distinguishes eligible toggles from recorded, occupied, unrevealed and special cells. Shrine success priority and exhaustion failure remain explicit.",
+  "source_run_at": "2026-09-29T19:35:18.732342+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coverage": {
+      "states": [
+        "Turn Planning",
+        "Move Resolution",
+        "Wait Resolution",
+        "World Shift",
+        "Pause",
+        "Result"
+      ],
+      "screens": [
+        "Expedition Brief",
+        "Living Map Gameplay",
+        "Expedition Result"
+      ],
+      "pair_classes": [
+        "Path-Marsh",
+        "Path-Ridge",
+        "Marsh-Ridge",
+        "Path-Spring"
+      ],
+      "tile_variants": [
+        "fog",
+        "revealed A/B",
+        "recorded",
+        "occupied",
+        "Spring consumed",
+        "Camp",
+        "Shrine"
+      ]
+    },
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "coordinates": "0-100 screen-percent"
+  },
+  "developer_handoff": {
+    "persistence": [
+      "best Score",
+      "success flag"
+    ],
+    "required_data": [
+      "4x4 authored grid",
+      "A/B pairs",
+      "tile flags",
+      "party position",
+      "stamina",
+      "ink",
+      "turn limits"
+    ],
+    "scene_hierarchy": [
+      "Brief",
+      "Gameplay/HUD",
+      "Gameplay/Grid",
+      "Gameplay/Tools",
+      "PauseOverlay",
+      "Result"
+    ],
+    "state_ownership": {
+      "screen": "drag preview/selection/overlay",
+      "mission": "tile lifecycle/resources/turn/position"
+    },
+    "content_templates": {
+      "tile_states": [
+        "fog",
+        "revealed",
+        "recorded",
+        "occupied",
+        "Spring consumed"
+      ],
+      "pair_classes": [
+        "Path-Marsh",
+        "Path-Ridge",
+        "Marsh-Ridge",
+        "Path-Spring"
+      ]
+    },
+    "reusable_components": [
+      "TileCell",
+      "TerrainBadge",
+      "AlternateFormPreview",
+      "ResourceMeter",
+      "DragTool",
+      "ResultSummary"
+    ],
+    "implementation_order": [
+      "grid/tile state",
+      "Scout",
+      "Record",
+      "Move resolution",
+      "Wait",
+      "World Shift",
+      "Spring/goal/failure",
+      "result/retry"
+    ]
+  },
+  "acceptance_criteria": [
+    "All three screens and all Planning/Move/Wait/Shift/Pause/Result states are observable.",
+    "Scout reveals Form A and alternate Form B and enforces two-per-turn.",
+    "Record drag costs one Ink, locks current form and enforces one-per-turn.",
+    "Move rejects diagonal, fog, Ridge and unaffordable targets without cost.",
+    "World Shift toggles exactly revealed unrecorded unoccupied mutable tiles once.",
+    "All four A/B pair classes are representable by the reusable TileCell variant.",
+    "Spring first-entry recovery and consumed state are visible.",
+    "Shrine entry at Stamina 1 succeeds at 0 while Wait at 1 fails.",
+    "Retry fully restores mission state."
+  ],
+  "primary_interaction": "Scout + Record seal drag + adjacent Move/Wait",
+  "interaction_principles": [
+    "Map is the primary control surface",
+    "Current and alternate tile forms remain simultaneously legible",
+    "Record/Scout limits are visible before action",
+    "Invalid drag/tap never mutates mission state"
+  ]
+}

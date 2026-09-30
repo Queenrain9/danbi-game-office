@@ -1,0 +1,937 @@
+{
+  "id": "eb90171d-965c-462b-bd32-55dfdfc4d630",
+  "title": "Night Signal Operator",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "87a317e3-340f-47ad-a95f-7b643d20ace1",
+  "screens": [
+    {
+      "id": "shift_select",
+      "name": "Shift Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 72,
+            "w": 86,
+            "x": 7,
+            "y": 16,
+            "id": "list",
+            "role": "content",
+            "label": "Shifts"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "base",
+          "condition": "open"
+        }
+      ],
+      "purpose": "choose shift",
+      "feedback": [],
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "list_buttons",
+          "label": "rule shifts+mixed",
+          "enabled_when": "unlocked",
+          "state_binding": "unlocks",
+          "interaction_role": "select"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "Rule Brief",
+          "from": "Shift Select",
+          "trigger": "tap",
+          "animation": "push",
+          "condition": "unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select",
+          "target": "cards",
+          "feedback": "selection",
+          "precondition": "unlocked",
+          "state_change": "brief",
+          "invalid_input": "disabled pulse"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "locked",
+          "name": "Locked",
+          "notes": "mixed unlocks later",
+          "condition": "locked",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "cards": {
+              "state_binding": "disabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "no economy"
+      ]
+    },
+    {
+      "id": "rule_brief",
+      "name": "Rule Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 60,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "rules",
+            "role": "info",
+            "label": "Rules"
+          },
+          {
+            "h": 12,
+            "w": 84,
+            "x": 8,
+            "y": 80,
+            "id": "actions",
+            "role": "controls",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "condition": "selected"
+        }
+      ],
+      "purpose": "show active rules",
+      "feedback": [],
+      "components": [
+        {
+          "id": "rule_card",
+          "box": {
+            "h": 54,
+            "w": 80,
+            "x": 10,
+            "y": 15
+          },
+          "type": "rule_card",
+          "label": "direction/color/pulse legend",
+          "state_binding": "rules"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 11,
+            "w": 44,
+            "x": 48,
+            "y": 80
+          },
+          "type": "button",
+          "label": "START",
+          "enabled_when": "ready",
+          "state_binding": "shift",
+          "interaction_role": "start"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 11,
+            "w": 30,
+            "x": 8,
+            "y": 80
+          },
+          "type": "button",
+          "label": "BACK",
+          "state_binding": "none",
+          "interaction_role": "back"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "Signal Station",
+          "from": "Rule Brief",
+          "trigger": "start",
+          "animation": "fade",
+          "condition": "ready"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "initialize 5 vessels",
+          "target": "start",
+          "feedback": "fade",
+          "precondition": "ready",
+          "state_change": "station",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "same thresholds as evaluator"
+      ]
+    },
+    {
+      "id": "station",
+      "name": "Signal Station",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 52,
+            "w": 94,
+            "x": 3,
+            "y": 4,
+            "id": "sea",
+            "role": "world",
+            "label": "Sea"
+          },
+          {
+            "h": 38,
+            "w": 94,
+            "x": 3,
+            "y": 58,
+            "id": "console",
+            "role": "controls",
+            "label": "Console"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "no_target",
+          "condition": "none selected"
+        },
+        {
+          "id": "selected",
+          "condition": "target selected"
+        },
+        {
+          "id": "composing",
+          "condition": "controls active"
+        },
+        {
+          "id": "shutter_held",
+          "condition": "pointer down"
+        },
+        {
+          "id": "pattern_ready",
+          "condition": "1-4 complete pulses"
+        },
+        {
+          "id": "evaluating",
+          "condition": "send submitted"
+        },
+        {
+          "id": "warning",
+          "condition": "deadline low"
+        }
+      ],
+      "purpose": "compose/transmit",
+      "feedback": [
+        "beam follows lens",
+        "color follows filter",
+        "live timeline",
+        "deadline warning",
+        "safe path response"
+      ],
+      "components": [
+        {
+          "id": "vessels",
+          "box": {
+            "h": 32,
+            "w": 90,
+            "x": 5,
+            "y": 20
+          },
+          "type": "world_targets",
+          "label": "Vessel targets",
+          "enabled_when": "not evaluating",
+          "state_binding": "vessels",
+          "interaction_role": "select target"
+        },
+        {
+          "id": "request",
+          "box": {
+            "h": 12,
+            "w": 70,
+            "x": 6,
+            "y": 7
+          },
+          "type": "request_card",
+          "label": "Request/deadline",
+          "state_binding": "selected.request"
+        },
+        {
+          "id": "strikes",
+          "box": {
+            "h": 10,
+            "w": 16,
+            "x": 79,
+            "y": 7
+          },
+          "type": "meter",
+          "label": "Strikes",
+          "state_binding": "strikes"
+        },
+        {
+          "id": "lens",
+          "box": {
+            "h": 28,
+            "w": 35,
+            "x": 5,
+            "y": 61
+          },
+          "type": "rotary",
+          "label": "8-sector lens",
+          "enabled_when": "selected and not evaluating",
+          "state_binding": "sector",
+          "interaction_role": "circular drag"
+        },
+        {
+          "id": "filter",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 43,
+            "y": 61
+          },
+          "type": "slider",
+          "label": "White Red Green",
+          "enabled_when": "selected and not evaluating",
+          "state_binding": "color",
+          "interaction_role": "horizontal drag"
+        },
+        {
+          "id": "timeline",
+          "box": {
+            "h": 8,
+            "w": 52,
+            "x": 43,
+            "y": 72
+          },
+          "type": "timeline",
+          "label": "Pulse timeline",
+          "state_binding": "pulses"
+        },
+        {
+          "id": "shutter",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 43,
+            "y": 82
+          },
+          "type": "hold_control",
+          "label": "SHUTTER",
+          "enabled_when": "selected and pulses<4 and not evaluating",
+          "state_binding": "held",
+          "interaction_role": "press/release"
+        },
+        {
+          "id": "clear",
+          "box": {
+            "h": 12,
+            "w": 11,
+            "x": 70,
+            "y": 82
+          },
+          "type": "button",
+          "label": "CLEAR",
+          "enabled_when": "pulses>0",
+          "state_binding": "pulses",
+          "interaction_role": "clear"
+        },
+        {
+          "id": "send",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 83,
+            "y": 82
+          },
+          "type": "button",
+          "label": "SEND",
+          "enabled_when": "selected and pulses 1..4 and not held/evaluating",
+          "state_binding": "pattern_ready",
+          "interaction_role": "evaluate"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 8,
+            "x": 88,
+            "y": 4
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "paused",
+          "interaction_role": "pause"
+        }
+      ],
+      "edge_cases": [
+        "deadline resolves consistently before late release/send",
+        "target switch blocked while shutter held",
+        "two vessel deadlines independent"
+      ],
+      "transitions": [
+        {
+          "to": "Shift Result",
+          "from": "Signal Station",
+          "trigger": "5 safe",
+          "animation": "fade",
+          "condition": "success"
+        },
+        {
+          "to": "Shift Result",
+          "from": "Signal Station",
+          "trigger": "3 strikes/deadline miss",
+          "animation": "warning/fade",
+          "condition": "failure"
+        },
+        {
+          "to": "Pause Overlay",
+          "from": "Signal Station",
+          "trigger": "pause",
+          "animation": "modal",
+          "condition": "not evaluating"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select vessel",
+          "target": "vessels",
+          "feedback": "highlight",
+          "precondition": "not evaluating",
+          "state_change": "selected",
+          "invalid_input": "miss none"
+        },
+        {
+          "input": "circular drag",
+          "action": "angle around wheel center; snap nearest 45deg",
+          "target": "lens",
+          "feedback": "detent+haptic",
+          "precondition": "selected",
+          "state_change": "actual beam sector",
+          "invalid_input": "release nearest sector"
+        },
+        {
+          "input": "horizontal drag",
+          "action": "clamp and snap white/red/green",
+          "target": "filter",
+          "feedback": "detent",
+          "precondition": "selected",
+          "state_change": "actual beam color",
+          "invalid_input": "edge clamp"
+        },
+        {
+          "input": "press/release",
+          "action": "measure monotonic duration; .25-.65 short; .8-1.5 long; append",
+          "target": "shutter",
+          "feedback": "live pulse/tick",
+          "precondition": "selected and pulses<4",
+          "state_change": "timeline",
+          "invalid_input": "gap/out-of-range discarded; cancel discards unfinished"
+        },
+        {
+          "input": "tap",
+          "action": "clear pulses",
+          "target": "clear",
+          "feedback": "timeline clear",
+          "precondition": "pulses>0",
+          "state_change": "composing",
+          "invalid_input": "disabled"
+        },
+        {
+          "input": "tap",
+          "action": "compare sector/color/code",
+          "target": "send",
+          "feedback": "path bend or reject; wrong strike",
+          "precondition": "selected and 1-4 pulses and not held",
+          "state_change": "evaluating→ack/reject",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "selected",
+          "name": "Selected",
+          "notes": "deadline visible",
+          "condition": "selected",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "request": {
+              "state_binding": "visible request"
+            }
+          }
+        },
+        {
+          "id": "shutter_held",
+          "name": "Shutter Held",
+          "notes": "release classifies duration",
+          "condition": "held",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "send": {
+              "state_binding": "disabled"
+            },
+            "timeline": {
+              "state_binding": "live pulse"
+            }
+          }
+        },
+        {
+          "id": "pattern_ready",
+          "name": "Pattern Ready",
+          "notes": "max 4",
+          "condition": "1-4 pulses",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "send": {
+              "state_binding": "enabled"
+            }
+          }
+        },
+        {
+          "id": "evaluating",
+          "name": "Evaluating",
+          "notes": "await result",
+          "condition": "send",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "lens": {
+              "state_binding": "locked"
+            },
+            "send": {
+              "state_binding": "locked"
+            },
+            "filter": {
+              "state_binding": "locked"
+            },
+            "shutter": {
+              "state_binding": "locked"
+            }
+          }
+        },
+        {
+          "id": "warning",
+          "name": "Warning",
+          "notes": "does not steal controls",
+          "condition": "deadline low",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "request": {
+              "state_binding": "warning"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "monotonic shutter time",
+        "lens render/hit share center",
+        "do not replace gestures with buttons"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 40,
+            "w": 70,
+            "x": 15,
+            "y": 30,
+            "id": "modal",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused",
+          "condition": "open"
+        }
+      ],
+      "purpose": "pause",
+      "feedback": [
+        "scrim"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 43
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused",
+          "interaction_role": "resume"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 10,
+            "w": 52,
+            "x": 24,
+            "y": 57
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused",
+          "interaction_role": "quit"
+        }
+      ],
+      "edge_cases": [
+        "deadlines frozen"
+      ],
+      "transitions": [
+        {
+          "to": "Signal Station",
+          "from": "Pause Overlay",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resume clocks",
+          "target": "resume",
+          "feedback": "fade",
+          "precondition": "paused",
+          "state_change": "station",
+          "invalid_input": "background blocked"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "exclude pause duration"
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Shift Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 48,
+            "w": 80,
+            "x": 10,
+            "y": 18,
+            "id": "summary",
+            "role": "summary",
+            "label": "Summary"
+          },
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 74,
+            "id": "actions",
+            "role": "controls",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result",
+          "condition": "ended"
+        }
+      ],
+      "purpose": "summary",
+      "feedback": [],
+      "components": [
+        {
+          "id": "score",
+          "box": {
+            "h": 36,
+            "w": 72,
+            "x": 14,
+            "y": 23
+          },
+          "type": "summary",
+          "label": "accuracy/time/streak/strikes",
+          "state_binding": "result"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 77
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "result",
+          "interaction_role": "retry"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 77
+          },
+          "type": "button",
+          "label": "NEXT",
+          "enabled_when": "success and next",
+          "state_binding": "progress",
+          "interaction_role": "next"
+        }
+      ],
+      "edge_cases": [
+        "final hides next"
+      ],
+      "transitions": [
+        {
+          "to": "Rule Brief",
+          "from": "Shift Result",
+          "trigger": "retry/next",
+          "animation": "push",
+          "condition": "valid"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reload",
+          "target": "retry",
+          "feedback": "fade",
+          "precondition": "always",
+          "state_change": "brief",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "select next",
+          "target": "next",
+          "feedback": "push",
+          "precondition": "success and next",
+          "state_change": "brief",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure",
+          "name": "Failure",
+          "notes": "retry remains",
+          "condition": "3 strikes/deadline",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "next": {
+              "state_binding": "disabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "first-send accuracy + time + streak"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "565b94b4-9106-46dc-b7b3-d4f5af4f56df",
+  "input_map": {
+    "cancel": [
+      "shutter cancel discards",
+      "lens snaps nearest",
+      "filter snaps nearest"
+    ],
+    "gestures": [
+      {
+        "name": "shutter",
+        "priority": 1
+      },
+      {
+        "name": "lens/filter drag",
+        "priority": 2
+      },
+      {
+        "name": "buttons",
+        "priority": 3
+      },
+      {
+        "name": "vessel tap",
+        "priority": 4
+      }
+    ],
+    "conflicts": [
+      "pointer-down control captures until release",
+      "shutter capture persists"
+    ],
+    "multitouch": "single control owner; second touch ignored"
+  },
+  "created_at": "2026-09-29T15:37:15.804709+00:00",
+  "edge_cases": [
+    "deadline expiry resolves before later Send",
+    "pause freezes deadlines",
+    "max 4 pulses blocks shutter",
+    "no target disables signal controls",
+    "evaluation locks composition"
+  ],
+  "updated_at": "2026-09-29T15:37:15.804709+00:00",
+  "core_screen": "Signal Station",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "Send requires target and 1-4 pulses",
+      "evaluation locks controls"
+    ],
+    "normal": [
+      "Shift Select",
+      "Rule Brief",
+      "Signal Station",
+      "Shift Result"
+    ],
+    "branches": [
+      "compose↔transmit→evaluating→ack/reject",
+      "Pause→resume"
+    ],
+    "exceptions": [
+      "wrong→strike→continue",
+      "deadline miss→failure",
+      "3 strikes→failure"
+    ]
+  },
+  "state_count": 15,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "paused",
+      "effect": "freeze deadlines/block station",
+      "condition": "pause"
+    },
+    {
+      "id": "input_lock",
+      "effect": "lock controls",
+      "condition": "evaluating"
+    },
+    {
+      "id": "success",
+      "effect": "result",
+      "condition": "5 safe"
+    },
+    {
+      "id": "failure",
+      "effect": "result",
+      "condition": "3 strikes or deadline miss"
+    }
+  ],
+  "pack_markdown": "# Night Signal Operator — Interaction Wireframe Pack v0.2",
+  "source_run_at": "2026-09-29T15:37:15.804709+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "coordinates": "0-100 portrait",
+    "sea_fraction": 0.54,
+    "console_fraction": 0.38
+  },
+  "developer_handoff": {
+    "critical": "never replace measured controls with discrete buttons",
+    "persistence": [
+      "unlocked_shifts",
+      "best_score"
+    ],
+    "required_data": [
+      "8 requests",
+      "sector 0-7",
+      "3 colors",
+      "pulse code 1-4",
+      "deadline 25-45",
+      "path state"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "ScreenRouter",
+      "ShiftSelect",
+      "RuleBrief",
+      "SignalStation",
+      "PauseOverlay",
+      "ShiftResult"
+    ],
+    "state_ownership": {
+      "Vessel": "deadline/path",
+      "Shutter": "press time",
+      "ShiftSession": "vessels/strikes/streak",
+      "SignalStation": "selection/composition"
+    },
+    "reusable_components": [
+      "VesselTarget",
+      "RequestCard",
+      "LensWheel",
+      "FilterRack",
+      "ShutterControl",
+      "PulseTimeline",
+      "DeadlineMeter"
+    ],
+    "implementation_order": [
+      "data/evaluator",
+      "deadlines",
+      "selection",
+      "lens",
+      "filter",
+      "shutter/timeline",
+      "send",
+      "path",
+      "flow"
+    ]
+  },
+  "acceptance_criteria": [
+    "All five screens reachable",
+    "Lens circular drag changes actual one-of-8 beam sector",
+    "Filter drag changes actual white/red/green color",
+    "Shutter measures duration: .25-.65 short, .8-1.5 long",
+    "Timeline has 1-4 pulses and Send disabled otherwise",
+    "Wrong signal adds strike; three fail",
+    "Deadline miss fails and pause freezes clocks",
+    "Correct send changes vessel path",
+    "Five-vessel shift completes"
+  ],
+  "primary_interaction": "Lens circular drag + filter slide + measured shutter press/release compose signal.",
+  "interaction_principles": [
+    "Physical controls directly alter signal state",
+    "Sea/request readable above thumb console",
+    "Lens snaps 45 degrees",
+    "Shutter duration measured, not button-selected",
+    "Send disabled without 1-4 complete pulses"
+  ]
+}

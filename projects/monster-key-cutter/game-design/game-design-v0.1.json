@@ -1,220 +1,226 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "spec": {
-    "id": "346e3091-434f-4e90-b8a8-05444cf93eef",
-    "title": "Monster Key Cutter",
-    "source": "chat_automation",
-    "economy": "Not required. MVP에 화폐/상점 없음.",
-    "idea_id": "24ab50fc-bdbe-4d56-86a1-75d4f6aa7a2f",
-    "version": "v0.1",
-    "one_line": "괴물 손님의 자물쇠 핀 높이를 읽고 열쇠 홈을 직접 깎아 부드럽게 회전시키는 촉각 제작 퍼즐.",
-    "core_loop": "8–15초 관찰→25–45초 절삭→5초 삽입·회전 테스트→실패 핀 피드백을 읽고 10–20초 재가공. 최대 3회 테스트 안에 성공하는 60–120초 주문.",
-    "mvp_scope": "4핀 lock 1종, blank 2개, lens, coarse/fine filing, irreversible depth, insert/rotate test, diagnostic, 12 profiles, result.",
-    "game_rules": {
-      "pins": 4,
-      "failure": "two blanks unusable or timer expires",
-      "overcut": "below target-tolerance is irreversible",
-      "scoring": {
-        "base": 1000,
-        "test_penalty": 80,
-        "replacement_penalty": 200
-      },
-      "success": "all pin errors <= tolerance and rotation reaches 75 degrees",
-      "cut_rule": "material removal only, depth 0..1",
-      "tolerance": 0.08,
-      "test_limit": 3,
-      "blank_count": 2,
-      "time_limit_sec": 180
+  "id": "346e3091-434f-4e90-b8a8-05444cf93eef",
+  "title": "Monster Key Cutter",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required. MVP에 화폐/상점 없음.",
+  "idea_id": "24ab50fc-bdbe-4d56-86a1-75d4f6aa7a2f",
+  "version": "v0.1",
+  "one_line": "괴물 손님의 자물쇠 핀 높이를 읽고 열쇠 홈을 직접 깎아 부드럽게 회전시키는 촉각 제작 퍼즐.",
+  "core_loop": "8–15초 관찰→25–45초 절삭→5초 삽입·회전 테스트→실패 핀 피드백을 읽고 10–20초 재가공. 최대 3회 테스트 안에 성공하는 60–120초 주문.",
+  "mvp_scope": "4핀 lock 1종, blank 2개, lens, coarse/fine filing, irreversible depth, insert/rotate test, diagnostic, 12 profiles, result.",
+  "created_at": "2026-09-29T17:06:41.210299+00:00",
+  "game_rules": {
+    "pins": 4,
+    "failure": "two blanks unusable or timer expires",
+    "overcut": "below target-tolerance is irreversible",
+    "scoring": {
+      "base": 1000,
+      "test_penalty": 80,
+      "replacement_penalty": 200
     },
-    "not_in_mvp": [
-      "5–6 pins",
-      "Multiple materials",
-      "Shop economy",
-      "Narrative customers",
-      "Decor",
-      "Procedural locks"
-    ],
-    "known_risks": [
-      "finger occlusion",
-      "pixel-luck precision",
-      "diagnostic over-help",
-      "irreversible frustration"
-    ],
-    "progression": "12개 주문 순차 해금과 최고 정확도 기록. 이후 새 파일/렌즈 기능을 해금할 수 있으나 MVP 제외.",
-    "screen_flow": "Order Board→Inspect→Cut→Test→Result 또는 Diagnostic→Cut; blank 소진/시간초과→Result→Retry.",
-    "state_model": [
-      {
-        "ui": "pin heights/order",
-        "exit": "start cut",
-        "enter": "order start",
-        "state": "Inspect",
-        "inputs": [
-          "lens",
-          "select blank"
-        ]
-      },
-      {
-        "ui": "profile/metal",
-        "exit": "test",
-        "enter": "blank mounted",
-        "state": "Cut",
-        "inputs": [
-          "coarse",
-          "fine"
-        ]
-      },
-      {
-        "ui": "pin contact/torque",
-        "exit": "success or diagnostic",
-        "enter": "key inserted",
-        "state": "Test",
-        "inputs": [
-          "rotate"
-        ]
-      },
-      {
-        "ui": "high/low pins",
-        "exit": "Cut",
-        "enter": "blocked",
-        "state": "Diagnostic",
-        "inputs": [
-          "return",
-          "replace"
-        ]
-      },
-      {
-        "ui": "accuracy/tests/time",
-        "exit": "new order",
-        "enter": "success/failure",
-        "state": "Result",
-        "inputs": [
-          "next",
-          "retry"
-        ]
-      }
-    ],
-    "content_unit": "자물쇠 주문 1건",
-    "content_model": {
-      "mvp": "12 authored 4-pin profiles",
-      "axes": [
-        "pin count",
-        "target profile",
-        "tolerance",
-        "material",
-        "wear",
-        "keyway"
-      ],
-      "unit": "lock order",
-      "validation": "minimum notch spacing and reachable depth"
+    "success": "all pin errors <= tolerance and rotation reaches 75 degrees",
+    "cut_rule": "material removal only, depth 0..1",
+    "tolerance": 0.08,
+    "test_limit": 3,
+    "blank_count": 2,
+    "time_limit_sec": 180
+  },
+  "not_in_mvp": [
+    "5–6 pins",
+    "Multiple materials",
+    "Shop economy",
+    "Narrative customers",
+    "Decor",
+    "Procedural locks"
+  ],
+  "updated_at": "2026-09-29T17:06:41.210299+00:00",
+  "archived_at": "2026-09-29T17:06:54+00:00",
+  "known_risks": [
+    "finger occlusion",
+    "pixel-luck precision",
+    "diagnostic over-help",
+    "irreversible frustration"
+  ],
+  "progression": "12개 주문 순차 해금과 최고 정확도 기록. 이후 새 파일/렌즈 기능을 해금할 수 있으나 MVP 제외.",
+  "screen_flow": "Order Board→Inspect→Cut→Test→Result 또는 Diagnostic→Cut; blank 소진/시간초과→Result→Retry.",
+  "state_model": [
+    {
+      "ui": "pin heights/order",
+      "exit": "start cut",
+      "enter": "order start",
+      "state": "Inspect",
+      "inputs": [
+        "lens",
+        "select blank"
+      ]
     },
-    "source_run_at": "2026-09-29T17:06:41.210299+00:00",
-    "player_fantasy": "플레이어는 야간 괴물 거리의 정밀 열쇠공이다. 핀 구조를 읽고 금속을 조금씩 제거해 딱 맞는 열쇠를 만드는 숙련감과 시험 회전 순간의 긴장을 느낀다.",
-    "session_length": "1–2분",
-    "test_scenarios": [
-      "20초 내 inspect→first cut",
-      "tolerance feedback 5회 연속 일치",
-      "overcut 후 replacement 이유 이해",
-      "blocked rotation으로 wrong tooth 80% 이상 식별",
-      "주문 평균 60–120초"
-    ],
-    "feedback_system": {
-      "cut": {
-        "audio": "file scrape",
-        "haptic": "texture",
-        "visual": "shavings/profile"
-      },
-      "test": {
-        "audio": "clicks",
-        "haptic": "resistance",
-        "visual": "pins/cylinder"
-      },
-      "inspect": {
-        "audio": "metal click",
-        "haptic": "tick",
-        "visual": "pin highlight"
-      },
-      "overcut": {
-        "audio": "dull nick",
-        "haptic": "warning",
-        "visual": "warning edge"
-      },
-      "success": {
-        "audio": "clean clack",
-        "haptic": "success",
-        "visual": "full turn"
-      }
+    {
+      "ui": "profile/metal",
+      "exit": "test",
+      "enter": "blank mounted",
+      "state": "Cut",
+      "inputs": [
+        "coarse",
+        "fine"
+      ]
     },
-    "round_structure": "4핀 lock과 blank 2개로 시작. Inspect→Cut→Test 반복. 각 tooth는 목표 높이 허용오차 안이어야 한다. 과절삭은 되돌릴 수 없다. 성공 시 Result, blank 2개 소진 또는 180초 초과 시 실패.",
-    "interaction_spec": {
-      "cut": {
-        "cancel": "lift",
-        "target": "44pt minimum",
-        "gesture": "drag across tooth",
-        "invalid": "outside tooth no cut",
-        "priority": "stroke over pan"
-      },
-      "fine": {
-        "step": 0.01,
-        "gesture": "fine tool + short strokes"
-      },
-      "test": {
-        "insert": "drag until snap",
-        "rotate": "clockwise arc",
-        "blocked": "stops proportional to worst error"
-      },
-      "replacement": "explicit hold-confirm"
+    {
+      "ui": "pin contact/torque",
+      "exit": "success or diagnostic",
+      "enter": "key inserted",
+      "state": "Test",
+      "inputs": [
+        "rotate"
+      ]
     },
-    "screen_inventory": [
-      "Order Board",
-      "Workbench",
-      "Result",
-      "Pause/Settings"
+    {
+      "ui": "high/low pins",
+      "exit": "Cut",
+      "enter": "blocked",
+      "state": "Diagnostic",
+      "inputs": [
+        "return",
+        "replace"
+      ]
+    },
+    {
+      "ui": "accuracy/tests/time",
+      "exit": "new order",
+      "enter": "success/failure",
+      "state": "Result",
+      "inputs": [
+        "next",
+        "retry"
+      ]
+    }
+  ],
+  "archive_path": "projects/monster-key-cutter/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "자물쇠 주문 1건",
+  "content_model": {
+    "mvp": "12 authored 4-pin profiles",
+    "axes": [
+      "pin count",
+      "target profile",
+      "tolerance",
+      "material",
+      "wear",
+      "keyway"
     ],
-    "core_player_verbs": [
-      {
-        "verb": "inspect",
-        "input": "drag lens",
-        "target": "lock cutaway",
-        "feedback": "pin highlight",
-        "condition": "Inspect",
-        "state_change": "reveals target pin heights"
-      },
-      {
-        "verb": "cut",
-        "input": "drag file",
-        "target": "key tooth",
-        "feedback": "shavings/depth",
-        "condition": "Cut",
-        "state_change": "irreversibly lowers tooth"
-      },
-      {
-        "verb": "fine_file",
-        "input": "short strokes",
-        "target": "tooth",
-        "feedback": "fine scrape",
-        "condition": "Cut",
-        "state_change": "small depth reduction"
-      },
-      {
-        "verb": "test",
-        "input": "insert drag + arc rotate",
-        "target": "lock",
-        "feedback": "pins rise/rotation stops or completes",
-        "condition": "Test",
-        "state_change": "evaluates pin errors"
-      }
-    ],
-    "wireframe_handoff": [
-      "Inspect/Cut/Test/Diagnostic/Result",
-      "lens/file/insert/rotate gestures",
-      "valid/invalid tooth target",
-      "overcut/replacement confirm",
-      "blocked feedback",
-      "timer/blank/test counters"
-    ],
-    "primary_interaction": "핀 관찰 → 열쇠 홈 직접 절삭 → 삽입·회전 테스트",
-    "difficulty_variation": "넓은 허용오차/계단형 profile→인접 높이 차/좁은 tolerance/마모 핀→재질별 절삭 관성/5–6핀. 속도 증가만으로 난도를 올리지 않는다.",
-    "visual_direction_brief": "Portrait mobile. 중앙에 큰 lock/key 단면, 하단 얇은 tool rail. Tooth는 손가락보다 넓게 확대하고 숫자보다 형태·핀 정렬을 우선 읽힌다. 테스트도 같은 작업대에서 lock 쪽으로 짧게 이동."
-  }
+    "unit": "lock order",
+    "validation": "minimum notch spacing and reachable depth"
+  },
+  "source_run_at": "2026-09-29T17:06:41.210299+00:00",
+  "archive_commit": "b29ec5456dcdf4d6a8a492556d02880e7d246289",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 야간 괴물 거리의 정밀 열쇠공이다. 핀 구조를 읽고 금속을 조금씩 제거해 딱 맞는 열쇠를 만드는 숙련감과 시험 회전 순간의 긴장을 느낀다.",
+  "session_length": "1–2분",
+  "test_scenarios": [
+    "20초 내 inspect→first cut",
+    "tolerance feedback 5회 연속 일치",
+    "overcut 후 replacement 이유 이해",
+    "blocked rotation으로 wrong tooth 80% 이상 식별",
+    "주문 평균 60–120초"
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Monster Key Cutter\n\n## 1. Product Definition\nPortrait mobile precision craft puzzle, 1–2분. 핀을 읽고 금속을 직접 제거해 정확한 열쇠를 만든다. Non-goals: 자동 제작, 선택지형 상점, CNC 시뮬레이터.\n## 2. Player Fantasy\n괴물 거리의 정밀 열쇠공으로 관찰과 손기술을 익힌다.\n## 3. Core Player Verbs\nLens inspect, coarse/fine file, insert, arc rotate. 절삭은 비가역 상태변화.\n## 4. Core Loop\n관찰→절삭→테스트→진단→재가공.\n## 5. Round / Session Structure\n4핀, blank 2, test 3회, 180초 한도.\n## 6. Game Rules\nTolerance ±0.08, depth 0..1, material removal only. 모든 pin error가 tolerance 이내이고 75° 회전하면 성공.\n## 7. State Model\nInspect→Cut→Test→Result 또는 Diagnostic→Cut.\n## 8. Interaction Spec\n44pt tooth target, file drag/lift cancel, fine 0.01 step, insert snap, arc rotate, outside target no cut.\n## 9. Content Model\nOrder 단위; pin profile/tolerance/material/wear/keyway 축. MVP 12 authored profiles.\n## 10. Difficulty / Variation\n넓은 tolerance→높이차/마모→재질/핀수. Speed-only 금지.\n## 11. Progression\n12 주문 순차 해금과 최고 정확도.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nOrder Board, Workbench, Result, Pause.\n## 14. Screen Flow\nBoard→Inspect→Cut→Test↔Diagnostic→Result.\n## 15. Feedback System\nPin ticks, shavings/scrape, torque resistance, success turn, overcut warning.\n## 16. Visual Direction Brief\nPortrait, 큰 cross-section, 하단 tool rail, finger-safe 확대, 금속 작업대.\n## 17. MVP Scope\n4핀, 2 blanks, lens, two files, depth model, test/diagnostic, 12 profiles. NOT IN MVP: economy/narrative/decor/multi-material.\n## 18. Test Scenarios\n20초 내 first cut, tolerance feedback 일치, overcut 이해, diagnostic 80%, 60–120초 주문.\n## 19. Known Risks\nFinger occlusion, pixel-luck precision, over-helpful diagnostic, irreversible frustration.\n## 20. Wireframe Handoff\n모든 state와 lens/file/insert/rotate gesture, invalid target, overcut, replacement, blocked feedback, counters.",
+  "feedback_system": {
+    "cut": {
+      "audio": "file scrape",
+      "haptic": "texture",
+      "visual": "shavings/profile"
+    },
+    "test": {
+      "audio": "clicks",
+      "haptic": "resistance",
+      "visual": "pins/cylinder"
+    },
+    "inspect": {
+      "audio": "metal click",
+      "haptic": "tick",
+      "visual": "pin highlight"
+    },
+    "overcut": {
+      "audio": "dull nick",
+      "haptic": "warning",
+      "visual": "warning edge"
+    },
+    "success": {
+      "audio": "clean clack",
+      "haptic": "success",
+      "visual": "full turn"
+    }
+  },
+  "round_structure": "4핀 lock과 blank 2개로 시작. Inspect→Cut→Test 반복. 각 tooth는 목표 높이 허용오차 안이어야 한다. 과절삭은 되돌릴 수 없다. 성공 시 Result, blank 2개 소진 또는 180초 초과 시 실패.",
+  "interaction_spec": {
+    "cut": {
+      "cancel": "lift",
+      "target": "44pt minimum",
+      "gesture": "drag across tooth",
+      "invalid": "outside tooth no cut",
+      "priority": "stroke over pan"
+    },
+    "fine": {
+      "step": 0.01,
+      "gesture": "fine tool + short strokes"
+    },
+    "test": {
+      "insert": "drag until snap",
+      "rotate": "clockwise arc",
+      "blocked": "stops proportional to worst error"
+    },
+    "replacement": "explicit hold-confirm"
+  },
+  "screen_inventory": [
+    "Order Board",
+    "Workbench",
+    "Result",
+    "Pause/Settings"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "inspect",
+      "input": "drag lens",
+      "target": "lock cutaway",
+      "feedback": "pin highlight",
+      "condition": "Inspect",
+      "state_change": "reveals target pin heights"
+    },
+    {
+      "verb": "cut",
+      "input": "drag file",
+      "target": "key tooth",
+      "feedback": "shavings/depth",
+      "condition": "Cut",
+      "state_change": "irreversibly lowers tooth"
+    },
+    {
+      "verb": "fine_file",
+      "input": "short strokes",
+      "target": "tooth",
+      "feedback": "fine scrape",
+      "condition": "Cut",
+      "state_change": "small depth reduction"
+    },
+    {
+      "verb": "test",
+      "input": "insert drag + arc rotate",
+      "target": "lock",
+      "feedback": "pins rise/rotation stops or completes",
+      "condition": "Test",
+      "state_change": "evaluates pin errors"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Inspect/Cut/Test/Diagnostic/Result",
+    "lens/file/insert/rotate gestures",
+    "valid/invalid tooth target",
+    "overcut/replacement confirm",
+    "blocked feedback",
+    "timer/blank/test counters"
+  ],
+  "primary_interaction": "핀 관찰 → 열쇠 홈 직접 절삭 → 삽입·회전 테스트",
+  "difficulty_variation": "넓은 허용오차/계단형 profile→인접 높이 차/좁은 tolerance/마모 핀→재질별 절삭 관성/5–6핀. 속도 증가만으로 난도를 올리지 않는다.",
+  "visual_direction_brief": "Portrait mobile. 중앙에 큰 lock/key 단면, 하단 얇은 tool rail. Tooth는 손가락보다 넓게 확대하고 숫자보다 형태·핀 정렬을 우선 읽힌다. 테스트도 같은 작업대에서 lock 쪽으로 짧게 이동."
 }

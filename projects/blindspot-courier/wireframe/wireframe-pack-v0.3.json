@@ -1,0 +1,999 @@
+{
+  "id": "a279c89b-a466-42ea-8c33-3149d9ee56dd",
+  "title": "Blindspot Courier",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "af8996ba-523b-47d8-9341-726003e98d4d",
+  "screens": [
+    {
+      "id": "S1_STAGE_SELECT",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "grid",
+            "box": {
+              "h": 76,
+              "w": 90,
+              "x": 5,
+              "y": 15
+            }
+          }
+        ]
+      },
+      "states": [
+        "ready"
+      ],
+      "purpose": "Choose an unlocked stage.",
+      "feedback": [
+        "locked/unlocked/completed legible"
+      ],
+      "components": [
+        {
+          "id": "stage_grid",
+          "box": {
+            "h": 76,
+            "w": 90,
+            "x": 5,
+            "y": 15
+          },
+          "type": "scroll_grid",
+          "source_refs": [
+            "Progression"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "stage_card",
+          "box": {
+            "h": 16,
+            "w": 40,
+            "x": 8,
+            "y": 19
+          },
+          "type": "repeated_button",
+          "source_refs": [
+            "Progression"
+          ],
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "Locked stage cannot start."
+      ],
+      "transitions": [
+        {
+          "to": "S2_STAGE_INTRO",
+          "guard": "unlocked stage selected",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select_stage",
+          "input": "tap",
+          "target": "stage_card",
+          "feedback": "selected card responds",
+          "source_refs": [
+            "Progression"
+          ],
+          "precondition": "stage unlocked",
+          "state_change": "selected stage pending intro",
+          "invalid_input": "locked card stays unchanged",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Ten stages are data-driven."
+      ]
+    },
+    {
+      "id": "S2_STAGE_INTRO",
+      "name": "Stage Intro",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "preview",
+            "box": {
+              "h": 58,
+              "w": 88,
+              "x": 6,
+              "y": 10
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 10,
+              "w": 88,
+              "x": 6,
+              "y": 84
+            }
+          }
+        ]
+      },
+      "states": [
+        "preview"
+      ],
+      "purpose": "Preview objective and rule-relevant stage elements.",
+      "feedback": [
+        "required parcels visible"
+      ],
+      "components": [
+        {
+          "id": "stage_preview",
+          "box": {
+            "h": 55,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "map_preview",
+          "source_refs": [
+            "Content Model"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "start_button",
+          "box": {
+            "h": 10,
+            "w": 42,
+            "x": 52,
+            "y": 84
+          },
+          "type": "button",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "back_button",
+          "box": {
+            "h": 10,
+            "w": 36,
+            "x": 6,
+            "y": 84
+          },
+          "type": "button",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_note": "Safe pre-stage return only.",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [
+        "No immediate-detection start layout."
+      ],
+      "transitions": [
+        {
+          "to": "S3_GAMEPLAY",
+          "guard": "start",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S1_STAGE_SELECT",
+          "guard": "back",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_note": "Pre-stage navigation only.",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start_stage",
+          "input": "tap",
+          "target": "start_button",
+          "feedback": "preview becomes live board",
+          "source_refs": [
+            "R8",
+            "Round Structure"
+          ],
+          "precondition": "stage data ready",
+          "state_change": "enter planning from stage-start snapshot",
+          "decision_note": "Explicit start preserves snapshot semantics.",
+          "invalid_input": "disabled while unavailable",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S3_GAMEPLAY",
+      "name": "Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "hud",
+            "box": {
+              "h": 10,
+              "w": 94,
+              "x": 3,
+              "y": 2
+            }
+          },
+          {
+            "id": "world",
+            "box": {
+              "h": 76,
+              "w": 100,
+              "x": 0,
+              "y": 12
+            }
+          },
+          {
+            "id": "action",
+            "box": {
+              "h": 9,
+              "w": 92,
+              "x": 4,
+              "y": 89
+            }
+          }
+        ]
+      },
+      "states": [
+        "planning",
+        "moving",
+        "interaction",
+        "success",
+        "failure"
+      ],
+      "purpose": "Rotate view, plan node route, move, collect and deliver.",
+      "feedback": [
+        "Detection shows detecting watcher and LOS.",
+        "Walls visibly block LOS.",
+        "Overlapping sectors remain distinguishable.",
+        "Cargo persists."
+      ],
+      "components": [
+        {
+          "id": "gameplay_viewport",
+          "box": {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12
+          },
+          "type": "interactive_world_view",
+          "source_refs": [
+            "R2",
+            "R3",
+            "R4"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "route_layer",
+          "box": {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12
+          },
+          "type": "route_overlay",
+          "source_refs": [
+            "R1",
+            "R5"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "courier",
+          "box": {
+            "h": 10,
+            "w": 12,
+            "x": 44,
+            "y": 48
+          },
+          "type": "world_actor",
+          "source_refs": [
+            "State Model"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "watcher_layer",
+          "box": {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12
+          },
+          "type": "world_overlay",
+          "source_refs": [
+            "R2",
+            "R3",
+            "R10"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "parcel_targets",
+          "box": {
+            "h": 76,
+            "w": 100,
+            "x": 0,
+            "y": 12
+          },
+          "type": "world_targets",
+          "source_refs": [
+            "R7"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "cargo_hud",
+          "box": {
+            "h": 8,
+            "w": 58,
+            "x": 4,
+            "y": 3
+          },
+          "type": "persistent_status",
+          "source_refs": [
+            "R7",
+            "Feedback System"
+          ],
+          "decision_note": "Exposes existing cargo state.",
+          "decision_origin": "wireframe_feedback"
+        },
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 8,
+            "w": 10,
+            "x": 86,
+            "y": 3
+          },
+          "type": "button",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "move_confirm",
+          "box": {
+            "h": 9,
+            "w": 34,
+            "x": 62,
+            "y": 89
+          },
+          "type": "button",
+          "source_refs": [
+            "R5",
+            "R6"
+          ],
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "Camera rotation never moves world positions.",
+        "Route editing locked while moving.",
+        "Wall-blocked LOS cannot detect.",
+        "One delivered parcel does not succeed while required parcels remain."
+      ],
+      "transitions": [
+        {
+          "to": "S5_PAUSE",
+          "guard": "pause",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S4_STAGE_RESULT",
+          "guard": "all required delivered or detection",
+          "source_refs": [
+            "R8"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "rotate_camera",
+          "input": "drag/swipe on gameplay viewport while stationary",
+          "target": "gameplay_viewport",
+          "feedback": "entering watchers freeze; fully exiting watchers wake",
+          "source_refs": [
+            "R2",
+            "R4",
+            "Interaction Spec"
+          ],
+          "precondition": "planning or interaction; courier stationary",
+          "state_change": "camera_angle changes then watcher visibility/frozen/facing recalculates",
+          "invalid_input": "locked while moving",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "keep",
+            "target_component_id": "gameplay_viewport"
+          }
+        },
+        {
+          "id": "draw_route",
+          "input": "trace connected route nodes",
+          "target": "route_layer",
+          "feedback": "legal route and invalid reason shown",
+          "source_refs": [
+            "R1",
+            "R5"
+          ],
+          "precondition": "planning and stationary",
+          "state_change": "queued_route becomes legal traced node sequence; invalid trace preserves prior valid state",
+          "invalid_input": "non-adjacent/non-walkable route rejected",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "kind": "trace",
+            "cancel": "keep",
+            "target_component_id": "route_layer",
+            "related_component_ids": [
+              "courier"
+            ]
+          }
+        },
+        {
+          "id": "confirm_move",
+          "input": "tap",
+          "target": "move_confirm",
+          "feedback": "node progress and danger remain visible",
+          "source_refs": [
+            "R5",
+            "R6"
+          ],
+          "precondition": "valid non-empty queued_route",
+          "state_change": "moving; traverse route and evaluate detection at each node",
+          "invalid_input": "disabled with reason when route invalid",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pickup_delivery",
+          "input": "tap",
+          "target": "parcel_targets",
+          "feedback": "world target and cargo HUD update",
+          "source_refs": [
+            "R7"
+          ],
+          "precondition": "interaction at pickup or matching destination",
+          "state_change": "parcel state becomes carried or delivered",
+          "invalid_input": "wrong destination leaves state unchanged",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause_game",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "R9"
+          ],
+          "precondition": "nonterminal gameplay",
+          "state_change": "paused with variables frozen",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V_ROTATING",
+          "name": "Active rotation watchers",
+          "notes": "Same watcher rule.",
+          "condition": "stage contains active-rotation watcher",
+          "source_refs": [
+            "R10"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "watcher_layer": "freeze on viewport entry, wake on complete exit"
+          },
+          "component_overrides": {
+            "watcher_layer": "show active/frozen state and facing"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V_MULTI_PARCEL",
+          "name": "Multiple parcels",
+          "notes": "Success waits for all required parcels.",
+          "condition": "more than one required parcel",
+          "source_refs": [
+            "R7",
+            "R8",
+            "R10"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "cargo_hud": "remaining required deliveries persist"
+          },
+          "component_overrides": {
+            "cargo_hud": "show each required parcel state"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "Keep world-rule evaluation separate from presentation architecture."
+      ]
+    },
+    {
+      "id": "S4_STAGE_RESULT",
+      "name": "Stage Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "result",
+            "box": {
+              "h": 54,
+              "w": 86,
+              "x": 7,
+              "y": 12
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 22,
+              "w": 86,
+              "x": 7,
+              "y": 70
+            }
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "Explain terminal outcome and continuation.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "result_summary",
+          "box": {
+            "h": 54,
+            "w": 86,
+            "x": 7,
+            "y": 12
+          },
+          "type": "result_panel",
+          "source_refs": [
+            "R8"
+          ],
+          "decision_origin": "wireframe_feedback"
+        },
+        {
+          "id": "retry_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 7,
+            "y": 72
+          },
+          "type": "button",
+          "source_refs": [
+            "R8"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "next_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 53,
+            "y": 72
+          },
+          "type": "button",
+          "source_refs": [
+            "Progression"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "select_button",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 83
+          },
+          "type": "button",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "Final stage can omit Next."
+      ],
+      "transitions": [
+        {
+          "to": "S3_GAMEPLAY",
+          "guard": "failure retry",
+          "source_refs": [
+            "R8"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S2_STAGE_INTRO",
+          "guard": "success next",
+          "source_refs": [
+            "Progression"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S1_STAGE_SELECT",
+          "guard": "select",
+          "source_refs": [
+            "Screen Flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "result_action",
+          "input": "tap",
+          "target": "result action button",
+          "feedback": "immediate transition",
+          "source_refs": [
+            "R8",
+            "Progression"
+          ],
+          "precondition": "terminal state",
+          "state_change": "retry restores snapshot; next opens next intro; select returns stage select",
+          "invalid_input": "unavailable next disabled",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V_FAILURE",
+          "name": "Detection failure",
+          "notes": "Retry restores snapshot.",
+          "condition": "terminal reason=detection",
+          "source_refs": [
+            "R6",
+            "R8"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "result_summary": "failure cause emphasized"
+          },
+          "component_overrides": {
+            "result_summary": "show watcher and LOS cause"
+          },
+          "interaction_overrides": {
+            "next_button": "hidden"
+          }
+        },
+        {
+          "id": "V_SUCCESS",
+          "name": "Delivery success",
+          "notes": "Unlock next stage.",
+          "condition": "all required parcels delivered",
+          "source_refs": [
+            "R8",
+            "Progression"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "result_summary": "show required deliveries complete"
+          },
+          "interaction_overrides": {
+            "next_button": "enabled when next stage exists"
+          }
+        }
+      ],
+      "implementation_notes": []
+    },
+    {
+      "id": "S5_PAUSE",
+      "name": "Pause",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "overlay",
+            "box": {
+              "h": 60,
+              "w": 84,
+              "x": 8,
+              "y": 20
+            }
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze simulation; resume or restart.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "pause_panel",
+          "box": {
+            "h": 60,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "modal",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 45
+          },
+          "type": "button",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "restart_button",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 59
+          },
+          "type": "button",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "Paused watchers and courier do not advance."
+      ],
+      "transitions": [
+        {
+          "to": "S3_GAMEPLAY",
+          "guard": "resume or restart",
+          "source_refs": [
+            "R9"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "R9"
+          ],
+          "precondition": "paused",
+          "state_change": "return to exact prior gameplay state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "restart",
+          "input": "tap",
+          "target": "restart_button",
+          "feedback": "board resets",
+          "source_refs": [
+            "R9"
+          ],
+          "precondition": "paused",
+          "state_change": "restore stage-start snapshot and planning",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "8269d760-b8e0-442a-9158-a798b684c1e5",
+  "input_map": {
+    "bindings": [
+      {
+        "scope": "gameplay_viewport",
+        "gesture": "drag/swipe",
+        "meaning": "camera rotation"
+      },
+      {
+        "scope": "route_layer",
+        "gesture": "trace",
+        "meaning": "queued route"
+      },
+      {
+        "scope": "parcel_targets/buttons",
+        "gesture": "tap",
+        "meaning": "context action"
+      }
+    ],
+    "conflicts": [
+      "Route trace owns its pointer sequence; moving locks camera/route manipulation."
+    ],
+    "decision_note": "Arbitration only.",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T17:33:28.26286+00:00",
+  "edge_cases": {
+    "cases": [
+      "invalid route rejected without movement",
+      "camera rotation recalculates watcher state first",
+      "wall blocks LOS",
+      "overlapping sectors evaluated independently",
+      "all required parcels needed for success",
+      "retry/restart restore snapshot"
+    ],
+    "upstream_issues": []
+  },
+  "updated_at": "2026-09-30T17:33:28.26286+00:00",
+  "core_screen": "S3_GAMEPLAY",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1_STAGE_SELECT",
+    "paths": [
+      {
+        "to": "S2_STAGE_INTRO",
+        "from": "S1_STAGE_SELECT",
+        "guard": "unlocked selected"
+      },
+      {
+        "to": "S3_GAMEPLAY",
+        "from": "S2_STAGE_INTRO",
+        "guard": "start"
+      },
+      {
+        "to": "S4_STAGE_RESULT",
+        "from": "S3_GAMEPLAY",
+        "guard": "success or detection"
+      },
+      {
+        "to": "S5_PAUSE",
+        "from": "S3_GAMEPLAY",
+        "guard": "pause"
+      },
+      {
+        "to": "S3_GAMEPLAY",
+        "from": "S5_PAUSE",
+        "guard": "resume/restart"
+      },
+      {
+        "to": "S3_GAMEPLAY",
+        "from": "S4_STAGE_RESULT",
+        "guard": "retry"
+      },
+      {
+        "to": "S2_STAGE_INTRO",
+        "from": "S4_STAGE_RESULT",
+        "guard": "next"
+      },
+      {
+        "to": "S1_STAGE_SELECT",
+        "from": "S4_STAGE_RESULT",
+        "guard": "select"
+      }
+    ],
+    "source_refs": [
+      "Screen Flow",
+      "R8",
+      "R9"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 7,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "stage_intro"
+    },
+    {
+      "id": "planning"
+    },
+    {
+      "id": "moving"
+    },
+    {
+      "id": "interaction"
+    },
+    {
+      "id": "success"
+    },
+    {
+      "id": "failure"
+    },
+    {
+      "id": "paused"
+    }
+  ],
+  "pack_markdown": "# Blindspot Courier — Interaction Wireframe Pack v0.3\\n\\nFun promise: rotate the view to deliberately create unseen space and use that blindspot as a delivery corridor.\\n\\nFlow: Stage Select → Stage Intro → Gameplay → Result; Gameplay ↔ Pause. Failure retries from stage-start snapshot.\\n\\nCore: stationary planning supports camera rotation and node-route tracing; movement locks edits and checks detection node-by-node; pickup/delivery updates cargo.\\n\\nVariations: static/active-rotation watchers, wall LOS, overlapping sectors, route branching, multiple parcels.\\n\\nGodot architecture remains Implementation Blueprint responsibility.",
+  "source_run_at": "2026-09-30T17:33:28.26286+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "화면을 돌려 보지 않는 곳을 의도적으로 만들고 그 사각지대를 배송 통로로 쓴다.",
+    "decision_origin": "wireframe_layout",
+    "feedback_priority": [
+      "detection",
+      "freeze/wake",
+      "route",
+      "cargo"
+    ]
+  },
+  "developer_handoff": {
+    "fun_promise": "화면을 돌려 보지 않는 곳을 의도적으로 만들고 그 사각지대를 배송 통로로 쓴다.",
+    "source_refs": [
+      "Wireframe Handoff",
+      "Difficulty / Variation"
+    ],
+    "decision_origin": "game_design",
+    "content_variation": {
+      "cargo": [
+        "single",
+        "multiple"
+      ],
+      "route": [
+        "linear",
+        "branching"
+      ],
+      "geometry": [
+        "wall LOS",
+        "overlap"
+      ],
+      "watchers": [
+        "static",
+        "active-rotation"
+      ]
+    },
+    "architecture_boundary": "Godot scene/node/script choices belong to Implementation Blueprint."
+  },
+  "acceptance_criteria": [
+    "Five Screen Inventory types exist and flow refs resolve.",
+    "Camera rotation changes camera_angle only and recalculates watcher state.",
+    "Route drawing accepts connected walkable nodes and rejects invalid routes without movement.",
+    "Movement checks detection at each node.",
+    "Pickup and matching delivery update cargo; all required parcels are needed for success.",
+    "Pause freezes variables; restart/retry restores stage-start snapshot.",
+    "Watcher/LOS/multiple-parcel variations use existing verbs.",
+    "Core interaction semantic component references resolve within S3."
+  ],
+  "primary_interaction": "카메라 회전으로 visible/frozen과 offscreen/active를 조절하고 경로를 그려 배송한다.",
+  "interaction_principles": [
+    "Camera framing is a gameplay control.",
+    "Planning is direct and reversible until movement.",
+    "Watcher, route, LOS and cargo state stay legible.",
+    "Movement locks route editing."
+  ]
+}

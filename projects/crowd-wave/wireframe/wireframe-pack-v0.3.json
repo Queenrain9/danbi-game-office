@@ -1,0 +1,847 @@
+{
+  "id": "14ab0c8f-fa3f-44a5-ba5d-7dbbce5d605f",
+  "title": "Crowd Wave",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "c04f37d4-ae36-4413-9914-b719b49056a4",
+  "screens": [
+    {
+      "id": "C1",
+      "name": "Performance Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 92,
+            "w": 94,
+            "x": 3,
+            "y": 4,
+            "id": "select",
+            "role": "progression",
+            "label": "Performance Select"
+          }
+        ]
+      },
+      "states": [
+        "Performance Select"
+      ],
+      "purpose": "Choose unlocked performance",
+      "feedback": [],
+      "components": [
+        {
+          "id": "performances",
+          "box": {
+            "h": 56,
+            "w": 90,
+            "x": 5,
+            "y": 16
+          },
+          "type": "card_row",
+          "label": "6 Performance Cards",
+          "state_binding": "unlock,best stars,coverage"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 14,
+            "w": 30,
+            "x": 65,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Open Brief",
+          "state_binding": "selected unlocked"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "C2",
+          "from": "C1",
+          "trigger": "select unlocked"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "unlocked performance",
+          "feedback": "card focus",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "precondition": "unlocked",
+          "state_change": "Brief",
+          "invalid_input": "locked no-op",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "C2",
+      "name": "Performance Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 92,
+            "x": 4,
+            "y": 5,
+            "id": "brief",
+            "role": "preview",
+            "label": "Brief"
+          }
+        ]
+      },
+      "states": [
+        "Brief"
+      ],
+      "purpose": "Preview BPM, graph class and section goals",
+      "feedback": [],
+      "components": [
+        {
+          "id": "info",
+          "box": {
+            "h": 55,
+            "w": 45,
+            "x": 5,
+            "y": 8
+          },
+          "type": "panel",
+          "label": "Performance Info",
+          "state_binding": "BPM+3 section goals"
+        },
+        {
+          "id": "graph",
+          "box": {
+            "h": 55,
+            "w": 42,
+            "x": 53,
+            "y": 8
+          },
+          "type": "graph_preview",
+          "label": "Network Preview",
+          "state_binding": "authored class"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 14,
+            "w": 30,
+            "x": 5,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 14,
+            "w": 30,
+            "x": 65,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "loaded"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "C3",
+          "from": "C2",
+          "trigger": "Start"
+        },
+        {
+          "to": "C1",
+          "from": "C2",
+          "trigger": "Back"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "2-beat count",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "precondition": "loaded",
+          "state_change": "Count-In",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "C3",
+      "name": "Concert Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 96,
+            "x": 2,
+            "y": 2,
+            "id": "hud",
+            "role": "goals",
+            "label": "Section HUD"
+          },
+          {
+            "h": 62,
+            "w": 94,
+            "x": 3,
+            "y": 13,
+            "id": "crowd",
+            "role": "spatial graph",
+            "label": "Directed Crowd Field"
+          },
+          {
+            "h": 20,
+            "w": 94,
+            "x": 3,
+            "y": 77,
+            "id": "controls",
+            "role": "rhythm input",
+            "label": "Pulse Controls"
+          }
+        ]
+      },
+      "states": [
+        "Count-In",
+        "Play",
+        "Section Summary"
+      ],
+      "purpose": "Pulse crowd waves, route junctions, observe merges and section goals",
+      "feedback": [
+        "active wave ripple",
+        "merge crest/stage reaction",
+        "power0 expiry"
+      ],
+      "components": [
+        {
+          "id": "section",
+          "box": {
+            "h": 8,
+            "w": 35,
+            "x": 3,
+            "y": 2
+          },
+          "type": "status",
+          "label": "Section Goals",
+          "state_binding": "section1..3 coverage/merge"
+        },
+        {
+          "id": "cue",
+          "box": {
+            "h": 8,
+            "w": 40,
+            "x": 40,
+            "y": 2
+          },
+          "type": "cue_strip",
+          "label": "Beat/Cue",
+          "state_binding": "nearest authored action cue"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 7,
+            "x": 90,
+            "y": 2
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "Count-In/Play"
+        },
+        {
+          "id": "graph",
+          "box": {
+            "h": 62,
+            "w": 94,
+            "x": 3,
+            "y": 13
+          },
+          "type": "spatial_graph",
+          "label": "Audience Graph",
+          "state_binding": "normal/junction/merge/stage + waves"
+        },
+        {
+          "id": "clap",
+          "box": {
+            "h": 16,
+            "w": 24,
+            "x": 8,
+            "y": 79
+          },
+          "type": "action_button",
+          "label": "Clap",
+          "state_binding": "Play"
+        },
+        {
+          "id": "jump",
+          "box": {
+            "h": 16,
+            "w": 24,
+            "x": 38,
+            "y": 79
+          },
+          "type": "action_button",
+          "label": "Jump",
+          "state_binding": "Play"
+        },
+        {
+          "id": "light",
+          "box": {
+            "h": 16,
+            "w": 24,
+            "x": 68,
+            "y": 79
+          },
+          "type": "action_button",
+          "label": "Light",
+          "state_binding": "Play"
+        }
+      ],
+      "edge_cases": [
+        "wrong action Miss",
+        "route outside window no-op"
+      ],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Play",
+          "from": "Count-In",
+          "trigger": "2 beats complete",
+          "condition": "start/resume"
+        },
+        {
+          "to": "Section Summary",
+          "from": "Play",
+          "trigger": "end beat"
+        },
+        {
+          "to": "Count-In",
+          "from": "Section Summary",
+          "trigger": "2s",
+          "condition": "section<3"
+        },
+        {
+          "to": "C4",
+          "from": "Section Summary",
+          "trigger": "2s",
+          "condition": "section=3"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "pulse_clap",
+          "input": "tap",
+          "target": "clap",
+          "feedback": "individual action+judgment+first ripple",
+          "source_refs": [
+            "interaction_spec.pulse",
+            "game_rules.beat"
+          ],
+          "precondition": "Play; unjudged cue within ±160ms",
+          "state_change": "correct: Perfect<=80ms power2 or Good<=160ms power1 wave; wrong action Miss/no wave",
+          "timing_rules": "audio transport; cue once",
+          "invalid_input": "no cue window no state change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pulse_jump",
+          "input": "tap",
+          "target": "jump",
+          "feedback": "jump+ripple/judgment",
+          "source_refs": [
+            "interaction_spec.pulse"
+          ],
+          "precondition": "Play; cue within ±160ms",
+          "state_change": "same accuracy rule; must match jump",
+          "timing_rules": "80/160ms",
+          "invalid_input": "wrong/no cue Miss/no wave",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pulse_light",
+          "input": "tap",
+          "target": "light",
+          "feedback": "light+ripple/judgment",
+          "source_refs": [
+            "interaction_spec.pulse"
+          ],
+          "precondition": "Play; cue within ±160ms",
+          "state_change": "same accuracy rule; must match light",
+          "timing_rules": "80/160ms",
+          "invalid_input": "wrong/no cue Miss/no wave",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "route",
+          "input": "directional swipe",
+          "target": "active junction",
+          "feedback": "edge lights; wave commits",
+          "priority": "same pointer suppresses Pulse; other finger allowed",
+          "source_refs": [
+            "interaction_spec.route",
+            "interaction_spec.priority",
+            "game_rules.wave.route"
+          ],
+          "precondition": "Play; arrival±0.5 beat; first valid route",
+          "state_change": "lock authored left/right/straight edge",
+          "gesture_rules": ">=0.08 normalized screen dimension",
+          "invalid_input": "outside/second route no-op; no route uses default power-1",
+          "cancel_behavior": "below threshold no-op; locked no undo",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "frozen field",
+          "priority": "highest",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "Count-In/Play",
+          "state_change": "freeze transport/waves/windows",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "single",
+          "name": "Single Front",
+          "notes": "route effect on coverage",
+          "condition": "class Single Front",
+          "source_refs": [
+            "content_model.classes[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "wave": "single readable ripple"
+          },
+          "component_overrides": {
+            "graph": {
+              "state_binding": "one lane simple junctions"
+            }
+          },
+          "interaction_overrides": []
+        },
+        {
+          "id": "cross",
+          "name": "Cross Merge",
+          "notes": "merge timing visible",
+          "condition": "class Cross Merge",
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "merge": "arrival convergence+power crest"
+          },
+          "component_overrides": {
+            "graph": {
+              "state_binding": "two converging lanes+merge node"
+            }
+          },
+          "interaction_overrides": [
+            "route"
+          ]
+        },
+        {
+          "id": "split",
+          "name": "Action Split",
+          "notes": "same gestures",
+          "condition": "class Action Split",
+          "source_refs": [
+            "content_model.classes[2]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "miss": "wrong action Miss/no wave"
+          },
+          "component_overrides": {
+            "cue": {
+              "state_binding": "rapid clap/jump/light identity"
+            }
+          },
+          "interaction_overrides": [
+            "pulse"
+          ]
+        },
+        {
+          "id": "trap",
+          "name": "Default Trap",
+          "notes": "communicates authored consequence",
+          "condition": "class Default Trap",
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_note": "Showing the authored default edge changes no rule.",
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "default": "no route->default power-1/expiry"
+          },
+          "component_overrides": {
+            "graph": {
+              "state_binding": "default edge visibly marked"
+            }
+          },
+          "interaction_overrides": [
+            "route"
+          ]
+        },
+        {
+          "id": "festival",
+          "name": "Festival Network",
+          "notes": "combines prior rules",
+          "condition": "class Festival Network",
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "priority": "route windows highlighted without hiding waves"
+          },
+          "component_overrides": {
+            "graph": {
+              "state_binding": "3 lanes+multiple merges"
+            }
+          },
+          "interaction_overrides": [
+            "pulse",
+            "route"
+          ]
+        },
+        {
+          "id": "countin",
+          "name": "Count-In",
+          "notes": "transport resumes after count",
+          "condition": "start/resume",
+          "source_refs": [
+            "state_model[2]",
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "count": "2 beats; resume advances no cues/waves"
+          },
+          "component_overrides": {
+            "clap": {
+              "state_binding": "disabled"
+            },
+            "jump": {
+              "state_binding": "disabled"
+            },
+            "light": {
+              "state_binding": "disabled"
+            }
+          },
+          "interaction_overrides": []
+        },
+        {
+          "id": "summary",
+          "name": "Section Summary",
+          "notes": "auto next section/result",
+          "condition": "end beat",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "summary": "coverage+merge pass/fail for 2s"
+          },
+          "component_overrides": {
+            "graph": {
+              "state_binding": "read-only dimmed"
+            }
+          },
+          "interaction_overrides": []
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "cue strip must not become conventional note highway"
+      ]
+    },
+    {
+      "id": "C4",
+      "name": "Performance Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "result",
+            "role": "terminal",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Section passes, stars, next/retry/select",
+      "feedback": [],
+      "components": [
+        {
+          "id": "sections",
+          "box": {
+            "h": 42,
+            "w": 50,
+            "x": 7,
+            "y": 10
+          },
+          "type": "criteria",
+          "label": "3 Section Results",
+          "state_binding": "coverage+merge pass"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 42,
+            "w": 31,
+            "x": 62,
+            "y": 10
+          },
+          "type": "rating",
+          "label": "Stars/Outcome",
+          "state_binding": "2/3 success + star rules"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 14,
+            "w": 28,
+            "x": 5,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "always"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 14,
+            "w": 28,
+            "x": 36,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "always"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 14,
+            "w": 28,
+            "x": 67,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "success+next"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "C2",
+          "from": "C4",
+          "trigger": "Retry/Next"
+        },
+        {
+          "to": "C1",
+          "from": "C4",
+          "trigger": "Select"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "waves/scores clear",
+          "source_refs": [
+            "game_rules.retry"
+          ],
+          "precondition": "Result",
+          "state_change": "full performance reset",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "fedeb352-5141-4c2d-b3dc-710a0a8fb411",
+  "input_map": {
+    "pulse": "tap clap/jump/light",
+    "route": "swipe >=0.08 normalized dimension",
+    "cancel": "unfinished route no-op; locked no undo",
+    "priority": "Pause > route pointer for same pointer; other finger Pulse allowed",
+    "multitouch": "same-pointer suppression only",
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T11:38:09.137052+00:00",
+  "edge_cases": {
+    "items": [
+      "wrong action inside window Miss/no wave",
+      "route outside window/second route no-op",
+      "no route default power-1 min0",
+      "power0 activates current node then expires",
+      "merge only within 0.5 beat"
+    ],
+    "source_refs": [
+      "game_rules",
+      "interaction_spec.invalid"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T11:38:09.137052+00:00",
+  "core_screen": "C3",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "C1",
+    "pause": "Count-In/Play->Pause->2-beat Count-In exact-offset resume / Retry / Select",
+    "guards": [
+      "Next only success",
+      "success at least 2 of 3 section passes"
+    ],
+    "normal": [
+      "C1",
+      "C2",
+      "C3:Count-In",
+      "C3:Play",
+      "C3:Section Summary",
+      "repeat 3 sections",
+      "C4"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 10,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze audio transport,waves,route windows; resume 2-beat count-in then exact offset",
+      "actions": [
+        "Resume",
+        "Retry",
+        "Select"
+      ],
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "RouteWindow": {
+      "effect": "arrival±0.5 beat; first valid route locks; default on close",
+      "source_refs": [
+        "game_rules.wave.route"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Crowd Wave\nWhole-MVP spatial rhythm-chain UX blueprint covering Select, Brief, Gameplay, Result plus Count-In, Section Summary, Pause and all five content classes. Structured Pulse/Route interactions preserve timing, routing, merge and default semantics. Decision trace embedded; Godot architecture remains downstream.",
+  "source_run_at": "2026-09-30T11:38:09.137052+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "한 번의 리듬 입력이 군중 전체로 커지는 시각 보상과 그 파동의 경로 판단을 동시에 느끼게 한다",
+    "source_refs": [
+      "wireframe_handoff[0]",
+      "visual_direction_brief"
+    ],
+    "decision_origin": "wireframe_layout",
+    "safe_area_percent": 3
+  },
+  "developer_handoff": {
+    "fun_promise": "A precise personal action blooms into a readable crowd-scale wave then becomes a spatial routing decision",
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "6 performances x 3 sections",
+      "BPM/cues",
+      "directed graph/travel beats",
+      "junction semantic/default edges",
+      "section goals/end beat"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "persistent unlock/best stars/coverage",
+      "performance section pass/perfect ratio",
+      "section clock/waves/nodes/merge/cues"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "Single Front",
+      "Cross Merge",
+      "Action Split",
+      "Default Trap",
+      "Festival Network"
+    ],
+    "architecture_boundary": "Implementation Blueprint chooses Godot scene/node/script architecture"
+  },
+  "acceptance_criteria": [
+    "C1-C4 cover every required screen; Count-In Play Section Summary and Pause are represented",
+    "+60ms correct action is Perfect power2; +120ms Good power1; +190ms or wrong action Miss/no wave",
+    "Wave travel follows authored integer beat edges",
+    "Route only accepts arrival±0.5 beat and >=0.08 swipe; no route uses default power-1",
+    "Merge within 0.5 beat uses authored power formula; outside stays separate",
+    "Coverage+merge goals determine section and 2/3 pass determines performance success/stars",
+    "Pause freezes transport/waves/windows and resume count-in advances none until exact-offset resume",
+    "All five content classes are structured C3 variants"
+  ],
+  "primary_interaction": "비트 입력으로 wave 생성 + junction swipe로 전파 경로 선택",
+  "interaction_principles": [
+    "Spatial crowd graph remains primary",
+    "Pulse visibly grows from one person into a crowd wave",
+    "Route is a direct swipe at active junctions",
+    "Concurrent pointer semantics are preserved"
+  ]
+}

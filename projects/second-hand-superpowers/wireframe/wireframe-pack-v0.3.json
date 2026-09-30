@@ -1,0 +1,1059 @@
+{
+  "id": "ab2ec902-4938-4892-9b43-14d166421d22",
+  "title": "Second-Hand Superpowers",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "884e6c78-3e9a-44b8-8f1c-3ea32a646889",
+  "screens": [
+    {
+      "id": "S0",
+      "name": "Run Start",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 65,
+            "w": 80,
+            "x": 10,
+            "y": 20,
+            "id": "main",
+            "role": "entry",
+            "label": "Start"
+          }
+        ]
+      },
+      "states": [
+        "RUN_START"
+      ],
+      "purpose": "Start fresh run",
+      "components": [
+        {
+          "id": "start",
+          "box": {
+            "h": 14,
+            "w": 60,
+            "x": 20,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Start Run",
+          "state_binding": "Credits12 Integrity5"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "S1",
+          "from": "S0",
+          "trigger": "start",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S0I1",
+          "input": "tap",
+          "target": "start",
+          "feedback": "market opens",
+          "source_refs": [
+            "round_structure"
+          ],
+          "precondition": "RUN_START",
+          "state_change": "initialize fresh run -> MARKET",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S1",
+      "name": "Market",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 90,
+            "x": 5,
+            "y": 13,
+            "id": "market",
+            "role": "core",
+            "label": "Market"
+          }
+        ]
+      },
+      "states": [
+        "MARKET"
+      ],
+      "purpose": "Inspect, buy and sell",
+      "components": [
+        {
+          "id": "hud",
+          "box": {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 3
+          },
+          "type": "hud",
+          "label": "Credits/Integrity/Contract",
+          "state_binding": "run values"
+        },
+        {
+          "id": "listings",
+          "box": {
+            "h": 42,
+            "w": 90,
+            "x": 5,
+            "y": 14
+          },
+          "type": "card_list",
+          "label": "4 Listings",
+          "state_binding": "price/tag/strength/defect"
+        },
+        {
+          "id": "inventory",
+          "box": {
+            "h": 22,
+            "w": 90,
+            "x": 5,
+            "y": 59
+          },
+          "type": "inventory",
+          "label": "Owned 0-6",
+          "state_binding": "capacity/equipped"
+        },
+        {
+          "id": "loadout",
+          "box": {
+            "h": 11,
+            "w": 40,
+            "x": 55,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Edit Loadout",
+          "state_binding": "owned>=1"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S1",
+          "trigger": "inspect"
+        },
+        {
+          "to": "S3",
+          "from": "S1",
+          "trigger": "loadout",
+          "condition": "owned>=1"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S1I1",
+          "input": "tap",
+          "target": "listing",
+          "feedback": "exact rules/defect",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "precondition": "MARKET",
+          "state_change": "open detail only",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "S1I2",
+          "input": "tap",
+          "target": "sell owned power",
+          "feedback": "exact credit delta",
+          "source_refs": [
+            "game_rules.market"
+          ],
+          "precondition": "owned and unequipped",
+          "state_change": "remove; credits += floor(base/2)",
+          "invalid_input": "equipped sell zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S2",
+      "name": "Listing Detail / Trade Confirmation",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 84,
+            "x": 8,
+            "y": 14,
+            "id": "detail",
+            "role": "modal",
+            "label": "Detail"
+          }
+        ]
+      },
+      "states": [
+        "DETAIL"
+      ],
+      "purpose": "Inspect exact power/defect and confirm purchase",
+      "components": [
+        {
+          "id": "detail_card",
+          "box": {
+            "h": 48,
+            "w": 84,
+            "x": 8,
+            "y": 14
+          },
+          "type": "detail_card",
+          "label": "Power + defect",
+          "state_binding": "tag/strength/price/timing/effect"
+        },
+        {
+          "id": "buy",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Buy",
+          "state_binding": "credits>=price and inventory<6"
+        },
+        {
+          "id": "cancel",
+          "box": {
+            "h": 12,
+            "w": 36,
+            "x": 8,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Cancel",
+          "state_binding": "always"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[2]"
+      ],
+      "transitions": [
+        {
+          "to": "S1",
+          "from": "S2",
+          "trigger": "buy/cancel",
+          "condition": "resolved"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S2I1",
+          "input": "tap",
+          "target": "buy",
+          "feedback": "credit delta/acquired",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "interaction_spec.invalid"
+          ],
+          "precondition": "credits>=price and capacity available",
+          "state_change": "credits-price; add listing",
+          "invalid_input": "unaffordable/full zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S3",
+      "name": "Loadout",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 88,
+            "x": 6,
+            "y": 15,
+            "id": "build",
+            "role": "core",
+            "label": "Build"
+          }
+        ]
+      },
+      "states": [
+        "LOADOUT"
+      ],
+      "purpose": "Assemble 1-3 owned powers",
+      "components": [
+        {
+          "id": "slots",
+          "box": {
+            "h": 25,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "slot_row",
+          "label": "3 equivalent slots",
+          "state_binding": "1-3 owned"
+        },
+        {
+          "id": "owned",
+          "box": {
+            "h": 28,
+            "w": 88,
+            "x": 6,
+            "y": 48
+          },
+          "type": "card_grid",
+          "label": "Owned powers",
+          "state_binding": "owned/equipped"
+        },
+        {
+          "id": "combo",
+          "box": {
+            "h": 14,
+            "w": 54,
+            "x": 6,
+            "y": 78
+          },
+          "type": "preview",
+          "label": "Tag-pair/defect preview",
+          "state_binding": "loadout"
+        },
+        {
+          "id": "start_contract",
+          "box": {
+            "h": 10,
+            "w": 31,
+            "x": 63,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Start Contract",
+          "state_binding": "loadout>=1"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "S4",
+          "from": "S3",
+          "trigger": "start_contract",
+          "condition": "loadout>=1"
+        },
+        {
+          "to": "S1",
+          "from": "S3",
+          "trigger": "back",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S3I1",
+          "input": "drag or tap-to-slot",
+          "target": "owned power -> slots",
+          "feedback": "slot snap + combo refresh",
+          "source_refs": [
+            "core_player_verbs[2]"
+          ],
+          "precondition": "owned; max3",
+          "state_change": "equip/replace/remove membership",
+          "invalid_input": "unowned/fourth rejected",
+          "cancel_behavior": "outside returns prior state",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "S3I2",
+          "input": "tap",
+          "target": "start_contract",
+          "feedback": "requirement reveal",
+          "source_refs": [
+            "game_rules.loadout"
+          ],
+          "precondition": "1-3 equipped",
+          "state_change": "phase1 INCIDENT_DECISION",
+          "invalid_input": "empty loadout zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "S3V1",
+          "name": "Active Tag Pair",
+          "notes": "Preview only; +1 rule unchanged",
+          "condition": "two+ equipped share primary tag",
+          "source_refs": [
+            "game_rules.phase"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "combo": "synergy visible before incident"
+          },
+          "component_overrides": {
+            "combo": {
+              "state_binding": "show +1 effective strength and affected powers"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S4",
+      "name": "Incident",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 78,
+            "w": 88,
+            "x": 6,
+            "y": 14,
+            "id": "incident",
+            "role": "core",
+            "label": "Incident"
+          }
+        ]
+      },
+      "states": [
+        "INCIDENT_DECISION",
+        "RESOLVE"
+      ],
+      "purpose": "Choose power or Pass and resolve deterministically",
+      "components": [
+        {
+          "id": "requirement",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 15
+          },
+          "type": "challenge",
+          "label": "Required tag + threshold",
+          "state_binding": "phase data"
+        },
+        {
+          "id": "powers",
+          "box": {
+            "h": 30,
+            "w": 88,
+            "x": 6,
+            "y": 34
+          },
+          "type": "action_cards",
+          "label": "Equipped powers",
+          "state_binding": "effective strength+defect"
+        },
+        {
+          "id": "pair",
+          "box": {
+            "h": 8,
+            "w": 84,
+            "x": 8,
+            "y": 66
+          },
+          "type": "warning",
+          "label": "Tag-pair warning",
+          "state_binding": "shared tag"
+        },
+        {
+          "id": "pass",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 8,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Pass",
+          "state_binding": "decision only"
+        },
+        {
+          "id": "resolve",
+          "box": {
+            "h": 16,
+            "w": 44,
+            "x": 48,
+            "y": 77
+          },
+          "type": "delta_log",
+          "label": "Resolution log",
+          "state_binding": "RESOLVE"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "S4",
+          "from": "S4",
+          "trigger": "resolve complete",
+          "condition": "phase<3 and integrity>0"
+        },
+        {
+          "to": "S6",
+          "from": "S4",
+          "trigger": "terminal",
+          "condition": "phase3 or integrity=0"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S4I1",
+          "input": "tap",
+          "target": "one equipped power",
+          "feedback": "comparison then ordered deltas",
+          "priority": 2,
+          "source_refs": [
+            "core_player_verbs[3]",
+            "game_rules.phase",
+            "game_rules.side_effect"
+          ],
+          "precondition": "INCIDENT_DECISION and equipped",
+          "state_change": "RESOLVE: compare effective strength; score+1 or integrity-1; apply declared effect; advance/terminal",
+          "invalid_input": "unequipped or RESOLVE input zero mutation",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "S4I2",
+          "input": "tap",
+          "target": "pass",
+          "feedback": "-1 Integrity cause Pass",
+          "priority": 2,
+          "source_refs": [
+            "game_rules.pass_action"
+          ],
+          "precondition": "INCIDENT_DECISION",
+          "state_change": "integrity-1 and advance",
+          "invalid_input": "locked in RESOLVE",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "S4V1",
+          "name": "Contract 1",
+          "notes": "Composition only",
+          "condition": "contract=1",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "requirement": {
+              "state_binding": "threshold1-2 repeated tags"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "S4V2",
+          "name": "Contract 2",
+          "notes": "Composition only",
+          "condition": "contract=2",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "requirement": {
+              "state_binding": "mixed tags threshold2-3"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "S4V3",
+          "name": "Contract 3",
+          "notes": "Composition only",
+          "condition": "contract=3",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "requirement": {
+              "state_binding": "changing tags threshold3-4"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "S4E1",
+          "name": "on_use effect",
+          "notes": "Exact timing preserved",
+          "condition": "effect timing=on_use",
+          "source_refs": [
+            "game_rules.side_effect"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "ordered delta"
+          },
+          "component_overrides": {
+            "resolve": {
+              "state_binding": "comparison then declared on_use order"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "S4E2",
+          "name": "after_phase effect",
+          "notes": "Exact timing preserved",
+          "condition": "effect timing=after_phase",
+          "source_refs": [
+            "game_rules.side_effect"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "ordered delta"
+          },
+          "component_overrides": {
+            "resolve": {
+              "state_binding": "comparison then after_phase order"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "S4E3",
+          "name": "tag_pair effect",
+          "notes": "Exact timing preserved",
+          "condition": "effect timing=tag_pair",
+          "source_refs": [
+            "game_rules.side_effect"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "ordered delta"
+          },
+          "component_overrides": {
+            "resolve": {
+              "state_binding": "declared tag_pair timing"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S5",
+      "name": "Pause Overlay",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 70,
+            "x": 15,
+            "y": 25,
+            "id": "pause",
+            "role": "overlay",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        "PAUSED"
+      ],
+      "purpose": "Freeze/resume exact snapshot or quit",
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 32
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "always"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 50
+          },
+          "type": "button",
+          "label": "Quit",
+          "state_binding": "confirm"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[5]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "S5I1",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "close",
+          "source_refs": [
+            "game_rules.recovery"
+          ],
+          "precondition": "PAUSED",
+          "state_change": "exact prior state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "S5I2",
+          "input": "tap",
+          "target": "quit",
+          "feedback": "quit cause",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "confirmed",
+          "state_change": "RUN_END",
+          "invalid_input": "cancel stays paused",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S6",
+      "name": "Contract Result",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 72,
+            "w": 84,
+            "x": 8,
+            "y": 15,
+            "id": "result",
+            "role": "result",
+            "label": "Result"
+          }
+        ]
+      },
+      "states": [
+        "RESULT"
+      ],
+      "purpose": "Show result/reward and next path",
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 34,
+            "w": 84,
+            "x": 8,
+            "y": 24
+          },
+          "type": "summary",
+          "label": "Score/Integrity/effects",
+          "state_binding": "result"
+        },
+        {
+          "id": "reward",
+          "box": {
+            "h": 10,
+            "w": 84,
+            "x": 8,
+            "y": 62
+          },
+          "type": "delta",
+          "label": "Credits reward",
+          "state_binding": "success=4+score"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "success contract<3"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[6]"
+      ],
+      "transitions": [
+        {
+          "to": "S1",
+          "from": "S6",
+          "trigger": "next",
+          "condition": "success contract<3"
+        },
+        {
+          "to": "S7",
+          "from": "S6",
+          "trigger": "end",
+          "condition": "failure or contract3 victory"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S6I1",
+          "input": "tap",
+          "target": "next/end",
+          "feedback": "exact reward/terminal cause",
+          "source_refs": [
+            "game_rules.contract"
+          ],
+          "precondition": "RESULT",
+          "state_change": "success contract<3 => reward+next MARKET; else RUN_END",
+          "invalid_input": "unavailable action hidden",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "S7",
+      "name": "Run End",
+      "order": 8,
+      "layout": {
+        "regions": [
+          {
+            "h": 65,
+            "w": 84,
+            "x": 8,
+            "y": 18,
+            "id": "end",
+            "role": "terminal",
+            "label": "Run End"
+          }
+        ]
+      },
+      "states": [
+        "RUN_END"
+      ],
+      "purpose": "Terminal summary and fresh replay",
+      "components": [
+        {
+          "id": "terminal",
+          "box": {
+            "h": 38,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "summary",
+          "label": "Victory/Failure cause",
+          "state_binding": "terminal"
+        },
+        {
+          "id": "restart",
+          "box": {
+            "h": 14,
+            "w": 60,
+            "x": 20,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Fresh Run",
+          "state_binding": "always"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[7]"
+      ],
+      "transitions": [
+        {
+          "to": "S0",
+          "from": "S7",
+          "trigger": "restart",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "S7I1",
+          "input": "tap",
+          "target": "restart",
+          "feedback": "fresh start",
+          "source_refs": [
+            "round_structure"
+          ],
+          "precondition": "RUN_END",
+          "state_change": "reset Credits12 Integrity5 inventory/loadout/contracts -> RUN_START",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "614359dd-6ded-4bb7-a8f8-4962e31f509c",
+  "input_map": {
+    "cancel": "inspection/trade cancel zero mutation; loadout back to market",
+    "conflict": "RESOLVE locks duplicate input",
+    "gestures": [
+      "tap",
+      "drag/tap-to-slot"
+    ],
+    "priority": [
+      "pause",
+      "incident decision",
+      "trade/navigation"
+    ],
+    "multitouch": "single gameplay pointer",
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_note": "Pointer arbitration prevents duplicate atomic actions only.",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T12:31:49.306424+00:00",
+  "edge_cases": {
+    "items": [
+      "unaffordable/full/unowned/equipped-sell/empty-start/unequipped-use zero mutation",
+      "Integrity0 terminates run",
+      "Pass costs Integrity1 and advances",
+      "fresh run resets run state",
+      "slots logically equivalent"
+    ],
+    "source_refs": [
+      "interaction_spec.invalid",
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T12:31:49.306424+00:00",
+  "core_screen": "S4 Incident",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S0",
+    "detail": "S1<->S2",
+    "normal": [
+      "S0",
+      "S1",
+      "S3",
+      "S4",
+      "S6",
+      "S1"
+    ],
+    "screens": [
+      "S0",
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7"
+    ],
+    "terminal": "S6->S7 on failure or contract3 victory",
+    "source_refs": [
+      "screen_flow"
+    ],
+    "pause_overlay": "S5",
+    "decision_origin": "game_design"
+  },
+  "state_count": 9,
+  "screen_count": 8,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze exact snapshot",
+      "source_refs": [
+        "game_rules.recovery"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InputLock": {
+      "effect": "block gameplay except pause",
+      "condition": "RESOLVE",
+      "source_refs": [
+        "interaction_spec.priority"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Second-Hand Superpowers — Interaction Wireframe Pack v0.3\n\nWhole-MVP pack covering all 8 screens, the complete three-contract run, trade/loadout/incident/result flow, Contract1-3 difficulty and all side-effect timing classes. Core interactions and variants are structured with decision trace. Godot architecture is deferred to Implementation Blueprint.",
+  "source_run_at": "2026-09-30T12:31:49.306424+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "결함까지 가격과 빌드의 일부로 받아들이고 예상 밖 조합을 발견해 다음 시장에서 즉시 고쳐 가는 재미.",
+    "source_refs": [
+      "visual_direction_brief",
+      "wireframe_handoff"
+    ],
+    "decision_note": "Presentation only.",
+    "decision_origin": "wireframe_layout",
+    "coverage_summary": "8 screens; full 3-contract run; 12 powers/8 effects/4 tags; trade, capacity6, 3 slots, Contract1-3, pause/result/run end",
+    "coordinate_system": "0..100 screen-percent"
+  },
+  "developer_handoff": {
+    "fun_promise": "결함까지 가격과 빌드의 일부로 받아들이고 예상 밖 조합을 발견해 다음 시장에서 즉시 고쳐 가는 재미.",
+    "source_refs": [
+      "content_model",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "Credits12",
+      "Integrity5",
+      "capacity6",
+      "3 slots",
+      "power tag/strength1-4/price2-7/effect",
+      "phase required_tag+threshold"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "content_variations": [
+      "12 powers/4 tags",
+      "8 side effects: on_use/after_phase/tag_pair",
+      "Contract1 thresholds1-2 repeated tags",
+      "Contract2 mixed2-3",
+      "Contract3 changing3-4",
+      "6+ three-phase templates"
+    ],
+    "responsibility_boundary": "UX/data/state only; Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "All 8 required screens are present and reachable.",
+    "Market supports inspect, valid buy/sell and zero-mutation invalid reasons with capacity6.",
+    "Loadout supports 1-3 owned powers and shared-tag +1 preview.",
+    "Incident shows requirement/threshold and structured Contract1-3 plus side-effect timing variants.",
+    "Resolution compares effective strength then applies declared side effects in order while input locked.",
+    "Phase3 success requires Integrity>=1 and Score>=2 and rewards 4+Score; otherwise run ends.",
+    "Pause resumes exact snapshot; fresh run resets Credits12 Integrity5 and run inventory."
+  ],
+  "primary_interaction": "Trade imperfect powers, assemble a 3-slot build, then choose one equipped power per incident phase while absorbing attached side effects.",
+  "interaction_principles": [
+    "Make defect and synergy consequences legible before commitment",
+    "Invalid input never mutates state",
+    "Direct trade/loadout manipulation",
+    "RESOLVE locks gameplay except pause"
+  ]
+}

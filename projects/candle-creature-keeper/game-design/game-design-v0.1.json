@@ -1,14 +1,240 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "idea_id": "a5b7a285-1c6d-44d1-ab73-cac9492a5233",
+  "id": "9e539239-f1b1-4a29-9128-23c37816c529",
   "title": "Candle Creature Keeper",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Stars are record only.",
+  "idea_id": "a5b7a285-1c6d-44d1-ab73-cac9492a5233",
   "version": "v0.1",
-  "primary_interaction": "heat, shape, cool, fit",
-  "session_length": "4-6 min per case",
-  "content_unit": "one creature care puzzle",
-  "mvp_scope": "3 cases, 9 puzzles, 1 species, 5 body regions, 3 forms per region, 3 habitats",
-  "screen_inventory": ["Case Select","Creature Care","Creature Result Overlay","Case Result","Pause"],
-  "game_rules": {"heat_range":[0,100],"shapeable":[50,89],"warning":80,"overheat":90,"lock_below":25,"integrity":3,"tests_per_puzzle":3,"correction_seconds":20},
-  "source": "chat_automation"
+  "one_line": "촛농 생물의 부위를 가열·변형·냉각해 목표 서식 형태에 맞추는 모바일 돌봄 퍼즐.",
+  "core_loop": "목표 형태 확인→부위 가열→soft region 변형→냉각 lock→habitat fit test→불일치 부위 correction→다음 creature. Case당 3마리.",
+  "mvp_scope": "MVP 3 cases/9 creatures/species1/regions5/forms3/habitats3와 heat-softness-overheat-integrity-cooling-lock-reheat-fit-correction 규칙.",
+  "created_at": "2026-09-29T18:11:59.148565+00:00",
+  "game_rules": {
+    "fit": "required form indices exact match; optional ignored",
+    "lock": 25,
+    "pause": "all heat/cool/grace timers freeze",
+    "shape": "50-89 only; 3 forms/region",
+    "danger": 90,
+    "regions": 5,
+    "warning": 80,
+    "fit_fail": "test+1, exact mismatches shown, 20s correction",
+    "heat_max": 100,
+    "heat_min": 0,
+    "overheat": "region >=90 for 1s => integrity-1, form default, heat70",
+    "terminal": "integrity0 or third failed test or grace0",
+    "lock_rule": "below25 locks; reheat to50 unlocks",
+    "plate_cool": 25,
+    "passive_cool": 5,
+    "heat_gain_mid": 10,
+    "case_creatures": 3,
+    "heat_gain_near": 20,
+    "soft_threshold": 50,
+    "integrity_start": 3
+  },
+  "not_in_mvp": [
+    "Procedural wax mesh",
+    "Multiple species",
+    "Breeding",
+    "Freeform sculpting",
+    "Economy/shop",
+    "Decoration",
+    "Narrative dialogue",
+    "Multitouch tools"
+  ],
+  "updated_at": "2026-09-29T18:11:59.148565+00:00",
+  "archived_at": "2026-09-29T18:13:18.100103+00:00",
+  "known_risks": [
+    "단계형 form이 자유 변형 판타지 약화",
+    "heat/softness 혼동",
+    "finger occlusion",
+    "grace stress",
+    "9 puzzle 반복감"
+  ],
+  "progression": "3 cases 순차 unlock과 journal stars. Tool/stat upgrade 없음.",
+  "screen_flow": "Select→Brief→Care↔Overheat→Fit→pass Result 또는 fail Correction Care→다음 creature→3마리 후 Case Result. Terminal failure도 Creature Result. Pause overlay.",
+  "state_model": [
+    {
+      "exit": "start",
+      "next": "Care",
+      "enter": "spawn",
+      "state": "Brief",
+      "inputs": [
+        "start"
+      ]
+    },
+    {
+      "exit": "place/failure",
+      "next": "Fit/Result",
+      "enter": "start/correction",
+      "state": "Care",
+      "inputs": [
+        "heat",
+        "shape",
+        "cool",
+        "place"
+      ]
+    },
+    {
+      "exit": "penalty applied",
+      "next": "Care",
+      "enter": ">=90 for1s",
+      "state": "Overheat",
+      "inputs": [
+        "withdraw"
+      ]
+    },
+    {
+      "exit": "evaluation",
+      "next": "Result/Correction",
+      "enter": "placed",
+      "state": "Fit",
+      "inputs": []
+    },
+    {
+      "exit": "next",
+      "next": "Brief/Case Result",
+      "enter": "pass/terminal fail",
+      "state": "Creature Result",
+      "inputs": [
+        "next"
+      ]
+    },
+    {
+      "exit": "selection",
+      "next": "Brief",
+      "enter": "3 resolved",
+      "state": "Case Result",
+      "inputs": [
+        "retry",
+        "next"
+      ]
+    }
+  ],
+  "archive_path": "projects/candle-creature-keeper/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "촛농 생물 1마리 적응 퍼즐",
+  "content_model": {
+    "mvp": {
+      "cases": 3,
+      "regions": 5,
+      "species": 1,
+      "habitats": 3,
+      "creatures": 9,
+      "forms_per_region": 3
+    },
+    "axes": [
+      "required forms",
+      "required regions",
+      "starting locks",
+      "heat interaction",
+      "habitat silhouette"
+    ],
+    "unit": "creature care puzzle",
+    "authoring": "form-index sets; no procedural mesh"
+  },
+  "source_run_at": "2026-09-29T18:11:59.148565+00:00",
+  "archive_commit": "b82df6617a475be5293f650db640c4edb2acca77",
+  "human_priority": true,
+  "player_fantasy": "지하 생태실 사육사로서 생물을 상하게 하지 않고 열과 재질을 읽어 정확한 형태로 돌보는 섬세한 감각.",
+  "session_length": "4–6분/케이스",
+  "test_scenarios": [
+    "heat50 상태를 시각 피드백으로 인지",
+    "shape가 3 forms 중 예측 가능하게 snap",
+    "80 warning 후 90 overheat 회피 시간 존재",
+    "fit fail이 exact mismatches를 알려 correction 가능",
+    "9 puzzles가 정답 탭처럼 느껴지지 않음"
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Candle Creature Keeper\n## 1. Product Definition\n촛농 생물을 heat-shape-cool해 habitat에 맞추는 portrait mobile transformation puzzle, 4–6분/case. Non-goals: free sculpting, breeding, idle care.\n## 2. Player Fantasy\n섬세한 사육사로서 열과 재질을 읽고 생물을 다치지 않게 정확한 형태로 돌본다.\n## 3. Core Player Verbs\nHeat=source drag/hold, Shape=soft region drag, Cool=plate drag/hold, Place=habitat drag. 성공 입력은 heat/form/locked/fit state를 변경한다.\n## 4. Core Loop\n목표 확인→가열→변형→냉각 lock→fit→correction→다음 creature.\n## 5. Round / Session Structure\nCase당3 creatures, creature당3 tests. Fail 후20s grace. Integrity0/3rd fail/grace0 terminal. 4–6분.\n## 6. Game Rules\n5 regions, heat0–100. 50–89 shapeable, 80 warning, 90+ 1초면 integrity-1/form reset/heat70. Passive -5/sec, plate -25/sec. Below25 lock, reheat50 unlock. 3 forms/region. Fit exact required indices. Pause freezes all.\n## 7. State Model\nBrief→Care↔Overheat→Fit→Result/Correction; 3 resolved→Case Result. Retry resets case.\n## 8. Interaction Spec\nSingle touch. Closest region heat. Shape only50–89, release snaps nearest form, return-before-release cancels. Plate one region. Invalid place returns. Shape>tool>place priority.\n## 9. Content Model\n3 cases/9 creatures/species1/5 regions/3 forms/3 habitats. Authored form-index requirements.\n## 10. Difficulty / Variation\nRequired region count→starting locks→adjacent 25% heat interaction. Speed-only 금지.\n## 11. Progression\n3 cases unlock+journal stars; upgrades 없음.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nCase Select, Creature Care, Creature Result, Case Result, Pause.\n## 14. Screen Flow\nSelect→Brief→Care→Fit→Result/correction→3 creatures→Case Result. Terminal failure도 Result. Pause overlay.\n## 15. Feedback System\nGloss/droop, shape snap, matte lock, overheat shimmer, exact mismatch flash + audio/haptic.\n## 16. Visual Direction Brief\nPortrait close-up workbench, creature 중심, 5 regions 판독. Dark lab/warm flame/cool plate. 좌표는 Wireframe 책임.\n## 17. MVP Scope\n3 cases, 9 creatures, 1 species, 5 regions, 3 forms each, 3 habitats와 닫힌 heat/shape/cool/fit/correction rules.\n## 18. Test Scenarios\nThreshold 인지, predictable snap, overheat reaction, exact correction, 9 puzzle 반복성.\n## 19. Known Risks\n단계형 형태, 상태 혼동, finger occlusion, grace stress, content repetition.\n## 20. Wireframe Handoff\n확정된 state/gesture/threshold feedback/error/transition만 표현하고 새 규칙을 만들지 않는다.",
+  "feedback_system": {
+    "fit": {
+      "audio": "chime/buzz",
+      "haptic": "success/error",
+      "visual": "exact mismatches flash"
+    },
+    "cool": {
+      "audio": "hiss",
+      "haptic": "lock tick",
+      "visual": "matte/frost"
+    },
+    "heat": {
+      "audio": "sizzle",
+      "haptic": "50 light,80 warning",
+      "visual": "gloss/droop"
+    },
+    "shape": {
+      "audio": "stretch/pop",
+      "haptic": "tick",
+      "visual": "preview/snap"
+    },
+    "overheat": {
+      "audio": "sharp sizzle",
+      "haptic": "heavy",
+      "visual": "red shimmer/drip"
+    }
+  },
+  "round_structure": "Creature spawn 후 Care. Fit pass면 완료, fail이면 20초 correction grace로 Care 복귀. Creature당 최대3 tests. 3번째 fail, grace0, integrity0은 terminal fail. 3 creatures 후 Case Result. 평균4–6분.",
+  "interaction_spec": {
+    "cool": "plate covers one region and cools -25/sec",
+    "heat": "one finger source; closest intersected region gains heat",
+    "pause": "tools blocked, simulation frozen",
+    "place": "invalid habitat release returns work area",
+    "shape": "starts only heat50-89; release snaps nearest of 3 forms; drag back before release cancels",
+    "invalid": "hard region rigid bounce; overheated region shape locked; locked region must reheat50",
+    "priority": "shape drag > tool drag > creature placement",
+    "multitouch": "disabled"
+  },
+  "screen_inventory": [
+    "Case Select",
+    "Creature Care",
+    "Creature Result Overlay",
+    "Case Result",
+    "Pause"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Heat",
+      "input": "drag/hold heat source",
+      "target": "5 body regions",
+      "feedback": "gloss/droop",
+      "condition": "Care",
+      "state_change": "heat/softness rise"
+    },
+    {
+      "verb": "Shape",
+      "input": "drag region",
+      "target": "soft region",
+      "feedback": "shape preview/snap",
+      "condition": "heat 50-89",
+      "state_change": "form index changes"
+    },
+    {
+      "verb": "Cool",
+      "input": "drag/hold plate",
+      "target": "region",
+      "feedback": "matte/lock",
+      "condition": "Care",
+      "state_change": "heat falls; below25 locks"
+    },
+    {
+      "verb": "Place",
+      "input": "drag creature",
+      "target": "habitat socket",
+      "feedback": "contact highlight",
+      "condition": "required regions locked",
+      "state_change": "fit test"
+    }
+  ],
+  "human_priority_at": "2026-09-29T18:14:33.244+00:00",
+  "wireframe_handoff": [
+    "Brief/Care/Overheat/Fit/Correction/Result/Pause",
+    "5 region heat/soft/locked 차이",
+    "heat drag/shape snap-cancel/cool/place",
+    "80 warning/90 overheat/integrity loss/reset",
+    "exact mismatch+20s grace",
+    "3-test failure/pause freeze/retry reset"
+  ],
+  "primary_interaction": "열원 드래그 + softened region 변형 + 냉각 lock",
+  "difficulty_variation": "Case1 1–2 required regions, Case2 3 regions+starting locked region, Case3 4–5 regions+adjacent region receives 25% heat. 속도보다 요구 형태 수와 열 상호작용으로 상승.",
+  "visual_direction_brief": "Portrait close-up workbench. Creature가 크게 보이고 5 regions가 손가락으로 구분. Heat/softness는 재질 변화가 1차, 보조 meter 허용. Dark lab, warm flame/cool plate 대비. 세부 UI 배치는 Wireframe에서 결정."
 }

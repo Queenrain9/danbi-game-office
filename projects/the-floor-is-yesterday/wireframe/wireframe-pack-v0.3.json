@@ -1,0 +1,1071 @@
+{
+  "id": "1d72ffd9-0ef4-4a88-a3d5-c476c1538375",
+  "title": "The Floor Is Yesterday",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "01ef32af-bcd3-4e44-839b-77133747b6d1",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 12,
+            "id": "grid",
+            "role": "selection",
+            "label": "Stages"
+          }
+        ]
+      },
+      "states": [
+        "available",
+        "locked"
+      ],
+      "purpose": "Choose unlocked stage; show best time.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stage_cards",
+          "box": {
+            "h": 72,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          },
+          "type": "card_grid",
+          "label": "Stage cards",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "unlock+best_time",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 55,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Open",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected+unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S1",
+          "trigger": "Open",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "stage_cards",
+          "feedback": "highlight",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected stage",
+          "invalid_input": "locked remains locked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S2",
+      "name": "Stage Intro",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 66,
+            "w": 90,
+            "x": 5,
+            "y": 10,
+            "id": "preview",
+            "role": "topology",
+            "label": "Preview"
+          }
+        ]
+      },
+      "states": [
+        "intro"
+      ],
+      "purpose": "Preview baseline topology/zones/devices/spawns/exit.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "map",
+          "box": {
+            "h": 66,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          },
+          "type": "map_preview",
+          "label": "Baseline map",
+          "source_refs": [
+            "content_model.stage"
+          ],
+          "state_binding": "stage baseline",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 57,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "round_structure"
+          ],
+          "state_binding": "loaded",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "5s grace cue",
+          "source_refs": [
+            "round_structure"
+          ],
+          "precondition": "loaded",
+          "state_change": "baseline recorded; grace",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S3",
+      "name": "Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 78,
+            "w": 96,
+            "x": 2,
+            "y": 8,
+            "id": "world",
+            "role": "play",
+            "label": "Current topology"
+          },
+          {
+            "h": 7,
+            "w": 96,
+            "x": 2,
+            "y": 1,
+            "id": "hud",
+            "role": "status",
+            "label": "Timing HUD"
+          }
+        ]
+      },
+      "states": [
+        "grace",
+        "chase",
+        "zone:idle",
+        "zone:armed",
+        "zone:restoring",
+        "zone:deferred",
+        "zone:cancelled",
+        "pursuer:dormant",
+        "pursuer:chasing",
+        "pursuer:waiting_no_path"
+      ],
+      "purpose": "Arm delayed spatial rewind and use restored topology against pursuer.",
+      "feedback": [
+        "baseline/current distinguished by form/ghost/direction",
+        "pursuer blocked/restarted states distinct"
+      ],
+      "components": [
+        {
+          "id": "world",
+          "box": {
+            "h": 78,
+            "w": 96,
+            "x": 2,
+            "y": 8
+          },
+          "type": "world_view",
+          "label": "Topology/zones",
+          "source_refs": [
+            "content_model.topology"
+          ],
+          "state_binding": "current graph+baseline ghost",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "player",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 44,
+            "y": 45
+          },
+          "type": "actor",
+          "label": "Player",
+          "source_refs": [
+            "game_rules.rewind"
+          ],
+          "state_binding": "position never rewound",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pursuer",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 6,
+            "y": 15
+          },
+          "type": "actor",
+          "label": "Pursuer",
+          "source_refs": [
+            "state_model.pursuer"
+          ],
+          "state_binding": "dormant/chasing/waiting_no_path",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "zones",
+          "box": {
+            "h": 78,
+            "w": 96,
+            "x": 2,
+            "y": 8
+          },
+          "type": "world_targets",
+          "label": "Rewind zones",
+          "source_refs": [
+            "state_model.zone"
+          ],
+          "state_binding": "idle/armed/restoring/deferred/cancelled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "devices",
+          "box": {
+            "h": 78,
+            "w": 96,
+            "x": 2,
+            "y": 8
+          },
+          "type": "world_targets",
+          "label": "Linked devices",
+          "source_refs": [
+            "content_model.device_types"
+          ],
+          "state_binding": "current/baseline",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "exit",
+          "box": {
+            "h": 18,
+            "w": 18,
+            "x": 78,
+            "y": 14
+          },
+          "type": "world_target",
+          "label": "Exit",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "state_binding": "active",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "move",
+          "box": {
+            "h": 24,
+            "w": 28,
+            "x": 4,
+            "y": 70
+          },
+          "type": "direction_control",
+          "label": "Move",
+          "source_refs": [
+            "interaction_spec.move"
+          ],
+          "decision_note": "Mobile control realizes existing continuous-direction verb.",
+          "state_binding": "continuous direction",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "interact",
+          "box": {
+            "h": 14,
+            "w": 24,
+            "x": 70,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Interact",
+          "source_refs": [
+            "interaction_spec.interact"
+          ],
+          "decision_note": "Context button preserves adjacency rule.",
+          "state_binding": "one adjacent device",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 88,
+            "y": 1
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "interaction_spec.pause"
+          ],
+          "state_binding": "grace/chase",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "timers",
+          "box": {
+            "h": 7,
+            "w": 73,
+            "x": 3,
+            "y": 1
+          },
+          "type": "timer_stack",
+          "label": "Grace/run + rewind timers",
+          "source_refs": [
+            "round_structure",
+            "feedback_system"
+          ],
+          "state_binding": "5s grace; each armed zone 3s; <=1s emphasized",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [
+        "no-path recalculates .25s",
+        "duplicate rewind reservation ignored",
+        "continued occupancy after 2s cancels restore"
+      ],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "S4",
+          "from": "S3",
+          "trigger": "Pause",
+          "condition": "grace/chase"
+        },
+        {
+          "to": "S5",
+          "from": "S3",
+          "trigger": "active exit contact",
+          "condition": "success"
+        },
+        {
+          "to": "S6",
+          "from": "S3",
+          "trigger": "pursuer contact",
+          "condition": "failure"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "move",
+          "input": "continuous direction",
+          "target": "move/world",
+          "feedback": "trail+countdown+wave",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "game_rules.rewind"
+          ],
+          "precondition": "grace or chase; passable",
+          "state_change": "position; zone leave arms one 3s restore",
+          "invalid_input": "blocked topology stops movement",
+          "spatial_rules": "current graph",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "interact",
+          "input": "tap",
+          "target": "adjacent device",
+          "feedback": "linked response",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "game_rules.switch"
+          ],
+          "precondition": "enabled adjacent device",
+          "state_change": "linked device toggles immediately",
+          "invalid_input": "button disabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "restore",
+          "input": "automatic timer expiry",
+          "target": "armed zone",
+          "feedback": "<=1s warning; snap/defer/cancel cue",
+          "source_refs": [
+            "game_rules.rewind",
+            "game_rules.occupancy"
+          ],
+          "precondition": "3s elapsed",
+          "state_change": "baseline restore; occupied => defer .25s up to 2s then cancel",
+          "timing_rules": "3s fixed; .25s occupancy checks; 2s max defer",
+          "invalid_input": "duplicate arm ignored",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "exit",
+          "input": "automatic contact",
+          "target": "active exit",
+          "feedback": "immediate clear",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "precondition": "reachable",
+          "state_change": "clear/input lock",
+          "invalid_input": "inactive does nothing",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "frozen world",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "grace/chase",
+          "state_change": "pause; timers/movement freeze",
+          "invalid_input": "ignored terminal",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "corridor",
+          "name": "Corridor Restore",
+          "notes": "Same 3s automatic rule.",
+          "condition": "corridor_restore",
+          "source_refs": [
+            "content_model.zone_types[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "restore": "directional snap"
+          },
+          "component_overrides": {
+            "zones": {
+              "state_binding": "corridor baseline/current geometry"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "door",
+          "name": "Door Restore",
+          "notes": "Route cutoff remains legible.",
+          "condition": "door_restore",
+          "source_refs": [
+            "content_model.zone_types[1]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "restore": "door snaps baseline"
+          },
+          "component_overrides": {
+            "devices": {
+              "state_binding": "door current/baseline visibly distinct"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "platform",
+          "name": "Platform Restore",
+          "notes": "Actor positions never rewind.",
+          "condition": "platform_restore",
+          "source_refs": [
+            "content_model.zone_types[2]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "restore": "platform snaps baseline"
+          },
+          "component_overrides": {
+            "zones": {
+              "state_binding": "platform current/baseline footprint"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "multi",
+          "name": "Multiple Armed Zones",
+          "notes": "Late-stage variation.",
+          "condition": "2+ zones armed",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "armed": "each wave individually readable"
+          },
+          "component_overrides": {
+            "timers": {
+              "state_binding": "independent fixed 3s countdowns"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "Current graph authoritative for movement and pursuit.",
+        "Never rewind actor positions."
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 52,
+            "w": 70,
+            "x": 15,
+            "y": 24,
+            "id": "modal",
+            "role": "modal",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        "pause"
+      ],
+      "purpose": "Resume/restart/select while all play timers are frozen.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 34
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "restart",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 48
+          },
+          "type": "button",
+          "label": "Restart",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 62
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S4",
+          "trigger": "Resume/Restart"
+        },
+        {
+          "to": "S1",
+          "from": "S4",
+          "trigger": "Select"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "timers resume",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "paused",
+          "state_change": "exact prior grace/chase",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S5",
+      "name": "Clear Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 72,
+            "w": 84,
+            "x": 8,
+            "y": 14,
+            "id": "result",
+            "role": "result",
+            "label": "Clear"
+          }
+        ]
+      },
+      "states": [
+        "clear"
+      ],
+      "purpose": "Show run/best time; next/retry/select.",
+      "feedback": [
+        "new best/next unlock"
+      ],
+      "components": [
+        {
+          "id": "time",
+          "box": {
+            "h": 14,
+            "w": 70,
+            "x": 15,
+            "y": 28
+          },
+          "type": "metric",
+          "label": "Time",
+          "state_binding": "run+best"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 35,
+            "x": 55,
+            "y": 58
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "next exists"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 35,
+            "x": 10,
+            "y": 58
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 10,
+            "w": 80,
+            "x": 10,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [
+        "final stage disables Next"
+      ],
+      "source_refs": [
+        "screen_inventory[4]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S5",
+          "trigger": "Next"
+        },
+        {
+          "to": "S3",
+          "from": "S5",
+          "trigger": "Retry"
+        },
+        {
+          "to": "S1",
+          "from": "S5",
+          "trigger": "Select"
+        }
+      ],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S6",
+      "name": "Fail Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 64,
+            "w": 84,
+            "x": 8,
+            "y": 20,
+            "id": "result",
+            "role": "result",
+            "label": "Fail"
+          }
+        ]
+      },
+      "states": [
+        "fail"
+      ],
+      "purpose": "End on contact; retry/select.",
+      "feedback": [
+        "contact cause visible"
+      ],
+      "components": [
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 10,
+            "y": 56
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 52,
+            "y": 56
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "enabled"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[5]",
+        "game_rules.failure"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S6",
+          "trigger": "Retry"
+        },
+        {
+          "to": "S1",
+          "from": "S6",
+          "trigger": "Select"
+        }
+      ],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "176b4b99-2c01-4157-91f3-d5a4c71befc5",
+  "input_map": {
+    "cancel": "release movement => neutral; no queued interaction",
+    "gestures": {
+      "exit": "automatic contact",
+      "move": "continuous direction",
+      "pause": "tap",
+      "rewind": "automatic on zone leave",
+      "interact": "tap"
+    },
+    "priority": [
+      "terminal",
+      "pause",
+      "automatic restore",
+      "interact",
+      "move"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_note": "Conflict/cancel UX only.",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T14:32:06.965262+00:00",
+  "edge_cases": {
+    "items": [
+      "armed zone cannot duplicate reservation",
+      "occupancy defers .25s up to 2s then cancels",
+      "no-path pursuer recalculates .25s",
+      "pause freezes every run timer",
+      "restart reconstructs baseline"
+    ],
+    "source_refs": [
+      "game_rules",
+      "test_scenarios"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T14:32:06.965262+00:00",
+  "core_screen": "S3",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "S1",
+    "paths": [
+      [
+        "S1",
+        "S2",
+        "open"
+      ],
+      [
+        "S2",
+        "S3",
+        "start"
+      ],
+      [
+        "S3",
+        "S4",
+        "pause"
+      ],
+      [
+        "S4",
+        "S3",
+        "resume/restart"
+      ],
+      [
+        "S4",
+        "S1",
+        "select"
+      ],
+      [
+        "S3",
+        "S5",
+        "exit contact"
+      ],
+      [
+        "S3",
+        "S6",
+        "pursuer contact"
+      ],
+      [
+        "S5",
+        "S2",
+        "next"
+      ],
+      [
+        "S5",
+        "S3",
+        "retry"
+      ],
+      [
+        "S5",
+        "S1",
+        "select"
+      ],
+      [
+        "S6",
+        "S3",
+        "retry"
+      ],
+      [
+        "S6",
+        "S1",
+        "select"
+      ]
+    ],
+    "guards": [
+      "next requires next stage",
+      "pause only grace/chase",
+      "exit active/reachable"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 14,
+  "screen_count": 6,
+  "global_states": {
+    "fail": {
+      "screen": "S6"
+    },
+    "zone": [
+      "idle",
+      "armed",
+      "restoring",
+      "deferred",
+      "cancelled"
+    ],
+    "chase": {
+      "screen": "S3"
+    },
+    "clear": {
+      "screen": "S5"
+    },
+    "grace": {
+      "screen": "S3",
+      "duration": "5s"
+    },
+    "intro": {
+      "screen": "S2"
+    },
+    "pause": {
+      "screen": "S4"
+    },
+    "pursuer": [
+      "dormant",
+      "chasing",
+      "waiting_no_path"
+    ],
+    "source_refs": [
+      "state_model"
+    ],
+    "decision_origin": "game_design"
+  },
+  "pack_markdown": "# The Floor Is Yesterday — Interaction Wireframe Pack v0.3\n\n## Fun Promise\n지나온 공간의 지연된 과거 복원을 예측해 추격자의 길을 끊는 쾌감.\n\n## Coverage\nStage Select, Stage Intro, Gameplay, Pause Overlay, Clear Result, Fail Result. Global/zone/pursuer states and corridor/door/platform/multi-timer variations are covered.\n\n## Core Interaction\nMovement arms delayed spatial restoration. Current topology, baseline ghost, fixed countdown, pursuer state and exit remain readable together. Rewind is automatic and never rewinds characters.\n\n## Boundary\nUX/state/data contract only; Godot architecture belongs to Implementation Blueprint.",
+  "source_run_at": "2026-09-30T14:32:06.965262+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "지나온 공간의 지연된 과거 복원을 예측해 추격자의 길을 끊는 쾌감",
+    "source_refs": [
+      "wireframe_handoff[0]",
+      "idea.why_promoted",
+      "idea.next_test"
+    ],
+    "decision_note": "Upstream intent restated without new rules.",
+    "decision_origin": "wireframe_completion",
+    "coverage_summary": "Select, Intro, Gameplay, Pause, Clear, Fail; all zone/pursuer/global states; corridor/door/platform and multi-timer variants"
+  },
+  "developer_handoff": {
+    "fun_promise": "지나온 공간의 지연된 과거 복원을 예측해 추격자의 길을 끊는 쾌감",
+    "source_refs": [
+      "wireframe_handoff",
+      "content_model",
+      "progression"
+    ],
+    "required_data": [
+      "baseline/current topology",
+      "zone type/state/timer",
+      "device links/states",
+      "spawns/exit",
+      "pursuer path state",
+      "elapsed/best time",
+      "unlock state"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "persistent: unlock+best time",
+      "run-local: topology/zones/devices/actors/timers"
+    ],
+    "upstream_issues": [],
+    "architecture_boundary": "Implementation Blueprint chooses Godot scene/node/script architecture.",
+    "content_variation_bindings": {
+      "door_restore": "door",
+      "multiple_armed": "multi",
+      "corridor_restore": "corridor",
+      "platform_restore": "platform"
+    }
+  },
+  "acceptance_criteria": [
+    "Six inventory screens exist and all flow destinations resolve.",
+    "Gameplay shows current topology, baseline difference, zone timers, pursuer state and exit together.",
+    "Grace lasts 5s; pause freezes and resumes exact state.",
+    "Zone leave arms one fixed 3s restore; characters never rewind.",
+    "Occupancy defers every .25s up to 2s then cancels persistent occupancy restore.",
+    "No-path pursuer waits and recalculates every .25s.",
+    "Corridor/door/platform plus multiple armed timers are structurally represented.",
+    "Contact immediately fails; active exit immediately clears.",
+    "Clear unlocks next and stores best time; Retry restores baseline."
+  ],
+  "primary_interaction": "이동으로 zone rewind를 예약하고 복원 타이밍에 맞춰 topology를 바꾸며 추격자를 유도한다.",
+  "interaction_principles": [
+    "현재 topology/baseline/rewind timing을 동시에 읽게 한다",
+    "공간 직접 조작과 추격 경로 결과를 우선한다",
+    "캐릭터 자체가 rewind된다는 인상을 주지 않는다"
+  ]
+}

@@ -1,0 +1,1017 @@
+{
+  "id": "e2d36d1a-b348-4764-9e60-f65d33b1c741",
+  "title": "Pocket Ecosystem Smuggler",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "03e0f837-730f-4d24-895d-fff05e7c814f",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Run Setup",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "bag",
+            "box": {
+              "h": 52,
+              "w": 80,
+              "x": 10,
+              "y": 18
+            }
+          },
+          {
+            "id": "tray",
+            "box": {
+              "h": 15,
+              "w": 92,
+              "x": 4,
+              "y": 73
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 7,
+              "w": 92,
+              "x": 4,
+              "y": 90
+            }
+          }
+        ]
+      },
+      "states": [
+        "loadout",
+        "invalid"
+      ],
+      "purpose": "Initial composition and placement.",
+      "feedback": [
+        "placement prediction"
+      ],
+      "components": [
+        {
+          "id": "setup_grid",
+          "box": {
+            "h": 52,
+            "w": 80,
+            "x": 10,
+            "y": 18
+          },
+          "type": "grid"
+        },
+        {
+          "id": "organism_tray",
+          "box": {
+            "h": 15,
+            "w": 92,
+            "x": 4,
+            "y": 73
+          },
+          "type": "tray"
+        },
+        {
+          "id": "depart_button",
+          "box": {
+            "h": 7,
+            "w": 34,
+            "x": 62,
+            "y": 90
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [
+        "occupied cells reject"
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "depart"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "place",
+          "input": "drag/drop",
+          "target": "setup_grid",
+          "feedback": "valid cells + temperature/food preview",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "game_rules.R1"
+          ],
+          "precondition": "loadout; empty destination",
+          "state_change": "occupancy changes",
+          "invalid_input": "return origin + reason",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "return_origin",
+            "completion": {
+              "kind": "snap",
+              "target_component_id": "setup_grid"
+            },
+            "target_component_id": "organism_tray",
+            "related_component_ids": [
+              "setup_grid"
+            ]
+          }
+        },
+        {
+          "id": "depart",
+          "input": "tap",
+          "target": "depart_button",
+          "feedback": "bag locks for resolution",
+          "source_refs": [
+            "state_model.transitions"
+          ],
+          "precondition": "valid loadout",
+          "state_change": "save segment snapshot; start tick 1",
+          "decision_note": "Explicit commit represents specified depart transition.",
+          "invalid_input": "no change + reason",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Never expand beyond 3x3."
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Suitcase Ecosystem",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "hud",
+            "box": {
+              "h": 11,
+              "w": 94,
+              "x": 3,
+              "y": 2
+            }
+          },
+          {
+            "id": "bag",
+            "box": {
+              "h": 58,
+              "w": 86,
+              "x": 7,
+              "y": 16
+            }
+          },
+          {
+            "id": "prediction",
+            "box": {
+              "h": 8,
+              "w": 92,
+              "x": 4,
+              "y": 76
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 11,
+              "w": 92,
+              "x": 4,
+              "y": 86
+            }
+          }
+        ]
+      },
+      "states": [
+        "loadout",
+        "transit_resolution",
+        "intervention",
+        "critical_danger"
+      ],
+      "purpose": "Resolve ticks and perform one between-tick intervention.",
+      "feedback": [
+        "temperature, hunger, health, trace",
+        "ordered tick events"
+      ],
+      "components": [
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 8,
+            "w": 9,
+            "x": 88,
+            "y": 3
+          },
+          "type": "button"
+        },
+        {
+          "id": "eco_grid",
+          "box": {
+            "h": 58,
+            "w": 86,
+            "x": 7,
+            "y": 16
+          },
+          "type": "grid"
+        },
+        {
+          "id": "food_action",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 4,
+            "y": 86
+          },
+          "type": "button"
+        },
+        {
+          "id": "isolation_action",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 36,
+            "y": 86
+          },
+          "type": "button"
+        },
+        {
+          "id": "next_tick_button",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 68,
+            "y": 86
+          },
+          "type": "button"
+        },
+        {
+          "id": "prediction_strip",
+          "box": {
+            "h": 8,
+            "w": 92,
+            "x": 4,
+            "y": 76
+          },
+          "type": "status"
+        }
+      ],
+      "edge_cases": [
+        "last target death fails segment immediately",
+        "resolution ignores gameplay input"
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "guard": "final tick resolved"
+        },
+        {
+          "to": "S6",
+          "guard": "pause"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "move",
+          "input": "drag organism to adjacent empty cell",
+          "target": "eco_grid",
+          "feedback": "valid adjacent cells + next-tick preview",
+          "source_refs": [
+            "game_rules.R6"
+          ],
+          "precondition": "intervention; action unused",
+          "state_change": "occupancy changes; action consumed",
+          "invalid_input": "return origin + reason",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "both",
+            "kind": "drag",
+            "cancel": "return_origin",
+            "completion": {
+              "kind": "snap",
+              "target_component_id": "eco_grid"
+            },
+            "target_component_id": "eco_grid"
+          }
+        },
+        {
+          "id": "feed",
+          "input": "tap action then organism",
+          "target": "food_action",
+          "feedback": "hunger update",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "game_rules.R6"
+          ],
+          "precondition": "food_tokens>0; action unused",
+          "state_change": "food -1; hunger=0; action consumed",
+          "invalid_input": "no mutation + reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "isolate",
+          "input": "tap action then central organism",
+          "target": "isolation_action",
+          "feedback": "isolation mark + blocked adjacency",
+          "source_refs": [
+            "game_rules.R1",
+            "game_rules.R6"
+          ],
+          "precondition": "central target; action unused",
+          "state_change": "toggle isolation; action consumed",
+          "invalid_input": "no mutation + central-only reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "game_rules.R10"
+          ],
+          "precondition": "active",
+          "state_change": "paused without variable change",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "resolution",
+          "name": "Transit Resolution",
+          "notes": "Deterministic ordered resolution.",
+          "condition": "tick resolving",
+          "source_refs": [
+            "game_rules.R2",
+            "interaction_spec.timing"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "sequence": "environment→feeding/predation→health"
+          },
+          "component_overrides": {
+            "actions": "disabled",
+            "eco_grid": "read-only"
+          },
+          "interaction_overrides": {
+            "interventions": "locked"
+          }
+        },
+        {
+          "id": "intervention",
+          "name": "Intervention",
+          "notes": "One action only.",
+          "condition": "non-final tick resolved",
+          "source_refs": [
+            "game_rules.R2",
+            "game_rules.R6"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "prediction": "risk cells, expected feeding, temperature exits"
+          },
+          "component_overrides": {
+            "actions": "enabled",
+            "prediction_strip": "visible"
+          },
+          "interaction_overrides": {
+            "move/feed/isolate": "exactly one"
+          }
+        },
+        {
+          "id": "critical",
+          "name": "Critical Danger",
+          "notes": "Presentation only.",
+          "condition": "health=1 or hunger>=1 or projected checkpoint danger",
+          "source_refs": [
+            "feedback_system.danger"
+          ],
+          "decision_origin": "wireframe_feedback",
+          "feedback_overrides": {
+            "danger": "icon+cause"
+          },
+          "component_overrides": {
+            "affected_cells": "danger badge"
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "Predation follows species priority data, never visual order."
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Checkpoint",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "risk",
+            "box": {
+              "h": 14,
+              "w": 90,
+              "x": 5,
+              "y": 4
+            }
+          },
+          {
+            "id": "bag",
+            "box": {
+              "h": 57,
+              "w": 84,
+              "x": 8,
+              "y": 21
+            }
+          },
+          {
+            "id": "controls",
+            "box": {
+              "h": 15,
+              "w": 90,
+              "x": 5,
+              "y": 82
+            }
+          }
+        ]
+      },
+      "states": [
+        "pre_conceal",
+        "zone_select",
+        "post_conceal",
+        "passed",
+        "caught"
+      ],
+      "purpose": "Conceal one connected 3-cell zone then resolve inspection.",
+      "feedback": [
+        "risk=remaining trace+forbidden species versus limit"
+      ],
+      "components": [
+        {
+          "id": "checkpoint_grid",
+          "box": {
+            "h": 57,
+            "w": 84,
+            "x": 8,
+            "y": 21
+          },
+          "type": "grid"
+        },
+        {
+          "id": "risk_panel",
+          "box": {
+            "h": 14,
+            "w": 90,
+            "x": 5,
+            "y": 4
+          },
+          "type": "formula"
+        },
+        {
+          "id": "conceal_action",
+          "box": {
+            "h": 11,
+            "w": 42,
+            "x": 5,
+            "y": 84
+          },
+          "type": "button"
+        },
+        {
+          "id": "pause_checkpoint",
+          "box": {
+            "h": 8,
+            "w": 9,
+            "x": 86,
+            "y": 4
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [
+        "trace floors at zero"
+      ],
+      "transitions": [
+        {
+          "to": "S4",
+          "guard": "conceal complete + risk evaluated"
+        },
+        {
+          "to": "S6",
+          "guard": "pause"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "conceal",
+          "input": "tap action then select connected 3-cell zone",
+          "target": "conceal_action",
+          "feedback": "zone highlight + risk recalc",
+          "source_refs": [
+            "core_player_verbs[3]",
+            "game_rules.R7"
+          ],
+          "precondition": "conceal unused",
+          "state_change": "zone trace reduced up to 2; conceal consumed",
+          "invalid_input": "non-3/disconnected selection does not commit",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause_checkpoint",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "screen_flow",
+            "game_rules.R10"
+          ],
+          "precondition": "checkpoint active",
+          "state_change": "paused unchanged",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "pre",
+          "name": "Before Concealment",
+          "notes": "Makes concealment consequence legible.",
+          "condition": "conceal unused",
+          "source_refs": [
+            "game_rules.R7"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "risk_panel": "trace + forbidden count + limit"
+          },
+          "interaction_overrides": {
+            "conceal_action": "enabled"
+          }
+        },
+        {
+          "id": "post",
+          "name": "After Concealment",
+          "notes": "One use.",
+          "condition": "valid zone committed",
+          "source_refs": [
+            "game_rules.R7"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "zone": "trace reduction"
+          },
+          "component_overrides": {
+            "risk_panel": "recalculated"
+          },
+          "interaction_overrides": {
+            "conceal_action": "disabled"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "3-cell connection uses bag orthogonal topology."
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Segment Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "summary",
+            "box": {
+              "h": 48,
+              "w": 84,
+              "x": 8,
+              "y": 14
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 18,
+              "w": 84,
+              "x": 8,
+              "y": 70
+            }
+          }
+        ]
+      },
+      "states": [
+        "passed",
+        "caught",
+        "extinction"
+      ],
+      "purpose": "Explain pass/failure and next destination.",
+      "feedback": [
+        "single-sentence cause"
+      ],
+      "components": [
+        {
+          "id": "result_summary",
+          "box": {
+            "h": 48,
+            "w": 84,
+            "x": 8,
+            "y": 14
+          },
+          "type": "panel"
+        },
+        {
+          "id": "continue_retry",
+          "box": {
+            "h": 12,
+            "w": 56,
+            "x": 22,
+            "y": 72
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "next segment or retry"
+        },
+        {
+          "to": "S5",
+          "guard": "third pass"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "continue",
+          "input": "tap",
+          "target": "continue_retry",
+          "feedback": "cause + restoration point",
+          "source_refs": [
+            "game_rules.R8",
+            "game_rules.R9"
+          ],
+          "precondition": "result visible",
+          "state_change": "pass carries survivors; failure restores segment snapshot",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S5",
+      "name": "Run Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "summary",
+            "box": {
+              "h": 50,
+              "w": 84,
+              "x": 8,
+              "y": 18
+            }
+          },
+          {
+            "id": "actions",
+            "box": {
+              "h": 14,
+              "w": 84,
+              "x": 8,
+              "y": 74
+            }
+          }
+        ]
+      },
+      "states": [
+        "run_success"
+      ],
+      "purpose": "Conclude successful three-segment run.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "run_summary",
+          "box": {
+            "h": 50,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "panel"
+        },
+        {
+          "id": "replay_button",
+          "box": {
+            "h": 12,
+            "w": 52,
+            "x": 24,
+            "y": 74
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S1",
+          "guard": "replay"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "replay",
+          "input": "tap",
+          "target": "replay_button",
+          "feedback": "setup shown",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "run result",
+          "state_change": "new run setup",
+          "decision_note": "Exposes stated run restart; no meta reward added.",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S6",
+      "name": "Pause",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "id": "modal",
+            "box": {
+              "h": 50,
+              "w": 70,
+              "x": 15,
+              "y": 25
+            }
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze state and resume or retry segment.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 42
+          },
+          "type": "button"
+        },
+        {
+          "id": "retry_button",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 57
+          },
+          "type": "button"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S2",
+          "guard": "resume ecosystem/retry"
+        },
+        {
+          "to": "S3",
+          "guard": "resume checkpoint"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "game_rules.R10"
+          ],
+          "precondition": "paused",
+          "state_change": "return unchanged",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry_button",
+          "feedback": "restoration shown",
+          "source_refs": [
+            "game_rules.R10"
+          ],
+          "precondition": "paused",
+          "state_change": "restore segment-start snapshot",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "aa85fafe-aee1-4e79-8141-6f5d7da8c028",
+  "input_map": {
+    "gestures": [
+      {
+        "input": "drag",
+        "cancel": "invalid destination returns origin",
+        "conflict": "resolution lock wins",
+        "priority": "active draggable over grid"
+      },
+      {
+        "input": "tap",
+        "cancel": "invalid target leaves state unchanged",
+        "conflict": "selected action scopes target tap",
+        "priority": "modal/global control over world"
+      }
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T16:33:45.299429+00:00",
+  "edge_cases": {
+    "cases": [
+      "No mutation during resolution input lock",
+      "Invalid drag returns origin",
+      "Food zero disables feed",
+      "Trace floors at zero",
+      "Last target death fails segment",
+      "Retry restores occupancy, temperature, health, hunger, food, trace and isolation"
+    ],
+    "source_refs": [
+      "game_rules.R6",
+      "game_rules.R7",
+      "game_rules.R8"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T16:33:45.299429+00:00",
+  "core_screen": "S2",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "flows": [
+      {
+        "to": "S2",
+        "from": "S1",
+        "guard": "valid loadout + depart"
+      },
+      {
+        "to": "S2",
+        "from": "S2",
+        "guard": "non-final tick resolved then one intervention"
+      },
+      {
+        "to": "S3",
+        "from": "S2",
+        "guard": "final tick resolved"
+      },
+      {
+        "to": "S4",
+        "from": "S3",
+        "guard": "conceal resolved + risk check"
+      },
+      {
+        "to": "S2",
+        "from": "S4",
+        "guard": "pass with segment remaining OR failed segment snapshot restore"
+      },
+      {
+        "to": "S5",
+        "from": "S4",
+        "guard": "third segment passed"
+      },
+      {
+        "to": "S6",
+        "from": "S2",
+        "guard": "pause"
+      },
+      {
+        "to": "S6",
+        "from": "S3",
+        "guard": "pause"
+      },
+      {
+        "to": "S2",
+        "from": "S6",
+        "guard": "retry or resume from ecosystem"
+      },
+      {
+        "to": "S3",
+        "from": "S6",
+        "guard": "resume from checkpoint"
+      }
+    ],
+    "source_refs": [
+      "screen_flow",
+      "state_model.transitions",
+      "game_rules.R8",
+      "game_rules.R9",
+      "game_rules.R10"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 7,
+  "screen_count": 6,
+  "global_states": {
+    "rules": {
+      "extinction": "last target death fails segment",
+      "resolution_lock": "no gameplay input during resolution",
+      "snapshot_restore": "retry restores exact segment-start state"
+    },
+    "states": [
+      "loadout",
+      "transit_tick",
+      "intervention",
+      "checkpoint",
+      "segment_result",
+      "run_result",
+      "paused"
+    ],
+    "source_refs": [
+      "state_model",
+      "game_rules.R8",
+      "game_rules.R10"
+    ],
+    "decision_origin": "game_design"
+  },
+  "pack_markdown": "# Pocket Ecosystem Smuggler — Interaction Wireframe Pack v0.3\nFun promise: 작은 가방 안의 먹이사슬을 예측·개입하면서 동시에 검문 흔적을 관리하는 압축된 생태 전략.\n\nFlow: Run Setup → Suitcase Ecosystem → Checkpoint → Segment Result → next segment/restored retry → Run Result. Pause preserves state. Core play keeps the 3x3 suitcase dominant, exposes deterministic resolution and next-tick prediction, and makes checkpoint concealment a direct reading of the same ecosystem. Invalid input is non-destructive; failures restore the segment-start snapshot. Implementation architecture is intentionally deferred to Blueprint.",
+  "source_run_at": "2026-09-30T16:33:45.299429+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "rules": [
+      "3x3 bag is primary focus",
+      "HUD exposes segment/tick, food and trace",
+      "danger uses icon plus value",
+      "resolution reads environment→feeding/predation→health"
+    ],
+    "fun_promise": "작은 가방 안의 먹이사슬을 예측·개입하면서 동시에 검문 흔적을 관리하는 압축된 생태 전략.",
+    "source_refs": [
+      "wireframe_handoff",
+      "feedback_system",
+      "visual_direction_brief"
+    ],
+    "decision_note": "Only exposes existing game state.",
+    "decision_origin": "wireframe_layout"
+  },
+  "developer_handoff": {
+    "data_hints": [
+      "Organism and segment schemas remain data-driven",
+      "Segment-start snapshot must be complete/deterministic",
+      "Ordered resolution events should be exposed for feedback"
+    ],
+    "fun_promise": "작은 가방 안의 먹이사슬을 예측·개입하면서 동시에 검문 흔적을 관리하는 압축된 생태 전략.",
+    "source_refs": [
+      "wireframe_handoff",
+      "content_model",
+      "state_model"
+    ],
+    "decision_note": "Implementation-neutral handoff only.",
+    "decision_origin": "wireframe_completion",
+    "upstream_issues": [],
+    "responsibility_boundary": [
+      "Wireframe owns UX states, boxes, feedback and semantic gestures",
+      "Blueprint chooses Godot architecture and reusable implementation components",
+      "Rules/numeric outcomes remain Game Design truth"
+    ]
+  },
+  "acceptance_criteria": [
+    "All six required screens exist and flow references resolve.",
+    "3x3 occupancy and orthogonal adjacency enforce R1/R6.",
+    "Each segment resolves exactly 3 ticks in environment→food→predation→health order.",
+    "Exactly one intervention is available between eligible ticks.",
+    "Temperature, hunger, health, food, trace, tick and segment remain readable.",
+    "Invalid movement never mutates state and returns origin.",
+    "Central isolation blocks adjacency until released.",
+    "Checkpoint permits one connected 3-cell concealment reducing trace by at most 2 and shows risk formula versus limit.",
+    "Caught/extinction restores exact segment-start snapshot with no permanent loss.",
+    "Pass carries surviving state; third pass reaches Run Result.",
+    "Pause freezes variables and retry restores segment snapshot.",
+    "All interaction_semantics component references resolve within their screen."
+  ],
+  "primary_interaction": "3x3 격자에서 생태 결과를 예측하고 틱 사이 이동·급여·격리로 개입한 뒤 흔적을 은폐한다.",
+  "interaction_principles": [
+    "Plan-first direct manipulation on the 3x3 bag",
+    "Resolution locks input; invalid input is non-destructive",
+    "Prediction is shown before intervention commitment"
+  ]
+}

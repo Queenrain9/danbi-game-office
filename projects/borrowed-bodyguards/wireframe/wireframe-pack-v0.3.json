@@ -1,0 +1,1033 @@
+{
+  "id": "652cb43a-34a4-4023-ab33-9a0323572f99",
+  "title": "Borrowed Bodyguards",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "d636fc0d-6580-4a46-b221-aa652ab9365e",
+  "screens": [
+    {
+      "id": "B1",
+      "name": "Stage Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 82,
+            "w": 90,
+            "x": 5,
+            "y": 8,
+            "id": "grid",
+            "role": "selection",
+            "label": "Stage grid",
+            "source_refs": [
+              "screen_inventory[0]"
+            ],
+            "decision_note": "Compact stage grid.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Select"
+      ],
+      "purpose": "Choose unlocked escort stage and view stars.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stages",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "card_grid",
+          "label": "8 stage cards",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "unlock/stars",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 12,
+            "w": 24,
+            "x": 70,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Open Brief",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "B2",
+          "from": "B1",
+          "trigger": "open",
+          "condition": "unlocked",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "stages",
+          "feedback": "selection emphasis",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected stage",
+          "invalid_input": "locked explains lock",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "B2",
+      "name": "Stage Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 88,
+            "w": 92,
+            "x": 4,
+            "y": 5,
+            "id": "preview",
+            "role": "preview",
+            "label": "Brief",
+            "source_refs": [
+              "screen_inventory[1]"
+            ],
+            "decision_note": "Graph preview makes authored adjacency explicit.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Brief"
+      ],
+      "purpose": "Preview graph, checkpoints, threat sequence and relay-relevant objects.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "map",
+          "box": {
+            "h": 62,
+            "w": 56,
+            "x": 5,
+            "y": 8
+          },
+          "type": "map_preview",
+          "label": "Graph preview",
+          "source_refs": [
+            "content_model.schema"
+          ],
+          "state_binding": "8-20 nodes, checkpoints, doors/props/hazards",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "waves",
+          "box": {
+            "h": 38,
+            "w": 31,
+            "x": 64,
+            "y": 8
+          },
+          "type": "list",
+          "label": "Threat sequence",
+          "source_refs": [
+            "content_model.schema"
+          ],
+          "state_binding": "3-5 typed waves",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rules",
+          "box": {
+            "h": 20,
+            "w": 31,
+            "x": 64,
+            "y": 49
+          },
+          "type": "panel",
+          "label": "HP/checkpoint summary",
+          "source_refs": [
+            "game_rules.vip"
+          ],
+          "state_binding": "HP2, 3-5 checkpoints+exit",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 22,
+            "x": 5,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Back",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 70,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Start",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "loaded",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "B3",
+          "from": "B2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "transition": "fade",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "street loads",
+          "source_refs": [
+            "game_rules.retry",
+            "state_model[1]"
+          ],
+          "precondition": "loaded",
+          "state_change": "Planning state initialized HP2 wave0 3s",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "B3",
+      "name": "Escort Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 82,
+            "w": 78,
+            "x": 2,
+            "y": 4,
+            "id": "street",
+            "role": "playfield",
+            "label": "Street graph diorama",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Graph adjacency must visually outrank Euclidean distance.",
+            "decision_origin": "wireframe_layout"
+          },
+          {
+            "h": 82,
+            "w": 17,
+            "x": 81,
+            "y": 4,
+            "id": "hud",
+            "role": "status/actions",
+            "label": "Threat/HUD",
+            "source_refs": [
+              "feedback_system"
+            ],
+            "decision_note": "Threat timing stays visible without obscuring relay field.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Planning",
+        "Warning",
+        "Resolve Atomic",
+        "Resolve Runner",
+        "Recovery",
+        "Pause",
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Relay possession through civilians and reshape routes before/through threats.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "world",
+          "box": {
+            "h": 82,
+            "w": 78,
+            "x": 2,
+            "y": 4
+          },
+          "type": "world_view",
+          "label": "Graph/VIP/civilians/host/props/doors",
+          "source_refs": [
+            "game_rules.topology",
+            "wireframe_handoff"
+          ],
+          "state_binding": "authored graph occupancy and routes",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "vip",
+          "box": {
+            "h": 13,
+            "w": 15,
+            "x": 82,
+            "y": 5
+          },
+          "type": "status",
+          "label": "VIP HP + checkpoint route",
+          "source_refs": [
+            "game_rules.vip"
+          ],
+          "state_binding": "HP2, ordered checkpoints/exit",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "wave",
+          "box": {
+            "h": 12,
+            "w": 15,
+            "x": 82,
+            "y": 20
+          },
+          "type": "timer",
+          "label": "Wave phase/timer",
+          "source_refs": [
+            "round_structure"
+          ],
+          "state_binding": "Planning3/Warning3/Resolve/Recovery1; Runner<=4",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "threat",
+          "box": {
+            "h": 17,
+            "w": 15,
+            "x": 82,
+            "y": 34
+          },
+          "type": "threat_panel",
+          "label": "Threat telegraph",
+          "source_refs": [
+            "feedback_system.warning"
+          ],
+          "state_binding": "source/path/lane/corridor",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "host",
+          "box": {
+            "h": 10,
+            "w": 15,
+            "x": 82,
+            "y": 53
+          },
+          "type": "status",
+          "label": "Current host badge",
+          "source_refs": [
+            "game_rules.borrow"
+          ],
+          "state_binding": "host citizen",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 10,
+            "w": 7,
+            "x": 82,
+            "y": 66
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "interaction_spec.priority"
+          ],
+          "state_binding": "not atomic resolve lock",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 7,
+            "x": 90,
+            "y": 66
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.retry"
+          ],
+          "decision_note": "Confirmation prevents accidental full-stage reset.",
+          "state_binding": "via confirm",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "relay",
+          "box": {
+            "h": 65,
+            "w": 70,
+            "x": 5,
+            "y": 8
+          },
+          "type": "world_overlay",
+          "label": "<=2-edge transfer candidate overlay",
+          "source_refs": [
+            "feedback_system.relay"
+          ],
+          "state_binding": "candidate pulses from current host",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "path",
+          "box": {
+            "h": 65,
+            "w": 70,
+            "x": 5,
+            "y": 8
+          },
+          "type": "world_overlay",
+          "label": "Host/VIP path preview",
+          "source_refs": [
+            "core_player_verbs[1]"
+          ],
+          "state_binding": "open edges, occupancy, reroute",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Warning",
+          "from": "Planning",
+          "trigger": "3s",
+          "condition": "stage active",
+          "transition": "telegraph",
+          "source_refs": [
+            "state_model"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Resolve Atomic",
+          "from": "Warning",
+          "trigger": "3s",
+          "condition": "Projectile/Surge",
+          "transition": "input lock then resolve",
+          "source_refs": [
+            "state_model"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Resolve Runner",
+          "from": "Warning",
+          "trigger": "3s",
+          "condition": "Runner",
+          "transition": "spawn chase",
+          "source_refs": [
+            "state_model"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Recovery",
+          "from": "Resolve Atomic",
+          "trigger": "outcome",
+          "condition": "HP>0",
+          "transition": "1s recovery",
+          "source_refs": [
+            "state_model"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Recovery",
+          "from": "Resolve Runner",
+          "trigger": "contact/block/max4s outcome",
+          "condition": "HP>0",
+          "transition": "1s recovery",
+          "source_refs": [
+            "game_rules.threats.runner"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "B4",
+          "from": "B3",
+          "trigger": "VIP exit or HP0",
+          "condition": "terminal",
+          "transition": "result",
+          "source_refs": [
+            "game_rules.success",
+            "game_rules.hit"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "borrow_transfer",
+          "input": "tap",
+          "target": "civilian in world",
+          "feedback": "relay pulse transfers to new <=2-edge candidates",
+          "priority": 4,
+          "source_refs": [
+            "core_player_verbs[0]",
+            "game_rules.borrow"
+          ],
+          "precondition": "no host OR shortest graph distance<=2",
+          "state_change": "new host; old host resumes patrol from current node",
+          "invalid_input": "out-of-range citizen: no change + graph-distance reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "move",
+          "input": "destination drag",
+          "target": "graph node",
+          "feedback": "path preview then route",
+          "priority": 3,
+          "source_refs": [
+            "core_player_verbs[1]",
+            "game_rules.move"
+          ],
+          "precondition": "host exists; open unoccupied path",
+          "state_change": "host route replaced; moves 2 edges/sec",
+          "invalid_input": "release elsewhere cancels preview; occupied/closed path reason",
+          "cancel_behavior": "invalid release cancels preview; new destination replaces route",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "push",
+          "input": "direction swipe",
+          "target": "adjacent pushable",
+          "feedback": "impact + destination node",
+          "priority": 3,
+          "source_refs": [
+            "core_player_verbs[2]",
+            "game_rules.push"
+          ],
+          "precondition": "authored direction and next node free",
+          "state_change": "target moves one node",
+          "gesture_rules": "swipe vector dot authored direction >=0.7",
+          "invalid_input": "dot<0.7 or occupied => no change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "operate",
+          "input": "tap",
+          "target": "adjacent door/switch",
+          "feedback": "barrier animation + reroute preview",
+          "priority": 4,
+          "source_refs": [
+            "core_player_verbs[3]",
+            "game_rules.operate"
+          ],
+          "precondition": "graph distance1",
+          "state_change": "barrier toggles; current crossing finishes",
+          "invalid_input": "nonadjacent => no change + adjacency reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "pause overlay",
+          "priority": 1,
+          "source_refs": [
+            "interaction_spec.priority"
+          ],
+          "precondition": "not blocked by nothing; highest priority",
+          "state_change": "all clocks/movement freeze",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "runner",
+          "name": "Runner Intercept",
+          "notes": "Play verbs remain enabled during runner chase.",
+          "condition": "wave type Runner",
+          "source_refs": [
+            "content_model.classes[0]",
+            "interaction_spec.runner_exception"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "contact hit or intercept/route change"
+          },
+          "component_overrides": {
+            "threat": {
+              "state_binding": "runner spawn/path + <=4s chase timer"
+            }
+          },
+          "interaction_overrides": {
+            "move": {
+              "precondition": "allowed during chase"
+            },
+            "push": {
+              "precondition": "allowed during chase"
+            },
+            "operate": {
+              "precondition": "allowed during chase"
+            },
+            "borrow_transfer": {
+              "precondition": "allowed during chase"
+            }
+          }
+        },
+        {
+          "id": "projectile",
+          "name": "Projectile Lane",
+          "notes": "Warning supports door timing; Resolve is atomic.",
+          "condition": "wave type Projectile",
+          "source_refs": [
+            "content_model.classes[1]",
+            "game_rules.threats.projectile"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "blocked/deflected/hit simultaneous cue"
+          },
+          "component_overrides": {
+            "threat": {
+              "state_binding": "authored source-to-VIP lane; barrier cuts highlighted"
+            }
+          },
+          "interaction_overrides": {
+            "borrow_transfer": {
+              "precondition": "locked during atomic Resolve"
+            }
+          }
+        },
+        {
+          "id": "surge",
+          "name": "Crowd Surge",
+          "notes": "Animation must match occupancy resolution.",
+          "condition": "wave type Surge",
+          "source_refs": [
+            "content_model.classes[2]",
+            "game_rules.threats.surge"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "resolve": "occupants shift one edge; hazard hit explicit"
+          },
+          "component_overrides": {
+            "threat": {
+              "state_binding": "corridor + push direction + hazard nodes"
+            }
+          },
+          "interaction_overrides": {
+            "borrow_transfer": {
+              "precondition": "locked during atomic Resolve"
+            }
+          }
+        },
+        {
+          "id": "relay_gap",
+          "name": "Relay Gap",
+          "notes": "Makes borrowed-body chain legible.",
+          "condition": "stage requires transfer chain",
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "invalid": "graph-distance reason shown"
+          },
+          "component_overrides": {
+            "relay": {
+              "state_binding": "only graph-distance<=2 citizens pulse; apparent screen distance irrelevant"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "combined",
+          "name": "Combined Escort",
+          "notes": "No new interaction rules.",
+          "condition": "stage combines prior threats",
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "threat": {
+              "state_binding": "current typed wave only; preserve prior cues"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "B4",
+      "name": "Stage Result",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "result",
+            "role": "summary",
+            "label": "Result",
+            "source_refs": [
+              "screen_inventory[3]"
+            ],
+            "decision_note": "Result keeps star causes explicit.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Show HP, checkpoint completion, stars, unlock and replay routes.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 10
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "source_refs": [
+            "game_rules.success",
+            "game_rules.hit"
+          ],
+          "state_binding": "success/failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "summary",
+          "box": {
+            "h": 20,
+            "w": 80,
+            "x": 10,
+            "y": 26
+          },
+          "type": "summary",
+          "label": "HP/checkpoints",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "remaining HP and authored checkpoints",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 49
+          },
+          "type": "summary",
+          "label": "Stars",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "1 success;2 HP2;3 HP2+all checkpoints",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 10,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.retry"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 24,
+            "x": 38,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 25,
+            "x": 65,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Next",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "success+next",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "B2",
+          "from": "B4",
+          "trigger": "Next",
+          "condition": "success+next",
+          "transition": "push",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "B3",
+          "from": "B4",
+          "trigger": "Retry",
+          "condition": "always",
+          "transition": "reset",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.retry"
+          ],
+          "precondition": "always",
+          "state_change": "full stage reset HP2 wave0 Planning3",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next",
+          "feedback": "unlock",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "success+next",
+          "state_change": "unlock/open next Brief",
+          "invalid_input": "disabled otherwise",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "83e894d6-7c3c-476b-88b6-094e9fe7fe2b",
+  "input_map": {
+    "cancel": "Move invalid release cancels preview; invalid tap/swipe no state change",
+    "conflict": "active drag/swipe suppresses tap until release; Runner exception only changes phase lock, not gesture arbitration",
+    "priority": [
+      "Pause",
+      "atomic Resolve lock",
+      "active drag/swipe",
+      "tap"
+    ],
+    "source_refs": [
+      "interaction_spec.priority"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T10:35:09.671388+00:00",
+  "edge_cases": {
+    "items": [
+      "transfer uses graph distance not screen distance",
+      "occupied node blocks movement",
+      "door toggle lets current crossing finish",
+      "new Move destination replaces route",
+      "hit removes threat then Recovery1s",
+      "Retry full stage reset"
+    ],
+    "source_refs": [
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T10:35:09.671388+00:00",
+  "core_screen": "B3",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "B1",
+    "paths": [
+      "B1->B2->B3 Planning->Warning->Resolve->Recovery repeat",
+      "VIP exit->B4 success",
+      "HP0->B4 failure",
+      "Pause exact resume",
+      "B4 Retry->B3; success Next->B2"
+    ],
+    "guards": [
+      "Projectile/Surge atomic Resolve locks play input",
+      "Runner Resolve allows play verbs",
+      "Next only success"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 10,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "freeze": "all movement/clocks",
+      "return": "exact prior phase/time",
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "AtomicResolveLock": {
+      "applies": "Projectile/Surge resolve only",
+      "exception": "Runner chase remains interactive",
+      "source_refs": [
+        "interaction_spec.priority",
+        "interaction_spec.runner_exception"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Borrowed Bodyguards\n\nFun promise: Borrow ordinary passers-by for seconds at a time, chaining possession into an improvised protection network.\n\nWhole-MVP coverage: Stage Select, Stage Brief, Escort Gameplay, Stage Result. Core screen: B3. Structured decision trace is embedded in JSON. Implementation architecture remains downstream responsibility.",
+  "source_run_at": "2026-09-30T10:33:50+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "Borrow ordinary passers-by for seconds at a time, chaining possession into an improvised protection network.",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Safe-area and hierarchy choices do not alter rules.",
+    "decision_origin": "wireframe_layout",
+    "coordinate_system": "0..100 screen-percent",
+    "safe_area_percent": 2
+  },
+  "developer_handoff": {
+    "fun_promise": "Borrow passers-by briefly and relay control; never frame civilians as owned permanent units.",
+    "source_refs": [
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "8 stages",
+      "graph8-20 nodes",
+      "VIP checkpoints/exit",
+      "civilian patrols",
+      "props/doors/hazards",
+      "3-5 typed waves"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "stage unlock/stars persistent",
+      "HP/host/routes/wave/occupancy stage-local"
+    ],
+    "upstream_issues": [],
+    "architecture_boundary": "Implementation Blueprint chooses Godot nodes/scripts."
+  },
+  "acceptance_criteria": [
+    "All four inventory screens and Planning/Warning/Resolve/Recovery/Pause/Result paths exist.",
+    "Transfer candidates reflect <=2 graph edges and old host resumes patrol after valid transfer.",
+    "Move/Push/Operate have structured valid/invalid/cancel behavior and visible graph causes.",
+    "Runner remains interactive for <=4s; Projectile/Surge atomic Resolve locks play input.",
+    "Warning3s, Recovery1s, HP2->0, checkpoint path, closed-edge reroute and pause exact-resume are observable.",
+    "All five content classes are represented; Combined introduces no new rules.",
+    "Success unlocks next stage and stars follow success/HP2/all-checkpoint rules."
+  ],
+  "primary_interaction": "tap relay transfer + destination drag + swipe push + adjacent operate",
+  "interaction_principles": [
+    "Possession relay through civilians is the dominant direct manipulation",
+    "Graph distance and occupancy must be visually explicit",
+    "Threat telegraphs distinguish Runner path, Projectile lane and Surge corridor",
+    "Atomic Resolve locks input except Runner chase"
+  ]
+}

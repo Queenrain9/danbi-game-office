@@ -1,0 +1,880 @@
+{
+  "id": "bfe4bc35-cef3-471c-bc58-60fa56b26bfe",
+  "title": "Paper Dragon Tailor",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "1ce650fb-ce65-4c9a-9631-f29a8e0a7304",
+  "screens": [
+    {
+      "id": "case_select",
+      "name": "Case Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 76,
+            "w": 86,
+            "x": 7,
+            "y": 12,
+            "id": "cases",
+            "role": "selection",
+            "label": "Cases"
+          }
+        ]
+      },
+      "states": [
+        "selection"
+      ],
+      "purpose": "select unlocked case",
+      "feedback": [
+        "selection"
+      ],
+      "components": [
+        {
+          "id": "case_list",
+          "box": {
+            "h": 65,
+            "w": 82,
+            "x": 9,
+            "y": 15
+          },
+          "type": "cards",
+          "label": "Cases",
+          "state_binding": "unlocked_cases"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 9,
+            "w": 56,
+            "x": 22,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Open Brief",
+          "enabled_when": "case_selected",
+          "state_binding": "selected_case",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "repair_brief",
+          "from": "case_select",
+          "trigger": "open",
+          "animation": "unfold",
+          "condition": "selected"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select/open",
+          "target": "case/open",
+          "feedback": "card lift",
+          "precondition": "unlocked",
+          "state_change": "brief",
+          "invalid_input": "locked inert"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "repair_brief",
+      "name": "Repair Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 84,
+            "x": 8,
+            "y": 14,
+            "id": "preview",
+            "role": "preview",
+            "label": "Preview"
+          }
+        ]
+      },
+      "states": [
+        "brief"
+      ],
+      "purpose": "show damage and requirements",
+      "feedback": [
+        "requirements"
+      ],
+      "components": [
+        {
+          "id": "preview",
+          "box": {
+            "h": 44,
+            "w": 76,
+            "x": 12,
+            "y": 17
+          },
+          "type": "preview",
+          "label": "Damage",
+          "state_binding": "damage"
+        },
+        {
+          "id": "tags",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 67
+          },
+          "type": "tags",
+          "label": "Requirements",
+          "state_binding": "constraints"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 9,
+            "w": 56,
+            "x": 22,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Start",
+          "enabled_when": "loaded",
+          "state_binding": "loaded",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "workbench",
+          "from": "repair_brief",
+          "trigger": "start",
+          "animation": "settle",
+          "condition": "loaded"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "initialize two sheets and attempt one",
+          "target": "start",
+          "feedback": "bench opens",
+          "precondition": "loaded",
+          "state_change": "inspect",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "workbench",
+      "name": "Workbench",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 11,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "Goal"
+          },
+          {
+            "h": 63,
+            "w": 92,
+            "x": 4,
+            "y": 16,
+            "id": "craft",
+            "role": "core",
+            "label": "Work Surface"
+          },
+          {
+            "h": 15,
+            "w": 92,
+            "x": 4,
+            "y": 80,
+            "id": "tools",
+            "role": "tools",
+            "label": "Tools"
+          }
+        ]
+      },
+      "states": [
+        "inspect",
+        "prepare",
+        "attach",
+        "inspect_failed_zone"
+      ],
+      "purpose": "inspect cut fold glue and place",
+      "feedback": [
+        "rustle",
+        "snip",
+        "crease",
+        "glue sheen",
+        "overlap ghost"
+      ],
+      "components": [
+        {
+          "id": "goal",
+          "box": {
+            "h": 7,
+            "w": 35,
+            "x": 5,
+            "y": 5
+          },
+          "type": "status",
+          "label": "Goal",
+          "state_binding": "requirement"
+        },
+        {
+          "id": "material",
+          "box": {
+            "h": 7,
+            "w": 24,
+            "x": 43,
+            "y": 5
+          },
+          "type": "resource",
+          "label": "Sheets",
+          "state_binding": "material_remaining"
+        },
+        {
+          "id": "attempt",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 70,
+            "y": 5
+          },
+          "type": "resource",
+          "label": "Attempts",
+          "state_binding": "attempt"
+        },
+        {
+          "id": "surface",
+          "box": {
+            "h": 54,
+            "w": 84,
+            "x": 8,
+            "y": 19
+          },
+          "type": "polygon_surface",
+          "label": "Paper Dragon",
+          "state_binding": "geometry",
+          "interaction_role": "repair target"
+        },
+        {
+          "id": "sheet",
+          "box": {
+            "h": 11,
+            "w": 30,
+            "x": 6,
+            "y": 82
+          },
+          "type": "cuttable",
+          "label": "Patch Sheet",
+          "enabled_when": "prepare and material remains",
+          "state_binding": "sheet",
+          "interaction_role": "cut source"
+        },
+        {
+          "id": "cut",
+          "box": {
+            "h": 10,
+            "w": 12,
+            "x": 39,
+            "y": 82
+          },
+          "type": "tool",
+          "label": "Cut",
+          "enabled_when": "prepare",
+          "state_binding": "active_tool"
+        },
+        {
+          "id": "fold",
+          "box": {
+            "h": 10,
+            "w": 12,
+            "x": 53,
+            "y": 82
+          },
+          "type": "tool",
+          "label": "Fold",
+          "enabled_when": "patch exists",
+          "state_binding": "active_tool"
+        },
+        {
+          "id": "glue",
+          "box": {
+            "h": 10,
+            "w": 12,
+            "x": 67,
+            "y": 82
+          },
+          "type": "tool",
+          "label": "Glue",
+          "enabled_when": "attach",
+          "state_binding": "active_tool"
+        },
+        {
+          "id": "launch",
+          "box": {
+            "h": 10,
+            "w": 14,
+            "x": 81,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Flight Test",
+          "enabled_when": "valid attach",
+          "state_binding": "repair_committed",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [
+        "material exhausted resolves result",
+        "pointer loss cancels transient action"
+      ],
+      "transitions": [
+        {
+          "to": "prepare",
+          "from": "inspect",
+          "trigger": "damage revealed",
+          "animation": "pattern appear",
+          "condition": "required damage known"
+        },
+        {
+          "to": "attach",
+          "from": "prepare",
+          "trigger": "patch prepared",
+          "animation": "focus",
+          "condition": "valid cut/fold"
+        },
+        {
+          "to": "flight_test",
+          "from": "workbench",
+          "trigger": "launch",
+          "animation": "to sky",
+          "condition": "valid attach"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reveal tear fold grain",
+          "target": "damage hotspot",
+          "feedback": "pulse/rustle",
+          "precondition": "inspect",
+          "state_change": "prepare",
+          "invalid_input": "no penalty"
+        },
+        {
+          "input": "drag/release",
+          "action": "validate path within 12px",
+          "target": "sheet",
+          "feedback": "snip",
+          "precondition": "cut active",
+          "state_change": "create patch",
+          "invalid_input": "shake; no material consumed"
+        },
+        {
+          "input": "swipe",
+          "action": "toggle fold within 12deg",
+          "target": "fold guide",
+          "feedback": "crease snap",
+          "precondition": "fold active",
+          "state_change": "fold orientation",
+          "invalid_input": "no change"
+        },
+        {
+          "input": "drag stroke",
+          "action": "accumulate coverage",
+          "target": "patch",
+          "feedback": "wet sheen",
+          "precondition": "glue active",
+          "state_change": "glue coverage",
+          "invalid_input": "outside ignored"
+        },
+        {
+          "input": "drag/twist/release",
+          "action": "validate 85% overlap, 15deg orientation, 80% glue",
+          "target": "patch",
+          "feedback": "settle or red-edge shake",
+          "precondition": "attach",
+          "state_change": "commit or return",
+          "invalid_input": "snap back"
+        },
+        {
+          "input": "tap",
+          "action": "run flight test",
+          "target": "launch",
+          "feedback": "lift",
+          "precondition": "valid attach",
+          "state_change": "test_running",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "cut_active",
+          "name": "Cut Active",
+          "notes": "boundary-to-boundary within 12px",
+          "condition": "cut tool",
+          "components": [
+            {
+              "id": "cut_trace",
+              "box": {
+                "h": 11,
+                "w": 30,
+                "x": 6,
+                "y": 82
+              },
+              "type": "polyline",
+              "label": "Cut Trace",
+              "state_binding": "cut_path"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "fold_active",
+          "name": "Fold Active",
+          "notes": "crossing swipe within 12deg",
+          "condition": "fold tool",
+          "components": [
+            {
+              "id": "fold_guide",
+              "box": {
+                "h": 54,
+                "w": 84,
+                "x": 8,
+                "y": 19
+              },
+              "type": "line",
+              "label": "Fold Guide",
+              "state_binding": "fold_guides"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "attach_active",
+          "name": "Placement",
+          "notes": "85% overlap, 15deg orientation, 80% glue",
+          "condition": "attach",
+          "components": [
+            {
+              "id": "overlap",
+              "box": {
+                "h": 54,
+                "w": 84,
+                "x": 8,
+                "y": 19
+              },
+              "type": "overlay",
+              "label": "Overlap Preview",
+              "state_binding": "placement_validity"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "failed_zone",
+          "name": "Failure Return",
+          "notes": "causal correction target",
+          "condition": "inspect_failed_zone",
+          "components": [
+            {
+              "id": "stress_ref",
+              "box": {
+                "h": 54,
+                "w": 84,
+                "x": 8,
+                "y": 19
+              },
+              "type": "overlay",
+              "label": "Stress Zone",
+              "state_binding": "last_stress"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "polygon hit areas",
+        "input priority tool stroke > patch drag > hotspot > UI",
+        "deterministic geometry only"
+      ]
+    },
+    {
+      "id": "flight_test",
+      "name": "Flight Test",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 92,
+            "x": 4,
+            "y": 8,
+            "id": "flight",
+            "role": "simulation",
+            "label": "Flight"
+          }
+        ]
+      },
+      "states": [
+        "test_running",
+        "test_pass",
+        "test_fail"
+      ],
+      "purpose": "evaluate and explain repair",
+      "feedback": [
+        "deformation",
+        "stress heat"
+      ],
+      "components": [
+        {
+          "id": "flight",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "scripted_sim",
+          "label": "Flight",
+          "state_binding": "timeline"
+        },
+        {
+          "id": "stress",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "overlay",
+          "label": "Stress",
+          "state_binding": "stress"
+        },
+        {
+          "id": "structure",
+          "box": {
+            "h": 8,
+            "w": 45,
+            "x": 10,
+            "y": 81
+          },
+          "type": "meter",
+          "label": "Structure",
+          "state_binding": "structure"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 9,
+            "w": 28,
+            "x": 62,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Continue",
+          "enabled_when": "complete",
+          "state_binding": "complete"
+        }
+      ],
+      "edge_cases": [
+        "second failure partial result"
+      ],
+      "transitions": [
+        {
+          "to": "workbench",
+          "from": "flight_test",
+          "trigger": "continue",
+          "animation": "map back",
+          "condition": "fail and attempt remains"
+        },
+        {
+          "to": "result",
+          "from": "flight_test",
+          "trigger": "continue",
+          "animation": "score",
+          "condition": "pass or exhausted"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "resolve attempt",
+          "target": "continue",
+          "feedback": "stress freeze",
+          "precondition": "complete",
+          "state_change": "result or failed-zone workbench",
+          "invalid_input": "disabled while running"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure",
+          "name": "Failure Explained",
+          "notes": "maps to repair zone",
+          "condition": "structure<70",
+          "components": [
+            {
+              "id": "reason",
+              "box": {
+                "h": 10,
+                "w": 76,
+                "x": 12,
+                "y": 67
+              },
+              "type": "callout",
+              "label": "Stress Cause",
+              "state_binding": "primary_failure"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "scripted deterministic evaluator"
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 55,
+            "w": 84,
+            "x": 8,
+            "y": 18,
+            "id": "score",
+            "role": "result",
+            "label": "Score"
+          }
+        ]
+      },
+      "states": [
+        "success_result",
+        "partial_result",
+        "material_exhausted"
+      ],
+      "purpose": "score and progression",
+      "feedback": [
+        "score breakdown"
+      ],
+      "components": [
+        {
+          "id": "scores",
+          "box": {
+            "h": 45,
+            "w": 80,
+            "x": 10,
+            "y": 22
+          },
+          "type": "panel",
+          "label": "Scores",
+          "state_binding": "score"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 8,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Next",
+          "enabled_when": "next_unlocked",
+          "state_binding": "next_unlocked"
+        },
+        {
+          "id": "return",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 52,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Case Select",
+          "state_binding": "progress"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "repair_brief",
+          "from": "result",
+          "trigger": "next",
+          "animation": "turn",
+          "condition": "next unlocked"
+        },
+        {
+          "to": "case_select",
+          "from": "result",
+          "trigger": "return",
+          "animation": "close",
+          "condition": "true"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "advance/return",
+          "target": "next/return",
+          "feedback": "paper card",
+          "precondition": "result",
+          "state_change": "brief/selection",
+          "invalid_input": "next disabled at final"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "score weights 50/20/20/10"
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "a6316686-e269-493f-ba26-e543371669a4",
+  "input_map": {
+    "cancel": "pointer loss cancels transient action",
+    "priority": [
+      "active_tool_stroke",
+      "dragged_patch",
+      "damage_hotspot",
+      "UI"
+    ],
+    "multitouch": "second touch cancels active cut; patch may twist"
+  },
+  "created_at": "2026-09-29T16:36:45.469727+00:00",
+  "edge_cases": {
+    "invalid_cut": "sheet unchanged",
+    "invalid_attach": "snap back",
+    "attempt_exhausted": "partial result",
+    "material_exhausted": "result"
+  },
+  "updated_at": "2026-09-29T16:36:45.469727+00:00",
+  "core_screen": "workbench",
+  "orientation": "portrait",
+  "screen_flow": {
+    "retry": {
+      "to": "workbench",
+      "from": "flight_test",
+      "condition": "structure<70 and attempt remains"
+    },
+    "normal": [
+      "case_select",
+      "repair_brief",
+      "workbench",
+      "flight_test",
+      "result"
+    ],
+    "resolve": {
+      "to": "result",
+      "from": "flight_test",
+      "condition": "pass or attempts exhausted"
+    }
+  },
+  "state_count": 13,
+  "screen_count": 5,
+  "global_states": {
+    "attempts": 2,
+    "input_lock": [
+      "cut_commit",
+      "attach_commit",
+      "flight_running"
+    ],
+    "material_sheets": 2,
+    "success_structure": 70
+  },
+  "pack_markdown": "# Paper Dragon Tailor — Interaction Wireframe Pack v0.2. Portrait greybox. Core Workbench uses 12px cut tolerance, guided fold, 80% glue, 85% overlap and 15deg placement tolerance. Two flight attempts. Failed first flight maps causal stress back to Workbench. Deterministic polygon evaluation only.",
+  "source_run_at": "2026-09-29T16:36:45.469727+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "layout": "top 15 goal / center 65 workbench / bottom 20 tools",
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "min_touch_pt": 44,
+    "coordinate_unit": "percent"
+  },
+  "developer_handoff": {
+    "persistence": "unlocks/best result only",
+    "critical_rule": "deterministic polygon evaluation; no opaque physics",
+    "required_data": [
+      "body polygons",
+      "damage hotspots",
+      "cut/fold guides",
+      "repair zones"
+    ],
+    "scene_hierarchy": [
+      "App",
+      "CaseSelect",
+      "Brief",
+      "Workbench",
+      "FlightTest",
+      "Result"
+    ],
+    "state_ownership": {
+      "case": "RepairCaseController",
+      "test": "FlightEvaluator",
+      "craft": "WorkbenchController",
+      "input": "GestureRouter"
+    },
+    "reusable_components": [
+      "PaperPolygon",
+      "CutSampler",
+      "FoldGuide",
+      "CoverageMask",
+      "PatchManipulator",
+      "StressOverlay"
+    ],
+    "implementation_order": [
+      "flow",
+      "polygon hits",
+      "inspect",
+      "cut",
+      "fold",
+      "glue",
+      "place",
+      "flight",
+      "result"
+    ]
+  },
+  "acceptance_criteria": [
+    "Five screens reachable",
+    "Workbench implements all core gestures",
+    "Invalid cut consumes no material",
+    "Fold enforces guide tolerance",
+    "Glue requires 80 percent",
+    "Placement requires 85 percent overlap and 15 degree orientation",
+    "Stress maps to failed repair zone",
+    "First failure returns when attempt remains",
+    "Two-sheet exhaustion has result path",
+    "No persistent economy"
+  ],
+  "primary_interaction": "재단 → 접기 → 풀칠 → 패치 배치/회전",
+  "interaction_principles": [
+    "direct paper manipulation",
+    "single input owner",
+    "invalid commits return safely",
+    "flight feedback explains structural cause"
+  ]
+}

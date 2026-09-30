@@ -1,0 +1,1084 @@
+{
+  "id": "3a6776a0-645b-49b8-bc96-39ddfdde1ca5",
+  "title": "Elevator Weightmaster",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "924b53f0-26b2-4340-840f-dd993c7b919c",
+  "screens": [
+    {
+      "id": "shift_select",
+      "name": "Shift Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 90,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "main",
+            "role": "selection",
+            "label": "Shifts"
+          }
+        ]
+      },
+      "states": [
+        "Shift Select"
+      ],
+      "purpose": "select unlocked shift/rules",
+      "feedback": [],
+      "components": [
+        {
+          "id": "shift_cards",
+          "box": {
+            "h": 60,
+            "w": 86,
+            "x": 7,
+            "y": 15
+          },
+          "type": "card_grid",
+          "label": "Shifts",
+          "source_refs": [
+            "screen_inventory[0]",
+            "progression"
+          ],
+          "state_binding": "unlock/rating",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 11,
+            "w": 38,
+            "x": 55,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Start Shift",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_note": "CTA only exposes existing selection.",
+          "state_binding": "selected+unlocked",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "brief",
+          "from": "shift_select",
+          "trigger": "start",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select",
+          "target": "shift_cards",
+          "feedback": "selection",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected_shift",
+          "invalid_input": "locked unchanged",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "brief",
+      "name": "Manifest Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 88,
+            "w": 90,
+            "x": 5,
+            "y": 6,
+            "id": "manifest",
+            "role": "brief",
+            "label": "Manifest"
+          }
+        ]
+      },
+      "states": [
+        "QueuePreview"
+      ],
+      "purpose": "read requests, weights and destinations",
+      "feedback": [],
+      "components": [
+        {
+          "id": "queue",
+          "box": {
+            "h": 58,
+            "w": 86,
+            "x": 7,
+            "y": 15
+          },
+          "type": "manifest_list",
+          "label": "Passengers/Cargo",
+          "source_refs": [
+            "wireframe_handoff[0]",
+            "content_model"
+          ],
+          "state_binding": "4-6 objects weight/destination/footprint",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "enter",
+          "box": {
+            "h": 11,
+            "w": 38,
+            "x": 55,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Open Doors",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Local transition control only.",
+          "state_binding": "loaded",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "loading",
+          "from": "brief",
+          "trigger": "enter",
+          "condition": "loaded",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "enter loading",
+          "target": "enter",
+          "feedback": "doors open",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "precondition": "loaded",
+          "state_change": "Loading",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "loading",
+      "name": "Elevator Loading",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "hud",
+            "role": "status",
+            "label": "Load HUD"
+          },
+          {
+            "h": 62,
+            "w": 70,
+            "x": 15,
+            "y": 17,
+            "id": "cabin",
+            "role": "primary play",
+            "label": "Cabin Floor"
+          },
+          {
+            "h": 16,
+            "w": 58,
+            "x": 4,
+            "y": 81,
+            "id": "queue",
+            "role": "source",
+            "label": "Queue"
+          },
+          {
+            "h": 16,
+            "w": 31,
+            "x": 65,
+            "y": 81,
+            "id": "actions",
+            "role": "dispatch",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        "Loading",
+        "InvalidReady"
+      ],
+      "purpose": "directly pack cabin and satisfy dispatch constraints",
+      "feedback": [
+        "ghost",
+        "snap",
+        "live needle",
+        "invalid shake"
+      ],
+      "components": [
+        {
+          "id": "mass",
+          "box": {
+            "h": 9,
+            "w": 25,
+            "x": 4,
+            "y": 3
+          },
+          "type": "gauge",
+          "label": "Total Load",
+          "source_refs": [
+            "game_rules.capacity_kg"
+          ],
+          "state_binding": "total_mass/1000kg",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "center",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 32,
+            "y": 3
+          },
+          "type": "gauge",
+          "label": "Balance",
+          "source_refs": [
+            "game_rules"
+          ],
+          "state_binding": "center_offset safe .18 warn .28 critical .38",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "timer",
+          "box": {
+            "h": 9,
+            "w": 19,
+            "x": 77,
+            "y": 3
+          },
+          "type": "timer",
+          "label": "Load Time",
+          "source_refs": [
+            "game_rules.load_phase_sec"
+          ],
+          "state_binding": "40s",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cabin_floor",
+          "box": {
+            "h": 62,
+            "w": 70,
+            "x": 15,
+            "y": 17
+          },
+          "type": "drop_grid",
+          "label": "Cabin",
+          "source_refs": [
+            "interaction_spec.drag",
+            "content_model"
+          ],
+          "state_binding": "20cm grid, blocked tiles, occupancy",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "queue_objects",
+          "box": {
+            "h": 16,
+            "w": 58,
+            "x": 4,
+            "y": 81
+          },
+          "type": "drag_sources",
+          "label": "Waiting Loads",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "state_binding": "manifest remainder",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rotate",
+          "box": {
+            "h": 7,
+            "w": 14,
+            "x": 65,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Rotate Selected",
+          "source_refs": [
+            "interaction_spec.rotate"
+          ],
+          "state_binding": "selected rotatable cargo + doors open",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "dispatch",
+          "box": {
+            "h": 16,
+            "w": 15,
+            "x": 81,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Dispatch",
+          "source_refs": [
+            "game_rules.dispatch_requires"
+          ],
+          "state_binding": "mass<=1000 and abs(center)<=.28",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "invalid_reason",
+          "box": {
+            "h": 7,
+            "w": 14,
+            "x": 65,
+            "y": 90
+          },
+          "type": "status",
+          "label": "Constraint Reason",
+          "source_refs": [
+            "interaction_spec.invalid"
+          ],
+          "decision_note": "Makes authored constraint failure legible without changing thresholds.",
+          "state_binding": "overload/center/overlap/out-of-bounds",
+          "decision_origin": "wireframe_feedback"
+        }
+      ],
+      "edge_cases": [
+        "cancelled drop returns prior valid pose"
+      ],
+      "transitions": [
+        {
+          "to": "InvalidReady",
+          "from": "Loading",
+          "trigger": "constraint fails",
+          "condition": "overload or unsafe center",
+          "source_refs": [
+            "state_model[2]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "travel",
+          "from": "loading",
+          "trigger": "Dispatch",
+          "condition": "safe configuration",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "place/reposition on valid 20cm grid",
+          "target": "queue_objects/cabin object",
+          "feedback": "ghost+snap+thump",
+          "source_refs": [
+            "interaction_spec.drag",
+            "interaction_spec.collision"
+          ],
+          "precondition": "doors open",
+          "state_change": "mass/center/occupancy update",
+          "invalid_input": "overlap/out-of-bounds returns prior pose",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "drag through door",
+          "action": "remove",
+          "target": "loaded object",
+          "feedback": "gauge updates",
+          "source_refs": [
+            "interaction_spec.remove"
+          ],
+          "precondition": "doors open",
+          "state_change": "returns queue",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "rotate 90 degrees",
+          "target": "rotate",
+          "feedback": "outline snap",
+          "source_refs": [
+            "interaction_spec.rotate"
+          ],
+          "precondition": "selected rotatable cargo+doors open",
+          "state_change": "footprint orientation",
+          "invalid_input": "disabled otherwise",
+          "decision_origin": "game_design"
+        },
+        {
+          "input": "tap",
+          "action": "close doors/start travel",
+          "target": "dispatch",
+          "feedback": "safe-zone lock+motor",
+          "source_refs": [
+            "core_player_verbs[3]",
+            "game_rules.dispatch_requires"
+          ],
+          "precondition": "mass<=1000 and abs(center)<=.28",
+          "state_change": "Travel",
+          "invalid_input": "disabled and reason shown",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "invalid",
+          "name": "Invalid Ready",
+          "notes": "Never auto-arrange.",
+          "condition": "overload or abs(center)>.28",
+          "components": [],
+          "source_refs": [
+            "state_model[2]",
+            "interaction_spec.invalid"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "dispatch": {
+              "state_binding": "disabled"
+            },
+            "invalid_reason": {
+              "state_binding": "show exact failing constraint category"
+            }
+          }
+        },
+        {
+          "id": "dual_future",
+          "name": "Destination-aware layout",
+          "notes": "Shows authored destination meaning; no new rule.",
+          "condition": "objects remain for later floors",
+          "components": [],
+          "source_refs": [
+            "content_model.axes.destination"
+          ],
+          "decision_note": "Destination badge is information presentation only.",
+          "decision_origin": "wireframe_feedback",
+          "hide_components": [],
+          "component_overrides": {
+            "queue_objects": {
+              "state_binding": "destination badges visible"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Hit area may expand beyond visual bounds while logical footprint remains authored."
+      ]
+    },
+    {
+      "id": "travel",
+      "name": "Travel / Correction",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "progress",
+            "role": "status",
+            "label": "Travel HUD"
+          },
+          {
+            "h": 68,
+            "w": 70,
+            "x": 15,
+            "y": 17,
+            "id": "cabin",
+            "role": "primary play",
+            "label": "Cabin"
+          },
+          {
+            "h": 9,
+            "w": 84,
+            "x": 8,
+            "y": 88,
+            "id": "danger",
+            "role": "critical status",
+            "label": "Danger"
+          }
+        ]
+      },
+      "states": [
+        "Travel",
+        "Correction"
+      ],
+      "purpose": "observe ride and directly recover sway with allowed loads",
+      "feedback": [
+        "cabin tilt",
+        "warning tick",
+        "recovery haptic"
+      ],
+      "components": [
+        {
+          "id": "floor_progress",
+          "box": {
+            "h": 9,
+            "w": 35,
+            "x": 4,
+            "y": 3
+          },
+          "type": "progress",
+          "label": "Floor Progress",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "state_binding": "travel progress",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "balance",
+          "box": {
+            "h": 9,
+            "w": 38,
+            "x": 42,
+            "y": 3
+          },
+          "type": "gauge",
+          "label": "Balance",
+          "source_refs": [
+            "feedback_system.balance"
+          ],
+          "state_binding": "live center offset",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cabin",
+          "box": {
+            "h": 68,
+            "w": 70,
+            "x": 15,
+            "y": 17
+          },
+          "type": "direct_view",
+          "label": "Cabin Loads",
+          "source_refs": [
+            "state_model[3]",
+            "state_model[4]"
+          ],
+          "state_binding": "travel/correction allowed flags",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "critical",
+          "box": {
+            "h": 9,
+            "w": 84,
+            "x": 8,
+            "y": 88
+          },
+          "type": "timer",
+          "label": "Critical Hold",
+          "source_refs": [
+            "game_rules.critical_hold_sec"
+          ],
+          "state_binding": "3s when critical",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [
+        "critical threshold must be continuous for 3s"
+      ],
+      "transitions": [
+        {
+          "to": "Correction",
+          "from": "Travel",
+          "trigger": "sway event",
+          "condition": "active",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Travel",
+          "from": "Correction",
+          "trigger": "balance recovered/event ends",
+          "condition": "critical hold not reached",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "arrival",
+          "from": "travel",
+          "trigger": "floor reached",
+          "condition": "no emergency stop",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "arrival",
+          "from": "travel",
+          "trigger": "critical >=3s",
+          "condition": "emergency stop",
+          "source_refs": [
+            "game_rules.critical_hold_sec"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "reposition within allowed cabin area",
+          "target": "highlighted movable load",
+          "feedback": "tilt/needle recover",
+          "source_refs": [
+            "core_player_verbs[4]",
+            "interaction_spec.correction"
+          ],
+          "precondition": "Correction",
+          "state_change": "center changes live",
+          "invalid_input": "locked object rejects with locked feedback",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "correction",
+          "name": "Sway Correction",
+          "notes": "Locked objects reject input; live needle/tilt make one drag legible.",
+          "condition": "sway event active",
+          "components": [],
+          "source_refs": [
+            "interaction_spec.correction",
+            "wireframe_handoff[6]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [],
+          "component_overrides": {
+            "cabin": {
+              "state_binding": "only highlighted movable loads draggable"
+            },
+            "critical": {
+              "state_binding": "visible danger countdown"
+            }
+          }
+        }
+      ],
+      "implementation_notes": []
+    },
+    {
+      "id": "arrival",
+      "name": "Arrival Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 86,
+            "x": 7,
+            "y": 8,
+            "id": "result",
+            "role": "result",
+            "label": "Ride Result"
+          }
+        ]
+      },
+      "states": [
+        "Arrival",
+        "Failure Result"
+      ],
+      "purpose": "settle one ride or emergency stop",
+      "feedback": [],
+      "components": [
+        {
+          "id": "delivered",
+          "box": {
+            "h": 30,
+            "w": 80,
+            "x": 10,
+            "y": 15
+          },
+          "type": "summary",
+          "label": "Delivered",
+          "source_refs": [
+            "game_rules.score"
+          ],
+          "state_binding": "delivered/left behind/emergency",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "ride_score",
+          "box": {
+            "h": 15,
+            "w": 80,
+            "x": 10,
+            "y": 48
+          },
+          "type": "score",
+          "label": "Ride Score",
+          "source_refs": [
+            "game_rules.score"
+          ],
+          "state_binding": "score components",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 52,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Continue",
+          "source_refs": [
+            "state_model[5]"
+          ],
+          "state_binding": "normal arrival",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 10,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Retry Ride",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "emergency stop",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "brief",
+          "from": "arrival",
+          "trigger": "continue",
+          "condition": "rides remain",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "shift_result",
+          "from": "arrival",
+          "trigger": "continue",
+          "condition": "shift complete",
+          "source_refs": [
+            "round_structure"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "next manifest or reset same ride",
+          "target": "continue/retry",
+          "feedback": "doors/brief",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "result",
+          "state_change": "session flow",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "shift_result",
+      "name": "Shift Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 84,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "result",
+            "role": "meta result",
+            "label": "Shift Result"
+          }
+        ]
+      },
+      "states": [
+        "Shift Success",
+        "Shift Failure"
+      ],
+      "purpose": "evaluate 3-5 ride shift and unlock rule content",
+      "feedback": [],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 40,
+            "w": 80,
+            "x": 10,
+            "y": 15
+          },
+          "type": "summary",
+          "label": "Shift Summary",
+          "source_refs": [
+            "round_structure",
+            "game_rules.rating"
+          ],
+          "state_binding": "delivery ratio,total score,rating",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rating",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 58
+          },
+          "type": "rating",
+          "label": "Rating",
+          "source_refs": [
+            "game_rules.rating"
+          ],
+          "state_binding": "B>=250,A>=350,S>=450",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "home",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 10,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Shift Select",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 52,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Replay Shift",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_note": "Replay exposes existing session loop without new reward.",
+          "state_binding": "always",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "navigate",
+          "target": "home/replay",
+          "feedback": "transition",
+          "source_refs": [
+            "screen_flow",
+            "progression"
+          ],
+          "precondition": "result",
+          "state_change": "new shift/session",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "3f6f7586-c41e-4db6-a746-1009bb523a68",
+  "input_map": {
+    "cancel": "release outside cabin returns prior valid pose",
+    "conflict": "authoritative rotate button avoids twist/drag ambiguity",
+    "gestures": [
+      "drag place/reposition/remove",
+      "tap authoritative rotate",
+      "optional two-finger rotate",
+      "tap dispatch",
+      "Correction drag"
+    ],
+    "priority": [
+      "modal/UI",
+      "selected object",
+      "cabin object",
+      "queue object",
+      "background"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T06:36:17.533149+00:00",
+  "edge_cases": {
+    "items": [
+      "overlap drop rejected",
+      "out-of-bounds returns prior pose",
+      "dispatch disabled with cause",
+      "locked travel load rejects drag",
+      "critical must exceed threshold continuously 3s"
+    ],
+    "source_refs": [
+      "interaction_spec",
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T06:36:17.533149+00:00",
+  "core_screen": "loading",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "shift_select",
+    "guards": [
+      "dispatch requires mass<=1000 and abs(center)<=0.28"
+    ],
+    "normal": [
+      "shift_select",
+      "brief",
+      "loading",
+      "travel",
+      "arrival",
+      "next_manifest",
+      "shift_result"
+    ],
+    "branches": [
+      "loading<->invalid_ready",
+      "travel<->correction",
+      "emergency_stop->failure->retry"
+    ],
+    "source_refs": [
+      "screen_flow",
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 10,
+  "screen_count": 6,
+  "global_states": {
+    "Loading": {
+      "effect": "Brief start disabled until manifest ready",
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "decision_note": "Local UX only.",
+      "decision_origin": "wireframe_completion"
+    },
+    "InputLock": {
+      "effect": "Travel accepts no load manipulation outside Correction; Correction accepts highlighted loads only",
+      "source_refs": [
+        "interaction_spec.correction"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Elevator Weightmaster\n\nFun promise: turn a visibly messy cabin into a balanced safe ride by direct placement, then rescue sway with a meaningful drag. Whole-MVP coverage includes all six screen types, Loading/InvalidReady/Travel/Correction/Arrival and shift results, content modifiers, scoring and progression. Decision trace is embedded in JSON.",
+  "source_run_at": "2026-09-30T06:36:17.533149+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coordinates": "0..100 screen-percent",
+    "fun_promise": "Read weight and space at a glance, then physically arrange the cabin into a safe ride.",
+    "source_refs": [
+      "visual_direction_brief",
+      "wireframe_handoff"
+    ],
+    "decision_note": "Portrait cabin-dominant layout follows visual brief.",
+    "decision_origin": "wireframe_layout"
+  },
+  "developer_handoff": {
+    "fun_promise": "The satisfying moment is seeing a messy cabin become visibly balanced through your own placement, then saving a sway with one meaningful drag.",
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "3 MVP manifests",
+      "4-6 objects each",
+      "mass/footprint/destination/behavior",
+      "cabin grid/modifiers",
+      "sway event",
+      "score/rating"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "shift progression persistent",
+      "ride placement/travel local"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "mass/shape",
+      "destination",
+      "blocked/slippery tile",
+      "stable/shifts/needs wall/fragile"
+    ],
+    "implementation_boundary": "Implementation Blueprint chooses Godot scene/node/script architecture."
+  },
+  "acceptance_criteria": [
+    "All six screen types are reachable in full shift flow.",
+    "Loading and InvalidReady show mass, center and exact dispatch cause.",
+    "Drag placement snaps to 20cm grid; overlap/out-of-bounds never auto-arrange.",
+    "Dispatch requires mass<=1000kg and abs(center)<=0.28.",
+    "Travel only allows manipulation during Correction and only highlighted loads.",
+    "Critical offset held continuously for 3s produces emergency stop.",
+    "Arrival and Shift Result preserve authored score/rating/progression semantics."
+  ],
+  "primary_interaction": "passenger/cargo drag placement + live center-of-mass + sway correction",
+  "interaction_principles": [
+    "Direct placement is the puzzle",
+    "Balance feedback updates continuously",
+    "Invalid drops never auto-arrange",
+    "Correction reuses the same spatial understanding"
+  ]
+}

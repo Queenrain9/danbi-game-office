@@ -1,0 +1,998 @@
+{
+  "id": "8cc35d68-2a62-4331-9d6b-7f522ef7bdb0",
+  "title": "Haunted Record Press",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "22cd1908-2f81-4e86-b286-2edad742b7d4",
+  "screens": [
+    {
+      "id": "H1",
+      "name": "Record Shelf / Mission Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "locked",
+        "unlocked"
+      ],
+      "purpose": "Select among ten linear missions",
+      "components": [
+        {
+          "id": "records",
+          "box": {
+            "h": 63,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "card_list",
+          "label": "Records",
+          "state_binding": "locked/unlocked,best score/stars"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Open",
+          "state_binding": "selected unlocked"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "H2",
+          "from": "H1",
+          "trigger": "Open",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "records",
+          "feedback": "focus",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "select",
+          "invalid_input": "locked explains prerequisite",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "H2",
+      "name": "Mission Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "brief"
+      ],
+      "purpose": "Show record, segment count and target focus",
+      "components": [
+        {
+          "id": "record",
+          "box": {
+            "h": 34,
+            "w": 80,
+            "x": 10,
+            "y": 12
+          },
+          "type": "preview",
+          "label": "Record",
+          "state_binding": "mission"
+        },
+        {
+          "id": "segments",
+          "box": {
+            "h": 10,
+            "w": 84,
+            "x": 8,
+            "y": 52
+          },
+          "type": "progress_strip",
+          "label": "Segments",
+          "state_binding": "3..6 ordered"
+        },
+        {
+          "id": "focus",
+          "box": {
+            "h": 12,
+            "w": 84,
+            "x": 8,
+            "y": 66
+          },
+          "type": "rule_card",
+          "label": "Focus",
+          "state_binding": "class"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "loaded"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "H3",
+          "from": "H2",
+          "trigger": "Start",
+          "condition": "loaded",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "ghost cue",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "loaded",
+          "state_change": "first Inspect",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "H3",
+      "name": "Record Carving Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 51,
+            "w": 88,
+            "x": 6,
+            "y": 13,
+            "id": "play",
+            "role": "direct manipulation",
+            "label": "Record"
+          }
+        ]
+      },
+      "states": [
+        "Inspect",
+        "Carve Ready",
+        "Carving",
+        "Review",
+        "Pause"
+      ],
+      "purpose": "Preview target, set pressure, carve, review, correct/accept",
+      "components": [
+        {
+          "id": "progress",
+          "box": {
+            "h": 7,
+            "w": 30,
+            "x": 4,
+            "y": 3
+          },
+          "type": "progress",
+          "label": "Segment",
+          "state_binding": "i of 3..6"
+        },
+        {
+          "id": "attempts",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 38,
+            "y": 3
+          },
+          "type": "counter",
+          "label": "Attempts",
+          "state_binding": "3..0"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 12,
+            "x": 84,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "record",
+          "box": {
+            "h": 51,
+            "w": 88,
+            "x": 6,
+            "y": 13
+          },
+          "type": "spatial_view",
+          "label": "Active Groove",
+          "state_binding": "target/player trace"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 15,
+            "y": 46
+          },
+          "type": "hit_zone",
+          "label": "Start",
+          "state_binding": "logical radius0.12"
+        },
+        {
+          "id": "end",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 73,
+            "y": 25
+          },
+          "type": "hit_zone",
+          "label": "End",
+          "state_binding": "logical radius0.12"
+        },
+        {
+          "id": "preview",
+          "box": {
+            "h": 10,
+            "w": 25,
+            "x": 5,
+            "y": 68
+          },
+          "type": "hold_button",
+          "label": "Preview",
+          "state_binding": "Inspect/Ready"
+        },
+        {
+          "id": "pressure",
+          "box": {
+            "h": 20,
+            "w": 18,
+            "x": 34,
+            "y": 67
+          },
+          "type": "vertical_drag",
+          "label": "Pressure 1/2/3",
+          "state_binding": "Ready"
+        },
+        {
+          "id": "review",
+          "box": {
+            "h": 20,
+            "w": 39,
+            "x": 56,
+            "y": 67
+          },
+          "type": "comparison_panel",
+          "label": "Review Metrics",
+          "state_binding": "Review"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 5,
+            "y": 90
+          },
+          "type": "button",
+          "label": "Replay",
+          "state_binding": "Review"
+        },
+        {
+          "id": "correct",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 37,
+            "y": 90
+          },
+          "type": "button",
+          "label": "Correct",
+          "state_binding": "Review attempts>0"
+        },
+        {
+          "id": "accept",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 69,
+            "y": 90
+          },
+          "type": "button",
+          "label": "Accept",
+          "state_binding": "Review score>=70"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[2]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Carving",
+          "from": "Carve Ready",
+          "trigger": "valid start",
+          "condition": "attempt remains",
+          "source_refs": [
+            "interaction_spec.carve"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Review",
+          "from": "Carving",
+          "trigger": "valid end",
+          "condition": ">=80% progress",
+          "source_refs": [
+            "game_rules"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Carve Ready",
+          "from": "Review",
+          "trigger": "Correct",
+          "condition": "attempts>0",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Inspect",
+          "from": "Review",
+          "trigger": "Accept",
+          "condition": "more segments",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "H4",
+          "from": "H3",
+          "trigger": "Accept",
+          "condition": "last segment",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "H5",
+          "from": "H3",
+          "trigger": "valid sub70 carve",
+          "condition": "attempts becomes0",
+          "source_refs": [
+            "round_structure"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "preview",
+          "input": "tap/hold",
+          "target": "Preview",
+          "feedback": "target trace pulse + ghost hum",
+          "source_refs": [
+            "interaction_spec.preview"
+          ],
+          "precondition": "Inspect or Carve Ready",
+          "state_change": "none",
+          "invalid_input": "release stops",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pressure",
+          "input": "vertical drag",
+          "target": "Pressure",
+          "feedback": "stylus depth",
+          "source_refs": [
+            "interaction_spec.pressure"
+          ],
+          "precondition": "Carve Ready",
+          "state_change": "pressure_level quantized1/2/3",
+          "invalid_input": "outside release keeps prior",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "carve",
+          "input": "single-pointer drag",
+          "target": "active arc start→end",
+          "feedback": "groove+cut texture+haptic",
+          "priority": "active carve owns pointer",
+          "source_refs": [
+            "interaction_spec.carve",
+            "game_rules"
+          ],
+          "precondition": "Carve Ready; attempt remains; valid start",
+          "state_change": "valid completion attempts-1; store 32-sample trace; Review",
+          "timing_rules": "duration valid start touch to valid end release",
+          "gesture_rules": "u reverse >0.08 invalid; end radius0.12; >=80% progress",
+          "invalid_input": "invalid start/end/progress clears trace; zero cost",
+          "cancel_behavior": "Pause cancels uncommitted carve no cost -> Ready",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "replay",
+          "input": "tap",
+          "target": "Replay",
+          "feedback": "target/player mismatch",
+          "source_refs": [
+            "interaction_spec.review"
+          ],
+          "precondition": "Review",
+          "state_change": "none",
+          "invalid_input": "disabled outside Review",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "correct",
+          "input": "tap",
+          "target": "Correct",
+          "feedback": "retry cue",
+          "source_refs": [
+            "interaction_spec.review"
+          ],
+          "precondition": "Review attempts>0",
+          "state_change": "clear trace -> Ready",
+          "invalid_input": "disabled attempts0",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "accept",
+          "input": "tap",
+          "target": "Accept",
+          "feedback": "phrase resolves",
+          "source_refs": [
+            "interaction_spec.review"
+          ],
+          "precondition": "Review score>=70",
+          "state_change": "lock segment -> next Inspect or Full Playback",
+          "invalid_input": "disabled score<70",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "clean",
+          "name": "Clean Melody",
+          "notes": "3-4 segments",
+          "condition": "class Clean",
+          "source_refs": [
+            "content_model.classes[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "record": {
+              "state_binding": "low-amplitude target"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "wave",
+          "name": "Wavering Voice",
+          "notes": "same state graph",
+          "condition": "class Wavering",
+          "source_refs": [
+            "content_model.classes[1]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "review": "shape mismatch emphasis"
+          },
+          "component_overrides": {
+            "record": {
+              "state_binding": "frequent v sign changes"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "pressure_v",
+          "name": "Pressure Phrase",
+          "notes": "no new state",
+          "condition": "class Pressure",
+          "source_refs": [
+            "content_model.classes[2]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "review": "pressure emphasis"
+          },
+          "component_overrides": {
+            "pressure": {
+              "state_binding": "target1/2/3 salient"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "tempo",
+          "name": "Tempo Phrase",
+          "notes": "no new state",
+          "condition": "class Tempo",
+          "source_refs": [
+            "content_model.classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "review": "tempo emphasis"
+          },
+          "component_overrides": {
+            "record": {
+              "state_binding": "target duration1.5..5s visible"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "composite",
+          "name": "Composite Record",
+          "notes": "declared axes combined",
+          "condition": "class Composite",
+          "source_refs": [
+            "content_model.classes[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "review": "all three errors visible"
+          },
+          "component_overrides": {
+            "record": {
+              "state_binding": "wavering+tempo;5..6 segments"
+            },
+            "pressure": {
+              "state_binding": "target pressure salient"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "H4",
+      "name": "Full Playback",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Full Playback",
+        "Pause"
+      ],
+      "purpose": "Hear/see reconstructed whole record",
+      "components": [
+        {
+          "id": "record",
+          "box": {
+            "h": 53,
+            "w": 80,
+            "x": 10,
+            "y": 14
+          },
+          "type": "playback_view",
+          "label": "Restored Record",
+          "state_binding": "accepted grooves"
+        },
+        {
+          "id": "progress",
+          "box": {
+            "h": 7,
+            "w": 80,
+            "x": 10,
+            "y": 71
+          },
+          "type": "meter",
+          "label": "Playback",
+          "state_binding": "assembled song"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 10,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 56,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Continue",
+          "state_binding": "enabled"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [
+        {
+          "to": "H5",
+          "from": "H4",
+          "trigger": "Continue/playback end",
+          "condition": "success",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "continue",
+          "input": "tap",
+          "target": "continue",
+          "feedback": "phrase resolves",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "always",
+          "state_change": "success Result",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "H5",
+      "name": "Mission Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "Success/failure score stars and navigation",
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 16,
+            "w": 84,
+            "x": 8,
+            "y": 12
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "state_binding": "success/failure"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 34
+          },
+          "type": "summary",
+          "label": "Score/Stars",
+          "state_binding": "average accepted; stars1/2>=80/3>=90"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 6,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "always"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 36,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "success+next"
+        },
+        {
+          "id": "shelf",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 66,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Shelf",
+          "state_binding": "always"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "H2",
+          "from": "H5",
+          "trigger": "Next",
+          "condition": "success+next",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "H3",
+          "from": "H5",
+          "trigger": "Retry",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "H1",
+          "from": "H5",
+          "trigger": "Shelf",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "clean restart",
+          "source_refs": [
+            "game_rules"
+          ],
+          "precondition": "always",
+          "state_change": "reset mission-local only",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next",
+          "feedback": "unlock",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "success+next",
+          "state_change": "unlock exactly next; open Brief",
+          "invalid_input": "disabled otherwise",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "0665bfe8-d61d-46c5-a924-9995504700c7",
+  "input_map": {
+    "cancel": "invalid carve and Carving Pause clear uncommitted trace no cost",
+    "priority": [
+      "Pause",
+      "active carve",
+      "Review",
+      "Preview/Pressure"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design",
+    "single_pointer_carve": true
+  },
+  "created_at": "2026-09-30T09:36:00.284415+00:00",
+  "edge_cases": {
+    "rules": [
+      "invalid carve zero attempt",
+      "valid carve exactly one attempt",
+      "sub70 attempts0 failure",
+      "Retry resets mission-local only",
+      "last Accept Full Playback"
+    ],
+    "source_refs": [
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T09:36:00.284415+00:00",
+  "core_screen": "H3",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "H1",
+    "guards": [
+      "Accept score>=70",
+      "Correct attempts>0",
+      "next segment locked until Accept"
+    ],
+    "normal": [
+      "H1",
+      "H2",
+      "H3",
+      "H4",
+      "H5"
+    ],
+    "branches": [
+      "Accept->next Inspect",
+      "Correct->Ready",
+      "third sub70 valid->H5 failure",
+      "success Next->H2"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 9,
+  "screen_count": 5,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze; Carving cancels uncommitted trace no cost -> Ready; Full Playback freezes",
+      "source_refs": [
+        "interaction_spec.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "InputLock": {
+      "effect": "active carve owns pointer",
+      "source_refs": [
+        "interaction_spec.carve"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Haunted Record Press\nWhole-MVP portrait pack preserving the ghost-hum-to-groove direct carving promise, five content classes, correction, playback, failure and progression.",
+  "source_run_at": "2026-09-30T09:33:36+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "Turn a ghost's humming pattern into a visible tactile groove with one deliberate finger carve, then hear the lost phrase return.",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Layout only.",
+    "decision_origin": "wireframe_layout",
+    "coordinate_system": "0..100"
+  },
+  "developer_handoff": {
+    "fun_promise": "Turn a ghost's humming pattern into a visible tactile groove with one deliberate finger carve, then hear the lost phrase return.",
+    "source_refs": [
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "10 missions",
+      "3-6 segments",
+      "32 target_v samples",
+      "pressure1..3",
+      "duration1.5..5s",
+      "best score/stars"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "content_bindings": [
+      "Clean Melody",
+      "Wavering Voice",
+      "Pressure Phrase",
+      "Tempo Phrase",
+      "Composite Record"
+    ],
+    "architecture_boundary": "Implementation Blueprint chooses Godot architecture; normalized judging space is logic, not UI coordinates."
+  },
+  "acceptance_criteria": [
+    "Five inventory screens and all declared gameplay states exist.",
+    "Core interactions and five content variants are structured objects.",
+    "Valid carve costs one attempt; invalid and Carving Pause cost zero.",
+    "Accept requires70; third valid sub70 attempt fails mission.",
+    "Last Accept reaches Full Playback; success unlocks exactly next mission.",
+    "Retry resets mission-local state and preserves meta."
+  ],
+  "primary_interaction": "pressure selection + single-pointer start-to-end groove carving",
+  "interaction_principles": [
+    "Keep rotating record central to hand action",
+    "Deterministic normalized judging",
+    "Make no-cost invalid carve and attempt spending explicit",
+    "All five classes reuse declared state graph"
+  ]
+}

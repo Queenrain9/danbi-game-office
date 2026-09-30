@@ -1,0 +1,174 @@
+{
+  "id": "614359dd-6ded-4bb7-a8f8-4962e31f509c",
+  "title": "Second-Hand Superpowers",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Credits only: start12; buy subtracts price; sell adds floor(base price/2); success adds4+Score; never below0.",
+  "idea_id": "884e6c78-3e9a-44b8-8f1c-3ea32a646889",
+  "version": "v0.1",
+  "one_line": "중고 초능력을 사고팔며 서로 충돌하는 부작용까지 조합해 의뢰를 해결하는 빌드크래프트 로그라이트.",
+  "core_loop": "시장 확인 → 거래 → 최대 3개 장착 → 3단계 사건에서 능력 선택 → 효과와 부작용 확인 → 보상/손실 → 다음 시장에서 빌드 수정.",
+  "mvp_scope": "One 3-contract run; 12 powers; 8 side effects; 6+ contract templates; 4 tags; trading; capacity6; 3-slot loadout; deterministic resolution; synergy; pause/restart.",
+  "created_at": "2026-09-30T12:12:20.222288+00:00",
+  "game_rules": {
+    "phase": "required_tag+threshold1-4; effective_strength=strength+1 if another equipped power shares primary tag; pass gives score+1 else integrity-1",
+    "market": "4 listings; buy if credits>=price and inventory<6; sell unequipped owned power for floor(base_price/2)",
+    "loadout": "1-3 owned powers; at least1 to start",
+    "contract": "after phase3 integrity>=1 and score>=2 succeeds; reward=4+score; otherwise run ends",
+    "recovery": "invalid input mutates nothing; pause resumes exact snapshot",
+    "pass_action": "Pass costs integrity1 and advances; no power effect",
+    "side_effect": "exactly one attached effect; timing on_use/after_phase/tag_pair; resolves after phase comparison in declared order"
+  },
+  "not_in_mvp": [
+    "real-time combat",
+    "free roam",
+    "permanent upgrades",
+    "online economy",
+    "crafting",
+    "power leveling"
+  ],
+  "updated_at": "2026-09-30T12:31:49.306424+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "Dominant cheap combos",
+    "Stacked side effects may reduce readability",
+    "Random market may offer poor tag coverage",
+    "Three-phase incidents may feel abstract without strong feedback"
+  ],
+  "progression": "Success grants Credits and next market; contracts progress1→3. No permanent upgrades; new run resets run state.",
+  "screen_flow": "Run Start→Market↔Listing Detail→Loadout↔Market→Incident/Resolve x3→Result→next Market; failure/victory→Run End→Run Start. Pause resumes exact prior state; quit→Run End.",
+  "state_model": [
+    {
+      "exit": "MARKET",
+      "name": "RUN_START"
+    },
+    {
+      "exit": "LOADOUT",
+      "name": "MARKET"
+    },
+    {
+      "exit": "INCIDENT_DECISION or MARKET",
+      "name": "LOADOUT"
+    },
+    {
+      "exit": "RESOLVE or PAUSED",
+      "name": "INCIDENT_DECISION"
+    },
+    {
+      "exit": "next INCIDENT_DECISION or RESULT",
+      "name": "RESOLVE"
+    },
+    {
+      "exit": "previous state or RUN_END",
+      "name": "PAUSED"
+    },
+    {
+      "exit": "MARKET or RUN_END",
+      "name": "RESULT"
+    },
+    {
+      "exit": "RUN_START",
+      "name": "RUN_END"
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "power listing + attached side effect / three-phase contract",
+  "content_model": {
+    "unit": "power listing + attached side effect; 3-phase contract",
+    "powers": "12 across Force/Mobility/Sense/Control; strength1-4; price2-7",
+    "topology": "slots logically equivalent; phases strict1→2→3; no spatial adjacency",
+    "contracts": "at least6 templates of 3 ordered required_tag+threshold phases",
+    "variation": [
+      "market composition",
+      "attached side effect",
+      "tag sequence",
+      "threshold"
+    ],
+    "side_effects": "8 across on_use/after_phase/tag_pair"
+  },
+  "source_run_at": "2026-09-30T12:12:20.222288+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "결함 있는 중고 초능력의 가치를 알아보고 부작용까지 계산해 작동하는 3슬롯 빌드를 만드는 초능력 브로커.",
+  "session_length": "8-15 minutes",
+  "test_scenarios": [
+    "Success: start12; buy Force strength3 price4 and Force strength2 price3 =>5 credits; equip both; synergy makes strength3 effective4; thresholds2,3,4 all pass; score3 integrity5; reward7 =>12 credits.",
+    "Failure: integrity2; Sense strength1 vs threshold3 fails => integrity1; attached Integrity Leak -1 =>0; failure result and run end.",
+    "Invalid: credits2 buying price5 changes nothing.",
+    "Tag-pair warning appears before incident and resolves only at declared timing."
+  ],
+  "design_markdown": "# Second-Hand Superpowers — Playable Game Design Spec v0.1\n\n## 1. Product Definition\n중고 초능력과 결함을 함께 거래하는 모바일 빌드크래프트 로그라이트. 강한 능력 수집보다 결함까지 포함한 거래와 조합 발견이 중심이다.\n## 2. Player Fantasy\n결함 있는 중고 초능력의 가치를 알아보고 부작용까지 계산해 작동하는 3슬롯 빌드를 만드는 초능력 브로커.\n## 3. Core Player Verbs\nInspect listing; trade valid listing; equip owned power; choose equipped power or Pass. Accepted actions mutate explicit state and return immediate feedback.\n## 4. Core Loop\n시장 확인 → 거래 → 3슬롯 빌드 → 3단계 사건 → 효과/부작용 확인 → 보상/실패 → 다음 시장에서 수정.\n## 5. Round / Session Structure\n3 contracts per run; each Market→Loadout→3 phases→Result. Start Credits12, Integrity5, capacity6. Pause freezes state; failed run restarts fresh.\n## 6. Game Rules\nMarket offers4 listings. Buy requires credits>=price and capacity; sell unequipped owned power for floor(base/2). Loadout1-3. Each phase has required tag and threshold1-4. Effective strength = strength+1 if another equipped power shares primary tag. Meeting threshold adds Score1, miss removes Integrity1. Each listing carries one side effect with on_use/after_phase/tag_pair timing. Pass removes Integrity1. Phase3 with Score>=2 and Integrity>=1 succeeds and pays4+Score; otherwise run ends. Invalid actions change nothing.\n## 7. State Model\nRUN_START→MARKET→LOADOUT→INCIDENT_DECISION→RESOLVE. Resolve loops or opens RESULT. PAUSED resumes previous state or quits. RESULT goes next MARKET or RUN_END. RUN_END→fresh RUN_START.\n## 8. Interaction Spec\nUnaffordable/full/unowned/equipped-sell/empty-start/unequipped-use are rejected with zero mutation. RESOLVE locks gameplay input except pause.\n## 9. Content Model\n12 powers across Force/Mobility/Sense/Control; 8 side effects across three timing classes; 6+ contract templates of three ordered tag+threshold phases. Slots are logically equivalent; phases strict1→2→3; no spatial adjacency.\n## 10. Difficulty / Variation\nContract1 thresholds1-2 repeated tags; Contract2 mixed tags2-3; Contract3 thresholds3-4 and changing tags. Variation is composition, defects, sequences, thresholds—not speed.\n## 11. Progression\nSuccess grants Credits and next market; contracts1→3. No permanent stat upgrades; fresh run resets.\n## 12. Economy\nCredits only. Start12; buy subtracts; sale adds floor(base/2); success adds4+Score; never negative.\n## 13. Screen Inventory\nRun Start; Market; Listing Detail/Trade Confirmation; Loadout; Incident; Pause Overlay; Contract Result; Run End.\n## 14. Screen Flow\nRun Start→Market↔Detail→Loadout↔Market→Incident/Resolve×3→Result→next Market; failure/victory→Run End→Run Start. Pause resumes exact state; quit ends run.\n## 15. Feedback System\nShow credit delta, active tag-pair warning, requirement+threshold, effective-strength comparison, ordered side-effect deltas, invalid reason, terminal cause.\n## 16. Visual Direction Brief\nPortrait-first worn superpower marketplace and compact incident stage. Tags/defects must read at a glance. No coordinates prescribed.\n## 17. MVP Scope + NOT IN MVP\nMVP: full 3-contract run, 12 powers, 8 side effects, 6+ templates, 4 tags, trading, capacity6, 3 slots, deterministic resolution, synergy, pause/restart. NOT: real-time combat, free roam, permanent upgrades, online economy, crafting, leveling.\n## 18. Test Scenarios\nSuccess: start12, buy Force3 price4 + Force2 price3 =>5; shared tag makes Force3 effective4, clearing thresholds2/3/4; Score3, Integrity5; reward7 =>12. Failure: Integrity2, Sense1 vs threshold3 =>Integrity1, attached Leak -1 =>0 and run end. Invalid price5 purchase with Credits2 changes nothing.\n## 19. Known Risks\nCheap dominant combos; stacked effects readability; poor random tag coverage; repeated three-phase abstraction.\n## 20. Wireframe Handoff\nFun promise: 결함까지 가격과 빌드의 일부로 받아들이고 예상 밖 조합을 발견해 다음 시장에서 즉시 고쳐 가는 재미. Represent every screen, valid/invalid trade, 3-slot build, tag-pair warning, phase requirement/threshold, ordered resolution, terminal results, pause/resume/quit, and contract1-3 variation. Full transition entry→market→loadout→incident→result→next→victory/failure→replay.",
+  "feedback_system": {
+    "signals": [
+      "exact credit delta",
+      "active tag-pair warning",
+      "required tag and threshold before choice",
+      "effective-strength comparison",
+      "ordered side-effect deltas",
+      "invalid reason",
+      "terminal cause"
+    ]
+  },
+  "round_structure": "한 run은 3 contracts. 각 contract는 Market→Loadout→3 ordered phases→Result. Start Credits=12, Integrity=5, inventory capacity=6. Phase3 종료 시 Integrity>=1 and Score>=2면 성공. Integrity=0 또는 최종 Score<2면 실패. Pause는 상태를 동결하고 retry는 fresh run.",
+  "interaction_spec": {
+    "valid": "accepted input changes named state/value",
+    "cancel": "inspection/trade cancel zero mutation; loadout back returns market",
+    "invalid": "unaffordable/full/unowned/equipped-sell/empty-start/unequipped-use rejected with zero mutation",
+    "priority": "RESOLVE locks gameplay input except pause"
+  },
+  "screen_inventory": [
+    "Run Start",
+    "Market",
+    "Listing Detail/Trade Confirmation",
+    "Loadout",
+    "Incident",
+    "Pause Overlay",
+    "Contract Result",
+    "Run End"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "inspect",
+      "input": "tap",
+      "target": "listing",
+      "feedback": "detail",
+      "condition": "MARKET",
+      "state_change": "reveal rules"
+    },
+    {
+      "verb": "trade",
+      "input": "tap",
+      "target": "listing",
+      "feedback": "delta",
+      "condition": "valid credits/capacity",
+      "state_change": "credits+inventory"
+    },
+    {
+      "verb": "equip",
+      "input": "drag/tap",
+      "target": "3 slots",
+      "feedback": "combo preview",
+      "condition": "owned",
+      "state_change": "loadout"
+    },
+    {
+      "verb": "act",
+      "input": "tap",
+      "target": "phase",
+      "feedback": "resolution",
+      "condition": "INCIDENT_DECISION",
+      "state_change": "score/integrity/phase"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Fun promise: 결함까지 가격과 빌드의 일부로 받아들이고 예상 밖 조합을 발견해 다음 시장에서 즉시 고쳐 가는 재미.",
+    "Represent all 8 screens, trade validity, inventory limits, 3-slot build, tag-pair warning, requirement+threshold, ordered resolution, success/failure, pause/resume/quit, contract1-3 variations.",
+    "Gestures: tap inspect/trade/action/pass; drag or tap-to-slot equip; cancel/back.",
+    "Transition: entry→market→loadout→incident→result→next→victory/failure→replay."
+  ],
+  "primary_interaction": "Trade imperfect powers, assemble a 3-slot build, then choose one equipped power per incident phase while absorbing attached side effects.",
+  "difficulty_variation": "Contract1 thresholds1-2 repeated tags; Contract2 mixed tags thresholds2-3; Contract3 thresholds3-4 and changing tags. Variation changes combinations, not speed.",
+  "visual_direction_brief": "Portrait mobile marketplace; worn listing/defect identity; compact incident stage. Tags and defects highly legible; no fixed coordinates."
+}

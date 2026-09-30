@@ -1,401 +1,408 @@
 {
-    "title": "Living Map Expedition",
-    "source": "chat_automation",
-    "economy": "Not required. Ink와 Stamina는 한 mission 안에서만 존재하는 tactical resources이며 영구 화폐가 아니다.",
-    "idea_id": "3ea61de4-5f0b-408c-8b07-a50c8a95cb9c",
-    "version": "v0.1",
-    "one_line": "탐험한 타일의 현재 지형을 지도에 기록해 현실을 고정하거나 빈칸으로 남겨 다음 턴에 지형이 뒤집히게 하며 원정대를 신전까지 이끄는 모바일 턴제 탐험 전략 게임.",
-    "core_loop": "한 턴마다 인접 미지 타일을 최대 2개 정찰해 현재/다음 형태를 확인 → 필요하면 공개 타일 1개를 잉크로 기록해 현재 형태를 영구 고정 → 원정대를 인접 타일로 이동하거나 1 Stamina를 써서 Wait → 이동/대기 후 공개된 미기록 타일들이 A↔B로 뒤집힘 → 새 지형을 기준으로 다음 턴을 계획한다. 6–10턴 안팎으로 Shrine 도달을 노린다.",
-    "mvp_scope": "Authored island mission 1개, 4×4=16 cells. Camp 1, Shrine 1, mutable 14. Mutable pair 구성은 Path↔Marsh 5, Path↔Ridge 4, Marsh↔Ridge 3, Path↔Spring 2. Terrain 4종(Path/Marsh/Ridge/Spring), Stamina 9/10, Ink 4, turn당 Scout 2/Record 1, deterministic A↔B World Shift, occupied tile temporary freeze, Spring one-time recovery, Move/Wait cost, success/failure/score/result/retry를 구현한다.",
-    "game_rules": {
-        "move": {
-            "valid": "Target is orthogonally adjacent, revealed, passable in current form, and current stamina >= its move cost.",
-            "invalid": "Diagonal, unrevealed, Ridge, or unaffordable target changes no state.",
-            "resolution_order": [
-                "deduct move cost",
-                "move party",
-                "resolve Spring if applicable",
-                "if target is Shrine -> success",
-                "else if stamina==0 -> failure",
-                "else World Shift"
-            ]
-        },
-        "wait": {
-            "valid": "stamina>=1",
-            "purpose": "advance unrecorded terrain without changing party position",
-            "resolution_order": [
-                "stamina -1",
-                "if stamina==0 -> failure",
-                "else World Shift"
-            ]
-        },
-        "board": {
-            "grid": "4x4 orthogonal grid",
-            "cells": 16,
-            "camp_cells": 1,
-            "shrine_cells": 1,
-            "mutable_cells": 14
-        },
-        "pause": "Pause freezes World Shift animation/transition and accepts no gameplay input except Resume/Retry. No resource changes occur while paused.",
-        "retry": "Restore all 16 cells to initial mission data: mutable cells unrevealed/Form A/not recorded/spring_consumed=false; party at Camp; Stamina=9; Ink=4; turn_count=1; scouts_left=2; record_used=false.",
-        "score": "On success only: 1200 + (remaining Stamina ×100) + (remaining Ink ×150) - (turn_count ×50). Failure score=0.",
-        "scout": {
-            "cost": "none",
-            "reset": "scouts_left returns to 2 at each Turn Planning entry",
-            "result": "reveal Form A and Form B information",
-            "target": "orthogonally adjacent unrevealed mutable tile",
-            "per_turn": 2
-        },
-        "failure": "Stamina reaches 0 after Wait or after resolving entry effects on a non-Shrine tile.",
-        "success": "Enter Shrine after paying its 1 Stamina move cost. Goal success has priority over exhaustion, so entering Shrine with exactly 1 Stamina succeeds at 0.",
-        "terrain": {
-            "Camp": {
-                "passable": true,
-                "move_cost": 0,
-                "entry_effect": "start only; never shifts or records"
-            },
-            "Path": {
-                "passable": true,
-                "move_cost": 1,
-                "entry_effect": "none"
-            },
-            "Marsh": {
-                "passable": true,
-                "move_cost": 2,
-                "entry_effect": "none"
-            },
-            "Ridge": {
-                "passable": false,
-                "move_cost": null,
-                "entry_effect": "cannot enter"
-            },
-            "Shrine": {
-                "passable": true,
-                "move_cost": 1,
-                "entry_effect": "goal; never shifts or records"
-            },
-            "Spring": {
-                "passable": true,
-                "move_cost": 1,
-                "entry_effect": "If this cell spring_consumed=false, add 2 Stamina up to max10 then set spring_consumed=true; later entries give no stamina"
-            }
-        },
-        "resources": {
-            "ink": {
-                "max": 4,
-                "min": 0,
-                "limit": "At most one Record action per turn",
-                "start": 4,
-                "decrease": "Record costs exactly 1",
-                "increase": "No recovery in MVP"
-            },
-            "stamina": {
-                "max": 10,
-                "min": 0,
-                "loss": "If stamina is 0 after resolving a non-Shrine entry or Wait, mission fails",
-                "start": 9,
-                "decrease": "Path/Spring/Shrine move costs 1; Marsh move costs 2; Wait costs 1",
-                "increase": "Entering an unconsumed Spring adds 2 after movement cost, capped at 10"
-            }
-        },
-        "mutable_tile": {
-            "shift": "After every completed Move or Wait, every revealed, unrecorded mutable tile except the currently occupied tile toggles A↔B exactly once.",
-            "record": "Record permanently locks the tile's current form; recorded tiles never shift again. Recording Ridge is legal and permanently blocks that cell. Record has no refund.",
-            "occupied": "The currently occupied mutable tile does not shift. If the party later leaves it and it is still unrecorded, it participates in that turn's World Shift.",
-            "unrevealed": "Unrevealed cells do not shift. When first scouted they always begin in Form A.",
-            "authored_pair": "Each mutable cell owns Form A and Form B from Path/Marsh/Ridge/Spring. It starts unrevealed. First Scout reveals it in Form A and also reveals what Form B will be."
-        }
+  "id": "b139a820-6ca7-4b1d-89f1-ee90b99530de",
+  "title": "Living Map Expedition",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Not required. Ink와 Stamina는 한 mission 안에서만 존재하는 tactical resources이며 영구 화폐가 아니다.",
+  "idea_id": "3ea61de4-5f0b-408c-8b07-a50c8a95cb9c",
+  "version": "v0.1",
+  "one_line": "탐험한 타일의 현재 지형을 지도에 기록해 현실을 고정하거나 빈칸으로 남겨 다음 턴에 지형이 뒤집히게 하며 원정대를 신전까지 이끄는 모바일 턴제 탐험 전략 게임.",
+  "core_loop": "한 턴마다 인접 미지 타일을 최대 2개 정찰해 현재/다음 형태를 확인 → 필요하면 공개 타일 1개를 잉크로 기록해 현재 형태를 영구 고정 → 원정대를 인접 타일로 이동하거나 1 Stamina를 써서 Wait → 이동/대기 후 공개된 미기록 타일들이 A↔B로 뒤집힘 → 새 지형을 기준으로 다음 턴을 계획한다. 6–10턴 안팎으로 Shrine 도달을 노린다.",
+  "mvp_scope": "Authored island mission 1개, 4×4=16 cells. Camp 1, Shrine 1, mutable 14. Mutable pair 구성은 Path↔Marsh 5, Path↔Ridge 4, Marsh↔Ridge 3, Path↔Spring 2. Terrain 4종(Path/Marsh/Ridge/Spring), Stamina 9/10, Ink 4, turn당 Scout 2/Record 1, deterministic A↔B World Shift, occupied tile temporary freeze, Spring one-time recovery, Move/Wait cost, success/failure/score/result/retry를 구현한다.",
+  "created_at": "2026-09-29T18:34:13.006387+00:00",
+  "game_rules": {
+    "move": {
+      "valid": "Target is orthogonally adjacent, revealed, passable in current form, and current stamina >= its move cost.",
+      "invalid": "Diagonal, unrevealed, Ridge, or unaffordable target changes no state.",
+      "resolution_order": [
+        "deduct move cost",
+        "move party",
+        "resolve Spring if applicable",
+        "if target is Shrine -> success",
+        "else if stamina==0 -> failure",
+        "else World Shift"
+      ]
     },
-    "not_in_mvp": [
-        "Multiple islands",
-        "Procedural generation",
-        "Multiple expedition members",
-        "Combat",
-        "Inventory items",
-        "Persistent upgrades",
-        "Narrative dialogue choices",
-        "Hidden/random terrain outcomes"
-    ],
-    "known_risks": [
-        "지도를 기록하면 세계가 고정된다는 규칙이 첫 플레이에 추상적으로 느껴질 위험",
-        "Form A/B를 동시에 예측하는 정보량이 모바일에서 복잡할 위험",
-        "Record가 너무 강하면 정답 타일만 찍는 퍼즐로 고착될 위험",
-        "Wait가 과도하게 사용되면 진행 템포가 늘어질 위험",
-        "단일 authored 4×4는 장기 반복성이 낮아 MVP 이후 콘텐츠 생산 규칙이 필요함"
-    ],
-    "progression": "MVP에는 영구 성장 불필요. 미션 성공 여부와 best Score만 저장한다. 장기 확장에서는 새 island mission을 해금할 수 있으나 플레이 중 Stamina/Ink 규칙은 메타 업그레이드로 변경하지 않는다.",
-    "screen_flow": "Expedition Brief → Living Map Gameplay/Turn Planning → Move or Wait Resolution → World Shift → Turn Planning 반복 → Shrine success Result 또는 Stamina failure Result. Invalid Scout/Record/Move는 같은 Turn Planning에 남는다. Pause는 Gameplay 위 상태로 들어가며 Resume 시 동일 state로 복귀. Result의 Retry는 같은 mission을 완전 초기화한다.",
-    "state_model": [
-        {
-            "exit": "valid Move or Wait",
-            "next": "Move Resolution or Wait Resolution",
-            "enter": "mission start or World Shift complete",
-            "state": "Turn Planning",
-            "variables": [
-                "party_position",
-                "stamina",
-                "ink",
-                "turn_count",
-                "scouts_left",
-                "record_used",
-                "tile reveal/form/record/consumed"
-            ],
-            "allowed_inputs": [
-                "Scout up to 2",
-                "Record up to 1",
-                "Move",
-                "Wait",
-                "Pause"
-            ],
-            "failure_cancel": "invalid input changes nothing; Pause returns to same state"
-        },
-        {
-            "exit": "entry effects resolved",
-            "next": "World Shift or Result",
-            "enter": "valid Move accepted",
-            "state": "Move Resolution",
-            "variables": [
-                "move_cost",
-                "stamina",
-                "party_position",
-                "spring_consumed"
-            ],
-            "allowed_inputs": [
-                "Pause only after atomic resource/position update completes"
-            ],
-            "failure_cancel": "Shrine -> success Result; non-Shrine stamina0 -> failure Result"
-        },
-        {
-            "exit": "stamina decremented",
-            "next": "World Shift or Result",
-            "enter": "valid Wait accepted",
-            "state": "Wait Resolution",
-            "variables": [
-                "stamina"
-            ],
-            "allowed_inputs": [
-            ],
-            "failure_cancel": "stamina0 -> failure Result"
-        },
-        {
-            "exit": "each eligible tile toggled exactly once; turn_count +1",
-            "next": "Turn Planning with scouts_left=2 and record_used=false",
-            "enter": "resolved Move/Wait with mission still active",
-            "state": "World Shift",
-            "variables": [
-                "each revealed unrecorded tile current_form"
-            ],
-            "allowed_inputs": [
-                "Pause"
-            ],
-            "failure_cancel": "Pause freezes transition; Resume continues"
-        },
-        {
-            "exit": "retry or finish",
-            "next": "Turn Planning on Retry or session exit",
-            "enter": "Shrine success or Stamina failure",
-            "state": "Result",
-            "variables": [
-                "success",
-                "score",
-                "turn_count",
-                "remaining stamina",
-                "remaining ink"
-            ],
-            "allowed_inputs": [
-                "retry",
-                "finish"
-            ],
-            "failure_cancel": "none"
-        }
-    ],
-    "content_unit": "authored living-island mission",
-    "artifact_type": "playable-game-design-spec",
-    "content_model": {
-        "mvp": {
-            "ink": 4,
-            "camp": 1,
-            "grid": "4x4",
-            "cells": 16,
-            "shrine": 1,
-            "mutable": 14,
-            "missions": 1,
-            "stamina_start": 9
-        },
-        "axes": [
-            "Form A/B pair",
-            "tile adjacency",
-            "Spring placement",
-            "required detour",
-            "record-worthy chokepoint",
-            "stamina pressure"
-        ],
-        "unit": "authored living-island mission",
-        "expansion": "Future islands change grid topology, pair composition, ink budget and goal placement while preserving deterministic Scout/Record/Shift rules.",
-        "mutable_pair_composition": {
-            "Path↔Marsh": 5,
-            "Path↔Ridge": 4,
-            "Marsh↔Ridge": 3,
-            "Path↔Spring": 2
-        }
+    "wait": {
+      "valid": "stamina>=1",
+      "purpose": "advance unrecorded terrain without changing party position",
+      "resolution_order": [
+        "stamina -1",
+        "if stamina==0 -> failure",
+        "else World Shift"
+      ]
     },
-    "source_run_at": "2026-09-29T18:34:13.006387+00:00",
-    "player_fantasy": "플레이어는 현실을 기록으로 붙잡는 원정대의 지도 제작자다. 눈앞의 지형뿐 아니라 다음 변화까지 읽고, 귀한 잉크를 어디에 써서 길을 영구화할지 결정해 살아 움직이는 섬을 이해했다는 지적 만족과 원정을 간신히 이어가는 긴장감을 느껴야 한다.",
-    "schema_version": "game-design-v0.1",
-    "session_length": "4–6분",
-    "test_scenarios": [
-        "Turn 1에서 인접 fog 2개를 Scout하면 각각 Form A와 Form B 정보가 공개되고 scouts_left가 0이 된다.",
-        "Ink 4에서 한 tile을 Record하면 Ink 3, recorded=true가 되고 같은 turn의 두 번째 Record는 invalid다.",
-        "Move 후 occupied tile을 제외한 revealed unrecorded tiles만 정확히 한 번 A↔B toggle된다.",
-        "Path cost1, Marsh cost2, Ridge invalid, Spring cost1 후 최초 1회 +2가 정확히 적용된다.",
-        "Stamina 1로 Shrine에 들어가 0이 되어도 success가 exhaustion보다 우선한다.",
-        "Stamina 1에서 Wait하면 0이 되어 failure Result에 도달한다.",
-        "Retry가 reveal/record/current form/Spring consumed/position/Stamina/Ink/turn을 모두 초기화한다.",
-        "Authored 4×4 mission은 Ink 4, Stamina 9 조건에서 최소 한 개의 검증된 success route를 가진다."
-    ],
-    "design_markdown": "# Playable Game Design Spec v0.1 — Living Map Expedition\n\n## 1. Product Definition\n탐험한 타일의 현재 지형을 지도에 기록해 현실을 고정하거나 빈칸으로 남겨 다음 턴에 뒤집히게 하며 Shrine까지 가는 portrait mobile turn-based exploration strategy. 세션 4–6분. 목표 감각은 살아 움직이는 세계의 규칙을 읽고 기록으로 길을 붙잡는 지적 숙련감이다. Non-goals: 실시간 액션, 전투 RPG, 랜덤 로그라이크, 대화 선택 게임.\n\n## 2. Player Fantasy\n플레이어는 현실을 기록으로 붙잡는 원정대의 지도 제작자다. 현재 지형과 다음 변화를 읽고 귀한 Ink를 써서 필요한 길만 영구화하며 섬을 이해했다는 만족을 느낀다.\n\n## 3. Core Player Verbs\nScout: 인접 fog tap, tile reveal+scouts_left-1. Record: record seal을 revealed tile에 drag, Ink-1+현재 form 영구 고정. Move: expedition token을 adjacent passable tile로 drag, Stamina cost+position change. Wait: Stamina1을 쓰고 제자리에서 World Shift. Pause: 현재 simulation을 동결한다.\n\n## 4. Core Loop\n최대 2 Scout → 필요 시 1 Record → Move 또는 Wait → World Shift → 다음 turn. 6–10 turn 안팎에서 Shrine 도달을 노린다.\n\n## 5. Round / Session Structure\n4×4 island 한 판. Camp에서 Stamina9/10, Ink4, Turn1 시작. Turn Planning → Move/Wait Resolution → World Shift → 다음 Turn Planning. Shrine 진입은 success, 비-Shrine에서 entry effect 후 Stamina0 또는 Wait 후 Stamina0은 failure. Retry는 전체 mission state reset.\n\n## 6. Game Rules\n16 cells 중 Camp1/Shrine1/mutable14. Path cost1, Marsh cost2, Ridge impassable, Spring cost1+최초 entry Stamina2 회복(max10). Mutable cell은 A/B form을 가진다. 첫 Scout 시 A로 reveal되며 B도 알려진다. Move/Wait 완료 후 revealed+unrecorded+unoccupied mutable tile만 A↔B 한 번 toggle. Occupied tile은 서 있는 동안 shift하지 않는다. Record는 current form을 영구 고정, Ink1, turn당 1회, refund 없음. Scout는 adjacent fog, turn당 2회.\n\nMove valid는 orthogonal adjacent+revealed+passable+affordable. Resolution은 cost 지불→이동→Spring effect→Shrine면 success→아니면 Stamina0 failure→그 외 shift. Shrine은 Stamina1로 들어가 0이어도 success가 우선한다. Wait는 Stamina1 지불→0이면 failure, 아니면 shift.\n\nSuccess score = 1200 + remaining Stamina×100 + remaining Ink×150 - turn_count×50. Failure score0. Pause는 automatic shift와 입력을 정지. Retry는 mutable tile을 unrevealed/A/unrecorded/unconsumed, party Camp, Stamina9, Ink4, Turn1로 복구한다.\n\n## 7. State Model\nTurn Planning: Scout/Record/Move/Wait/Pause. Invalid는 no change. Move/Wait로 exit.\nMove Resolution: cost/position/entry effect atomic resolve. Shrine→Result success, non-Shrine stamina0→Result failure, otherwise World Shift.\nWait Resolution: stamina-1; 0→failure, else Shift.\nWorld Shift: eligible tiles toggle once, turn_count+1, then scouts_left2/record_used=false로 Planning.\nResult: Retry/finish.\n\n## 8. Interaction Spec\nScout target은 orthogonally adjacent fog mutable tile. Record target은 revealed, unrecorded mutable tile; invalid release는 Ink 소모 없음. Move는 adjacent revealed passable affordable tile만 valid; invalid release는 token 원위치·비용 없음. Drag 중 해당 pointer input이 우선한다. Wait는 stamina>=1에서 atomic. Pause는 current state를 보존한다.\n\n## 9. Content Model\n반복 단위는 authored living-island mission. MVP는 4×4 한 개. Mutable pair 구성: Path↔Marsh 5, Path↔Ridge 4, Marsh↔Ridge 3, Path↔Spring 2. 확장 축은 pair, adjacency, Spring, chokepoint, Ink/Stamina pressure.\n\n## 10. Difficulty / Variation\nPath↔Marsh로 규칙 학습 → Path↔Ridge chokepoint에서 record/timing 선택 → Marsh↔Ridge와 Path↔Spring 조합으로 Stamina·Wait·귀환로까지 계산. 속도 증가가 아니라 topology/resource pressure로 상승.\n\n## 11. Progression\nMVP persistent progression 없음. Success와 best Score만 저장. 이후 island unlock 가능하나 Stamina/Ink 규칙은 meta upgrade로 바꾸지 않는다.\n\n## 12. Economy\nNot required. Ink/Stamina는 mission-local tactical resource다.\n\n## 13. Screen Inventory\nExpedition Brief, Living Map Gameplay, Expedition Result.\n\n## 14. Screen Flow\nBrief → Gameplay Turn Planning → Move/Wait Resolution → World Shift → Planning 반복 → Shrine success Result 또는 Stamina failure Result. Invalid input은 Planning 유지. Pause→Resume 동일 state. Result Retry→full reset.\n\n## 15. Feedback System\nScout는 fog reveal+A/B 정보, Record는 permanent lock+Ink decrement, Move는 terrain cost/position, Spring은 one-time recovery, Shift는 eligible tile toggle, invalid move는 no-state-change reject, Result는 goal/exhaustion 의미를 명확히 전달한다.\n\n## 16. Visual Direction Brief\nPortrait mobile의 단일 4×4 island-map view. fog/revealed/current/next/recorded/party가 즉시 구분되고 A/B 변화가 작은 화면에서도 읽혀야 한다. 탐험 일지·양피지 감성과 살아 움직이는 섬의 변형을 결합한다. UI 좌표와 세부 배치는 Wireframe에서 정한다.\n\n## 17. MVP Scope\nIsland mission 1개, 16 cells(Camp1/Shrine1/mutable14), pair composition 5/4/3/2, terrain4종, Stamina9/10, Ink4, Scout2/turn, Record1/turn, deterministic shift, occupied freeze, Spring one-time recovery, Move/Wait, success/failure/score/result/retry. NOT IN MVP: multiple islands, procedural generation, party members, combat, inventory, upgrades, dialogue, random hidden terrain.\n\n## 18. Test Scenarios\nScout limit와 A/B 공개, Record Ink/turn limit, 정확한 shift 대상, 4 terrain rule, Shrine success priority, Wait exhaustion failure, Retry full reset, authored map solvability를 검증한다.\n\n## 19. Known Risks\n기록=현실 고정 규칙의 추상성, A/B 정보 과부하, Record 정답화, Wait 템포 저하, 단일 map 반복성.\n\n## 20. Wireframe Handoff\n3 screens, Planning/Move/Wait/Shift/Pause/Result, tile lifecycle flags, Scout/Record/Move/Wait gestures와 invalid/cancel, Stamina/Ink 의미, turn limits, exact shift eligibility, Shrine success/exhaustion failure, Retry full reset을 표현한다. 새 게임 규칙 결정은 남기지 않는다.",
-    "feedback_system": {
-        "move": {
-            "audio": "terrain-specific travel cue",
-            "state": "stamina cost and position update",
-            "haptic": "light arrival",
-            "visual": "expedition traverses chosen adjacent terrain"
-        },
-        "scout": {
-            "audio": "paper reveal cue",
-            "state": "revealed=true; scouts_left-1",
-            "haptic": "light tick",
-            "visual": "fog clears and both current Form A and alternate Form B meaning become known"
-        },
-        "shift": {
-            "audio": "world-turn cue",
-            "state": "current_form toggles",
-            "haptic": "single global pulse",
-            "visual": "eligible unrecorded revealed tiles visibly change A↔B"
-        },
-        "record": {
-            "audio": "ink stamp",
-            "state": "ink-1; recorded=true",
-            "haptic": "firm stamp",
-            "visual": "tile gains permanent recorded state and no longer previews shifting"
-        },
-        "result": {
-            "audio": "success/failure sting",
-            "state": "Result",
-            "haptic": "distinct success/failure pattern",
-            "visual": "goal arrival or exhaustion state is unambiguous"
-        },
-        "spring": {
-            "audio": "restorative cue",
-            "state": "stamina +2 capped; consumed=true",
-            "haptic": "soft success",
-            "visual": "one-time resource recovery is explicit"
-        },
-        "invalid_move": {
-            "audio": "dry reject",
-            "state": "no changes",
-            "haptic": "short reject tick",
-            "visual": "target refuses movement and current terrain remains unchanged"
-        }
+    "board": {
+      "grid": "4x4 orthogonal grid",
+      "cells": 16,
+      "camp_cells": 1,
+      "shrine_cells": 1,
+      "mutable_cells": 14
     },
-    "round_structure": "MVP 미션은 4×4 island grid 한 판이다. Camp에서 Stamina 9/10, Ink 4, Turn 1로 시작한다. 각 turn은 Turn Planning → Move Resolution 또는 Wait Resolution → World Shift → 다음 Turn Planning 순서다. Shrine에 진입하면 즉시 성공 Result. Shrine이 아닌 곳에서 entry effect까지 처리한 뒤 Stamina가 0이면 즉시 실패 Result. Result에서 Retry는 grid reveal/record/form/consumed flags, position, Stamina, Ink, turn count를 전부 초기화한다. 평균 4–6분.",
-    "interaction_spec": {
-        "move": {
-            "input": "drag expedition token and release",
-            "valid": "revealed/passable/affordable",
-            "cancel": "release outside valid target; token returns and no cost paid",
-            "target": "orthogonally adjacent tile",
-            "invalid": "diagonal, fog, Ridge, insufficient stamina",
-            "priority": "expedition drag owns pointer and blocks record/scout input",
-            "success_change": "atomic movement resolution then turn ends"
-        },
-        "wait": {
-            "input": "tap",
-            "valid": "stamina>=1",
-            "cancel": "none",
-            "invalid": "stamina0 cannot occur in active Turn Planning",
-            "success_change": "stamina-1 then failure or World Shift"
-        },
-        "pause": {
-            "input": "tap pause",
-            "success_change": "freeze current state and automatic timers/animations"
-        },
-        "scout": {
-            "input": "tap",
-            "valid": "mutable, unrevealed, scouts_left>0",
-            "cancel": "not needed; tap is atomic",
-            "target": "orthogonally adjacent fog tile",
-            "invalid": "nonadjacent, special, already revealed, or scouts_left=0",
-            "priority": "ignored while expedition token or record seal is being dragged",
-            "success_change": "revealed=true,current_form=A,scouts_left-1"
-        },
-        "record": {
-            "input": "drag record seal and release",
-            "valid": "not recorded, ink>0, record_used=false",
-            "cancel": "release outside valid tile; no ink spent",
-            "target": "revealed mutable tile",
-            "invalid": "fog, Camp, Shrine, already recorded, ink0, second record same turn",
-            "priority": "record drag owns pointer until release",
-            "success_change": "ink-1,recorded=true,record_used=true"
-        }
+    "pause": "Pause freezes World Shift animation/transition and accepts no gameplay input except Resume/Retry. No resource changes occur while paused.",
+    "retry": "Restore all 16 cells to initial mission data: mutable cells unrevealed/Form A/not recorded/spring_consumed=false; party at Camp; Stamina=9; Ink=4; turn_count=1; scouts_left=2; record_used=false.",
+    "score": "On success only: 1200 + (remaining Stamina ×100) + (remaining Ink ×150) - (turn_count ×50). Failure score=0.",
+    "scout": {
+      "cost": "none",
+      "reset": "scouts_left returns to 2 at each Turn Planning entry",
+      "result": "reveal Form A and Form B information",
+      "target": "orthogonally adjacent unrevealed mutable tile",
+      "per_turn": 2
     },
-    "screen_inventory": [
-        "Expedition Brief",
-        "Living Map Gameplay",
-        "Expedition Result"
+    "failure": "Stamina reaches 0 after Wait or after resolving entry effects on a non-Shrine tile.",
+    "success": "Enter Shrine after paying its 1 Stamina move cost. Goal success has priority over exhaustion, so entering Shrine with exactly 1 Stamina succeeds at 0.",
+    "terrain": {
+      "Camp": {
+        "passable": true,
+        "move_cost": 0,
+        "entry_effect": "start only; never shifts or records"
+      },
+      "Path": {
+        "passable": true,
+        "move_cost": 1,
+        "entry_effect": "none"
+      },
+      "Marsh": {
+        "passable": true,
+        "move_cost": 2,
+        "entry_effect": "none"
+      },
+      "Ridge": {
+        "passable": false,
+        "move_cost": null,
+        "entry_effect": "cannot enter"
+      },
+      "Shrine": {
+        "passable": true,
+        "move_cost": 1,
+        "entry_effect": "goal; never shifts or records"
+      },
+      "Spring": {
+        "passable": true,
+        "move_cost": 1,
+        "entry_effect": "If this cell spring_consumed=false, add 2 Stamina up to max10 then set spring_consumed=true; later entries give no stamina"
+      }
+    },
+    "resources": {
+      "ink": {
+        "max": 4,
+        "min": 0,
+        "limit": "At most one Record action per turn",
+        "start": 4,
+        "decrease": "Record costs exactly 1",
+        "increase": "No recovery in MVP"
+      },
+      "stamina": {
+        "max": 10,
+        "min": 0,
+        "loss": "If stamina is 0 after resolving a non-Shrine entry or Wait, mission fails",
+        "start": 9,
+        "decrease": "Path/Spring/Shrine move costs 1; Marsh move costs 2; Wait costs 1",
+        "increase": "Entering an unconsumed Spring adds 2 after movement cost, capped at 10"
+      }
+    },
+    "mutable_tile": {
+      "shift": "After every completed Move or Wait, every revealed, unrecorded mutable tile except the currently occupied tile toggles A↔B exactly once.",
+      "record": "Record permanently locks the tile's current form; recorded tiles never shift again. Recording Ridge is legal and permanently blocks that cell. Record has no refund.",
+      "occupied": "The currently occupied mutable tile does not shift. If the party later leaves it and it is still unrecorded, it participates in that turn's World Shift.",
+      "unrevealed": "Unrevealed cells do not shift. When first scouted they always begin in Form A.",
+      "authored_pair": "Each mutable cell owns Form A and Form B from Path/Marsh/Ridge/Spring. It starts unrevealed. First Scout reveals it in Form A and also reveals what Form B will be."
+    }
+  },
+  "not_in_mvp": [
+    "Multiple islands",
+    "Procedural generation",
+    "Multiple expedition members",
+    "Combat",
+    "Inventory items",
+    "Persistent upgrades",
+    "Narrative dialogue choices",
+    "Hidden/random terrain outcomes"
+  ],
+  "updated_at": "2026-09-29T18:34:38.653277+00:00",
+  "archived_at": "2026-09-29T18:34:38.653277+00:00",
+  "known_risks": [
+    "지도를 기록하면 세계가 고정된다는 규칙이 첫 플레이에 추상적으로 느껴질 위험",
+    "Form A/B를 동시에 예측하는 정보량이 모바일에서 복잡할 위험",
+    "Record가 너무 강하면 정답 타일만 찍는 퍼즐로 고착될 위험",
+    "Wait가 과도하게 사용되면 진행 템포가 늘어질 위험",
+    "단일 authored 4×4는 장기 반복성이 낮아 MVP 이후 콘텐츠 생산 규칙이 필요함"
+  ],
+  "progression": "MVP에는 영구 성장 불필요. 미션 성공 여부와 best Score만 저장한다. 장기 확장에서는 새 island mission을 해금할 수 있으나 플레이 중 Stamina/Ink 규칙은 메타 업그레이드로 변경하지 않는다.",
+  "screen_flow": "Expedition Brief → Living Map Gameplay/Turn Planning → Move or Wait Resolution → World Shift → Turn Planning 반복 → Shrine success Result 또는 Stamina failure Result. Invalid Scout/Record/Move는 같은 Turn Planning에 남는다. Pause는 Gameplay 위 상태로 들어가며 Resume 시 동일 state로 복귀. Result의 Retry는 같은 mission을 완전 초기화한다.",
+  "state_model": [
+    {
+      "exit": "valid Move or Wait",
+      "next": "Move Resolution or Wait Resolution",
+      "enter": "mission start or World Shift complete",
+      "state": "Turn Planning",
+      "variables": [
+        "party_position",
+        "stamina",
+        "ink",
+        "turn_count",
+        "scouts_left",
+        "record_used",
+        "tile reveal/form/record/consumed"
+      ],
+      "allowed_inputs": [
+        "Scout up to 2",
+        "Record up to 1",
+        "Move",
+        "Wait",
+        "Pause"
+      ],
+      "failure_cancel": "invalid input changes nothing; Pause returns to same state"
+    },
+    {
+      "exit": "entry effects resolved",
+      "next": "World Shift or Result",
+      "enter": "valid Move accepted",
+      "state": "Move Resolution",
+      "variables": [
+        "move_cost",
+        "stamina",
+        "party_position",
+        "spring_consumed"
+      ],
+      "allowed_inputs": [
+        "Pause only after atomic resource/position update completes"
+      ],
+      "failure_cancel": "Shrine -> success Result; non-Shrine stamina0 -> failure Result"
+    },
+    {
+      "exit": "stamina decremented",
+      "next": "World Shift or Result",
+      "enter": "valid Wait accepted",
+      "state": "Wait Resolution",
+      "variables": [
+        "stamina"
+      ],
+      "allowed_inputs": [],
+      "failure_cancel": "stamina0 -> failure Result"
+    },
+    {
+      "exit": "each eligible tile toggled exactly once; turn_count +1",
+      "next": "Turn Planning with scouts_left=2 and record_used=false",
+      "enter": "resolved Move/Wait with mission still active",
+      "state": "World Shift",
+      "variables": [
+        "each revealed unrecorded tile current_form"
+      ],
+      "allowed_inputs": [
+        "Pause"
+      ],
+      "failure_cancel": "Pause freezes transition; Resume continues"
+    },
+    {
+      "exit": "retry or finish",
+      "next": "Turn Planning on Retry or session exit",
+      "enter": "Shrine success or Stamina failure",
+      "state": "Result",
+      "variables": [
+        "success",
+        "score",
+        "turn_count",
+        "remaining stamina",
+        "remaining ink"
+      ],
+      "allowed_inputs": [
+        "retry",
+        "finish"
+      ],
+      "failure_cancel": "none"
+    }
+  ],
+  "archive_path": "projects/living-map-expedition/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "authored living-island mission",
+  "content_model": {
+    "mvp": {
+      "ink": 4,
+      "camp": 1,
+      "grid": "4x4",
+      "cells": 16,
+      "shrine": 1,
+      "mutable": 14,
+      "missions": 1,
+      "stamina_start": 9
+    },
+    "axes": [
+      "Form A/B pair",
+      "tile adjacency",
+      "Spring placement",
+      "required detour",
+      "record-worthy chokepoint",
+      "stamina pressure"
     ],
-    "core_player_verbs": [
-        {
-            "verb": "Scout",
-            "input": "tap adjacent fog tile",
-            "target": "orthogonally adjacent unrevealed mutable tile",
-            "feedback": "terrain and alternate Form B are revealed",
-            "condition": "Turn Planning with scouts_left>0",
-            "state_change": "tile becomes revealed in Form A and scouts_left decreases by 1"
-        },
-        {
-            "verb": "Record",
-            "input": "drag record seal onto tile",
-            "target": "revealed unrecorded mutable tile",
-            "feedback": "map mark fixes and shift indicator disappears",
-            "condition": "Turn Planning with ink>0 and record_used=false",
-            "state_change": "ink -1; tile.recorded=true; its current form becomes permanent"
-        },
-        {
-            "verb": "Move",
-            "input": "drag expedition token to adjacent tile",
-            "target": "orthogonally adjacent revealed passable tile",
-            "feedback": "path confirms, stamina changes, token arrives",
-            "condition": "Turn Planning and stamina>=terrain move cost",
-            "state_change": "stamina decreases by cost; party position changes; entry effect resolves; turn ends"
-        },
-        {
-            "verb": "Wait",
-            "input": "tap Wait action",
-            "target": "current expedition",
-            "feedback": "camping beat then surrounding mutable terrain shifts",
-            "condition": "Turn Planning with stamina>=1",
-            "state_change": "stamina -1; party remains; turn ends and world shift begins"
-        },
-        {
-            "verb": "Pause",
-            "input": "pause action",
-            "target": "mission",
-            "feedback": "paused state",
-            "condition": "Turn Planning or World Shift",
-            "state_change": "simulation and automatic transition freeze"
-        }
-    ],
-    "wireframe_handoff": [
-        "Expedition Brief, Living Map Gameplay, Expedition Result 3 screens를 표현한다.",
-        "Turn Planning, Move Resolution, Wait Resolution, World Shift, Pause, Result 상태를 구분한다.",
-        "fog/revealed, Form A/current, Form B/next, recorded, occupied, Spring consumed의 의미를 표현한다.",
-        "Scout tap, Record seal drag/cancel, expedition Move drag/cancel, Wait, Pause의 valid/invalid 상태를 표현한다.",
-        "Stamina 9/10과 Ink 4의 증가·감소 의미, Record turn limit, Scout turn limit을 표현한다.",
-        "World Shift에서 eligible tile만 A↔B가 되고 occupied/recorded/unrevealed/special tile은 변하지 않는 것을 표현한다.",
-        "Shrine success priority, Stamina exhaustion failure, Result Retry full reset transition을 표현한다."
-    ],
-    "primary_interaction": "인접 타일 정찰 + 기록 seal drag로 현재 지형 고정 + 원정대 인접 이동/Wait",
-    "difficulty_variation": "초반 경로는 Path↔Marsh처럼 둘 다 통과 가능해 기록의 의미를 익힌다. 중반은 Path↔Ridge chokepoint가 나타나 지금의 Path를 기록할지, 잉크를 아끼고 timing으로 통과할지 결정하게 한다. 후반은 Marsh↔Ridge와 Path↔Spring이 섞여 Stamina 회복 시점, Wait 비용, 돌아갈 길의 변화까지 계산한다. 난도는 turn speed가 아니라 지형 pair, chokepoint, ink budget, stamina cost의 조합으로 상승한다.",
-    "visual_direction_brief": "Portrait mobile. 플레이 공간은 탐험 지도 자체가 세계처럼 느껴지는 단일 4×4 island view이며, fog/revealed/current terrain/recorded/party 위치가 즉시 구분되어야 한다. 현재 형태와 다음 형태의 관계가 작은 화면에서도 혼동되지 않아야 하며, 지도 기록은 장식이 아니라 지형의 영구성 변화를 읽게 해야 한다. 탐험 일지·양피지 감성과 살아 움직이는 섬의 미묘한 변형을 결합한다. 구체적인 UI 좌표·패널 크기·box 배치는 Wireframe에서 결정한다."
+    "unit": "authored living-island mission",
+    "expansion": "Future islands change grid topology, pair composition, ink budget and goal placement while preserving deterministic Scout/Record/Shift rules.",
+    "mutable_pair_composition": {
+      "Path↔Marsh": 5,
+      "Path↔Ridge": 4,
+      "Marsh↔Ridge": 3,
+      "Path↔Spring": 2
+    }
+  },
+  "source_run_at": "2026-09-29T18:34:13.006387+00:00",
+  "archive_commit": "5c7a491309bbb82d1c86ca42bc6f8d9e96f06428",
+  "human_priority": false,
+  "player_fantasy": "플레이어는 현실을 기록으로 붙잡는 원정대의 지도 제작자다. 눈앞의 지형뿐 아니라 다음 변화까지 읽고, 귀한 잉크를 어디에 써서 길을 영구화할지 결정해 살아 움직이는 섬을 이해했다는 지적 만족과 원정을 간신히 이어가는 긴장감을 느껴야 한다.",
+  "session_length": "4–6분",
+  "test_scenarios": [
+    "Turn 1에서 인접 fog 2개를 Scout하면 각각 Form A와 Form B 정보가 공개되고 scouts_left가 0이 된다.",
+    "Ink 4에서 한 tile을 Record하면 Ink 3, recorded=true가 되고 같은 turn의 두 번째 Record는 invalid다.",
+    "Move 후 occupied tile을 제외한 revealed unrecorded tiles만 정확히 한 번 A↔B toggle된다.",
+    "Path cost1, Marsh cost2, Ridge invalid, Spring cost1 후 최초 1회 +2가 정확히 적용된다.",
+    "Stamina 1로 Shrine에 들어가 0이 되어도 success가 exhaustion보다 우선한다.",
+    "Stamina 1에서 Wait하면 0이 되어 failure Result에 도달한다.",
+    "Retry가 reveal/record/current form/Spring consumed/position/Stamina/Ink/turn을 모두 초기화한다.",
+    "Authored 4×4 mission은 Ink 4, Stamina 9 조건에서 최소 한 개의 검증된 success route를 가진다."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Living Map Expedition\n\n## 1. Product Definition\n탐험한 타일의 현재 지형을 지도에 기록해 현실을 고정하거나 빈칸으로 남겨 다음 턴에 뒤집히게 하며 Shrine까지 가는 portrait mobile turn-based exploration strategy. 세션 4–6분. 목표 감각은 살아 움직이는 세계의 규칙을 읽고 기록으로 길을 붙잡는 지적 숙련감이다. Non-goals: 실시간 액션, 전투 RPG, 랜덤 로그라이크, 대화 선택 게임.\n\n## 2. Player Fantasy\n플레이어는 현실을 기록으로 붙잡는 원정대의 지도 제작자다. 현재 지형과 다음 변화를 읽고 귀한 Ink를 써서 필요한 길만 영구화하며 섬을 이해했다는 만족을 느낀다.\n\n## 3. Core Player Verbs\nScout: 인접 fog tap, tile reveal+scouts_left-1. Record: record seal을 revealed tile에 drag, Ink-1+현재 form 영구 고정. Move: expedition token을 adjacent passable tile로 drag, Stamina cost+position change. Wait: Stamina1을 쓰고 제자리에서 World Shift. Pause: 현재 simulation을 동결한다.\n\n## 4. Core Loop\n최대 2 Scout → 필요 시 1 Record → Move 또는 Wait → World Shift → 다음 turn. 6–10 turn 안팎에서 Shrine 도달을 노린다.\n\n## 5. Round / Session Structure\n4×4 island 한 판. Camp에서 Stamina9/10, Ink4, Turn1 시작. Turn Planning → Move/Wait Resolution → World Shift → 다음 Turn Planning. Shrine 진입은 success, 비-Shrine에서 entry effect 후 Stamina0 또는 Wait 후 Stamina0은 failure. Retry는 전체 mission state reset.\n\n## 6. Game Rules\n16 cells 중 Camp1/Shrine1/mutable14. Path cost1, Marsh cost2, Ridge impassable, Spring cost1+최초 entry Stamina2 회복(max10). Mutable cell은 A/B form을 가진다. 첫 Scout 시 A로 reveal되며 B도 알려진다. Move/Wait 완료 후 revealed+unrecorded+unoccupied mutable tile만 A↔B 한 번 toggle. Occupied tile은 서 있는 동안 shift하지 않는다. Record는 current form을 영구 고정, Ink1, turn당 1회, refund 없음. Scout는 adjacent fog, turn당 2회.\n\nMove valid는 orthogonal adjacent+revealed+passable+affordable. Resolution은 cost 지불→이동→Spring effect→Shrine면 success→아니면 Stamina0 failure→그 외 shift. Shrine은 Stamina1로 들어가 0이어도 success가 우선한다. Wait는 Stamina1 지불→0이면 failure, 아니면 shift.\n\nSuccess score = 1200 + remaining Stamina×100 + remaining Ink×150 - turn_count×50. Failure score0. Pause는 automatic shift와 입력을 정지. Retry는 mutable tile을 unrevealed/A/unrecorded/unconsumed, party Camp, Stamina9, Ink4, Turn1로 복구한다.\n\n## 7. State Model\nTurn Planning: Scout/Record/Move/Wait/Pause. Invalid는 no change. Move/Wait로 exit.\nMove Resolution: cost/position/entry effect atomic resolve. Shrine→Result success, non-Shrine stamina0→Result failure, otherwise World Shift.\nWait Resolution: stamina-1; 0→failure, else Shift.\nWorld Shift: eligible tiles toggle once, turn_count+1, then scouts_left2/record_used=false로 Planning.\nResult: Retry/finish.\n\n## 8. Interaction Spec\nScout target은 orthogonally adjacent fog mutable tile. Record target은 revealed, unrecorded mutable tile; invalid release는 Ink 소모 없음. Move는 adjacent revealed passable affordable tile만 valid; invalid release는 token 원위치·비용 없음. Drag 중 해당 pointer input이 우선한다. Wait는 stamina>=1에서 atomic. Pause는 current state를 보존한다.\n\n## 9. Content Model\n반복 단위는 authored living-island mission. MVP는 4×4 한 개. Mutable pair 구성: Path↔Marsh 5, Path↔Ridge 4, Marsh↔Ridge 3, Path↔Spring 2. 확장 축은 pair, adjacency, Spring, chokepoint, Ink/Stamina pressure.\n\n## 10. Difficulty / Variation\nPath↔Marsh로 규칙 학습 → Path↔Ridge chokepoint에서 record/timing 선택 → Marsh↔Ridge와 Path↔Spring 조합으로 Stamina·Wait·귀환로까지 계산. 속도 증가가 아니라 topology/resource pressure로 상승.\n\n## 11. Progression\nMVP persistent progression 없음. Success와 best Score만 저장. 이후 island unlock 가능하나 Stamina/Ink 규칙은 meta upgrade로 바꾸지 않는다.\n\n## 12. Economy\nNot required. Ink/Stamina는 mission-local tactical resource다.\n\n## 13. Screen Inventory\nExpedition Brief, Living Map Gameplay, Expedition Result.\n\n## 14. Screen Flow\nBrief → Gameplay Turn Planning → Move/Wait Resolution → World Shift → Planning 반복 → Shrine success Result 또는 Stamina failure Result. Invalid input은 Planning 유지. Pause→Resume 동일 state. Result Retry→full reset.\n\n## 15. Feedback System\nScout는 fog reveal+A/B 정보, Record는 permanent lock+Ink decrement, Move는 terrain cost/position, Spring은 one-time recovery, Shift는 eligible tile toggle, invalid move는 no-state-change reject, Result는 goal/exhaustion 의미를 명확히 전달한다.\n\n## 16. Visual Direction Brief\nPortrait mobile의 단일 4×4 island-map view. fog/revealed/current/next/recorded/party가 즉시 구분되고 A/B 변화가 작은 화면에서도 읽혀야 한다. 탐험 일지·양피지 감성과 살아 움직이는 섬의 변형을 결합한다. UI 좌표와 세부 배치는 Wireframe에서 정한다.\n\n## 17. MVP Scope\nIsland mission 1개, 16 cells(Camp1/Shrine1/mutable14), pair composition 5/4/3/2, terrain4종, Stamina9/10, Ink4, Scout2/turn, Record1/turn, deterministic shift, occupied freeze, Spring one-time recovery, Move/Wait, success/failure/score/result/retry. NOT IN MVP: multiple islands, procedural generation, party members, combat, inventory, upgrades, dialogue, random hidden terrain.\n\n## 18. Test Scenarios\nScout limit와 A/B 공개, Record Ink/turn limit, 정확한 shift 대상, 4 terrain rule, Shrine success priority, Wait exhaustion failure, Retry full reset, authored map solvability를 검증한다.\n\n## 19. Known Risks\n기록=현실 고정 규칙의 추상성, A/B 정보 과부하, Record 정답화, Wait 템포 저하, 단일 map 반복성.\n\n## 20. Wireframe Handoff\n3 screens, Planning/Move/Wait/Shift/Pause/Result, tile lifecycle flags, Scout/Record/Move/Wait gestures와 invalid/cancel, Stamina/Ink 의미, turn limits, exact shift eligibility, Shrine success/exhaustion failure, Retry full reset을 표현한다. 새 게임 규칙 결정은 남기지 않는다.",
+  "feedback_system": {
+    "move": {
+      "audio": "terrain-specific travel cue",
+      "state": "stamina cost and position update",
+      "haptic": "light arrival",
+      "visual": "expedition traverses chosen adjacent terrain"
+    },
+    "scout": {
+      "audio": "paper reveal cue",
+      "state": "revealed=true; scouts_left-1",
+      "haptic": "light tick",
+      "visual": "fog clears and both current Form A and alternate Form B meaning become known"
+    },
+    "shift": {
+      "audio": "world-turn cue",
+      "state": "current_form toggles",
+      "haptic": "single global pulse",
+      "visual": "eligible unrecorded revealed tiles visibly change A↔B"
+    },
+    "record": {
+      "audio": "ink stamp",
+      "state": "ink-1; recorded=true",
+      "haptic": "firm stamp",
+      "visual": "tile gains permanent recorded state and no longer previews shifting"
+    },
+    "result": {
+      "audio": "success/failure sting",
+      "state": "Result",
+      "haptic": "distinct success/failure pattern",
+      "visual": "goal arrival or exhaustion state is unambiguous"
+    },
+    "spring": {
+      "audio": "restorative cue",
+      "state": "stamina +2 capped; consumed=true",
+      "haptic": "soft success",
+      "visual": "one-time resource recovery is explicit"
+    },
+    "invalid_move": {
+      "audio": "dry reject",
+      "state": "no changes",
+      "haptic": "short reject tick",
+      "visual": "target refuses movement and current terrain remains unchanged"
+    }
+  },
+  "round_structure": "MVP 미션은 4×4 island grid 한 판이다. Camp에서 Stamina 9/10, Ink 4, Turn 1로 시작한다. 각 turn은 Turn Planning → Move Resolution 또는 Wait Resolution → World Shift → 다음 Turn Planning 순서다. Shrine에 진입하면 즉시 성공 Result. Shrine이 아닌 곳에서 entry effect까지 처리한 뒤 Stamina가 0이면 즉시 실패 Result. Result에서 Retry는 grid reveal/record/form/consumed flags, position, Stamina, Ink, turn count를 전부 초기화한다. 평균 4–6분.",
+  "interaction_spec": {
+    "move": {
+      "input": "drag expedition token and release",
+      "valid": "revealed/passable/affordable",
+      "cancel": "release outside valid target; token returns and no cost paid",
+      "target": "orthogonally adjacent tile",
+      "invalid": "diagonal, fog, Ridge, insufficient stamina",
+      "priority": "expedition drag owns pointer and blocks record/scout input",
+      "success_change": "atomic movement resolution then turn ends"
+    },
+    "wait": {
+      "input": "tap",
+      "valid": "stamina>=1",
+      "cancel": "none",
+      "invalid": "stamina0 cannot occur in active Turn Planning",
+      "success_change": "stamina-1 then failure or World Shift"
+    },
+    "pause": {
+      "input": "tap pause",
+      "success_change": "freeze current state and automatic timers/animations"
+    },
+    "scout": {
+      "input": "tap",
+      "valid": "mutable, unrevealed, scouts_left>0",
+      "cancel": "not needed; tap is atomic",
+      "target": "orthogonally adjacent fog tile",
+      "invalid": "nonadjacent, special, already revealed, or scouts_left=0",
+      "priority": "ignored while expedition token or record seal is being dragged",
+      "success_change": "revealed=true,current_form=A,scouts_left-1"
+    },
+    "record": {
+      "input": "drag record seal and release",
+      "valid": "not recorded, ink>0, record_used=false",
+      "cancel": "release outside valid tile; no ink spent",
+      "target": "revealed mutable tile",
+      "invalid": "fog, Camp, Shrine, already recorded, ink0, second record same turn",
+      "priority": "record drag owns pointer until release",
+      "success_change": "ink-1,recorded=true,record_used=true"
+    }
+  },
+  "screen_inventory": [
+    "Expedition Brief",
+    "Living Map Gameplay",
+    "Expedition Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Scout",
+      "input": "tap adjacent fog tile",
+      "target": "orthogonally adjacent unrevealed mutable tile",
+      "feedback": "terrain and alternate Form B are revealed",
+      "condition": "Turn Planning with scouts_left>0",
+      "state_change": "tile becomes revealed in Form A and scouts_left decreases by 1"
+    },
+    {
+      "verb": "Record",
+      "input": "drag record seal onto tile",
+      "target": "revealed unrecorded mutable tile",
+      "feedback": "map mark fixes and shift indicator disappears",
+      "condition": "Turn Planning with ink>0 and record_used=false",
+      "state_change": "ink -1; tile.recorded=true; its current form becomes permanent"
+    },
+    {
+      "verb": "Move",
+      "input": "drag expedition token to adjacent tile",
+      "target": "orthogonally adjacent revealed passable tile",
+      "feedback": "path confirms, stamina changes, token arrives",
+      "condition": "Turn Planning and stamina>=terrain move cost",
+      "state_change": "stamina decreases by cost; party position changes; entry effect resolves; turn ends"
+    },
+    {
+      "verb": "Wait",
+      "input": "tap Wait action",
+      "target": "current expedition",
+      "feedback": "camping beat then surrounding mutable terrain shifts",
+      "condition": "Turn Planning with stamina>=1",
+      "state_change": "stamina -1; party remains; turn ends and world shift begins"
+    },
+    {
+      "verb": "Pause",
+      "input": "pause action",
+      "target": "mission",
+      "feedback": "paused state",
+      "condition": "Turn Planning or World Shift",
+      "state_change": "simulation and automatic transition freeze"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Expedition Brief, Living Map Gameplay, Expedition Result 3 screens를 표현한다.",
+    "Turn Planning, Move Resolution, Wait Resolution, World Shift, Pause, Result 상태를 구분한다.",
+    "fog/revealed, Form A/current, Form B/next, recorded, occupied, Spring consumed의 의미를 표현한다.",
+    "Scout tap, Record seal drag/cancel, expedition Move drag/cancel, Wait, Pause의 valid/invalid 상태를 표현한다.",
+    "Stamina 9/10과 Ink 4의 증가·감소 의미, Record turn limit, Scout turn limit을 표현한다.",
+    "World Shift에서 eligible tile만 A↔B가 되고 occupied/recorded/unrevealed/special tile은 변하지 않는 것을 표현한다.",
+    "Shrine success priority, Stamina exhaustion failure, Result Retry full reset transition을 표현한다."
+  ],
+  "primary_interaction": "인접 타일 정찰 + 기록 seal drag로 현재 지형 고정 + 원정대 인접 이동/Wait",
+  "difficulty_variation": "초반 경로는 Path↔Marsh처럼 둘 다 통과 가능해 기록의 의미를 익힌다. 중반은 Path↔Ridge chokepoint가 나타나 지금의 Path를 기록할지, 잉크를 아끼고 timing으로 통과할지 결정하게 한다. 후반은 Marsh↔Ridge와 Path↔Spring이 섞여 Stamina 회복 시점, Wait 비용, 돌아갈 길의 변화까지 계산한다. 난도는 turn speed가 아니라 지형 pair, chokepoint, ink budget, stamina cost의 조합으로 상승한다.",
+  "visual_direction_brief": "Portrait mobile. 플레이 공간은 탐험 지도 자체가 세계처럼 느껴지는 단일 4×4 island view이며, fog/revealed/current terrain/recorded/party 위치가 즉시 구분되어야 한다. 현재 형태와 다음 형태의 관계가 작은 화면에서도 혼동되지 않아야 하며, 지도 기록은 장식이 아니라 지형의 영구성 변화를 읽게 해야 한다. 탐험 일지·양피지 감성과 살아 움직이는 섬의 미묘한 변형을 결합한다. 구체적인 UI 좌표·패널 크기·box 배치는 Wireframe에서 결정한다."
 }

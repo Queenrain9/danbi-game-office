@@ -1,0 +1,919 @@
+{
+  "id": "6a3d73ff-77a7-4a27-8ebc-9e63c7c6fbf0",
+  "title": "Monster Night Bus",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "33810b99-e8e6-4c1d-bf65-2faf54c32e0d",
+  "screens": [
+    {
+      "id": "brief",
+      "name": "Night Route Brief",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "title",
+            "role": "context",
+            "label": "Mission"
+          },
+          {
+            "h": 42,
+            "w": 88,
+            "x": 6,
+            "y": 17,
+            "id": "route",
+            "role": "route graph",
+            "label": "Route Preview"
+          },
+          {
+            "h": 25,
+            "w": 88,
+            "x": 6,
+            "y": 61,
+            "id": "rules",
+            "role": "legend",
+            "label": "Trait Rules"
+          },
+          {
+            "h": 8,
+            "w": 88,
+            "x": 6,
+            "y": 88,
+            "id": "actions",
+            "role": "action",
+            "label": "Start"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "ready",
+          "condition": "brief open"
+        }
+      ],
+      "purpose": "Explain mission goal, route shape, Comfort and trait legend before Depot.",
+      "feedback": [
+        "trait legend mirrors gameplay markers"
+      ],
+      "components": [
+        {
+          "id": "route_graph",
+          "box": {
+            "h": 35,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "graph",
+          "label": "8-stop directed route",
+          "state_binding": "authored route graph"
+        },
+        {
+          "id": "comfort",
+          "box": {
+            "h": 6,
+            "w": 38,
+            "x": 8,
+            "y": 57
+          },
+          "type": "meter",
+          "label": "Comfort 3",
+          "state_binding": "comfort_start"
+        },
+        {
+          "id": "trait_legend",
+          "box": {
+            "h": 19,
+            "w": 84,
+            "x": 8,
+            "y": 65
+          },
+          "type": "legend",
+          "label": "5 trait rules",
+          "state_binding": "traits"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 8,
+            "w": 84,
+            "x": 8,
+            "y": 88
+          },
+          "type": "button",
+          "label": "Start Route",
+          "interaction_role": "enter Depot"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "gameplay",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "short dissolve",
+          "condition": "ready"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "start mission",
+          "target": "start",
+          "feedback": "route view enters bus",
+          "precondition": "ready",
+          "state_change": "Stop Service at Depot",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No persistent upgrade UI."
+      ]
+    },
+    {
+      "id": "gameplay",
+      "name": "Bus Route Gameplay",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 10,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "resources/status",
+            "label": "Mission HUD"
+          },
+          {
+            "h": 15,
+            "w": 92,
+            "x": 4,
+            "y": 15,
+            "id": "route_strip",
+            "role": "route control",
+            "label": "Route + destination relation"
+          },
+          {
+            "h": 43,
+            "w": 92,
+            "x": 4,
+            "y": 31,
+            "id": "bus",
+            "role": "direct manipulation",
+            "label": "Bus Cutaway"
+          },
+          {
+            "h": 17,
+            "w": 60,
+            "x": 4,
+            "y": 75,
+            "id": "queue",
+            "role": "boarding source",
+            "label": "Stop Queue"
+          },
+          {
+            "h": 17,
+            "w": 30,
+            "x": 66,
+            "y": 75,
+            "id": "actions",
+            "role": "actions",
+            "label": "Route/Wait controls"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "stop_service",
+          "condition": "arrival/session start"
+        },
+        {
+          "id": "travel",
+          "condition": "route confirmed; no active warning"
+        },
+        {
+          "id": "travel_warning",
+          "condition": "warning queue active"
+        },
+        {
+          "id": "pause",
+          "condition": "pause tapped"
+        }
+      ],
+      "purpose": "Whole mission: board, unboard, route-select, travel, warning re-seat, arrival.",
+      "feedback": [
+        "reserved seat hatch",
+        "WetResidue badge",
+        "forbidden pair connector",
+        "route invalid passenger marker",
+        "Comfort decrement impact"
+      ],
+      "components": [
+        {
+          "id": "comfort",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 5,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Comfort",
+          "state_binding": "Comfort"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 30,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Score",
+          "state_binding": "Score"
+        },
+        {
+          "id": "stop",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 50,
+            "y": 5
+          },
+          "type": "label",
+          "label": "Current Stop",
+          "state_binding": "current_stop"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 11,
+            "x": 84,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "interaction_role": "pause"
+        },
+        {
+          "id": "route_graph",
+          "box": {
+            "h": 13,
+            "w": 90,
+            "x": 5,
+            "y": 16
+          },
+          "type": "route_selector",
+          "label": "Connected next stops",
+          "state_binding": "current_stop,next_stop,onboard destinations"
+        },
+        {
+          "id": "seat1",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 9,
+            "y": 38
+          },
+          "type": "drop_slot",
+          "label": "Seat 1",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "seat2",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 29,
+            "y": 38
+          },
+          "type": "drop_slot",
+          "label": "Seat 2",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "seat3",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 49,
+            "y": 38
+          },
+          "type": "drop_slot",
+          "label": "Seat 3",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "seat4",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 9,
+            "y": 51
+          },
+          "type": "drop_slot",
+          "label": "Seat 4",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "seat5",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 29,
+            "y": 51
+          },
+          "type": "drop_slot",
+          "label": "Seat 5",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "seat6",
+          "box": {
+            "h": 10,
+            "w": 18,
+            "x": 49,
+            "y": 51
+          },
+          "type": "drop_slot",
+          "label": "Seat 6",
+          "state_binding": "occupancy,reserved,WetResidue"
+        },
+        {
+          "id": "stand1",
+          "box": {
+            "h": 10,
+            "w": 19,
+            "x": 71,
+            "y": 38
+          },
+          "type": "drop_slot",
+          "label": "Standing 1",
+          "state_binding": "occupancy"
+        },
+        {
+          "id": "stand2",
+          "box": {
+            "h": 10,
+            "w": 19,
+            "x": 71,
+            "y": 51
+          },
+          "type": "drop_slot",
+          "label": "Standing 2",
+          "state_binding": "occupancy"
+        },
+        {
+          "id": "warning",
+          "box": {
+            "h": 9,
+            "w": 76,
+            "x": 12,
+            "y": 63
+          },
+          "type": "overlay_banner",
+          "label": "Conflict pair + 2.0s",
+          "state_binding": "active_pair,warning_remaining"
+        },
+        {
+          "id": "queue_cards",
+          "box": {
+            "h": 13,
+            "w": 58,
+            "x": 5,
+            "y": 77
+          },
+          "type": "draggable_list",
+          "label": "Waiting passengers",
+          "state_binding": "waiting queue"
+        },
+        {
+          "id": "confirm",
+          "box": {
+            "h": 7,
+            "w": 26,
+            "x": 68,
+            "y": 77
+          },
+          "type": "button",
+          "label": "Confirm Route",
+          "enabled_when": "valid next_stop selected",
+          "interaction_role": "route confirm"
+        },
+        {
+          "id": "cancel_route",
+          "box": {
+            "h": 6,
+            "w": 26,
+            "x": 68,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Cancel Route",
+          "enabled_when": "next_stop selected",
+          "interaction_role": "unlock next_stop"
+        }
+      ],
+      "edge_cases": [
+        "Arrival waits for warning queue",
+        "spent conflict cannot penalize twice per segment",
+        "auto-disembark may create WetResidue before Stop Service input"
+      ],
+      "transitions": [
+        {
+          "to": "travel",
+          "from": "stop_service",
+          "trigger": "route confirm",
+          "animation": "departure",
+          "condition": "valid route"
+        },
+        {
+          "to": "travel_warning",
+          "from": "travel",
+          "trigger": "queued pair activates",
+          "animation": "warning banner",
+          "condition": "queue nonempty"
+        },
+        {
+          "to": "travel",
+          "from": "travel_warning",
+          "trigger": "resolved/expired",
+          "animation": "banner clear",
+          "condition": "Comfort>0 and queue empty"
+        },
+        {
+          "to": "stop_service",
+          "from": "travel",
+          "trigger": "arrival",
+          "animation": "arrival",
+          "condition": "elapsed>=6 and queue empty"
+        },
+        {
+          "to": "result",
+          "from": "travel_warning",
+          "trigger": "expiry",
+          "animation": "failure cut",
+          "condition": "Comfort=0"
+        },
+        {
+          "to": "result",
+          "from": "travel",
+          "trigger": "Terminal arrival",
+          "animation": "success",
+          "condition": "Comfort>=1"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "drag",
+          "action": "board if hard-valid",
+          "target": "queue passenger→seat/standing",
+          "feedback": "valid preview/snap",
+          "precondition": "Stop Service",
+          "state_change": "waiting→onboard; occupancy update",
+          "invalid_input": "return source; reject tick; no state change"
+        },
+        {
+          "input": "drag",
+          "action": "unboard",
+          "target": "onboard→queue",
+          "feedback": "fare/route preview updates",
+          "precondition": "Stop Service before confirm",
+          "state_change": "waiting restored; slot free; route validity recalc",
+          "invalid_input": "snap source"
+        },
+        {
+          "input": "tap+confirm",
+          "action": "lock next_stop",
+          "target": "route_graph/confirm",
+          "feedback": "edge locks",
+          "precondition": "connected and all destinations reachable",
+          "state_change": "Travel; conflict scan",
+          "invalid_input": "keep Stop Service; identify stranded passenger"
+        },
+        {
+          "input": "drag",
+          "action": "re-seat",
+          "target": "onboard→empty slot",
+          "feedback": "snap/clear warning",
+          "precondition": "Travel Warning or Stop Service",
+          "state_change": "occupancy; active conflict may resolve",
+          "invalid_input": "source snap; no new forbidden adjacency allowed in Travel"
+        },
+        {
+          "input": "tap",
+          "action": "pause",
+          "target": "pause",
+          "feedback": "pause overlay",
+          "precondition": "gameplay active",
+          "state_change": "timers frozen",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "large_reserved",
+          "name": "Large Reservation",
+          "notes": "adjacent reserved seat shows blocked hatch",
+          "condition": "Large seated",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "wet_residue",
+          "name": "Wet Residue",
+          "notes": "affected seat shows residue badge and rejects Spark",
+          "condition": "residue>0",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "warning_active",
+          "name": "Conflict Warning",
+          "notes": "only warned pair may be moved; pair endpoints highlighted",
+          "condition": "active_pair exists",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "warning": {
+              "label": "Exact pair + countdown"
+            }
+          }
+        },
+        {
+          "id": "route_invalid",
+          "name": "Route Invalid",
+          "notes": "identify affected passenger/destination",
+          "condition": "selected edge strands onboard destination",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "confirm": {
+              "label": "Destination blocked",
+              "state_binding": "disabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Seat adjacency is authored logical relation, not inferred from pixel distance.",
+        "Trait markers remain visible on passenger cards.",
+        "Travel re-seat must not create new forbidden adjacency."
+      ]
+    },
+    {
+      "id": "result",
+      "name": "Run Result",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 18,
+            "w": 84,
+            "x": 8,
+            "y": 10,
+            "id": "outcome",
+            "role": "status",
+            "label": "Outcome"
+          },
+          {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 31,
+            "id": "summary",
+            "role": "summary",
+            "label": "Score breakdown"
+          },
+          {
+            "h": 15,
+            "w": 84,
+            "x": 8,
+            "y": 78,
+            "id": "actions",
+            "role": "actions",
+            "label": "Actions"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result_success",
+          "condition": "Terminal Comfort>=1"
+        },
+        {
+          "id": "result_failure",
+          "condition": "Comfort=0"
+        }
+      ],
+      "purpose": "Show success/failure and run accounting; retry full reset.",
+      "feedback": [
+        "success/failure distinct"
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 12,
+            "w": 80,
+            "x": 10,
+            "y": 12
+          },
+          "type": "headline",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        {
+          "id": "score_breakdown",
+          "box": {
+            "h": 36,
+            "w": 80,
+            "x": 10,
+            "y": 33
+          },
+          "type": "summary",
+          "label": "Score breakdown",
+          "state_binding": "score,delivered,left_behind,Comfort"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 10,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Retry",
+          "interaction_role": "full reset"
+        },
+        {
+          "id": "finish",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 52,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Finish",
+          "interaction_role": "exit"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "gameplay",
+          "from": "result",
+          "trigger": "retry",
+          "animation": "restart",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset session",
+          "target": "retry",
+          "feedback": "clean restart",
+          "precondition": "Result",
+          "state_change": "Depot Stop Service; all authored state reset",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "exit run",
+          "target": "finish",
+          "feedback": "close",
+          "precondition": "Result",
+          "state_change": "session exit",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "failure",
+          "name": "Failure",
+          "notes": "score=0 if source rule requires failure result presentation",
+          "condition": "Comfort=0",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "outcome": {
+              "label": "Run Failed"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Persist best score/success only."
+      ]
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "0b832354-bf86-46c8-8ecd-7a851f5b7aeb",
+  "input_map": {
+    "tap": {
+      "targets": [
+        "route nodes",
+        "confirm",
+        "cancel",
+        "pause",
+        "result actions"
+      ]
+    },
+    "drag": {
+      "cancel": "invalid/outside target returns source",
+      "targets": [
+        "passenger cards",
+        "onboard passengers"
+      ],
+      "priority": "drag pointer owns passenger until release"
+    },
+    "conflict": "During active passenger drag, route and other passenger inputs disabled; during Travel Warning only warned-pair re-seat is enabled."
+  },
+  "created_at": "2026-09-29T19:35:18.732342+00:00",
+  "edge_cases": {
+    "full_bus": "boarding targets reject.",
+    "Comfort_zero": "immediate failure Result.",
+    "route_invalid": "No state change; identify blocking onboard destination.",
+    "pause_mid_warning": "remaining deadline preserved.",
+    "warning_at_arrival": "arrival held until queue clears."
+  },
+  "updated_at": "2026-09-29T19:35:18.732342+00:00",
+  "core_screen": "Bus Route Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "brief→gameplay.stop_service",
+    "guards": [
+      "route confirm requires connected edge and all onboard destinations reachable",
+      "arrival waits until travel>=6s and warning queue empty"
+    ],
+    "normal": [
+      "stop_service→travel",
+      "travel→travel_warning?→travel",
+      "travel→next stop_service",
+      "terminal→result_success"
+    ],
+    "failure": "Comfort 0→result_failure",
+    "recovery": [
+      "pause→exact prior gameplay state",
+      "result retry→Depot clean state"
+    ]
+  },
+  "state_count": 8,
+  "screen_count": 3,
+  "global_states": {
+    "pause": {
+      "resume": "exact prior state",
+      "freezes": [
+        "travel clock",
+        "warning deadline",
+        "animation",
+        "passenger interaction"
+      ],
+      "overlay": true
+    },
+    "failure": {
+      "trigger": "Comfort=0 during Travel"
+    },
+    "success": {
+      "terminal": "Comfort>=1"
+    },
+    "input_lock": {
+      "active_during": "arrival/disembark atomic update"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.2 — Monster Night Bus\nWhole-MVP coverage: Night Route Brief, Bus Route Gameplay, Run Result; Stop Service, Travel, Travel Warning, Pause, success/failure Result; all five traits, route reachability, Large reservation, WetResidue, both forbidden-pair warnings, boarding/unboarding/re-seat, arrival/disembark and retry. Core gameplay uses six explicit seat targets and two standing targets, a route selector, waiting queue, Comfort/Score HUD and conflict countdown. All hard-invalid inputs reject without state mutation. Route choice is guarded by onboard destination reachability. Travel warnings expose exact pair and 2.0s deadline; arrival is held until warning queue clears. Content instances reuse PassengerCard/DropSlot/RouteNode templates while trait-specific state variants preserve every MVP interaction difference.",
+  "source_run_at": "2026-09-29T19:35:18.732342+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "min_hit": 7,
+    "coverage": {
+      "states": [
+        "Stop Service",
+        "Travel",
+        "Travel Warning",
+        "Pause",
+        "Result"
+      ],
+      "traits": [
+        "Large",
+        "Wet",
+        "Spark",
+        "Howler",
+        "Sleeper"
+      ],
+      "screens": [
+        "Night Route Brief",
+        "Bus Route Gameplay",
+        "Run Result"
+      ],
+      "variations": [
+        "Large reservation",
+        "WetResidue",
+        "Spark-Wet conflict",
+        "Howler-Sleeper conflict",
+        "route reachability invalid"
+      ]
+    },
+    "safe_area": {
+      "top": 4,
+      "bottom": 4
+    },
+    "coordinates": "0-100 screen-percent"
+  },
+  "developer_handoff": {
+    "persistence": [
+      "best Score",
+      "success flag"
+    ],
+    "required_data": [
+      "route graph",
+      "manifest",
+      "seat adjacency",
+      "trait rules",
+      "slot eligibility",
+      "residue",
+      "warning queue",
+      "score"
+    ],
+    "scene_hierarchy": [
+      "Brief",
+      "Gameplay/HUD",
+      "Gameplay/RouteStrip",
+      "Gameplay/BusSlots",
+      "Gameplay/Queue",
+      "Gameplay/WarningOverlay",
+      "PauseOverlay",
+      "Result"
+    ],
+    "state_ownership": {
+      "screen": "selection,drag preview,overlay",
+      "mission": "route,Comfort,Score,residue,passenger lifecycle"
+    },
+    "content_templates": {
+      "traits": [
+        "Large",
+        "Wet",
+        "Spark",
+        "Howler",
+        "Sleeper"
+      ],
+      "conflicts": [
+        "Spark-Wet",
+        "Howler-Sleeper"
+      ],
+      "slot_states": [
+        "empty",
+        "occupied",
+        "reserved",
+        "WetResidue"
+      ]
+    },
+    "reusable_components": [
+      "PassengerCard",
+      "DropSlot",
+      "TraitBadge",
+      "RouteNode",
+      "ConflictConnector",
+      "ResourceMeter"
+    ],
+    "implementation_order": [
+      "route/manifest model",
+      "slot eligibility",
+      "boarding drag",
+      "route guards",
+      "travel/warnings",
+      "arrival/residue",
+      "result/reset"
+    ]
+  },
+  "acceptance_criteria": [
+    "All three Game Design screens are reachable.",
+    "Six seats and two standing slots expose occupancy and hard-invalid rules.",
+    "Large reservation, WetResidue, Spark-Wet and Howler-Sleeper each have observable wireframe states.",
+    "Invalid route identifies the blocking onboard destination and cannot confirm.",
+    "A 2.0s warning can resolve by re-seat or expire to Comfort -1 without double penalty.",
+    "Pause resumes exact timer/state.",
+    "Terminal success and Comfort-zero failure reach distinct Result states.",
+    "Retry restores Depot manifest, route, residue, Comfort 3 and Score 0."
+  ],
+  "primary_interaction": "Passenger drag placement/re-seat + destination-safe route selection",
+  "interaction_principles": [
+    "Direct manipulation of passengers",
+    "Route choice never obscures onboard destination constraints",
+    "Hard-invalid placement rejects without state change",
+    "Travel warning preserves exact pair and deadline visibility"
+  ]
+}

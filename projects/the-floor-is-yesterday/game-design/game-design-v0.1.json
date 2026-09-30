@@ -1,0 +1,171 @@
+{
+  "id": "176b4b99-2c01-4157-91f3-d5a4c71befc5",
+  "title": "The Floor Is Yesterday",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required.",
+  "idea_id": "01ef32af-bcd3-4e44-839b-77133747b6d1",
+  "version": "v0.1",
+  "one_line": "지나간 공간이 3초 뒤 과거 상태로 되감기는 추격 퍼즐에서 복원 타이밍으로 추격자의 길을 끊고 탈출한다.",
+  "core_loop": "공간 읽기→이동/장치 조작→zone 이탈로 3초 복원 예약→복원 전 통과/추격 유도→topology 복원→다음 경로→출구 또는 피격.",
+  "mvp_scope": "이동, 3초 zone rewind, 스위치-장치, 단일 추격자, 출구, 스테이지 진행, pause/retry, best time.",
+  "created_at": "2026-09-30T14:04:22.66246+00:00",
+  "game_rules": {
+    "pause": "타이머/이동 정지",
+    "rewind": "zone 이탈 3초 후 baseline 복원; 중복 예약 없음",
+    "switch": "연결 장치 즉시 toggle",
+    "failure": "접촉 즉시 fail",
+    "pursuer": "현재 통행 그래프 최단경로; no-path면 0.25초마다 재계산",
+    "restart": "baseline부터 재시작",
+    "success": "활성 출구 진입 즉시 clear",
+    "occupancy": "점유 시 0.25초씩 최대 2초 유예 후 계속 점유면 해당 복원 취소"
+  },
+  "not_in_mvp": [
+    "전투",
+    "능력 성장",
+    "다중 추격자",
+    "임의 시간 조작",
+    "절차 생성",
+    "서사 캠페인",
+    "온라인 순위"
+  ],
+  "updated_at": "2026-09-30T14:32:13.991425+00:00",
+  "archived_at": "2026-09-30T14:04:43.609698+00:00",
+  "known_risks": [
+    "공간/캐릭터 되감기 혼동",
+    "약한 복원 예고",
+    "과도한 추격 속도",
+    "복원 취소 악용"
+  ],
+  "progression": "클리어 시 다음 스테이지 해금. 능력 성장 없음. 스테이지별 best time 저장.",
+  "screen_flow": "Select→Intro→Gameplay→Clear/Fail. Clear=Next/Retry/Select, Fail=Retry/Select, Gameplay→Pause→Resume/Restart/Select.",
+  "state_model": {
+    "zone": [
+      "idle",
+      "armed",
+      "restoring",
+      "deferred",
+      "cancelled"
+    ],
+    "global": [
+      "intro",
+      "grace",
+      "chase",
+      "clear",
+      "fail"
+    ],
+    "overlay": [
+      "pause"
+    ],
+    "pursuer": [
+      "dormant",
+      "chasing",
+      "waiting_no_path"
+    ]
+  },
+  "archive_path": "projects/the-floor-is-yesterday/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "추격 퍼즐 스테이지",
+  "content_model": {
+    "stage": [
+      "walkable_topology",
+      "zones",
+      "devices",
+      "links",
+      "spawns",
+      "exit"
+    ],
+    "topology": "current traversability graph",
+    "variation": [
+      "zone_count",
+      "route_overlap",
+      "detours",
+      "pursuer_distance",
+      "device_links",
+      "exit_access"
+    ],
+    "zone_types": [
+      "corridor_restore",
+      "door_restore",
+      "platform_restore"
+    ],
+    "device_types": [
+      "switch",
+      "door",
+      "platform"
+    ]
+  },
+  "source_run_at": "2026-09-30T14:04:22.66246+00:00",
+  "archive_commit": "c183d267d5d2730d27c7157b7c917c59aac49cb4",
+  "human_priority": false,
+  "player_fantasy": "내 발자국 뒤로 세계가 과거로 접히는 가운데 그 파동을 함정이자 길로 쓰는 도주자.",
+  "session_length": "3–8분",
+  "test_scenarios": [
+    "성공: 문 개방→zone 이탈→3초 내 통과→문 복원으로 추격 우회→출구",
+    "실패: 추격 접촉→fail→Retry baseline 복구",
+    "점유: 최대 2초 유예 후 복원 취소",
+    "no-path: 대기 후 경로 재계산"
+  ],
+  "design_markdown": "# The Floor Is Yesterday — Playable Game Design Spec v0.1\n## 1. Product Definition\n한 화면 추격 액션 퍼즐. 지나간 rewind zone은 이탈 3초 뒤 라운드 시작 상태로 복원된다.\n## 2. Player Fantasy\n내 발자국 뒤로 세계가 과거로 접히는 가운데 그 파동을 함정이자 길로 쓰는 도주자.\n## 3. Core Player Verbs\nMove: 방향→통행 공간→위치 변경→궤적. Interact: 인접 장치→연결 장치 toggle→즉시 반응. Escape: 출구 진입→clear.\n## 4. Core Loop\n공간 읽기→이동/조작→복원 예약→복원 전 통과/추격 유도→topology 복원→다음 경로→출구/피격.\n## 5. Round / Session Structure\n기준상태→5초 grace→추격→성공/실패→Next·Retry·Select. 세션 3–8분, 스테이지 30–120초.\n## 6. Game Rules\nZone 이탈 시 3초 예약, 중복 예약 없음. 만료 시 rewindable 장치를 baseline으로 복원하며 캐릭터 위치는 되감지 않는다. 복원 위치 점유 시 0.25초씩 최대 2초 유예 후 계속 점유면 해당 복원을 취소한다. 스위치는 연결 장치를 즉시 toggle한다. 추격자는 현재 통행 그래프 최단경로를 사용하고 no-path면 0.25초마다 재계산한다. 접촉=fail, 활성 출구=clear. Pause는 타이머/이동 정지. Restart는 baseline부터.\n## 7. State Model\nGlobal intro→grace→chase→clear|fail. Zone idle→armed→restoring 또는 deferred→cancelled. Pursuer dormant/chasing/waiting_no_path. Pause overlay.\n## 8. Interaction Spec\n연속 방향 이동, 인접 장치 interact, 출구 접촉 자동 판정, zone 이탈 자동 rewind, pause.\n## 9. Content Model\nStage={topology,zones,devices,links,spawns,exit}. Zone={corridor/door/platform restore}. Device={switch,door,platform}. Variation={zone 수,경로 중첩,우회,추격 거리,연결,출구 접근}. current graph로 판정.\n## 10. Difficulty / Variation\n단일 zone/문→연속 zone·우회→복수 타이머·연결 장치. 3초 고정.\n## 11. Progression\n클리어 시 다음 스테이지 해금. 능력 성장 없음. best time 저장.\n## 12. Economy\nNot required.\n## 13. Screen Inventory\nStage Select, Stage Intro, Gameplay, Pause Overlay, Clear Result, Fail Result.\n## 14. Screen Flow\nSelect→Intro→Gameplay→Clear/Fail. Clear=Next/Retry/Select, Fail=Retry/Select, Pause=Resume/Restart/Select.\n## 15. Feedback System\n3초 예고+방향성 파동, 1초 이하 강화, restore baseline snap, 장치 즉시 반응, 추격 활성/막힘/재개, 결과 즉시 표시.\n## 16. Visual Direction Brief\n한 화면 또는 제한 카메라. 현재 경로와 복원 예정 구역 동시 판독. 형태·잔상·방향성 우선.\n## 17. MVP Scope + NOT IN MVP\nMVP: 이동, rewind, 장치, 단일 추격자, 출구, 진행, pause/retry, best time. 제외: 전투, 성장, 다중 추격자, 임의 시간조작, 절차생성, 서사, 온라인 순위.\n## 18. Test Scenarios\n성공: 문 개방→zone 이탈→3초 내 통과→문 복원으로 추격 우회→출구. 실패: 접촉→fail→Retry. 점유: 2초 유예 후 취소. no-path: 대기/재계산.\n## 19. Known Risks\n공간/캐릭터 되감기 혼동, 약한 예고, 과도한 추격 속도, 복원 취소 악용.\n## 20. Wireframe Handoff\nfun_promise: 지나온 공간의 지연된 과거 복원을 예측해 추격자의 길을 끊는 쾌감. 모든 화면과 grace/chase/armed/restoring/deferred/clear/fail/pause를 전달. current topology, zone 경계, 남은 시간, baseline 대상, 추격자·출구를 판독 가능하게 하고 move/interact/pause/exit/retry/next/select 및 corridor/door/platform variation을 포함한다.",
+  "feedback_system": {
+    "armed": "3초 예고+방향성 파동",
+    "device": "즉시 연결 반응",
+    "result": "즉시 입력 종료",
+    "pursuer": "활성/막힘/재개 구분",
+    "restore": "baseline snap",
+    "imminent": "1초 이하 강화"
+  },
+  "round_structure": "기준상태 기록→5초 grace→추격 활성→출구 성공/접촉 실패→Next·Retry·Select.",
+  "interaction_spec": {
+    "exit": "automatic contact",
+    "move": "continuous direction",
+    "pause": "grace/chase",
+    "rewind": "automatic on zone leave",
+    "interact": "one adjacent device"
+  },
+  "screen_inventory": [
+    "Stage Select",
+    "Stage Intro",
+    "Gameplay",
+    "Pause Overlay",
+    "Clear Result",
+    "Fail Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "move",
+      "input": "direction",
+      "target": "traversable space",
+      "feedback": "trail",
+      "condition": "passable",
+      "state_change": "position"
+    },
+    {
+      "verb": "interact",
+      "input": "interact",
+      "target": "adjacent device",
+      "feedback": "response",
+      "condition": "enabled",
+      "state_change": "linked toggle"
+    },
+    {
+      "verb": "escape",
+      "input": "enter exit",
+      "target": "active exit",
+      "feedback": "result",
+      "condition": "reachable",
+      "state_change": "clear"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 지나온 공간의 지연된 과거 복원을 예측해 추격자의 길을 끊는 쾌감",
+    "모든 화면과 주요 state 전달",
+    "current topology/zone/남은 시간/baseline/추격자/출구 판독",
+    "move/interact/pause/exit/retry/next/select",
+    "corridor/door/platform variation"
+  ],
+  "primary_interaction": "이동으로 rewind zone을 예약하고 복원 타이밍에 맞춰 경로를 바꾸며 추격자를 유도한다.",
+  "difficulty_variation": "단일 zone/문→연속 zone·우회→복수 타이머·연결 장치. topology와 추격 압박으로 상승, delay 3초 고정.",
+  "visual_direction_brief": "한 화면 또는 제한 카메라. 현재 경로와 복원 예정 구역을 동시에 판독. 현재/baseline 차이는 형태·잔상·방향성 우선."
+}

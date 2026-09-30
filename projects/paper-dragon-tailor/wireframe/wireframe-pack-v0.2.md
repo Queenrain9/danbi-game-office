@@ -1,0 +1,1 @@
+# Paper Dragon Tailor — Interaction Wireframe Pack v0.2. Portrait greybox. Core Workbench uses 12px cut tolerance, guided fold, 80% glue, 85% overlap and 15deg placement tolerance. Two flight attempts. Failed first flight maps causal stress back to Workbench. Deterministic polygon evaluation only.

@@ -1,0 +1,1378 @@
+{
+  "id": "c8ba96fd-f221-43ef-89d7-2543e5059ef5",
+  "title": "Pocket Crime Scene Photographer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "98630915-b22e-43b0-8d44-5707ccee7e8a",
+  "screens": [
+    {
+      "id": "case_select",
+      "name": "Case Select / Archive",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "archive",
+            "box": {
+              "h": 76,
+              "w": 88,
+              "x": 6,
+              "y": 12
+            }
+          },
+          {
+            "id": "nav",
+            "box": {
+              "h": 7,
+              "w": 94,
+              "x": 3,
+              "y": 3
+            }
+          }
+        ]
+      },
+      "states": [
+        "locked progression",
+        "replay available"
+      ],
+      "purpose": "Choose unlocked authored case and review best stars.",
+      "feedback": [
+        "locked case rejects selection without changing state"
+      ],
+      "components": [
+        {
+          "id": "case_cards",
+          "box": {
+            "h": 62,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "states": [
+            "unlocked",
+            "locked",
+            "completed_1_3_stars"
+          ],
+          "interaction": "tap unlocked case"
+        },
+        {
+          "id": "best_stars",
+          "box": {
+            "h": 8,
+            "w": 18,
+            "x": 70,
+            "y": 19
+          },
+          "states": [
+            "none",
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ],
+      "edge_cases": [
+        "latest unlocked case has no best stars yet"
+      ],
+      "source_refs": [
+        "screen_inventory[0]",
+        "progression",
+        "state_model[0]"
+      ],
+      "transitions": [
+        {
+          "to": "case_brief",
+          "from": "case_select",
+          "trigger": "P1_SELECT_CASE",
+          "condition": "unlocked case selected",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P1_SELECT_CASE",
+          "input": "tap",
+          "target": "case_cards",
+          "feedback": "selected card highlights",
+          "source_refs": [
+            "state_model[0]",
+            "progression"
+          ],
+          "precondition": "selected case is unlocked",
+          "state_change": "sets selected case and opens Case Brief",
+          "invalid_input": "locked case does not select or change progression",
+          "decision_origin": "game_design"
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": "Ten authored cases; stars are mastery only."
+    },
+    {
+      "id": "case_brief",
+      "name": "Case Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "scene_preview",
+            "box": {
+              "h": 84,
+              "w": 62,
+              "x": 5,
+              "y": 8
+            }
+          },
+          {
+            "id": "brief_panel",
+            "box": {
+              "h": 84,
+              "w": 27,
+              "x": 69,
+              "y": 8
+            }
+          }
+        ]
+      },
+      "states": [
+        "ready"
+      ],
+      "purpose": "State the proof relationship before camera manipulation.",
+      "feedback": [
+        "proof language describes relationship, not solution coordinates"
+      ],
+      "components": [
+        {
+          "id": "proof_summary",
+          "box": {
+            "h": 42,
+            "w": 23,
+            "x": 71,
+            "y": 18
+          },
+          "states": [
+            "2-4 evidence relation summary"
+          ]
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 21,
+            "x": 72,
+            "y": 70
+          },
+          "interaction": "tap"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 8,
+            "w": 10,
+            "x": 2,
+            "y": 3
+          },
+          "interaction": "tap"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "state_model[1]",
+        "game_rules.relation_readability",
+        "wireframe_handoff[0]"
+      ],
+      "transitions": [
+        {
+          "to": "camera_gameplay",
+          "from": "case_brief",
+          "trigger": "P2_START",
+          "condition": "Start",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "case_select",
+          "from": "case_brief",
+          "trigger": "P2_BACK",
+          "condition": "Back",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P2_START",
+          "input": "tap",
+          "target": "start",
+          "feedback": "camera view opens with authored case defaults",
+          "source_refs": [
+            "state_model[1]",
+            "screen_flow"
+          ],
+          "precondition": "case brief ready",
+          "state_change": "case_brief -> camera_gameplay Compose",
+          "invalid_input": "ignored while brief data is not ready",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P2_BACK",
+          "input": "tap",
+          "target": "back",
+          "feedback": "returns to archive",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "precondition": "case brief",
+          "state_change": "case_brief -> case_select",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "decision_note": "A side brief preserves camera-centric fantasy while keeping rule meaning unchanged.",
+      "decision_origin": "wireframe_layout",
+      "implementation_notes": "Do not expose hidden distance/span/flash target numbers."
+    },
+    {
+      "id": "camera_gameplay",
+      "name": "Camera Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "viewfinder",
+            "box": {
+              "h": 92,
+              "w": 78,
+              "x": 3,
+              "y": 4
+            }
+          },
+          {
+            "id": "camera_controls",
+            "box": {
+              "h": 92,
+              "w": 15,
+              "x": 82,
+              "y": 4
+            }
+          }
+        ]
+      },
+      "states": [
+        "Compose",
+        "Review"
+      ],
+      "purpose": "Core composition surface for Reposition, Frame, Focus, Flash and Shoot.",
+      "feedback": [
+        "parallax every frame",
+        "zoom scale every frame",
+        "focus lock marker",
+        "flash sheen and cone-entry tick",
+        "capture freeze + shutter",
+        "Review failed categories only"
+      ],
+      "components": [
+        {
+          "id": "scene_drag_surface",
+          "box": {
+            "h": 92,
+            "w": 78,
+            "x": 3,
+            "y": 4
+          },
+          "states": [
+            "Compose",
+            "Review frozen capture"
+          ],
+          "interaction": "single-finger horizontal drag; two-finger pinch; evidence tap"
+        },
+        {
+          "id": "frame_margin",
+          "box": {
+            "h": 86.4,
+            "w": 73.4,
+            "x": 5.3,
+            "y": 6.8
+          },
+          "states": [
+            "visual guide only; evaluator remains normalized [0.03,0.97]"
+          ]
+        },
+        {
+          "id": "objective_chip",
+          "box": {
+            "h": 10,
+            "w": 30,
+            "x": 6,
+            "y": 7
+          },
+          "states": [
+            "compact proof summary"
+          ]
+        },
+        {
+          "id": "exposures",
+          "box": {
+            "h": 9,
+            "w": 11,
+            "x": 67,
+            "y": 7
+          },
+          "states": [
+            "3",
+            "2",
+            "1",
+            "0"
+          ]
+        },
+        {
+          "id": "flash_toggle",
+          "box": {
+            "h": 10,
+            "w": 11,
+            "x": 84,
+            "y": 20
+          },
+          "states": [
+            "off",
+            "on"
+          ],
+          "interaction": "tap"
+        },
+        {
+          "id": "flash_angle",
+          "box": {
+            "h": 30,
+            "w": 9,
+            "x": 85,
+            "y": 34
+          },
+          "states": [
+            "continuous sheen preview"
+          ],
+          "interaction": "horizontal drag mapped to -60..60"
+        },
+        {
+          "id": "shutter",
+          "box": {
+            "h": 18,
+            "w": 12,
+            "x": 84,
+            "y": 72
+          },
+          "interaction": "tap when Compose/exposures>0/no gesture"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 8,
+            "x": 86,
+            "y": 6
+          },
+          "interaction": "tap"
+        },
+        {
+          "id": "focus_marker",
+          "box": {
+            "h": 0,
+            "w": 0,
+            "x": 0,
+            "y": 0
+          },
+          "states": [
+            "absent when null",
+            "attached to tapped valid evidence"
+          ]
+        }
+      ],
+      "edge_cases": [
+        "vertical-only drag under horizontal threshold changes nothing",
+        "occluded/out-of-frame focus tap changes nothing",
+        "third valid shot succeeds despite exposures reaching 0"
+      ],
+      "source_refs": [
+        "core_player_verbs",
+        "interaction_spec",
+        "game_rules.coordinate_model",
+        "game_rules.shutter_evaluation",
+        "feedback_system"
+      ],
+      "transitions": [
+        {
+          "to": "review_overlay",
+          "from": "camera_gameplay",
+          "trigger": "P3_SHOOT",
+          "condition": "valid shutter activation",
+          "source_refs": [
+            "state_model[2]",
+            "interaction_spec.shoot"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "pause_overlay",
+          "from": "camera_gameplay",
+          "trigger": "P3_PAUSE",
+          "condition": "Pause from Compose",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P3_REPOSITION",
+          "input": "single-finger horizontal drag",
+          "target": "scene_drag_surface",
+          "feedback": "scene parallax changes continuously",
+          "source_refs": [
+            "interaction_spec.reposition",
+            "core_player_verbs[0]"
+          ],
+          "precondition": "Compose and no pinch/flash-angle drag active",
+          "state_change": "camera_x changes within authored rail range and all projections update",
+          "gesture_rules": {
+            "priority": "ignored during pinch or flash-angle drag",
+            "cancel_behavior": "release keeps current camera_x"
+          },
+          "invalid_input": "vertical-only drag below 0.05 normalized horizontal delta changes nothing",
+          "spatial_rules": {
+            "mapping": "camera_x += normalized_drag_dx*1.2 then clamp to case rail range"
+          },
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P3_FRAME",
+          "input": "two-finger pinch",
+          "target": "scene_drag_surface / camera zoom",
+          "feedback": "proof-set scale and frame boundaries update continuously",
+          "source_refs": [
+            "interaction_spec.frame",
+            "core_player_verbs[1]"
+          ],
+          "precondition": "Compose",
+          "state_change": "zoom changes continuously within 1.0..2.2 and projected radii/distances update",
+          "gesture_rules": {
+            "priority": "pinch overrides Reposition while two pointers are down",
+            "cancel_behavior": "release keeps zoom"
+          },
+          "invalid_input": "no zoom change if gesture never becomes a valid pinch",
+          "spatial_rules": {
+            "mapping": "zoom *= pinch_scale then clamp 1.0..2.2"
+          },
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P3_FOCUS",
+          "input": "tap",
+          "target": "in-frame unoccluded evidence on scene_drag_surface",
+          "feedback": "focus marker moves; focus-required evidence sharpness updates; focus lock tick",
+          "source_refs": [
+            "interaction_spec.focus",
+            "core_player_verbs[2]",
+            "feedback_system.focus"
+          ],
+          "precondition": "Compose and release was not a drag >=0.05 normalized distance",
+          "state_change": "focus_depth becomes tapped evidence depth",
+          "gesture_rules": {
+            "priority": "release after drag >=0.05 is not treated as focus tap"
+          },
+          "invalid_input": "background, occluder, out-of-frame or occluded evidence changes no focus value",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P3_FLASH",
+          "input": "flash toggle tap or horizontal angle drag",
+          "target": "flash_toggle / flash_angle",
+          "feedback": "flash-sensitive sheen updates continuously; light tick when entering accepted cone",
+          "source_refs": [
+            "interaction_spec.flash",
+            "core_player_verbs[3]",
+            "feedback_system.flash"
+          ],
+          "precondition": "Compose",
+          "state_change": "flash_on toggles or flash_angle changes within -60..60 degrees",
+          "gesture_rules": {
+            "priority": "flash-angle control owns its pointer",
+            "cancel_behavior": "release keeps angle"
+          },
+          "invalid_input": "angle drag outside its owned control does not change flash angle",
+          "spatial_rules": {
+            "mapping": "angle += normalized_horizontal_drag_dx*120 degrees then clamp -60..60"
+          },
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P3_SHOOT",
+          "input": "tap",
+          "target": "shutter",
+          "feedback": "brief capture freeze + shutter audio/haptic",
+          "source_refs": [
+            "interaction_spec.shoot",
+            "core_player_verbs[4]",
+            "game_rules.shot_resources"
+          ],
+          "precondition": "Compose, exposures>0, and no continuous gesture active",
+          "state_change": "consume exactly one exposure, sample current composition, then camera_gameplay -> review_overlay",
+          "gesture_rules": {
+            "priority": "ignored while any continuous gesture pointer is active"
+          },
+          "invalid_input": "ignored during pinch/drag/Review/Pause or when exposures=0",
+          "decision_origin": "game_design",
+          "resource_effects": {
+            "exposure_delta": -1
+          }
+        },
+        {
+          "id": "P3_PAUSE",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "camera input freezes and pause modal opens",
+          "source_refs": [
+            "game_rules.pause",
+            "state_model[4]"
+          ],
+          "precondition": "Compose",
+          "state_change": "camera_gameplay -> pause_overlay with return_state=Compose",
+          "decision_note": "Makes the authored Pause path explicit without changing its semantics.",
+          "invalid_input": "ignored during terminal transition",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "decision_note": "Control rail leaves most landscape area to direct photographic composition.",
+      "state_variants": [
+        {
+          "id": "P3V_CONTEXT",
+          "name": "Context Relation",
+          "notes": "Relationship readability is solved through camera composition, not a separate checklist control.",
+          "condition": "case class = Context Relation",
+          "source_refs": [
+            "content_model",
+            "game_rules.relation_readability",
+            "wireframe_handoff[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "continuous framing/parallax cues; no hidden target numbers"
+          },
+          "component_overrides": {
+            "objective_chip": {
+              "state_binding": "required evidence relationship summary"
+            },
+            "scene_drag_surface": {
+              "state_binding": "authored relation pair and static scene geometry"
+            }
+          },
+          "interaction_overrides": {
+            "P3_FRAME": {
+              "emphasis": "readable pair distance/span"
+            },
+            "P3_REPOSITION": {
+              "emphasis": "composition"
+            }
+          }
+        },
+        {
+          "id": "P3V_OCCLUSION",
+          "name": "Occlusion Relation",
+          "notes": "No new gesture; authored occlusion rules remain evaluator truth.",
+          "condition": "case class = Occlusion Relation",
+          "source_refs": [
+            "game_rules.occlusion",
+            "core_player_verbs[0]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "occlusion changes are visible directly in the viewfinder"
+          },
+          "component_overrides": {
+            "scene_drag_surface": {
+              "state_binding": "required evidence plus authored foreground/relation-blocking occluders"
+            }
+          },
+          "interaction_overrides": {
+            "P3_FRAME": {
+              "emphasis": "may change overlap through projection"
+            },
+            "P3_REPOSITION": {
+              "emphasis": "parallax clears evidence/relation line"
+            }
+          }
+        },
+        {
+          "id": "P3V_FOCUS",
+          "name": "Focus Anchor",
+          "notes": "Focus requirement is expressed through the photograph itself.",
+          "condition": "case class = Focus Anchor",
+          "source_refs": [
+            "game_rules.focus",
+            "feedback_system.focus"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "focus marker and sharpness response communicate focus state"
+          },
+          "component_overrides": {
+            "focus_marker": {
+              "visible": "after valid evidence tap"
+            },
+            "scene_drag_surface": {
+              "state_binding": "focus-required evidence depth response"
+            }
+          },
+          "interaction_overrides": {
+            "P3_FOCUS": {
+              "emphasis": "required"
+            }
+          }
+        },
+        {
+          "id": "P3V_FLASH",
+          "name": "Raking Flash",
+          "notes": "No exact ideal angle is shown.",
+          "condition": "case class = Raking Flash",
+          "source_refs": [
+            "game_rules.flash",
+            "feedback_system.flash"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "surface sheen strengthens as authored valid cone is approached"
+          },
+          "component_overrides": {
+            "flash_angle": {
+              "emphasis": "required"
+            },
+            "flash_toggle": {
+              "emphasis": "required"
+            },
+            "scene_drag_surface": {
+              "state_binding": "flash-sensitive sheen preview"
+            }
+          },
+          "interaction_overrides": {
+            "P3_FLASH": {
+              "emphasis": "required"
+            }
+          }
+        },
+        {
+          "id": "P3V_COMBINED",
+          "name": "Combined Reconstruction",
+          "notes": "Combines existing rules only; no new verb or threshold.",
+          "condition": "case class = Combined Reconstruction",
+          "source_refs": [
+            "wireframe_handoff[3]",
+            "content_model"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "existing camera feedback channels combine; no new checklist or gesture"
+          },
+          "component_overrides": {
+            "objective_chip": {
+              "state_binding": "compact proof summary only"
+            },
+            "scene_drag_surface": {
+              "state_binding": "combined relation/occlusion/focus/flash authored requirements"
+            }
+          },
+          "interaction_overrides": {
+            "P3_FLASH": {
+              "enabled": "when relevant"
+            },
+            "P3_FOCUS": {
+              "enabled": "when relevant"
+            },
+            "P3_FRAME": {
+              "enabled": true
+            },
+            "P3_SHOOT": {
+              "enabled": true
+            },
+            "P3_REPOSITION": {
+              "enabled": true
+            }
+          }
+        }
+      ],
+      "decision_origin": "wireframe_layout",
+      "implementation_notes": "Projection/evaluation thresholds are data/rule truth; UI must not approximate them."
+    },
+    {
+      "id": "review_overlay",
+      "name": "Shot Review Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "review_strip",
+            "box": {
+              "h": 18,
+              "w": 42,
+              "x": 22,
+              "y": 72
+            }
+          }
+        ]
+      },
+      "states": [
+        "countdown",
+        "paused"
+      ],
+      "purpose": "1.2s non-interactive diagnosis over captured composition.",
+      "feedback": [
+        "muted error or confirmation"
+      ],
+      "components": [
+        {
+          "id": "failed_categories",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 24,
+            "y": 75
+          },
+          "states": [
+            "Frame",
+            "Occlusion",
+            "Relation",
+            "Focus",
+            "Flash",
+            "valid"
+          ]
+        }
+      ],
+      "edge_cases": [
+        "Pause freezes countdown"
+      ],
+      "source_refs": [
+        "game_rules.shutter_evaluation",
+        "feedback_system.invalid_review"
+      ],
+      "transitions": [
+        {
+          "to": "camera_gameplay",
+          "from": "review_overlay",
+          "trigger": "1.2s elapsed",
+          "condition": "shot invalid and exposures>0",
+          "source_refs": [
+            "game_rules.shutter_evaluation",
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "case_result",
+          "from": "review_overlay",
+          "trigger": "1.2s elapsed",
+          "condition": "shot valid OR invalid with exposures=0",
+          "source_refs": [
+            "game_rules.shot_resources",
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "pause_overlay",
+          "from": "review_overlay",
+          "trigger": "P4_PAUSE",
+          "condition": "Pause",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P4_PAUSE",
+          "input": "tap",
+          "target": "pause control inherited from camera UI",
+          "feedback": "review countdown visibly freezes",
+          "source_refs": [
+            "state_model[3]",
+            "game_rules.pause"
+          ],
+          "precondition": "Review countdown active",
+          "state_change": "review_overlay -> pause_overlay with return_state=Review and frozen review_elapsed",
+          "invalid_input": "all camera/shutter inputs remain blocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": "Never reveal hidden numeric targets."
+    },
+    {
+      "id": "pause_overlay",
+      "name": "Pause",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "modal",
+            "box": {
+              "h": 60,
+              "w": 30,
+              "x": 35,
+              "y": 20
+            }
+          }
+        ]
+      },
+      "states": [
+        "from Compose",
+        "from Review"
+      ],
+      "purpose": "Freeze Compose/Review and preserve exact return state.",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 10,
+            "w": 20,
+            "x": 40,
+            "y": 34
+          }
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 20,
+            "x": 40,
+            "y": 49
+          }
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 10,
+            "w": 20,
+            "x": 40,
+            "y": 64
+          }
+        }
+      ],
+      "edge_cases": [
+        "no camera/shutter input passes through modal"
+      ],
+      "source_refs": [
+        "game_rules.pause",
+        "state_model[4]"
+      ],
+      "transitions": [
+        {
+          "to": "camera_gameplay",
+          "from": "pause_overlay",
+          "trigger": "P5_RESUME",
+          "condition": "return_state=Compose",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "review_overlay",
+          "from": "pause_overlay",
+          "trigger": "P5_RESUME",
+          "condition": "return_state=Review",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "camera_gameplay",
+          "from": "pause_overlay",
+          "trigger": "P5_RETRY",
+          "condition": "reset case",
+          "source_refs": [
+            "game_rules.case_reset"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "case_select",
+          "from": "pause_overlay",
+          "trigger": "P5_SELECT",
+          "condition": "abandon",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P5_RESUME",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "modal closes and frozen state resumes",
+          "source_refs": [
+            "state_model[4]",
+            "game_rules.pause"
+          ],
+          "precondition": "Pause",
+          "state_change": "return to exact Compose or Review state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P5_RETRY",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "case restarts at authored defaults",
+          "source_refs": [
+            "game_rules.case_reset",
+            "state_model[4]"
+          ],
+          "precondition": "Pause",
+          "state_change": "reset case-local camera/exposure/review state and open camera_gameplay Compose",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P5_SELECT",
+          "input": "tap",
+          "target": "select",
+          "feedback": "archive reopens",
+          "source_refs": [
+            "state_model[4]",
+            "progression"
+          ],
+          "precondition": "Pause",
+          "state_change": "abandon current case and return case_select with no progression change",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "decision_note": "Concrete modal presentation completes the specified Pause semantics without changing them.",
+      "decision_origin": "wireframe_completion",
+      "implementation_notes": "Modal ownership highest."
+    },
+    {
+      "id": "case_result",
+      "name": "Case Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "id": "photo",
+            "box": {
+              "h": 80,
+              "w": 60,
+              "x": 7,
+              "y": 10
+            }
+          },
+          {
+            "id": "result_panel",
+            "box": {
+              "h": 80,
+              "w": 25,
+              "x": 70,
+              "y": 10
+            }
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "Seal successful photograph or explain exhausted-attempt failure and offer next action.",
+      "feedback": [
+        "success seals photo into archive and updates best stars/unlock"
+      ],
+      "components": [
+        {
+          "id": "captured_photo",
+          "box": {
+            "h": 70,
+            "w": 56,
+            "x": 9,
+            "y": 14
+          },
+          "states": [
+            "success photo",
+            "failure last capture"
+          ]
+        },
+        {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 19,
+            "x": 73,
+            "y": 20
+          },
+          "states": [
+            "success 1-3",
+            "hidden on failure"
+          ]
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 19,
+            "x": 73,
+            "y": 48
+          },
+          "states": [
+            "enabled success",
+            "hidden failure"
+          ]
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 19,
+            "x": 73,
+            "y": 62
+          }
+        },
+        {
+          "id": "case_select",
+          "box": {
+            "h": 9,
+            "w": 19,
+            "x": 73,
+            "y": 76
+          }
+        }
+      ],
+      "edge_cases": [
+        "replay only replaces best stars if improved"
+      ],
+      "source_refs": [
+        "game_rules.rating",
+        "state_model[5]",
+        "progression"
+      ],
+      "transitions": [
+        {
+          "to": "case_brief",
+          "from": "case_result",
+          "trigger": "P6_NEXT",
+          "condition": "success and next case exists",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "camera_gameplay",
+          "from": "case_result",
+          "trigger": "P6_RETRY",
+          "condition": "retry",
+          "source_refs": [
+            "game_rules.case_reset"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "case_select",
+          "from": "case_result",
+          "trigger": "P6_SELECT",
+          "condition": "case select",
+          "source_refs": [
+            "state_model[5]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "P6_NEXT",
+          "input": "tap",
+          "target": "next",
+          "feedback": "next case brief opens",
+          "source_refs": [
+            "progression",
+            "state_model[5]"
+          ],
+          "precondition": "success and next case exists",
+          "state_change": "case_result -> case_brief for next unlocked case",
+          "invalid_input": "hidden/disabled on failure or final case",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P6_RETRY",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "camera returns to authored defaults with 3 exposures",
+          "source_refs": [
+            "game_rules.case_reset",
+            "state_model[5]"
+          ],
+          "precondition": "Result",
+          "state_change": "reset current case and open camera_gameplay Compose",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "P6_SELECT",
+          "input": "tap",
+          "target": "case_select",
+          "feedback": "archive opens with stored best stars",
+          "source_refs": [
+            "progression",
+            "state_model[5]"
+          ],
+          "precondition": "Result",
+          "state_change": "case_result -> case_select",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": "stars=exposures_remaining+1 on success."
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "3f2eb602-15f4-449a-b6ea-0109cfa329a1",
+  "input_map": {
+    "cancel": "continuous gestures keep last valid value on release; invalid focus/shoot changes nothing",
+    "gestures": {
+      "flash": "toggle tap + owned angle drag",
+      "focus": "tap valid projected evidence; release after drag >=0.05 is not tap",
+      "frame": "two-finger pinch; release keeps zoom",
+      "pause": "atomic tap",
+      "shoot": "atomic tap; ignored during continuous gesture",
+      "reposition": "one-finger horizontal drag outside controls; release keeps camera_x"
+    },
+    "priority": [
+      "modal UI",
+      "flash-angle control",
+      "two-finger pinch",
+      "single-pointer scene drag",
+      "evidence tap",
+      "shutter"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T06:35:48.175647+00:00",
+  "edge_cases": {
+    "items": [
+      "No shutter when exposures=0",
+      "Invalid focus target does not mutate focus_depth",
+      "Pause blocks input and freezes Review",
+      "Retry restores all case-local defaults",
+      "Abandon never changes unlock/stars",
+      "Third-shot valid takes success priority",
+      "Art silhouette must remain visually consistent with evaluator circles",
+      "Every authored case requires a validated solution tuple"
+    ],
+    "source_refs": [
+      "game_rules",
+      "known_risks",
+      "content_model.solvability_contract"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": []
+  },
+  "updated_at": "2026-09-30T06:35:48.175647+00:00",
+  "core_screen": "camera_gameplay",
+  "orientation": "landscape",
+  "screen_flow": {
+    "entry": "case_select",
+    "nodes": [
+      "case_select",
+      "case_brief",
+      "camera_gameplay",
+      "review_overlay",
+      "pause_overlay",
+      "case_result"
+    ],
+    "paths": [
+      {
+        "to": "case_brief",
+        "from": "case_select",
+        "guard": "unlocked case selected"
+      },
+      {
+        "to": "camera_gameplay",
+        "from": "case_brief",
+        "guard": "Start"
+      },
+      {
+        "to": "case_select",
+        "from": "case_brief",
+        "guard": "Back"
+      },
+      {
+        "to": "review_overlay",
+        "from": "camera_gameplay",
+        "guard": "Shoot with exposures>0 and no continuous gesture active"
+      },
+      {
+        "to": "case_result",
+        "from": "review_overlay",
+        "guard": "shot_valid OR invalid and exposures=0 after 1.2s"
+      },
+      {
+        "to": "camera_gameplay",
+        "from": "review_overlay",
+        "guard": "invalid and exposures>0 after 1.2s"
+      },
+      {
+        "to": "pause_overlay",
+        "from": "camera_gameplay",
+        "guard": "Pause; return_state=Compose"
+      },
+      {
+        "to": "pause_overlay",
+        "from": "review_overlay",
+        "guard": "Pause; freeze review_elapsed and return_state=Review"
+      },
+      {
+        "to": "camera_gameplay",
+        "from": "pause_overlay",
+        "guard": "Resume when return_state=Compose"
+      },
+      {
+        "to": "review_overlay",
+        "from": "pause_overlay",
+        "guard": "Resume when return_state=Review"
+      },
+      {
+        "to": "camera_gameplay",
+        "from": "pause_overlay",
+        "guard": "Retry; reset case-local state"
+      },
+      {
+        "to": "case_select",
+        "from": "pause_overlay",
+        "guard": "abandon; no progression change"
+      },
+      {
+        "to": "case_brief",
+        "from": "case_result",
+        "guard": "Next on success"
+      },
+      {
+        "to": "camera_gameplay",
+        "from": "case_result",
+        "guard": "Retry"
+      },
+      {
+        "to": "case_select",
+        "from": "case_result",
+        "guard": "Case Select"
+      }
+    ],
+    "source_refs": [
+      "screen_flow",
+      "state_model",
+      "game_rules.pause"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 7,
+  "screen_count": 6,
+  "global_states": {
+    "states": [
+      "Case Select",
+      "Case Brief",
+      "Compose",
+      "Review",
+      "Pause",
+      "Result success",
+      "Result failure"
+    ],
+    "source_refs": [
+      "state_model",
+      "content_model",
+      "wireframe_handoff"
+    ],
+    "rule_relevant": [
+      "evidence in/out frame",
+      "clear/occluded",
+      "relation line clear/blocked",
+      "distance/span pass/fail",
+      "focus pass/fail",
+      "flash pass/fail",
+      "exposures 3/2/1/0"
+    ],
+    "decision_origin": "game_design",
+    "content_variations": [
+      "Context Relation",
+      "Occlusion Relation",
+      "Focus Anchor",
+      "Raking Flash",
+      "Combined Reconstruction"
+    ]
+  },
+  "pack_markdown": "# Pocket Crime Scene Photographer — Interaction Wireframe Pack v0.3\nfun_promise: Compose evidence relationships through the camera, not tap hidden objects.\nFlow: Archive → Brief → Compose → 1.2s Review → Compose/Result, with Pause/Retry/abandon semantics preserved.\nCore: landscape viewfinder dominates; direct drag/pinch/evidence-focus/flash/shutter inputs retain exact Game Design thresholds and evaluator meaning.\nVariants: Context, Occlusion, Focus, Flash, Combined are data/state variants of the same camera screen.\nResult: exposure efficiency maps to 3/2/1 stars; any success unlocks next case.\nImplementation boundary: preserve rule math and data semantics; choose Godot scene/node architecture downstream.\n\n## Structural repair 2026-09-30\nNormalized camera_gameplay flow references, structured core interactions/content variants, added explicit non-core navigation interactions, and assigned unique screen/overlay order values without changing Game Design rules.",
+  "source_run_at": "2026-09-30T06:35:48.175647+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "touch": "All explicit controls use generous mobile hit areas; evidence focus uses authored projected circles.",
+    "hierarchy": [
+      "scene/frame",
+      "required relationship cues",
+      "exposures and case objective",
+      "camera controls",
+      "navigation"
+    ],
+    "safe_area": "All persistent controls remain outside the central evidence-reading region where possible.",
+    "fun_promise": "Compose evidence relationships through the camera, not tap hidden objects.",
+    "source_refs": [
+      "visual_direction_brief",
+      "wireframe_handoff[0]"
+    ],
+    "decision_note": "Keeps the photograph central without changing evaluator rules.",
+    "decision_origin": "wireframe_layout"
+  },
+  "developer_handoff": {
+    "data_hints": [
+      "Case data: rail range, evidence/occluders, proof_set, relations, span, focus/flash requirements",
+      "Persist unlock count and best stars; camera state is case-local",
+      "Review stores sampled shot result and failed category set"
+    ],
+    "fun_promise": "The player should feel that moving and operating the camera reveals or destroys evidentiary relationships.",
+    "source_refs": [
+      "content_model",
+      "wireframe_handoff",
+      "progression"
+    ],
+    "decision_note": "Implementation-facing data/responsibility hints only; no Godot hierarchy is prescribed.",
+    "decision_origin": "wireframe_completion",
+    "content_representation": "One shared screen template renders all five case classes via data/state variants; Combined adds no new interaction.",
+    "responsibility_boundary": "Wireframe owns presentation, hit regions, overlays and gesture routing. Implementation owns scene/node architecture while preserving exact Game Design projection/evaluator rules."
+  },
+  "acceptance_criteria": [
+    "All four Game Design screen types plus Review and Pause overlays are represented",
+    "Compose supports Reposition, Frame, Focus, Flash and Shoot with stated priority/cancel rules",
+    "Every shutter consumes exactly one exposure before evaluation",
+    "Review lasts 1.2s, reports categories only, and pause freezes it",
+    "Valid third shot succeeds with 1 star; three invalid shots fail",
+    "Retry resets case-local camera/shot state and abandon changes no progression",
+    "All five content classes use the same evaluator/input vocabulary",
+    "Required evidence and relation/focus/flash states are representable",
+    "No wireframe control changes numeric projection, tolerance, exposure, rating or unlock rules"
+  ],
+  "primary_interaction": "camera composition via drag/pinch/focus/flash/shutter",
+  "interaction_principles": [
+    "Photograph is the play surface; supporting UI never becomes a checklist",
+    "Direct camera manipulation before menu-like controls",
+    "Continuous parallax/zoom/focus/flash feedback before shutter",
+    "Failed shots reveal categories only, never hidden target numbers",
+    "Gesture ownership is explicit; no accidental shutter or focus after drag"
+  ]
+}

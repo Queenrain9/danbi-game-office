@@ -1,0 +1,425 @@
+{
+  "id": "3f2eb602-15f4-449a-b6ea-0109cfa329a1",
+  "title": "Pocket Crime Scene Photographer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Exposures are case-local attempts, not currency; stars are mastery records and are not spent.",
+  "idea_id": "98630915-b22e-43b0-8d44-5707ccee7e8a",
+  "version": "v0.1",
+  "one_line": "작은 사건 현장에서 촬영 위치·줌·초점·플래시 각도를 직접 조절해, 결정적 증거들이 가려지지 않고 관계가 읽히는 단 한 장의 기록 사진을 완성하는 모바일 공간 촬영 퍼즐.",
+  "core_loop": "사건 Brief에서 증거 관계 목표를 읽는다 → 현장을 좌우로 재배치하며 시차로 가림을 푼다 → pinch로 관계가 한 프레임 안에서 읽히는 크기를 만든다 → 핵심 증거를 tap해 초점을 맞추고 필요한 사건에서는 flash angle을 조절한다 → shutter로 한 장을 판정한다 → 실패하면 남은 노출 안에서 실패 범주를 보고 다시 구성한다 → 성공 사진 한 장을 확보하면 다음 사건을 해금한다.",
+  "mvp_scope": "10 authored cases using one shared camera/evaluator system. Every case uses camera_x rail reposition, 1.0–2.2x zoom and shutter with 3 exposures. MVP content covers Context Relation, Occlusion Relation, Focus Anchor, Raking Flash and Combined Reconstruction classes; each base class appears at least twice, with at least two combined cases. Proof sets contain 2–4 evidence entities and 1–2 relation pairs. Systems include normalized parallax projection, binary circle occlusion, relation-line clearance, pair-distance and composition-span checks, focus depth, directional flash, 1.2s shot Review, success/failure, 1–3 stars, linear unlock, pause/retry and Case Select archive.",
+  "created_at": "2026-09-30T06:26:50.344781+00:00",
+  "game_rules": {
+    "flash": {
+      "angle": "flash_angle is degrees relative to camera forward axis, clamped -60°..+60°.",
+      "toggle": "flash_off means all flash-required evidence checks fail; non-flash cases do not require flash_off.",
+      "recovery": "Adjust angle or toggle; no resource cost.",
+      "required": "A flash-sensitive evidence entity stores ideal_flash_angle and tolerance_deg. It passes when flash_on=true and abs(flash_angle-ideal_flash_angle)<=tolerance_deg.",
+      "mvp_tolerance": "Authored tolerance is 12°–20°; no multi-bounce ray tracing in MVP."
+    },
+    "focus": {
+      "default": "focus_depth=null; any focus-required check fails until a valid focus target is tapped.",
+      "required": "For every entity marked focus_required, abs(entity.depth-focus_depth)<=0.08.",
+      "focus_set": "Tapping a valid evidence entity sets focus_depth exactly to that entity depth.",
+      "invalid_tap": "Tap on out-of-frame or currently occluded evidence changes no focus value."
+    },
+    "pause": "Pause is available from Compose and Review. It freezes Review countdown and accepts no camera/shutter input until Resume. There is no case timer.",
+    "rating": {
+      "stars": "On success stars = exposures_remaining + 1, producing 3 stars on first-shot success, 2 on second, 1 on third.",
+      "progression": "Any success unlocks the next case; stars do not change puzzle rules."
+    },
+    "failure": "Three consumed exposures with the third shot invalid.",
+    "success": "A valid shot within the three exposures.",
+    "in_frame": {
+      "rule": "Every required evidence circle must fit fully inside normalized frame margin [0.03,0.97] on both axes: screen_x±radius and screen_y±radius must remain inside the margin.",
+      "invalid_result": "required entity is Out of Frame."
+    },
+    "occlusion": {
+      "recovery": "Change camera_x and/or zoom; scene itself never moves.",
+      "evidence_rule": "A required evidence entity E is occluded when any authored occluder O with O.depth < E.depth has projected center distance < E.screen_radius + O.screen_radius. Any such overlap fails evidence visibility.",
+      "relation_rule": "For a required relation pair A-B marked line_clearance=true, minimum Euclidean distance from every authored relation-blocking occluder center to the projected segment A-B must be >= occluder.screen_radius + 0.02."
+    },
+    "case_reset": "Retry restores exposures, camera_x, zoom, focus_depth, flash_on, flash_angle and Review state; authored case geometry is unchanged.",
+    "shot_resources": {
+      "retry": "Restores exposures=3 and all camera controls to case defaults; scene entities return to authored static state.",
+      "failure": "Only an invalid shot with exposures now equal to 0 produces case failure.",
+      "exposure_cost": "Every shutter activation costs exactly 1 before validity result.",
+      "exposures_start": 3,
+      "success_priority": "If the shot is valid, success occurs even when that shot reduced exposures to 0."
+    },
+    "coordinate_model": {
+      "zoom": "continuous 1.0–2.2x around frame center (0.5,0.5).",
+      "camera_x": "continuous normalized rail position in [-1,1] unless a case narrows the allowed range.",
+      "sampling": "projection and live previews update every rendered frame; shot evaluation samples the values at shutter activation.",
+      "projection": "parallax p=0.08+0.16*(1-d); pre_x=base_x-camera_x*p; screen_x=0.5+(pre_x-0.5)*zoom; screen_y=0.5+(base_y-0.5)*zoom; screen_radius=r*zoom.",
+      "scene_data": "Each evidence/occluder has base_center=(x,y) in normalized scene coordinates [0,1], depth d in [0,1] where 0=foreground and 1=background, and base_radius r in normalized frame-width units."
+    },
+    "shutter_evaluation": {
+      "order": [
+        "consume 1 exposure",
+        "in-frame checks",
+        "occlusion and relation-line checks",
+        "relation distance and composition span",
+        "focus checks",
+        "flash checks"
+      ],
+      "valid": "All required checks pass in the same sampled shot.",
+      "invalid": "Any failed check makes the shot invalid; Review reports only failed categories, not hidden target numbers.",
+      "review_duration_seconds": 1.2
+    },
+    "relation_readability": {
+      "purpose": "Prevents a shot from passing by merely containing tiny evidence or stacking related evidence into an unreadable cluster.",
+      "pair_distance": "Each required relation pair has authored min_distance and max_distance in normalized screen coordinates. Projected Euclidean center distance must lie inside the inclusive range.",
+      "composition_span": "Each case defines min_span/max_span. Compute the diagonal of the axis-aligned bounding box enclosing all required evidence circles, divided by sqrt(2); it must lie within the inclusive case range."
+    }
+  },
+  "not_in_mvp": [
+    "Free 3D camera movement",
+    "Vertical camera-position movement",
+    "Continuous autofocus simulation",
+    "Multiple flash bounces or ray-traced lighting",
+    "Moving suspects/evidence",
+    "Dialogue/interrogation",
+    "Inventory/tool upgrades",
+    "Economy/shop",
+    "Procedural crime scenes",
+    "More than 10 launch-MVP cases",
+    "Online sharing/leaderboards"
+  ],
+  "updated_at": "2026-09-30T06:36:51.411641+00:00",
+  "archived_at": "2026-09-30T06:27:23.573706+00:00",
+  "known_risks": [
+    "Binary circle-overlap occlusion may feel too strict if art silhouettes diverge from evaluator circles",
+    "Camera rail limited to horizontal motion may reduce variety if scene authoring does not exploit depth well",
+    "Failed-category feedback can become overly instructional and reduce discovery if too explicit",
+    "Focus and flash requirements layered onto framing can feel like checklist chores unless cases preserve one clear spatial insight",
+    "Ten authored scenes require disciplined solvability validation so late combined constraints never produce impossible cases"
+  ],
+  "progression": "10 cases unlock linearly: any success unlocks the next case. Case Select stores best 1–3 star rating based only on exposure efficiency. Replaying an unlocked case can improve stars. No tool stat upgrades or rule-changing meta progression in MVP.",
+  "screen_flow": "Game Entry → Case Select → Case Brief → Camera Gameplay/Compose → Shoot → Review overlay → valid shot → success Result → Next Case Brief or Case Select; invalid shot with exposures remaining → Compose; third invalid shot → failure Result → Retry or Case Select. Pause overlays Compose/Review and resumes exact return state; abandoning to Case Select gives no unlock/star change.",
+  "state_model": [
+    {
+      "exit": "case selected",
+      "next": "Case Brief",
+      "enter": "game entry or Result exit",
+      "state": "Case Select",
+      "variables": [
+        "unlocked_case_count",
+        "best_stars"
+      ],
+      "allowed_inputs": [
+        "select unlocked case"
+      ],
+      "failure_cancel": "none"
+    },
+    {
+      "exit": "Start or Back",
+      "next": "Compose or Case Select",
+      "enter": "case selected",
+      "state": "Case Brief",
+      "variables": [
+        "case proof requirement summary"
+      ],
+      "allowed_inputs": [
+        "start",
+        "back"
+      ],
+      "failure_cancel": "Back -> Case Select"
+    },
+    {
+      "exit": "Shoot or Pause",
+      "next": "Review or Pause",
+      "enter": "Start, failed Review completion, or Retry",
+      "state": "Compose",
+      "variables": [
+        "camera_x",
+        "zoom",
+        "focus_depth",
+        "flash_on",
+        "flash_angle",
+        "exposures"
+      ],
+      "allowed_inputs": [
+        "Reposition",
+        "Frame",
+        "Focus",
+        "Aim Flash",
+        "Shoot",
+        "Pause"
+      ],
+      "failure_cancel": "invalid camera/focus gestures change no forbidden values; no terminal failure without Shoot"
+    },
+    {
+      "exit": "1.2s elapsed",
+      "next": "Compose or Result",
+      "enter": "after Shoot evaluation",
+      "state": "Review",
+      "variables": [
+        "shot_valid",
+        "failed_categories",
+        "exposures",
+        "review_elapsed"
+      ],
+      "allowed_inputs": [
+        "Pause"
+      ],
+      "failure_cancel": "Pause freezes review; if valid -> success Result; if invalid and exposures=0 -> failure Result"
+    },
+    {
+      "exit": "choice",
+      "next": "return_state, Compose on Retry, or Case Select",
+      "enter": "Pause from Compose/Review",
+      "state": "Pause",
+      "variables": [
+        "return_state"
+      ],
+      "allowed_inputs": [
+        "resume",
+        "retry",
+        "case select"
+      ],
+      "failure_cancel": "Retry resets case; Case Select abandons current case without progression"
+    },
+    {
+      "exit": "choice",
+      "next": "Case Brief for Next, Compose on Retry, or Case Select",
+      "enter": "valid shot or third invalid shot",
+      "state": "Result",
+      "variables": [
+        "success",
+        "stars",
+        "best_stars"
+      ],
+      "allowed_inputs": [
+        "next if success",
+        "retry",
+        "case select"
+      ],
+      "failure_cancel": "none"
+    }
+  ],
+  "archive_path": "projects/pocket-crime-scene-photographer/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "authored crime-scene photo case",
+  "content_model": {
+    "unit": "authored crime-scene photo case",
+    "classes": [
+      {
+        "type": "Context Relation",
+        "unique_rules": "2–4 required evidence entities plus one or two pair-distance relations and composition-span range; teaches framing a relationship rather than object collection.",
+        "new_state_or_input": "none; uses Reposition/Frame/Shoot."
+      },
+      {
+        "type": "Occlusion Relation",
+        "unique_rules": "foreground occluder circles and/or relation-blocking occluders make camera rail position materially change what can be proven.",
+        "new_state_or_input": "none; uses parallax Reposition plus existing relation checks."
+      },
+      {
+        "type": "Focus Anchor",
+        "unique_rules": "one or more required entities are marked focus_required; tap Focus must set depth within ±0.08.",
+        "new_state_or_input": "Focus tap becomes mandatory."
+      },
+      {
+        "type": "Raking Flash",
+        "unique_rules": "at least one flash-sensitive clue requires flash_on and angle within its authored 12°–20° tolerance.",
+        "new_state_or_input": "Flash toggle/angle becomes mandatory."
+      },
+      {
+        "type": "Combined Reconstruction",
+        "unique_rules": "Combines at least two prior classes in one proof set; introduces no new evaluator or interaction rule.",
+        "new_state_or_input": "none; combines existing patterns."
+      }
+    ],
+    "case_schema": {
+      "entities": "id, role, base_center, depth, base_radius, focus_required, optional flash requirement",
+      "occluders": "entity id plus relation_blocking flag",
+      "proof_set": "2–4 required evidence entity IDs",
+      "relations": "entity A/B, min_distance, max_distance, line_clearance flag",
+      "composition_span": "min_span/max_span",
+      "camera_rail_range": "[min,max] within [-1,1]"
+    },
+    "mvp_case_count": 10,
+    "variation_axes": [
+      "required evidence count 2–4",
+      "camera rail width",
+      "depth spacing",
+      "occluder count/placement",
+      "relation distance window",
+      "composition span window",
+      "focus-required entity count",
+      "flash angle/tolerance",
+      "combined class count"
+    ],
+    "coverage_requirement": "Across 10 cases, each of the four base classes appears in at least two cases and at least two cases are Combined Reconstruction. Exact scene names, evidence identities, layouts and final ordering remain authored content data.",
+    "solvability_contract": "Every authored case must have at least one validated control tuple (camera_x,zoom,focus_depth,flash_on,flash_angle) that passes all checks before content is admitted to MVP."
+  },
+  "source_run_at": "2026-09-30T06:26:50.344781+00:00",
+  "archive_commit": "c5d5142e945da2d9b6827c18c784fada082cb6db",
+  "human_priority": true,
+  "player_fantasy": "플레이어는 봉쇄 직전 현장에 들어가는 기록 전문 수사 사진가다. 숨은 물건을 찾는 사람이 아니라, 같은 증거도 어디서 어떤 렌즈·초점·빛으로 찍느냐에 따라 관계가 읽히거나 사라진다는 것을 이해하고 한 장의 사진으로 사건의 구조를 증명하는 숙련감을 느껴야 한다.",
+  "session_length": "2–4분 / case",
+  "test_scenarios": [
+    "A Context Relation case can be solved only when all required entities are in-frame and both pair-distance/composition-span windows pass; merely containing the objects at tiny scale fails.",
+    "Moving camera_x changes foreground/background projected x according to the fixed parallax formula and can turn an occluded required clue into a clear one.",
+    "A relation-blocking occluder intersecting the A-B proof segment fails Relation even if both endpoint evidence circles are individually clear.",
+    "Focus-required evidence fails when focus_depth is null or differs by >0.08 and passes after a valid evidence tap sets the correct depth.",
+    "Flash-required evidence fails with flash_off or angle outside its authored tolerance and passes inside the tolerance without consuming a resource.",
+    "First valid shot consumes one exposure and awards 3 stars; second-shot success awards 2; third-shot success at exposures=0 still succeeds with 1 star.",
+    "Three invalid shots reach failure Result; Retry restores exposures=3 and all camera controls to defaults without changing unlocks.",
+    "Pause during Review freezes the 1.2s Review countdown and resumes into the same Review state.",
+    "All five content classes can be represented using only the defined evaluator checks and interaction patterns; Combined Reconstruction adds no new rule."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Pocket Crime Scene Photographer\n\n## 1. Product Definition\n작은 사건 현장에서 촬영 위치·줌·초점·플래시 각도를 직접 조절해, 결정적 증거들이 가려지지 않고 관계가 읽히는 단 한 장의 기록 사진을 완성하는 landscape mobile 공간 관찰/촬영 퍼즐. 한 case는 2–4분이며 MVP는 10개 case다. 목표 감각은 숨은 물건을 찾는 것이 아니라 동일한 현장도 촬영 구성이 달라지면 증거 관계가 보이거나 사라진다는 것을 손으로 이해하는 것이다. Non-goals: free 3D camera, moving-character action, interrogation, inventory, shop/economy.\n\n## 2. Player Fantasy\n플레이어는 봉쇄 직전 현장에 들어가는 기록 전문 수사 사진가다. 증거 자체보다 증거 사이의 거리·가림·깊이·빛을 읽고, 한 장의 사진으로 사건의 구조를 증명한다.\n\n## 3. Core Player Verbs\n- Reposition: scene 위 single-finger horizontal drag → camera_x 변경 → depth별 parallax로 evidence/occluder projection 변경.\n- Frame: two-finger pinch → zoom 1.0–2.2x 변경 → proof set의 화면 크기와 관계 거리 변경.\n- Focus: 현재 in-frame이며 unoccluded evidence tap → focus_depth를 해당 evidence depth로 설정.\n- Aim Flash: flash toggle tap + angle drag → flash_on/flash_angle 변경, flash-sensitive surface preview 변화.\n- Shoot: shutter tap → exposure 1 소비 → 현재 구성 전체를 한 번에 판정하고 Review 진입.\n\n## 4. Core Loop\nCase Brief에서 어떤 관계를 증명해야 하는지 확인 → camera_x를 옮겨 가림을 푼다 → zoom으로 증거 관계가 읽히는 크기를 만든다 → 필요한 case에서 focus/flash를 맞춘다 → shutter → 실패 범주만 확인하고 남은 exposure 안에서 재구성 → valid photo 한 장 확보 시 case 완료/다음 case 해금.\n\n## 5. Round / Session Structure\nMVP 10 authored cases. Case는 Brief → Compose → Review → Result. 시작값은 exposures=3, camera_x=0, zoom=1.0, focus_depth=null, flash_off, flash_angle=0°. 전역 timer는 없다. Shoot은 먼저 exposure 1을 소비하고 같은 순간의 구성값을 판정한다. Valid면 남은 exposure가 0이어도 success. Invalid 후 exposure가 남으면 1.2초 Review 뒤 Compose 복귀, 세 번째 invalid로 0이면 failure. Retry는 case-local 상태만 초기화한다.\n\n## 6. Game Rules\n### Coordinate / Projection\nEvidence와 occluder는 base_center=(x,y)∈[0,1], depth d∈[0,1](0 foreground, 1 background), base_radius r를 가진다. camera_x∈[-1,1], zoom∈[1.0,2.2].\n- parallax p = 0.08 + 0.16×(1-d)\n- pre_x = base_x - camera_x×p\n- screen_x = 0.5 + (pre_x-0.5)×zoom\n- screen_y = 0.5 + (base_y-0.5)×zoom\n- screen_radius = r×zoom\n판정은 shutter 순간 값을 사용한다.\n\n### In Frame\nRequired evidence circle 전체가 x/y 모두 [0.03,0.97] 안에 있어야 한다.\n\n### Occlusion\nEvidence E보다 앞(depth가 더 작은) authored occluder O와 projected circle이 겹치면 E는 occluded다: center distance < E.radius+O.radius. Relation이 line_clearance=true면 A-B projected segment와 relation-blocking occluder center의 최소 거리가 occluder.radius+0.02 이상이어야 한다.\n\n### Relation Readability\n각 relation pair는 authored min_distance/max_distance를 가지며 projected center distance가 범위 안이어야 한다. 모든 required evidence circle을 감싼 axis-aligned bbox의 diagonal/√2인 composition_span도 case의 min_span/max_span 안이어야 한다. 따라서 작은 증거를 한 프레임에 넣기만 해서는 통과하지 않는다.\n\n### Focus\nValid evidence tap은 focus_depth를 그 evidence depth로 설정한다. focus_required evidence는 |depth-focus_depth|≤0.08이어야 한다. 기본 focus_depth=null은 실패다.\n\n### Flash\nflash_angle은 camera forward 기준 -60°..+60°. Flash-sensitive evidence는 flash_on=true이며 |flash_angle-ideal_flash_angle|≤authored tolerance(12°–20°)일 때만 통과한다. Flash는 소비 자원이 아니다.\n\n### Shot / Recovery\nShutter → exposure-1 → in-frame → occlusion/relation-line → pair-distance/span → focus → flash 순으로 평가한다. 하나라도 실패하면 invalid. Review는 failed category만 알려주고 숨겨진 목표 숫자는 공개하지 않는다. exposure가 남으면 camera/zoom/focus/flash를 바꿔 재촬영한다.\n\n### Success / Failure / Rating\nValid photo가 success. Invalid third shot로 exposures=0이면 failure. Success stars=exposures_remaining+1(첫 shot 3, 둘째 2, 셋째 1). Pause는 Compose/Review에서 가능하며 Review countdown을 포함한 진행을 정지한다. Retry는 exposures/camera/zoom/focus/flash/Review를 초기화한다.\n\n## 7. State Model\n- Case Select: unlocked case 선택, best stars 표시. → Brief.\n- Case Brief: Start/Back. → Compose 또는 Select.\n- Compose: Reposition/Frame/Focus/Flash/Shoot/Pause. Shoot → Review.\n- Review: 1.2초 shot 결과 표시. Pause 가능. valid→success Result, invalid+exposures>0→Compose, invalid+0→failure Result.\n- Pause: Resume/Retry/Case Select. Resume은 exact return state.\n- Result: success/failure. Next(success), Retry, Case Select.\n\n## 8. Interaction Spec\nReposition은 horizontal drag의 normalized dx×1.2를 camera_x에 더해 case rail range로 clamp한다. horizontal delta가 0.05 미만인 vertical-only drag는 위치를 바꾸지 않는다. Pinch는 zoom을 multiplicative scale로 바꾸며 1.0–2.2 clamp, 두 pointer가 있는 동안 Reposition보다 우선한다. Focus tap은 projected evidence circle 안이며 in-frame/unoccluded일 때만 valid; drag가 0.05 이상이면 release는 tap이 아니다. Flash angle drag는 dx×120°를 더해 -60..60 clamp. Shoot은 continuous gesture가 활성 중이면 무시한다.\n\n## 9. Content Model\nContent unit은 authored crime-scene photo case. MVP 10개.\n- Context Relation: 2–4 evidence, pair-distance와 composition-span으로 관계를 읽게 함.\n- Occlusion Relation: foreground occluder/relation blocker로 camera_x parallax가 필수.\n- Focus Anchor: focus_required evidence를 포함.\n- Raking Flash: flash-sensitive evidence와 angle tolerance 포함.\n- Combined Reconstruction: 앞의 두 가지 이상을 조합하며 새 rule/input은 추가하지 않음.\n10개 전체에서 네 base class가 각각 최소 2개 case에 등장하고 Combined가 최소 2개 존재한다. Exact scene 이름/배치/순서는 data로 남긴다.\nCase schema는 camera rail range, entities, occluders, relations, composition span, 2–4 evidence proof_set을 가진다. 모든 authored case는 최소 1개 valid control tuple이 검증되어야 MVP에 들어간다.\n\n## 10. Difficulty / Variation\n초반은 넓은 relation window와 가림 없는 2-object 관계. 중반은 foreground occlusion으로 camera_x 해법을 좁히고 Focus와 Flash를 각각 도입. 후반은 3–4 evidence, 두 relation pair, occlusion+focus 또는 occlusion+flash를 조합한다. 속도나 timer가 아니라 동시에 만족해야 하는 공간 조건 수로 난도가 오른다.\n\n## 11. Progression\n10 cases linear unlock. 어떤 star 수든 success면 다음 case unlock. Case Select는 best 1–3 stars를 저장하며 replay로 개선 가능. Rule-changing upgrade는 없다.\n\n## 12. Economy\nNot required. Exposure는 case-local attempt이고 stars는 mastery record이며 소비되지 않는다.\n\n## 13. Screen Inventory\n1. Case Select / Archive\n2. Case Brief\n3. Camera Gameplay\n4. Case Result\n\n## 14. Screen Flow\nGame Entry → Case Select → Brief → Compose → Shoot → Review → success Result → Next/Select. Invalid+exposure remaining → Compose. Third invalid → failure Result → Retry/Select. Pause는 Compose/Review overlay이며 Resume은 exact state로 복귀. Case Select abandon은 progression을 바꾸지 않는다.\n\n## 15. Feedback System\nReposition은 parallax로 overlap 변화가 즉시 보인다. Frame은 lens scale 변화와 zoom clamp feedback. Focus는 marker/lock cue. Flash는 유효 cone에 가까워질수록 surface sheen이 강해지고 cone 진입 haptic을 준다. Shoot은 capture freeze+shutter. Invalid Review는 Frame/Occlusion/Relation/Focus/Flash category만 표시. Success는 사진을 archive에 봉인하고 stars/unlock을 보여준다.\n\n## 16. Visual Direction Brief\nLandscape mobile의 compact static crime-scene diorama. Evidence silhouette, foreground occluder, depth separation이 읽혀야 하며 camera_x parallax와 zoom이 관계를 실제로 바꾸는 것이 중심이다. 사진 frame 자체가 주 play surface이며 정보 UI가 checklist 게임처럼 지배하지 않는다. 늦은 밤의 절제된 forensic photography, practical light, reflective detail을 사용한다. UI 좌표/box는 Wireframe 책임이다.\n\n## 17. MVP Scope + NOT IN MVP\n10 authored cases, shared camera/evaluator 1세트. 모든 case는 horizontal camera rail, zoom, shutter 3 exposures를 사용한다. Context/Occlusion/Focus/Flash/Combined classes를 전체 MVP에서 커버하며 proof set 2–4 evidence, relation pair 1–2개. Projection, circle occlusion, relation-line clearance, distance/span, focus depth, directional flash, 1.2s Review, result, stars, unlock, pause/retry를 포함한다.\nNOT IN MVP: free 3D/vertical camera movement, continuous autofocus, multi-bounce/ray-traced flash, moving evidence, interrogation, inventory/upgrades, economy, procedural scenes, >10 MVP cases, online sharing.\n\n## 18. Test Scenarios\n- Context case는 object 포함만으로 통과하지 않고 pair-distance+composition-span을 만족해야 한다.\n- camera_x 변화가 고정 parallax 식으로 foreground overlap을 바꿔 occlusion을 풀 수 있다.\n- relation-blocking occluder가 A-B segment를 가리면 endpoints가 clear여도 Relation fail.\n- focus_required는 null 또는 error>0.08에서 fail, valid tap 후 pass.\n- flash_required는 flash_off/outside tolerance에서 fail, inside tolerance에서 pass.\n- 첫/둘째/셋째 valid shot은 각각 3/2/1 stars; 셋째 shot이 exposure0이어도 valid면 success.\n- 세 invalid shot은 failure. Retry는 case-local 상태 reset.\n- Review 중 Pause는 1.2s countdown freeze.\n- 다섯 content class가 정의된 evaluator/input만으로 표현된다.\n\n## 19. Known Risks\nEvaluator circle과 실제 art silhouette가 다르면 occlusion이 부당하게 느껴질 수 있다. Horizontal rail만으로 scene authoring이 반복될 수 있다. Failed-category feedback이 너무 친절하면 발견성이 줄 수 있다. Focus/Flash가 framing을 보조하지 않고 checklist처럼 느껴질 위험이 있다. 10개 authored case 모두 solvability validation이 필요하다.\n\n## 20. Wireframe Handoff\nfun_promise: 이 게임은 숨은 물건을 탭하는 것이 아니라 카메라로 증거 관계를 구성하는 게임이어야 한다.\nCase Select/Brief/Camera/Result 4 screen type과 Compose/Review/Pause/success/failure를 모두 표현한다. Context/Occlusion/Focus/Flash/Combined variation을 커버한다. Reposition drag, pinch Frame, Focus tap, Flash toggle/angle drag, Shutter의 priority/cancel/invalid semantics를 표현한다. Required evidence의 in-frame, clear/occluded, relation-line clear/blocked, distance/span, focus, flash pass/fail 상태를 보여준다. Invalid Review 1.2초와 remaining exposure flow, star mapping, unlock/replay, Pause/abandon/Retry를 표현한다. Wireframe은 배치와 표현 방식을 결정할 수 있지만 projection/occlusion/focus/flash/relation/exposure 규칙은 변경하지 않는다.\n",
+  "feedback_system": {
+    "flash": {
+      "audio": "flash mechanism cue",
+      "state": "flash_on/angle",
+      "haptic": "light tick when entering accepted cone",
+      "visual": "flash-sensitive surface sheen strengthens as angle approaches valid cone"
+    },
+    "focus": {
+      "audio": "focus lock tick",
+      "state": "focus_depth",
+      "haptic": "light lock",
+      "visual": "selected evidence gains focus marker and depth-sharpness response"
+    },
+    "frame": {
+      "audio": "lens movement cue",
+      "state": "zoom",
+      "haptic": "soft endpoint tick at zoom clamp",
+      "visual": "proof-set scale changes continuously"
+    },
+    "shoot": {
+      "audio": "shutter",
+      "state": "exposure consumed and Review begins",
+      "haptic": "shutter pulse",
+      "visual": "brief capture freeze"
+    },
+    "success": {
+      "audio": "confirmation cue",
+      "state": "case unlock progression",
+      "haptic": "success pattern",
+      "visual": "captured photo is sealed into case archive with star rating"
+    },
+    "reposition": {
+      "audio": "subtle movement cue",
+      "state": "camera_x projection",
+      "haptic": "none",
+      "visual": "parallax immediately changes evidence/occluder overlap"
+    },
+    "invalid_review": {
+      "audio": "muted review cue",
+      "state": "Compose return or failure Result",
+      "haptic": "single soft error",
+      "visual": "failed categories: Frame/Occlusion/Relation/Focus/Flash; no hidden numeric solution shown"
+    }
+  },
+  "round_structure": "MVP는 10개의 authored case로 구성된다. 각 case는 Case Brief → Compose → Review → Result 흐름이다. Case 시작 시 exposures=3, camera_x=0, zoom=1.0, focus_depth=null, flash_off, flash_angle=0°. Compose에는 전역 시간 제한이 없다. Shoot은 항상 exposure 1개를 소비한 뒤 같은 순간의 구성을 평가한다. 유효 사진이면 남은 exposure 수와 무관하게 즉시 success Result. 무효 사진이고 exposures>0이면 1.2초 Review 후 Compose로 복귀한다. 세 번째 무효 사진으로 exposures=0이면 failure Result. Success는 다음 case를 unlock하고 best star rating을 저장한다. Retry는 case-local camera/shot state를 초기값으로 복구한다. 평균 case 2–4분.",
+  "interaction_spec": {
+    "flash": {
+      "input": "tap toggle; drag angle control",
+      "valid": "Compose",
+      "cancel": "release keeps angle",
+      "mapping": "angle += normalized_horizontal_drag_dx*120° then clamp -60°..60°",
+      "priority": "angle-control drag owns pointer",
+      "success_change": "flash_on or flash_angle changes"
+    },
+    "focus": {
+      "input": "single tap on evidence projected circle",
+      "valid": "entity in-frame and not occluded under current projection",
+      "cancel": "atomic; no cancel",
+      "invalid": "background/occluder/out-of-frame/occluded target",
+      "priority": "if a drag exceeded 0.05 normalized distance, release is not treated as tap",
+      "success_change": "focus_depth=target.depth"
+    },
+    "frame": {
+      "input": "two-finger pinch",
+      "valid": "Compose",
+      "cancel": "release keeps zoom",
+      "mapping": "zoom *= pinch_scale then clamp 1.0..2.2",
+      "priority": "pinch overrides Reposition while two pointers are down",
+      "success_change": "zoom and projected radii/distances update"
+    },
+    "shoot": {
+      "input": "shutter tap",
+      "valid": "Compose with exposures>0",
+      "cancel": "atomic",
+      "invalid": "during pinch/drag/Review/Pause or exposures=0",
+      "priority": "ignored while any continuous gesture pointer is active",
+      "success_change": "exposures-1 then Review data generated"
+    },
+    "reposition": {
+      "input": "single-finger horizontal drag outside active controls",
+      "valid": "Compose only",
+      "cancel": "release keeps current camera_x",
+      "invalid": "vertical-only drag below 0.05 normalized horizontal delta changes nothing",
+      "mapping": "camera_x += normalized_drag_dx*1.2 then clamp to case rail range",
+      "priority": "ignored during pinch or flash-angle drag",
+      "success_change": "camera_x and all projections update"
+    }
+  },
+  "screen_inventory": [
+    "Case Select / Archive",
+    "Case Brief",
+    "Camera Gameplay",
+    "Case Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Reposition",
+      "input": "horizontal drag on scene",
+      "target": "camera rail position",
+      "feedback": "scene parallax changes continuously",
+      "condition": "Compose state and no other gesture active",
+      "state_change": "camera_x changes within authored rail range; projected evidence/occluders update by parallax"
+    },
+    {
+      "verb": "Frame",
+      "input": "two-finger pinch",
+      "target": "camera zoom",
+      "feedback": "proof set scale and frame boundaries update",
+      "condition": "Compose",
+      "state_change": "zoom changes continuously within 1.0–2.2x"
+    },
+    {
+      "verb": "Focus",
+      "input": "tap evidence entity",
+      "target": "in-frame, currently unoccluded evidence",
+      "feedback": "focus marker moves and focus-required evidence sharpness updates",
+      "condition": "Compose",
+      "state_change": "focus_depth becomes tapped entity depth"
+    },
+    {
+      "verb": "Aim Flash",
+      "input": "drag flash angle control; tap flash toggle",
+      "target": "flash direction",
+      "feedback": "flash-sensitive surfaces show continuous sheen strength",
+      "condition": "Compose",
+      "state_change": "flash_on toggles and flash_angle changes within -60°..+60°"
+    },
+    {
+      "verb": "Shoot",
+      "input": "tap shutter",
+      "target": "current composition",
+      "feedback": "shutter/haptic then Review with passed/failed criteria categories",
+      "condition": "Compose and exposures>0",
+      "state_change": "exposures-1 then shot evaluator produces valid/invalid result"
+    }
+  ],
+  "human_priority_at": "2026-09-30T06:30:26.66+00:00",
+  "wireframe_handoff": [
+    "fun_promise: The game must feel like composing evidence relationships through the camera, not tapping hidden objects; every major state should keep the photograph itself as the center of the decision.",
+    "Represent all four screen types: Case Select/Archive, Case Brief, Camera Gameplay, Case Result.",
+    "Represent Compose, Review, Pause, success Result and failure Result, including exposures 3→0 and Retry reset semantics.",
+    "Represent the five content classes: Context Relation, Occlusion Relation, Focus Anchor, Raking Flash, Combined Reconstruction; Combined uses existing rules only.",
+    "Show Reposition drag, pinch Frame, evidence Focus tap, flash toggle/angle drag and shutter priority/cancel/invalid semantics without inventing new thresholds.",
+    "Express rule-relevant states for required evidence: in-frame/out-of-frame, clear/occluded, relation-line clear/blocked, relation distance/span pass/fail, focus pass/fail, flash pass/fail.",
+    "Show 1.2s invalid Review categories and the return to Compose when exposures remain; third invalid shot goes to failure Result.",
+    "Show first/second/third-shot success star mapping, next-case unlock, replay for best stars, Pause resume, and Case Select abandon flow.",
+    "Wireframe may decide placement, grouping and visual treatment, but must not change projection, occlusion, focus, flash, relation or exposure rules."
+  ],
+  "primary_interaction": "수평 드래그로 카메라 위치 변경 + pinch framing + 증거 focus tap + flash angle 조절 + shutter 판정",
+  "difficulty_variation": "Early cases use wide relation-distance/span windows, no occluders, and one primary relation so the player learns that a good photo is about readable relationship. Mid cases narrow the camera rail solution through foreground occlusion, then require focus depth or flash angle separately. Late cases combine occlusion with focus or flash and use 3–4 evidence entities with two relation pairs. Difficulty grows through simultaneous spatial constraints and proof-set structure, not faster input or shorter timers.",
+  "visual_direction_brief": "Landscape mobile, compact static crime-scene diorama viewed through a camera-centric composition space. Evidence silhouettes, foreground occluders and depth separation must remain readable while camera_x parallax and zoom visibly change relationships. The photographic frame is the primary play surface; case information and failed-category feedback should support it without turning the experience into a checklist panel. Mood is restrained late-night forensic photography: practical lights, reflective surfaces, flash-sensitive detail, minimal dramatic clutter. Exact UI coordinates and panel layout remain Wireframe responsibility."
+}

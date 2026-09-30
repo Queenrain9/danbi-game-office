@@ -1,0 +1,1277 @@
+{
+  "id": "ddb3d7a9-885c-4072-817d-b364e7f463bf",
+  "title": "Echo Thief",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "5927f1aa-1576-4e06-a076-c53c6ce0d679",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Mission Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 9,
+            "w": 88,
+            "x": 6,
+            "y": 5,
+            "id": "header",
+            "role": "title/progression",
+            "label": "Museum Heists"
+          },
+          {
+            "h": 63,
+            "w": 88,
+            "x": 6,
+            "y": 17,
+            "id": "missions",
+            "role": "mission cards",
+            "label": "Mission Grid"
+          },
+          {
+            "h": 11,
+            "w": 88,
+            "x": 6,
+            "y": 83,
+            "id": "actions",
+            "role": "start",
+            "label": "Selection Action"
+          }
+        ]
+      },
+      "states": [
+        "ready",
+        "locked-selection",
+        "loading"
+      ],
+      "purpose": "Choose an unlocked authored heist and see completion/unlock state.",
+      "feedback": [
+        "unlock/best completion shown per card"
+      ],
+      "components": [
+        {
+          "id": "mission_cards",
+          "box": {
+            "h": 63,
+            "w": 88,
+            "x": 6,
+            "y": 17
+          },
+          "type": "selectable_card_grid",
+          "label": "8 Mission Cards",
+          "source_refs": [
+            "content_model.mvp_missions",
+            "progression"
+          ],
+          "state_binding": "unlock + best completion",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start_button",
+          "box": {
+            "h": 11,
+            "w": 39,
+            "x": 55,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Open Brief",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Explicit selection CTA closes navigation UX only.",
+          "state_binding": "selected unlocked mission",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [
+        "No selection keeps CTA disabled."
+      ],
+      "transitions": [
+        {
+          "to": "S2",
+          "from": "S1",
+          "trigger": "open_brief",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select_mission",
+          "input": "tap",
+          "target": "mission_cards",
+          "feedback": "selected card emphasis",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "card unlocked",
+          "state_change": "selected_mission changes",
+          "invalid_input": "locked card shows lock feedback",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "open_brief",
+          "input": "tap",
+          "target": "start_button",
+          "feedback": "brief opens",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "unlocked mission selected",
+          "state_change": "navigate S2",
+          "invalid_input": "disabled otherwise",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No economy or upgrade UI."
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Mission Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 15,
+            "w": 90,
+            "x": 5,
+            "y": 5,
+            "id": "summary",
+            "role": "objective",
+            "label": "Mission Summary"
+          },
+          {
+            "h": 55,
+            "w": 90,
+            "x": 5,
+            "y": 22,
+            "id": "map",
+            "role": "topology/patrol/source preview",
+            "label": "Tactical Preview"
+          },
+          {
+            "h": 14,
+            "w": 90,
+            "x": 5,
+            "y": 80,
+            "id": "actions",
+            "role": "back/start",
+            "label": "Brief Actions"
+          }
+        ]
+      },
+      "states": [
+        "Brief",
+        "loading"
+      ],
+      "purpose": "Preview topology, target/exit, guards, patrols and known sound sources before committing.",
+      "feedback": [
+        "Patrol/source previews use same visual language as gameplay."
+      ],
+      "components": [
+        {
+          "id": "preview_map",
+          "box": {
+            "h": 55,
+            "w": 90,
+            "x": 5,
+            "y": 22
+          },
+          "type": "top_down_map",
+          "label": "Museum Preview",
+          "source_refs": [
+            "content_model.schema",
+            "interaction_spec.planning"
+          ],
+          "state_binding": "authored graph/start/target/exit/guards/patrol/source",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 12,
+            "w": 42,
+            "x": 53,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Start Heist",
+          "source_refs": [
+            "state_model.transitions[0]"
+          ],
+          "decision_note": "Button realizes authored Start transition.",
+          "state_binding": "loaded",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 12,
+            "w": 42,
+            "x": 5,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Back",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Back navigation changes no mission state.",
+          "state_binding": "enabled",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S2",
+          "trigger": "start_heist",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "inspect_guard",
+          "input": "tap/hold",
+          "target": "guard on preview_map",
+          "feedback": "route overlay",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "interaction_spec.planning"
+          ],
+          "precondition": "Brief",
+          "state_change": "none; reveal cyclic patrol route",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "inspect_source",
+          "input": "tap/hold",
+          "target": "source on preview_map",
+          "feedback": "source pulse + strength",
+          "source_refs": [
+            "core_player_verbs[0]"
+          ],
+          "precondition": "Brief",
+          "state_change": "none; reveal recordability/strength",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start_heist",
+          "input": "tap",
+          "target": "start",
+          "feedback": "map becomes interactive",
+          "source_refs": [
+            "state_model.transitions[0]"
+          ],
+          "precondition": "mission loaded",
+          "state_change": "Mission=Planning",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Brief preview is read-only."
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Museum Gameplay",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 9,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "top_hud",
+            "role": "objective/exposure/pause",
+            "label": "Stealth HUD"
+          },
+          {
+            "h": 67,
+            "w": 94,
+            "x": 3,
+            "y": 13,
+            "id": "world",
+            "role": "direct manipulation playfield",
+            "label": "Museum World"
+          },
+          {
+            "h": 14,
+            "w": 92,
+            "x": 4,
+            "y": 82,
+            "id": "token_rack",
+            "role": "two-token inventory/record feedback",
+            "label": "Sound Token Rack"
+          }
+        ]
+      },
+      "states": [
+        "Planning",
+        "Infiltration",
+        "Free",
+        "Recording",
+        "Moving",
+        "Stealing",
+        "CarryingTarget",
+        "Guard Patrol",
+        "Guard InvestigateSound",
+        "Guard ReturnToPatrol"
+      ],
+      "purpose": "Observe, record, throw sound, redirect guards, move, steal and escape.",
+      "feedback": [
+        "Sound event renders effective shortest-path propagation rather than a misleading Euclidean radius.",
+        "Guard state marker distinguishes Patrol / Investigate / Return.",
+        "Exposure meter clears after 0.5s fully unseen.",
+        "Invalid action feedback names the violated condition."
+      ],
+      "components": [
+        {
+          "id": "objective",
+          "box": {
+            "h": 8,
+            "w": 36,
+            "x": 4,
+            "y": 3
+          },
+          "type": "objective_chip",
+          "label": "Objective",
+          "source_refs": [
+            "feedback_system.objective",
+            "game_rules.success"
+          ],
+          "state_binding": "Steal target / Reach exit",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "exposure",
+          "box": {
+            "h": 8,
+            "w": 31,
+            "x": 42,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Detection Exposure",
+          "source_refs": [
+            "game_rules.guard_vision",
+            "feedback_system.stealth"
+          ],
+          "state_binding": "0..0.75s visible; clears after 0.5s unseen",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 10,
+            "x": 86,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "decision_note": "Pause placement is presentation only.",
+          "state_binding": "Planning/Infiltration",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "museum_world",
+          "box": {
+            "h": 67,
+            "w": 94,
+            "x": 3,
+            "y": 13
+          },
+          "type": "grid_simulation_view",
+          "label": "Museum Diorama",
+          "source_refs": [
+            "game_rules.grid",
+            "visual_direction_brief"
+          ],
+          "state_binding": "walkable graph/walls/doors/player/target/exit/guards/sources/sounds",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "vision_overlay",
+          "box": {
+            "h": 67,
+            "w": 94,
+            "x": 3,
+            "y": 13
+          },
+          "type": "world_overlay",
+          "label": "Guard Vision",
+          "source_refs": [
+            "game_rules.guard_vision"
+          ],
+          "state_binding": "5-tile facing cones occluded by walls",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "token_1",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 5,
+            "y": 83
+          },
+          "type": "draggable_token_slot",
+          "label": "Sound Token 1",
+          "source_refs": [
+            "game_rules.recording"
+          ],
+          "decision_note": "Rack position exposes the authored two-token inventory for thumb drag.",
+          "state_binding": "empty or stored source strength",
+          "decision_origin": "wireframe_layout"
+        },
+        {
+          "id": "token_2",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 55,
+            "y": 83
+          },
+          "type": "draggable_token_slot",
+          "label": "Sound Token 2",
+          "source_refs": [
+            "game_rules.recording"
+          ],
+          "decision_note": "Same as token_1.",
+          "state_binding": "empty or stored source strength",
+          "decision_origin": "wireframe_layout"
+        }
+      ],
+      "edge_cases": [
+        "If multiple audible sounds exist, highest lure_strength wins; tie newest.",
+        "New audible sound during investigate/return replaces current investigation.",
+        "At least one reusable source remains reachable by authored mission invariant.",
+        "Same-tile guard collision causes immediate Caught."
+      ],
+      "transitions": [
+        {
+          "to": "Infiltration",
+          "from": "Planning",
+          "trigger": "first move/record completion/valid throw",
+          "source_refs": [
+            "state_model.transitions[1]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Caught",
+          "from": "Infiltration",
+          "trigger": "0.75s continuous vision or same tile as guard",
+          "source_refs": [
+            "game_rules.detection"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Success",
+          "from": "Infiltration",
+          "trigger": "enter exit with target",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S4",
+          "from": "S3",
+          "trigger": "Pause",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S5",
+          "from": "S3",
+          "trigger": "Caught/Success",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "observe_guard",
+          "input": "tap/hold",
+          "target": "guard",
+          "feedback": "patrol route preview",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "interaction_spec.planning"
+          ],
+          "precondition": "Planning or Infiltration and not Caught",
+          "state_change": "no rule mutation; route inspection shown",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "record_sound",
+          "input": "hold 1.0s",
+          "target": "active environmental sound source",
+          "feedback": "source pulse + 1s fill + waveform token",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "game_rules.recording",
+            "feedback_system.record"
+          ],
+          "precondition": "player within 1.5 tile path distance; token inventory <2; not caught; hold uninterrupted",
+          "state_change": "on completion store one token with authored lure_strength; Planning→Infiltration if first committed action",
+          "timing_rules": "1.0s uninterrupted",
+          "invalid_input": "full inventory blocks; release/move/vision before completion cancels with no token",
+          "spatial_rules": "path distance <=1.5 tiles",
+          "cancel_behavior": "release, movement or entering guard vision cancels with no resource change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "throw_sound",
+          "input": "drag stored token and release",
+          "target": "walkable floor tile",
+          "feedback": "drag arc + valid tile + predicted propagation path/range; release creates sound ring and guard attention cues",
+          "priority": "active token drag suppresses move taps",
+          "source_refs": [
+            "core_player_verbs[2]",
+            "game_rules.throwing",
+            "game_rules.sound",
+            "game_rules.investigation",
+            "interaction_spec.priority"
+          ],
+          "precondition": "token available; Manhattan distance <=6; unobstructed straight throw segment; not caught",
+          "state_change": "valid release consumes token and creates 2s sound event; Planning→Infiltration if first committed action; hearing guards replan by strongest then newest tie-break",
+          "timing_rules": "sound event lasts 2s; investigate lasts 2s on arrival",
+          "invalid_input": "nonwalkable/out of range/through wall returns token unchanged and guard state unchanged",
+          "spatial_rules": "Manhattan <=6; wall collision blocks straight throw; sound itself propagates shortest connected walkable path to lure_strength",
+          "cancel_behavior": "release invalid or cancel outside world restores token slot",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "move_player",
+          "input": "tap",
+          "target": "reachable walkable floor tile",
+          "feedback": "path preview then footsteps",
+          "source_refs": [
+            "core_player_verbs[3]",
+            "game_rules.grid",
+            "interaction_spec.priority"
+          ],
+          "precondition": "not Caught/Result; no Record/Steal hold; no token drag",
+          "state_change": "player follows shortest orthogonal walkable path; first committed action enters Infiltration",
+          "invalid_input": "unreachable/nonwalkable tile rejected with no movement",
+          "spatial_rules": "orthogonal walkable graph; walls block movement",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "steal_target",
+          "input": "hold 0.6s",
+          "target": "mission target exhibit",
+          "feedback": "0.6s pickup hold + pickup cue + exit highlight",
+          "source_refs": [
+            "core_player_verbs[4]",
+            "game_rules.steal",
+            "feedback_system.objective"
+          ],
+          "precondition": "adjacent; player currently unseen; not already carrying target",
+          "state_change": "on completion target becomes carried; objective becomes exit",
+          "timing_rules": "0.6s stationary hold",
+          "invalid_input": "not adjacent blocks; visibility during hold cancels; continuous exposure can still cause Caught",
+          "cancel_behavior": "movement/release/visibility cancels theft without completing",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "escape",
+          "input": "enter tile via movement",
+          "target": "authored exit",
+          "feedback": "escape transition",
+          "source_refs": [
+            "core_player_verbs[5]",
+            "game_rules.success"
+          ],
+          "precondition": "target carried",
+          "state_change": "Mission→Success→Result",
+          "invalid_input": "without target no transition; objective reminder",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause_play",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "S4 overlay",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "Planning or Infiltration",
+          "state_change": "Mission→Paused preserving exact active states/timers",
+          "invalid_input": "ignored once terminal",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V_BASIC",
+          "name": "One-Guard Basic Lure",
+          "notes": "Teaching composition of the same rules.",
+          "condition": "early mission with one guard",
+          "source_refs": [
+            "difficulty_variation",
+            "wireframe_handoff[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "vision_overlay": "single cone keeps cause/effect legible"
+          },
+          "component_overrides": {
+            "museum_world": "single guard and 2–4 sources; patrol route emphasis"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V_MULTI",
+          "name": "Overlapping Multi-Guard",
+          "notes": "No new mechanic; exposes composed deterministic reactions.",
+          "condition": "later mission with 2–3 guards",
+          "source_refs": [
+            "difficulty_variation",
+            "content_model.variation_axes",
+            "wireframe_handoff[4]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "museum_world": "each hearing guard gets immediate attention cue and current investigation target"
+          },
+          "component_overrides": {
+            "museum_world": "2–3 independent guards and overlapping patrol/hearing topology"
+          },
+          "interaction_overrides": {
+            "throw_sound": "one sound event may be heard by multiple guards using same priority rule"
+          }
+        },
+        {
+          "id": "V_CARRY",
+          "name": "Target Carried",
+          "notes": "Authored post-theft objective state.",
+          "condition": "target stolen",
+          "source_refs": [
+            "feedback_system.objective",
+            "game_rules.success"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "objective": "pickup cue then exit objective"
+          },
+          "component_overrides": {
+            "objective": "Reach exit; exit receives world emphasis",
+            "museum_world": "target removed from exhibit and player marked carrying"
+          },
+          "interaction_overrides": {
+            "steal_target": "disabled after theft"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "Simulation geometry is authoritative; UI hitboxes must not modify tile/range checks.",
+        "No microphone or player-authored audio."
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Pause Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 100,
+            "w": 100,
+            "x": 0,
+            "y": 0,
+            "id": "dim",
+            "role": "context",
+            "label": "Frozen Gameplay"
+          },
+          {
+            "h": 50,
+            "w": 70,
+            "x": 15,
+            "y": 25,
+            "id": "panel",
+            "role": "pause actions",
+            "label": "Pause Panel"
+          }
+        ]
+      },
+      "states": [
+        "Paused"
+      ],
+      "purpose": "Freeze all actors/timers/events/holds and offer exact resume or restart/select.",
+      "feedback": [
+        "Frozen world remains visible behind dim layer."
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 11,
+            "w": 54,
+            "x": 23,
+            "y": 36
+          },
+          "type": "button",
+          "label": "Resume",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 54,
+            "x": 23,
+            "y": 51
+          },
+          "type": "button",
+          "label": "Retry Mission",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 9,
+            "w": 54,
+            "x": 23,
+            "y": 66
+          },
+          "type": "button",
+          "label": "Mission Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Navigation option realizes existing Select route without changing progression.",
+          "state_binding": "enabled",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [
+        "Pause during Record/Steal/investigation freezes remaining hold/timer and resumes exact remainder."
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S4",
+          "trigger": "Resume/Retry",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S1",
+          "from": "S4",
+          "trigger": "Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Existing flow endpoint.",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume_exact",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "overlay removed",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "Paused",
+          "state_change": "restore exact pre-pause state and remaining timers",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry_pause",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "gameplay reloads Planning",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "Paused",
+          "state_change": "reset mission-local state to authored start",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "S5",
+      "name": "Mission Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 10,
+            "id": "outcome",
+            "role": "cause",
+            "label": "Outcome"
+          },
+          {
+            "h": 28,
+            "w": 84,
+            "x": 8,
+            "y": 35,
+            "id": "summary",
+            "role": "completion/progression",
+            "label": "Mission Summary"
+          },
+          {
+            "h": 26,
+            "w": 84,
+            "x": 8,
+            "y": 68,
+            "id": "actions",
+            "role": "retry/next/select",
+            "label": "Result Actions"
+          }
+        ]
+      },
+      "states": [
+        "Caught Result",
+        "Success Result"
+      ],
+      "purpose": "Explain caught/success cause and route to retry, next or select.",
+      "feedback": [
+        "Failure names detection cause; success shows next unlock/best completion."
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "result_banner",
+          "label": "Success / Caught",
+          "source_refs": [
+            "feedback_system.result"
+          ],
+          "state_binding": "terminal cause",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 40,
+            "x": 8,
+            "y": 69
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 40,
+            "x": 52,
+            "y": 69
+          },
+          "type": "button",
+          "label": "Next Mission",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "success and next exists",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 10,
+            "w": 84,
+            "x": 8,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Mission Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [
+        "Final mission hides Next."
+      ],
+      "transitions": [
+        {
+          "to": "S3",
+          "from": "S5",
+          "trigger": "Retry",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S2",
+          "from": "S5",
+          "trigger": "Next",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "S1",
+          "from": "S5",
+          "trigger": "Select",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry_result",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.pause_retry"
+          ],
+          "precondition": "always",
+          "state_change": "full authored mission reset; navigate S3 Planning",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next_result",
+          "input": "tap",
+          "target": "next",
+          "feedback": "next unlock shown",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "Success and next mission exists",
+          "state_change": "unlock exactly next mission and navigate its Brief",
+          "invalid_input": "hidden/disabled on failure or final mission",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select_result",
+          "input": "tap",
+          "target": "select",
+          "feedback": "mission grid",
+          "source_refs": [
+            "screen_flow",
+            "progression"
+          ],
+          "precondition": "always",
+          "state_change": "navigate S1; unlocks preserved",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No score/economy invented."
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "bfca4c5d-f895-4762-bdd2-59b2bcb0cdec",
+  "input_map": {
+    "gestures": [
+      {
+        "input": "tap",
+        "targets": [
+          "walkable tile",
+          "guard/source inspect",
+          "buttons"
+        ],
+        "priority": "world entity/button hit before floor move"
+      },
+      {
+        "input": "hold",
+        "targets": [
+          "sound source 1.0s",
+          "target 0.6s",
+          "guard/source inspect"
+        ],
+        "priority": "Record/Steal lock movement once hold begins"
+      },
+      {
+        "input": "drag",
+        "targets": [
+          "stored sound token"
+        ],
+        "priority": "suppresses floor move taps until release"
+      }
+    ],
+    "conflicts": [
+      "Token drag > floor move",
+      "Caught > all active holds",
+      "Pause freezes rather than cancels"
+    ],
+    "source_refs": [
+      "interaction_spec.priority",
+      "game_rules.recording",
+      "game_rules.throwing",
+      "game_rules.steal"
+    ],
+    "cancel_rules": [
+      "Invalid token release returns unchanged token.",
+      "Record early release/move/vision cancels with no token.",
+      "Steal release/move/vision cancels theft; detection rule remains active."
+    ],
+    "decision_origin": "game_design"
+  },
+  "created_at": "2026-09-30T15:29:27.807749+00:00",
+  "edge_cases": {
+    "items": [
+      "Full two-token inventory blocks Record and points to token rack.",
+      "Unreachable move shows rejection without pathing.",
+      "Exit without target reminds Steal objective.",
+      "Sound tie resolves strongest then newest and feedback marks chosen event.",
+      "Guard replacement sound during investigate/return replans immediately.",
+      "Authored reachability invariant prevents token depletion softlock.",
+      "Pause preserves partially elapsed detection/record/steal/investigation values."
+    ],
+    "source_refs": [
+      "game_rules",
+      "known_risks"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": []
+  },
+  "updated_at": "2026-09-30T15:29:27.807749+00:00",
+  "core_screen": "S3 Museum Gameplay",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "paths": [
+      [
+        "S1",
+        "S2",
+        "S3",
+        "S5"
+      ],
+      [
+        "S3",
+        "S4",
+        "S3"
+      ],
+      [
+        "S3",
+        "S5"
+      ]
+    ],
+    "guards": [
+      "Exit without target stays in S3 and shows objective feedback.",
+      "Invalid throw/record/move does not transition or mutate state."
+    ],
+    "source_refs": [
+      "screen_flow",
+      "game_rules.success",
+      "game_rules.detection",
+      "game_rules.pause_retry"
+    ],
+    "transitions": [
+      {
+        "to": "S2",
+        "from": "S1",
+        "guard": "mission unlocked",
+        "trigger": "Start selected unlocked mission"
+      },
+      {
+        "to": "S3",
+        "from": "S2",
+        "guard": "mission data loaded",
+        "trigger": "Start"
+      },
+      {
+        "to": "S4",
+        "from": "S3",
+        "guard": "Planning or Infiltration",
+        "trigger": "Pause"
+      },
+      {
+        "to": "S3",
+        "from": "S4",
+        "guard": "restore exact prior active state",
+        "trigger": "Resume"
+      },
+      {
+        "to": "S5",
+        "from": "S3",
+        "guard": "exposure>=0.75s/same guard tile OR exit entered while carrying target",
+        "trigger": "Caught or Success"
+      },
+      {
+        "to": "S3",
+        "from": "S5",
+        "guard": "always; authored mission reset",
+        "trigger": "Retry"
+      },
+      {
+        "to": "S2",
+        "from": "S5",
+        "guard": "Success and next mission exists",
+        "trigger": "Next"
+      },
+      {
+        "to": "S1",
+        "from": "S5",
+        "guard": "always",
+        "trigger": "Select"
+      }
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 18,
+  "screen_count": 5,
+  "global_states": [
+    {
+      "id": "G_PAUSE",
+      "name": "Paused",
+      "effect": "Freeze player, guards, sound events, detection, investigation and active holds; preserve exact remaining values.",
+      "source_refs": [
+        "game_rules.pause_retry"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "G_CAUGHT",
+      "name": "Caught Override",
+      "effect": "Immediately cancel/override active Record/Steal/move manipulation and route to failure result.",
+      "source_refs": [
+        "interaction_spec.priority",
+        "game_rules.detection"
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "G_LOADING",
+      "name": "Loading",
+      "effect": "Disable start/interaction until authored mission data is ready.",
+      "source_refs": [
+        "screen_inventory"
+      ],
+      "decision_note": "Local loading state prevents accidental input and changes no game rule.",
+      "decision_origin": "wireframe_completion"
+    }
+  ],
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Echo Thief\n\n## Overview\nPortrait mobile stealth-puzzle wireframe for the full MVP. **Fun promise:** sound is tactical ammunition: capture it, drag it into the museum, and immediately see deterministic guard logic bend around that placement.\n\n## Coverage\nFive required screens: S1 Mission Select, S2 Mission Brief, S3 Museum Gameplay, S4 Pause Overlay, S5 Mission Result. Core play covers Planning/Infiltration, Observe/Record/Throw/Move/Steal/Escape, two-token inventory, sound propagation and priority, Patrol/Investigate/Return, detection/Caught, carried-target escape, pause/retry, linear unlock, and early/late mission variation.\n\n## Interaction hierarchy\nThe museum world dominates S3. Tap acts in the world, holds perform authored timed interactions, and stored sounds are dragged directly from the two-slot rack onto valid floor tiles. Predictive throw/propagation feedback makes sound placement understandable before commitment. Token drag suppresses movement; active Record/Steal locks movement; Caught overrides active holds.\n\n## Implementation boundary\nThis pack fixes UX behavior, logical hit regions, visible states and rule feedback only. Godot scene/node/script architecture remains the Implementation Blueprint's responsibility.",
+  "source_run_at": "2026-09-30T15:29:27.807749+00:00",
+  "target_device": "Mobile",
+  "global_ui_rules": {
+    "hud": "Objective/exposure top; token rack bottom; pause top-right.",
+    "safe_area": "4% side inset; core world remains visually dominant.",
+    "fun_promise": "소리를 탄약처럼 녹음·저장·던져 경비 동선을 직접 재구성하는 잠입 놀이.",
+    "source_refs": [
+      "visual_direction_brief",
+      "interaction_spec",
+      "wireframe_handoff[0]"
+    ],
+    "decision_note": "HUD placement and hit areas improve direct manipulation while logical grid, range and state rules remain unchanged.",
+    "touch_targets": "Interactive world entities receive enlarged invisible hit areas without changing tile/spatial rules.",
+    "decision_origin": "wireframe_layout",
+    "coordinate_system": "All boxes are 0-100 screen-percent."
+  },
+  "developer_handoff": {
+    "fun_promise": "Capture sound as tactical ammunition, drag it into the world, and visibly watch deterministic guard logic bend around the player's placement.",
+    "source_refs": [
+      "wireframe_handoff",
+      "content_model",
+      "game_rules"
+    ],
+    "required_data": [
+      "8 authored mission graphs",
+      "start/target/exit",
+      "1–3 guard patrol cycles",
+      "2–4 source placements and strengths",
+      "walls/doorways",
+      "unlock/best completion"
+    ],
+    "decision_origin": "game_design",
+    "rule_invariants": [
+      "orthogonal graph",
+      "vision 5 tiles",
+      "detection 0.75s",
+      "record 1.0s within 1.5 path tiles",
+      "inventory 2",
+      "throw Manhattan<=6 and clear straight segment",
+      "sound 2s/path strength",
+      "investigate 2s",
+      "steal 0.6s adjacent unseen"
+    ],
+    "upstream_issues": [],
+    "content_variation": "Use same S3 template for one-guard and 2–3 guard missions; topology/patrol/source data drive variants.",
+    "responsibility_boundary": "Wireframe owns visible states, interaction affordances, feedback and logical hit regions. Implementation Blueprint owns Godot scenes/nodes/scripts and data architecture."
+  },
+  "acceptance_criteria": [
+    "screens contains exactly S1 Mission Select, S2 Mission Brief, S3 Museum Gameplay, S4 Pause Overlay, S5 Mission Result and screen_count is 5.",
+    "core_screen resolves to existing S3 Museum Gameplay.",
+    "All screen_flow references resolve to S1–S5 and orders 1–5 are unique.",
+    "S3 contains structured Observe, Record, Throw, Move, Steal, Escape and Pause interactions with authored numeric/spatial/timing rules.",
+    "S3 exposes Planning/Infiltration, player action states, guard Patrol/Investigate/Return, target-carried and multi-guard content variants.",
+    "Valid throw consumes one token; invalid throw leaves token and guard state unchanged; strongest then newest sound priority is visible/deterministic.",
+    "Record cancellation/full inventory, steal cancellation/detection, exit without target, Caught retry, Success next/retry/select and exact Pause resume are represented.",
+    "All 8 missions can use the same interaction/state model while topology, guard count, overlap, source placement/strength and target/exit separation vary.",
+    "No combat, upgrades, economy, microphone recording or new mechanics are introduced."
+  ],
+  "primary_interaction": "Record environmental sounds and drag stored sound tokens onto floor positions to deterministically redirect guards, then move/steal/escape.",
+  "interaction_principles": [
+    "World-first direct manipulation: tap world to move/inspect, hold sources/target, drag sound tokens into the museum floor.",
+    "Sound prediction stays visible before commitment: valid throw tile, line-of-throw and effective propagation are previewed without changing authored rules.",
+    "Stealth state is legible at a glance: guard facing/vision, exposure, investigation target and return intent remain visible.",
+    "Invalid/cancelled actions never consume tokens or mutate mission state; controls explain the failed guard.",
+    "One active manipulation wins: token drag suppresses movement; Record/Steal holds lock movement; Caught overrides holds."
+  ]
+}

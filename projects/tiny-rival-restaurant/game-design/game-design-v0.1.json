@@ -1,27 +1,177 @@
 {
-  "schema_version": "game-design-v0.1",
-  "artifact_type": "playable-game-design-spec",
-  "idea_id": "dda6a9f1-af8f-45cb-98a9-ebbc4b3c8ac3",
+  "id": "f834d383-afee-459a-8ba6-e1aab916dd6c",
   "title": "Tiny Rival Restaurant",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "현금 단일 자원. 시작60, 메뉴 가격6–18, meal 완료 시 획득. MVP day 사이 소비 없음.",
+  "idea_id": "dda6a9f1-af8f-45cb-98a9-ebbc4b3c8ac3",
   "version": "v0.1",
   "one_line": "공유 골목의 손님을 메뉴·냄새·대기열·좌석 회전으로 경쟁하는 모바일 식당 운영 게임.",
-  "primary_interaction": "손님 흐름 관찰 + 드래그 착석 + 아로마 재배치",
-  "session_length": "4–6분/하루",
-  "content_unit": "4-wave 식당 영업일",
+  "core_loop": "Prep 메뉴 설정→45초 wave에서 손님 흐름 관찰→아로마 재배치·대기 손님 착석·테이블 청소→정산. 하루 4 waves.",
+  "mvp_scope": "MVP 3 days, street1, player/rival 각1, tables4, dishes5, menu slots3, party archetypes4, 4 waves/day, aroma zones3, 닫힌 choice/patience/meal/clean/cash 규칙.",
+  "created_at": "2026-09-29T18:11:34.294787+00:00",
   "game_rules": {
-    "cash_start": 60,
-    "tables": 4,
-    "menu_slots": 3,
+    "meal": "8-16 sec then cash += price and table dirty",
+    "pause": "all timers and rival triggers freeze",
+    "rival": "one scripted offer/aroma change per wave",
     "waves": 4,
-    "wave_seconds": 45,
-    "patience_seconds": 18,
-    "clean_seconds": 3,
-    "aroma_zones": 3,
-    "aroma_cooldown": 5,
-    "party_choice": "taste+price tolerance+aroma-queue penalty; chosen queue final",
-    "meal": "8–16 sec then cash += price and table dirty",
+    "tables": 4,
     "failure": "cash<0",
-    "pause": "all timers freeze"
+    "success": "finish wave4 with cash>=0",
+    "walkout": "patience 0 => removed and reputation -1",
+    "cash_start": 60,
+    "menu_slots": 3,
+    "aroma_zones": 3,
+    "party_choice": "taste+price tolerance+aroma-queue penalty; tie seeded 50/50",
+    "wave_seconds": 45,
+    "choice_result": "chosen queue is final",
+    "clean_seconds": 3,
+    "aroma_cooldown": 5,
+    "patience_seconds": 18
+  },
+  "not_in_mvp": [
+    "Cooking minigame",
+    "Staff hiring",
+    "Decor placement",
+    "Multiple rivals",
+    "Online PvP",
+    "Persistent upgrade economy",
+    "Procedural streets"
+  ],
+  "updated_at": "2026-09-30T07:34:38.78706+00:00",
+  "archived_at": "2026-09-29T18:13:09.607391+00:00",
+  "known_risks": [
+    "선택식 불투명성",
+    "작은 화면 조작 과부하",
+    "scripted rival 반복성",
+    "가격 지배 전략"
+  ],
+  "progression": "3 days 순차 해금, 하루 완료 시 다음 day와 menu 1개 해금, best score 저장. 영구 stat upgrade 없음.",
+  "screen_flow": "Select→Prep→Service→Wave Result 반복→Day Result→Next/Select. Bankruptcy→Failure Result→Retry/Select. Pause는 동일 상태 overlay.",
+  "state_model": [
+    {
+      "exit": "start/10s",
+      "next": "Service",
+      "enter": "day/wave start",
+      "state": "Prep",
+      "inputs": [
+        "menu",
+        "price",
+        "start"
+      ]
+    },
+    {
+      "exit": "45s/cash<0",
+      "next": "Wave Result/Day Result",
+      "enter": "wave start",
+      "state": "Service",
+      "inputs": [
+        "aroma",
+        "seat",
+        "clear",
+        "special"
+      ]
+    },
+    {
+      "exit": "seated/patience0",
+      "next": "Dining/removed",
+      "enter": "party chose player",
+      "state": "Waiting",
+      "inputs": [
+        "seat"
+      ]
+    },
+    {
+      "exit": "meal timer0",
+      "next": "Dirty",
+      "enter": "seated",
+      "state": "Dining",
+      "inputs": []
+    },
+    {
+      "exit": "selection",
+      "next": "Prep",
+      "enter": "wave/day end",
+      "state": "Result",
+      "inputs": [
+        "continue",
+        "retry"
+      ]
+    }
+  ],
+  "archive_path": "projects/tiny-rival-restaurant/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "4-wave 식당 영업일",
+  "content_model": {
+    "mvp": {
+      "days": 3,
+      "dishes": 5,
+      "rivals": 1,
+      "streets": 1,
+      "party_archetypes": 4
+    },
+    "axes": [
+      "taste",
+      "budget",
+      "group size",
+      "dish tags",
+      "price",
+      "cook time",
+      "wave mix",
+      "rival script"
+    ],
+    "unit": "day"
+  },
+  "source_run_at": "2026-09-29T18:11:34.294787+00:00",
+  "archive_commit": "a20f56ab1dd6f03ba66b5809c6b73d1de08fe026",
+  "human_priority": false,
+  "player_fantasy": "작은 식당 주인으로서 거리 흐름을 읽고 경쟁점보다 영리하게 손님을 끌어오는 감각.",
+  "session_length": "4–6분/하루",
+  "test_scenarios": [
+    "첫 wave에서 선택 이유를 대략 예측",
+    "aroma 변경이 다음 미결정 party에 반영",
+    "착석/청소로 queue 회복",
+    "rival counter 후 의미 있는 대응 발생",
+    "3 days가 동일 행동 반복 없이 완주"
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Tiny Rival Restaurant\n## 1. Product Definition\n공유 골목의 손님을 경쟁하는 mobile management game, 4–6분/day. Non-goals: 조리 미니게임, idle tycoon, online PvP.\n## 2. Player Fantasy\n거리 흐름을 읽어 경쟁점보다 영리하게 손님을 끌어오는 작은 식당 주인.\n## 3. Core Player Verbs\nOffer=tap menu; Aroma=drag legal zone; Seat=drag waiting party; Clear=swipe dirty table. 각 성공 입력은 즉시 해당 state/value를 변경한다.\n## 4. Core Loop\nPrep→45초 Service 관찰/아로마/착석/청소→Wave Result, 4회.\n## 5. Round / Session Structure\nCash60, tables4, menu3, 4 waves. cash<0 실패. Retry는 day seed/상태 전부 초기화.\n## 6. Game Rules\nParty는 decision node에서 taste+price tolerance+aroma-queue를 비교, 선택 후 이동하지 않는다. Patience18초는 waiting에서만 감소, 0이면 제거/reputation-1. Seating 시 정지, meal8–16초 뒤 cash획득/table dirty. Swipe 후 cleaning3초. Aroma 3 zones,+attraction, cooldown5초. Rival wave당1회. Pause는 전 timer freeze.\n## 7. State Model\nPrep→Service; party는 Waiting→Dining→Dirty→Cleaning→Free. Wave/Day Result. Failure는 bankruptcy. Pause/resume은 state 보존.\n## 8. Interaction Spec\nParty drag는 free compatible table만 valid; invalid queue 복귀. Aroma는 3 zones만 snap. Dirty만 swipe clear. Party drag 입력 우선.\n## 9. Content Model\nDay 단위. 3 days, 5 dishes, 4 archetypes, 1 rival/street.\n## 10. Difficulty / Variation\n취향→group/budget tradeoff→rival counter/peak mix. Speed-only 금지.\n## 11. Progression\n3 days와 메뉴 순차 unlock, best score.\n## 12. Economy\nCash 단일 자원, 60 start, price6–18, day 사이 소비 없음.\n## 13. Screen Inventory\nDay Select, Gameplay, Wave Result, Day Result, Pause.\n## 14. Screen Flow\nSelect→Prep→Service→Wave Result 반복→Day Result. Failure→Result→Retry. Pause overlay.\n## 15. Feedback System\nRoute turn, seat snap, patience break, wipe, rival bell, tally.\n## 16. Visual Direction Brief\n두 가게와 공유 보행로가 동시에 보이고 NPC 흐름이 중심. HUD는 보조적이며 세부 배치는 Wireframe 책임.\n## 17. MVP Scope\n3 days/1 street/2 restaurants/4 tables/5 dishes/4 archetypes/4 waves/3 aroma zones와 명시된 rules.\n## 18. Test Scenarios\n선택 예측, aroma 반영, queue recovery, rival 대응, 3-day 비반복성.\n## 19. Known Risks\n선택식 가독성, 입력 과부하, rival 반복성, 가격 지배전략.\n## 20. Wireframe Handoff\n확정된 state/gesture/feedback/error/transition을 표현하고 새 게임 규칙은 만들지 않는다.",
+  "feedback_system": {
+    "seat": {
+      "audio": "chair",
+      "haptic": "light",
+      "visual": "snap pulse"
+    },
+    "clear": {
+      "audio": "wipe",
+      "visual": "wipe"
+    },
+    "rival": {
+      "audio": "bell",
+      "visual": "sign/plume change"
+    },
+    "choice": {
+      "audio": "step turn",
+      "visual": "route turn"
+    },
+    "result": {
+      "audio": "register",
+      "haptic": "success",
+      "visual": "tally"
+    },
+    "walkout": {
+      "audio": "sigh",
+      "haptic": "warning",
+      "visual": "patience break"
+    }
+  },
+  "round_structure": "현금60, 테이블4, 메뉴3으로 시작. Prep 10초 후 45초 Service. wave당 6–10 parties. 4 waves 후 Day Result. cash<0 즉시 실패. Retry는 day 초기 seed로 전부 복구.",
+  "interaction_spec": {
+    "seat": "drag party to free compatible table; invalid release returns queue",
+    "aroma": "drag marker snaps only to 3 zones; invalid returns prior zone",
+    "clear": "swipe dirty table; other states ignore",
+    "pause": "blocks play and freezes simulation",
+    "special": "once per wave; second attempt disabled",
+    "priority": "party drag > aroma drag > inspection"
   },
   "screen_inventory": [
     "Day Select",
@@ -30,12 +180,50 @@
     "Day Result",
     "Pause"
   ],
-  "mvp_scope": "3 days, street1, player/rival1 each, tables4, dishes5, menu slots3, archetypes4, 4 waves/day, aroma zones3",
-  "known_risks": [
-    "선택식 불투명성",
-    "작은 화면 조작 과부하",
-    "scripted rival 반복성",
-    "가격 지배 전략"
+  "core_player_verbs": [
+    {
+      "verb": "Offer",
+      "input": "tap",
+      "target": "menu",
+      "feedback": "board updates",
+      "condition": "prep",
+      "state_change": "menu/price changes"
+    },
+    {
+      "verb": "Aroma",
+      "input": "drag",
+      "target": "3 legal zones",
+      "feedback": "plume",
+      "condition": "service",
+      "state_change": "scent zone changes"
+    },
+    {
+      "verb": "Seat",
+      "input": "drag",
+      "target": "free table",
+      "feedback": "snap",
+      "condition": "waiting",
+      "state_change": "dining starts"
+    },
+    {
+      "verb": "Clear",
+      "input": "swipe",
+      "target": "dirty table",
+      "feedback": "wipe",
+      "condition": "dirty",
+      "state_change": "cleaning starts"
+    }
   ],
-  "source": "chat_automation"
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Prep/Service/Waiting/Dining/Dirty/Result/Pause 표현",
+    "party decision feedback",
+    "seat drag/aroma snap/dirty swipe invalid feedback",
+    "patience walkout/cash bankruptcy",
+    "rival once-per-wave action",
+    "pause/retry reset"
+  ],
+  "primary_interaction": "손님 흐름 관찰 + 드래그 착석 + 아로마 재배치",
+  "difficulty_variation": "Day1 단일 취향, Day2 그룹/가격 민감과 빠른 메뉴-vs고마진 tradeoff, Day3 rival counter와 peak composition. 속도만 올리지 않는다.",
+  "visual_direction_brief": "공유 골목과 두 가게 입구가 동시에 읽히는 compact mobile view. NPC 이동이 중심, 취향/그룹은 실루엣+작은 아이콘, HUD는 얇게. 좌표/box는 Wireframe에서 결정."
 }

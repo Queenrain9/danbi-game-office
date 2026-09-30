@@ -1,0 +1,347 @@
+{
+  "id": "504d9a6a-39e0-4fbe-972d-c1fd562bdb35",
+  "title": "Deep Sea Cable Splicer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "11b17ea3-f686-4f14-8401-949c58675cf5",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Job Select",
+      "order": 1,
+      "states": [
+        "Select"
+      ],
+      "purpose": "select unlocked job",
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 70,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          },
+          "type": "card_grid",
+          "state_binding": "unlock/best grade"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "cards",
+          "feedback": "highlight",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected",
+          "invalid_input": "locked unchanged",
+          "decision_origin": "game_design"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Splice Workbench",
+      "order": 2,
+      "states": [
+        "Sealed",
+        "Routing",
+        "ReadyTest",
+        "Rework"
+      ],
+      "purpose": "strip route clamp test rework",
+      "components": [
+        {
+          "id": "work",
+          "box": {
+            "h": 65,
+            "w": 92,
+            "x": 4,
+            "y": 14
+          },
+          "type": "direct_surface",
+          "state_binding": "work state"
+        },
+        {
+          "id": "tokens",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 4,
+            "y": 3
+          },
+          "type": "counter",
+          "state_binding": "0..2"
+        },
+        {
+          "id": "manifest",
+          "box": {
+            "h": 7,
+            "w": 50,
+            "x": 27,
+            "y": 3
+          },
+          "type": "mapping_panel",
+          "state_binding": "job mapping"
+        },
+        {
+          "id": "clamp",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 4,
+            "y": 83
+          },
+          "type": "hold_button",
+          "state_binding": "two ends seated"
+        },
+        {
+          "id": "test",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 36,
+            "y": 83
+          },
+          "type": "button",
+          "state_binding": "all pairs locked"
+        },
+        {
+          "id": "wave",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 68,
+            "y": 83
+          },
+          "type": "diagnostic",
+          "state_binding": "test diagnosis"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "strip",
+          "input": "forward drag",
+          "target": "sheath seam",
+          "feedback": "peel",
+          "source_refs": [
+            "interaction_spec.strip"
+          ],
+          "precondition": "Sealed",
+          "state_change": "strip progress",
+          "invalid_input": "20px corridor violation 150ms applies authored damage",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "route",
+          "input": "drag",
+          "target": "fiber to slot",
+          "feedback": "snap",
+          "source_refs": [
+            "interaction_spec.route"
+          ],
+          "precondition": "Routing/Rework",
+          "state_change": "24px snap assignment",
+          "invalid_input": "occupied/off-slot returns",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "clamp",
+          "input": "hold 400ms",
+          "target": "seated pair",
+          "feedback": "press",
+          "source_refs": [
+            "interaction_spec.clamp"
+          ],
+          "precondition": "two ends seated",
+          "state_change": "locked pair",
+          "invalid_input": "incomplete no lock",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "test",
+          "input": "tap",
+          "target": "Test",
+          "feedback": "waveform",
+          "source_refs": [
+            "game_rules.test"
+          ],
+          "precondition": "all pairs locked",
+          "state_change": "evaluate threshold 0.8",
+          "invalid_input": "disabled incomplete",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rework",
+          "input": "long-press 300ms",
+          "target": "failed pair",
+          "feedback": "opens",
+          "source_refs": [
+            "interaction_spec.rework"
+          ],
+          "precondition": "token>0",
+          "state_change": "unlock and token-1 on completion",
+          "invalid_input": "invalid target unchanged",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V1",
+          "name": "Symbol Remap",
+          "notes": "same routing",
+          "condition": "job 2",
+          "source_refs": [
+            "content_model"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "manifest": {
+              "state_binding": "symbol mapping"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V2",
+          "name": "Crossing Sensitive",
+          "notes": "same gestures",
+          "condition": "job 3",
+          "source_refs": [
+            "game_rules"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "crossing": "attenuation cue"
+          },
+          "component_overrides": {
+            "work": {
+              "state_binding": "6 fibers + crossing cues"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Job Result",
+      "order": 3,
+      "states": [
+        "Result Success",
+        "Result Failure"
+      ],
+      "purpose": "outcome retry next",
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 50,
+            "w": 84,
+            "x": 8,
+            "y": 10
+          },
+          "type": "summary",
+          "state_binding": "success/failure"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 8,
+            "y": 72
+          },
+          "type": "button",
+          "state_binding": "always"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 38,
+            "x": 54,
+            "y": 72
+          },
+          "type": "button",
+          "state_binding": "success"
+        }
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "e909c470-cbf0-472b-bf9b-da017b98aefc",
+  "input_map": {
+    "cancel": "strip lift pauses; route off-slot returns",
+    "priority": [
+      "Pause",
+      "fiber drag",
+      "hold",
+      "Test"
+    ],
+    "single_pointer": true
+  },
+  "created_at": "2026-09-30T08:31:04.371663+00:00",
+  "edge_cases": {
+    "items": [
+      "crossing attenuation",
+      "token only on completed unlock",
+      "retry full reset"
+    ]
+  },
+  "updated_at": "2026-09-30T08:31:04.371663+00:00",
+  "core_screen": "S2",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "normal": [
+      "S1",
+      "S2",
+      "S3"
+    ],
+    "branches": [
+      "failed test -> Rework -> test",
+      "zero-token fail -> S3"
+    ]
+  },
+  "state_count": 7,
+  "screen_count": 3,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze and resume exact state"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Deep Sea Cable Splicer",
+  "source_run_at": "2026-09-30T08:31:04.371663+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "coordinates": "0..100",
+    "fun_promise": "Hands-on cable repair ending in visible signal recovery."
+  },
+  "developer_handoff": {
+    "fun_promise": "Peel, route, clamp, restore signal.",
+    "upstream_issues": [],
+    "content_variants": [
+      "direct color",
+      "symbol remap",
+      "crossing-sensitive"
+    ],
+    "implementation_architecture": "Blueprint decides Godot structure."
+  },
+  "acceptance_criteria": [
+    "Three screens and all work states represented.",
+    "All three jobs complete full flow.",
+    "Invalid route returns and Test is gated.",
+    "Waveform diagnoses failure and rework consumes token correctly.",
+    "Retry fully resets."
+  ],
+  "primary_interaction": "strip + fiber routing + clamp/test/rework",
+  "interaction_principles": [
+    "direct manipulation",
+    "preserve exact repair rules"
+  ]
+}

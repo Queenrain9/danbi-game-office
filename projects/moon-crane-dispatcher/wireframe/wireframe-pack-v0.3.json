@@ -1,0 +1,1145 @@
+{
+  "id": "0873900b-547e-4928-9a89-6b6b72f4bd4b",
+  "title": "Moon Crane Dispatcher",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "e31edd98-382f-4fdb-a8a4-7bef91cba2a6",
+  "screens": [
+    {
+      "id": "M1",
+      "name": "Harbor Contract Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "locked",
+        "unlocked"
+      ],
+      "purpose": "Choose unlocked contract",
+      "components": [
+        {
+          "id": "contracts",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "card_list",
+          "label": "Contracts",
+          "state_binding": "locked/unlocked/stars"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Open",
+          "state_binding": "selected unlocked"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [
+        {
+          "to": "M2",
+          "from": "M1",
+          "trigger": "Open",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select",
+          "input": "tap",
+          "target": "contracts",
+          "feedback": "focus",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "select contract",
+          "invalid_input": "locked explains prerequisite",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M2",
+      "name": "Contract Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "brief"
+      ],
+      "purpose": "Preview 3 jobs and tier rules",
+      "components": [
+        {
+          "id": "rules",
+          "box": {
+            "h": 50,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "rule_cards",
+          "label": "Tier rules",
+          "state_binding": "contract tier"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "enabled"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [
+        {
+          "to": "M3",
+          "from": "M2",
+          "trigger": "Start",
+          "condition": "unlocked",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "job focus",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "unlocked",
+          "state_change": "open first Job Brief",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M3",
+      "name": "Job Brief",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Job Brief"
+      ],
+      "purpose": "Show topology,cargo,par,hazard",
+      "components": [
+        {
+          "id": "map",
+          "box": {
+            "h": 45,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          },
+          "type": "diagram",
+          "label": "Topology",
+          "state_binding": "pickup/solids/hazards/drop"
+        },
+        {
+          "id": "cargo",
+          "box": {
+            "h": 15,
+            "w": 43,
+            "x": 5,
+            "y": 62
+          },
+          "type": "rule_card",
+          "label": "Cargo Rule",
+          "state_binding": "class"
+        },
+        {
+          "id": "par",
+          "box": {
+            "h": 15,
+            "w": 43,
+            "x": 52,
+            "y": 62
+          },
+          "type": "label",
+          "label": "Par",
+          "state_binding": "seconds"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 40,
+            "x": 55,
+            "y": 82
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "loaded"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[2]"
+      ],
+      "transitions": [
+        {
+          "to": "M4",
+          "from": "M3",
+          "trigger": "Start",
+          "condition": "loaded",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "start",
+          "input": "tap",
+          "target": "start",
+          "feedback": "authored pose",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "precondition": "loaded",
+          "state_change": "Planning",
+          "invalid_input": "disabled loading",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M4",
+      "name": "Crane Gameplay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 61,
+            "w": 94,
+            "x": 3,
+            "y": 12,
+            "id": "play",
+            "role": "direct manipulation",
+            "label": "Play plane"
+          }
+        ]
+      },
+      "states": [
+        "Planning",
+        "Carrying",
+        "Delivery Check",
+        "Pause",
+        "Reset Confirm"
+      ],
+      "purpose": "Fold crane and deliver cargo",
+      "components": [
+        {
+          "id": "timer",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 4,
+            "y": 3
+          },
+          "type": "timer",
+          "label": "Timer",
+          "state_binding": "elapsed"
+        },
+        {
+          "id": "stability",
+          "box": {
+            "h": 7,
+            "w": 25,
+            "x": 27,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Stability",
+          "state_binding": "class resource"
+        },
+        {
+          "id": "brake_meter",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 55,
+            "y": 3
+          },
+          "type": "meter",
+          "label": "Brake",
+          "state_binding": "0..100"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 12,
+            "x": 84,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "playfield",
+          "box": {
+            "h": 59,
+            "w": 94,
+            "x": 3,
+            "y": 13
+          },
+          "type": "spatial_view",
+          "label": "Harbor",
+          "state_binding": "crane/cargo/obstacles/hazards/drop"
+        },
+        {
+          "id": "neck",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 44,
+            "y": 31
+          },
+          "type": "drag_handle",
+          "label": "Neck",
+          "state_binding": "-70..70"
+        },
+        {
+          "id": "left",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 20,
+            "y": 40
+          },
+          "type": "drag_handle",
+          "label": "Left wing",
+          "state_binding": "-55..55"
+        },
+        {
+          "id": "right",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 68,
+            "y": 40
+          },
+          "type": "drag_handle",
+          "label": "Right wing",
+          "state_binding": "-55..55"
+        },
+        {
+          "id": "leg",
+          "box": {
+            "h": 12,
+            "w": 12,
+            "x": 44,
+            "y": 55
+          },
+          "type": "drag_handle",
+          "label": "Leg boom",
+          "state_binding": "-45..65"
+        },
+        {
+          "id": "grab",
+          "box": {
+            "h": 11,
+            "w": 27,
+            "x": 4,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Grab/Release",
+          "state_binding": "Planning/Carrying"
+        },
+        {
+          "id": "brake",
+          "box": {
+            "h": 11,
+            "w": 27,
+            "x": 36,
+            "y": 78
+          },
+          "type": "hold_button",
+          "label": "Brake Hold",
+          "state_binding": "Carrying Brake>0"
+        },
+        {
+          "id": "reset",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 68,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Reset",
+          "state_binding": "before delivery"
+        },
+        {
+          "id": "cue",
+          "box": {
+            "h": 5,
+            "w": 92,
+            "x": 4,
+            "y": 92
+          },
+          "type": "status_panel",
+          "label": "Danger/Reject",
+          "state_binding": "class/hazard/delivery"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[3]",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Carrying",
+          "from": "Planning",
+          "trigger": "valid Grab",
+          "condition": "pickup rule",
+          "source_refs": [
+            "state_model[1]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Delivery Check",
+          "from": "Carrying",
+          "trigger": "valid Release",
+          "condition": "delivery rule",
+          "source_refs": [
+            "state_model[2]"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "M5",
+          "from": "M4",
+          "trigger": "collision or Stability0",
+          "condition": "failure",
+          "source_refs": [
+            "game_rules.collision",
+            "game_rules.stability"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "M6",
+          "from": "M4",
+          "trigger": "Delivery Check",
+          "condition": "valid delivery",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "joint",
+          "input": "drag",
+          "target": "joint handle",
+          "feedback": "arc/limit/fold sound/haptic",
+          "source_refs": [
+            "interaction_spec.joint_drag"
+          ],
+          "precondition": "Planning or Carrying",
+          "state_change": "signed angle; clamp range; collision delta rejected",
+          "gesture_rules": "up to two joint pointers; release ownership",
+          "invalid_input": "last valid pose retained",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "grab",
+          "input": "tap",
+          "target": "Grab",
+          "feedback": "readiness+snap",
+          "source_refs": [
+            "interaction_spec.grab_release"
+          ],
+          "precondition": "Planning; distance<=0.045 and speed<=0.08",
+          "state_change": "attach cargo; Carrying",
+          "invalid_input": "no attachment change + reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "release",
+          "input": "tap",
+          "target": "Release",
+          "feedback": "delivery snap",
+          "source_refs": [
+            "game_rules.delivery"
+          ],
+          "precondition": "Carrying; center in drop; speed<=0.08; class safe",
+          "state_change": "Delivery Check",
+          "invalid_input": "remains attached + reason",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "brake",
+          "input": "hold",
+          "target": "Brake",
+          "feedback": "meter+damped swing",
+          "priority": "can coexist with one joint drag other touch",
+          "source_refs": [
+            "game_rules.brake"
+          ],
+          "precondition": "Carrying and Brake>0",
+          "state_change": "drain35/sec; joint cap25%; dampingx2.5",
+          "invalid_input": "at0 effect ends",
+          "decision_origin": "game_design",
+          "resource_effects": "release recovers20/sec"
+        },
+        {
+          "id": "reset",
+          "input": "tap+confirm",
+          "target": "Reset",
+          "feedback": "rewind",
+          "source_refs": [
+            "game_rules.reset"
+          ],
+          "precondition": "before delivery",
+          "state_change": "restore authored pose/resources/hazard phase; +10sec",
+          "invalid_input": "dismiss no change",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "Pause",
+          "feedback": "overlay",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "Planning/Carrying",
+          "state_change": "freeze exact state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "standard",
+          "name": "Standard",
+          "notes": "scale1 Stability100",
+          "condition": "cargo Standard",
+          "source_refs": [
+            "game_rules.cargo.Standard"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "cue": {
+              "state_binding": "collision only"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "fragile",
+          "name": "Fragile",
+          "notes": "scale.8 Stability70",
+          "condition": "cargo Fragile",
+          "source_refs": [
+            "game_rules.cargo.Fragile"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "instability": "swing warning"
+          },
+          "component_overrides": {
+            "cue": {
+              "state_binding": "swing>18 drains25/sec"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "oversize",
+          "name": "Oversize",
+          "notes": "Stability100",
+          "condition": "cargo Oversize",
+          "source_refs": [
+            "game_rules.cargo.Oversize"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "collision": "footprint outline"
+          },
+          "component_overrides": {
+            "playfield": {
+              "state_binding": "collision footprint1.45"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "lantern",
+          "name": "Lantern",
+          "notes": "scale.7 Stability80",
+          "condition": "cargo Lantern",
+          "source_refs": [
+            "game_rules.cargo.Lantern"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "instability": "tilt warning"
+          },
+          "component_overrides": {
+            "cue": {
+              "state_binding": "tilt>25 drains30/sec"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "gate",
+          "name": "Swing Gate",
+          "notes": "same collision result",
+          "condition": "job has gate",
+          "source_refs": [
+            "content_model.obstacle_classes[2]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "hazard": "continuous motion"
+          },
+          "component_overrides": {
+            "playfield": {
+              "state_binding": "solid oscillation period4..7s"
+            }
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "draft",
+          "name": "Moon Draft",
+          "notes": "authored swing force",
+          "condition": "job has draft",
+          "source_refs": [
+            "content_model.obstacle_classes[3]"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "hazard": "0.5s pre-warning"
+          },
+          "component_overrides": {
+            "playfield": {
+              "state_binding": "draft zone/direction"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M5",
+      "name": "Job Failure",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Job Failure"
+      ],
+      "purpose": "Retry current job or quit",
+      "components": [
+        {
+          "id": "reason",
+          "box": {
+            "h": 22,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "banner",
+          "label": "Reason",
+          "state_binding": "collision/Stability0"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 60
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 60
+          },
+          "type": "button",
+          "label": "Quit",
+          "state_binding": "enabled"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [
+        {
+          "to": "M4",
+          "from": "M5",
+          "trigger": "Retry",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "M1",
+          "from": "M5",
+          "trigger": "Quit",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "reload",
+          "source_refs": [
+            "game_rules.retry"
+          ],
+          "precondition": "always",
+          "state_change": "reset current Job only",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M6",
+      "name": "Job Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Job Result"
+      ],
+      "purpose": "Stars and next/replay/select",
+      "components": [
+        {
+          "id": "stars",
+          "box": {
+            "h": 18,
+            "w": 70,
+            "x": 15,
+            "y": 15
+          },
+          "type": "rating",
+          "label": "Stars",
+          "state_binding": "scoring rule"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 36,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Next",
+          "state_binding": "job1-2/third routes contract result"
+        },
+        {
+          "id": "replay",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 6,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Replay",
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 11,
+            "w": 28,
+            "x": 66,
+            "y": 70
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "enabled"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[5]"
+      ],
+      "transitions": [
+        {
+          "to": "M3",
+          "from": "M6",
+          "trigger": "Next",
+          "condition": "job1-2",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "M7",
+          "from": "M6",
+          "trigger": "Next",
+          "condition": "third success",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next",
+          "feedback": "advance",
+          "source_refs": [
+            "state_model[5]"
+          ],
+          "precondition": "success",
+          "state_change": "next Job or Contract Result",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    },
+    {
+      "id": "M7",
+      "name": "Contract Result",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe"
+          }
+        ]
+      },
+      "states": [
+        "Contract Result"
+      ],
+      "purpose": "Confirm completion and unlock next contract",
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 30,
+            "w": 84,
+            "x": 8,
+            "y": 18
+          },
+          "type": "summary",
+          "label": "3 Job Summary",
+          "state_binding": "mastery"
+        },
+        {
+          "id": "unlock",
+          "box": {
+            "h": 14,
+            "w": 84,
+            "x": 8,
+            "y": 53
+          },
+          "type": "banner",
+          "label": "Unlock",
+          "state_binding": "next if exists"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 8,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Next Contract",
+          "state_binding": "next exists"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 52,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Select",
+          "state_binding": "enabled"
+        }
+      ],
+      "source_refs": [
+        "screen_inventory[6]"
+      ],
+      "transitions": [
+        {
+          "to": "M2",
+          "from": "M7",
+          "trigger": "Next Contract",
+          "condition": "exists",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "M1",
+          "from": "M7",
+          "trigger": "Select",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "next",
+          "input": "tap",
+          "target": "next",
+          "feedback": "unlock cue",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "next exists",
+          "state_change": "unlock/open next",
+          "invalid_input": "hidden final",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design"
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "ae8add10-d566-4a2e-915f-5878c7ca63e0",
+  "input_map": {
+    "cancel": "release joint ownership; invalid Grab/Release no change",
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_origin": "game_design",
+    "brake_multitouch": "may coexist with one joint drag",
+    "max_joint_pointers": 2
+  },
+  "created_at": "2026-09-30T09:35:32.06581+00:00",
+  "edge_cases": {
+    "rules": [
+      "collision immediate failure",
+      "Stability0 failure",
+      "safe stability recovers12/sec",
+      "Retry current Job only"
+    ],
+    "source_refs": [
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T09:35:32.06581+00:00",
+  "core_screen": "M4",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "M1",
+    "guards": [
+      "locked contract",
+      "Grab radius/speed",
+      "Release delivery rule",
+      "third success"
+    ],
+    "normal": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M6",
+      "M3/M7"
+    ],
+    "failure": [
+      "M4",
+      "M5",
+      "M4/M1"
+    ],
+    "source_refs": [
+      "screen_flow"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 11,
+  "screen_count": 7,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze timer,physics,Stability,Brake,hazards; exact resume",
+      "source_refs": [
+        "game_rules.pause"
+      ],
+      "decision_origin": "game_design"
+    },
+    "ResetConfirm": {
+      "effect": "confirm +10sec reset; dismiss no change",
+      "source_refs": [
+        "game_rules.reset"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Moon Crane Dispatcher\nWhole-MVP portrait pack with seven screens, all cargo/hazard classes, direct crane manipulation, failure/retry/reset/pause and progression.",
+  "source_run_at": "2026-09-30T09:33:36+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "fun_promise": "Directly fold a paper-crane mechanism with your fingers to thread cargo through tight moonlit harbor spaces.",
+    "source_refs": [
+      "visual_direction_brief"
+    ],
+    "decision_note": "Layout only.",
+    "decision_origin": "wireframe_layout",
+    "coordinate_system": "0..100"
+  },
+  "developer_handoff": {
+    "fun_promise": "Directly fold a paper-crane mechanism with your fingers to thread cargo through tight moonlit harbor spaces.",
+    "source_refs": [
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "4 contracts x3 jobs",
+      "4 cargo classes",
+      "4 obstacle/hazard classes",
+      "joint ranges",
+      "job polygons",
+      "par time"
+    ],
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "architecture_boundary": "Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "Seven inventory screens exist and flow resolves.",
+    "Joint drag, Grab/Release, Brake, Reset and Pause implement declared valid/invalid behavior.",
+    "Standard/Fragile/Oversize/Lantern and Wall/Arch/Swing Gate/Moon Draft are represented.",
+    "Failure/retry/reset/stars and four-contract progression are observable."
+  ],
+  "primary_interaction": "4-joint arc drag + Grab/Release + Brake hold",
+  "interaction_principles": [
+    "Direct paper-crane manipulation",
+    "Keep cargo constraints legible",
+    "Brake supports rather than replaces joint control"
+  ]
+}

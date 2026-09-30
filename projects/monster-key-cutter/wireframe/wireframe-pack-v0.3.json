@@ -1,0 +1,1502 @@
+{
+  "id": "77c3d896-f530-4cea-a01b-c8f1437b9f94",
+  "title": "Monster Key Cutter",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "24ab50fc-bdbe-4d56-86a1-75d4f6aa7a2f",
+  "screens": [
+    {
+      "id": "K1",
+      "name": "Order Board",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 14,
+            "id": "orders",
+            "role": "selection",
+            "label": "Orders"
+          }
+        ]
+      },
+      "states": [
+        "Order Select"
+      ],
+      "purpose": "Select unlocked order",
+      "feedback": [],
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 64,
+            "w": 88,
+            "x": 6,
+            "y": 14
+          },
+          "type": "card_grid",
+          "label": "Order cards",
+          "state_binding": "unlock/best result"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 58,
+            "y": 81
+          },
+          "type": "button",
+          "label": "Open",
+          "state_binding": "selected unlocked"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "K1_SELECT",
+          "input": "tap",
+          "target": "cards",
+          "feedback": "selection",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "unlocked",
+          "state_change": "selected order",
+          "invalid_input": "locked does not select",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "K2",
+      "name": "Workbench",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 8,
+            "w": 90,
+            "x": 5,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "Order HUD"
+          },
+          {
+            "h": 54,
+            "w": 90,
+            "x": 5,
+            "y": 14,
+            "id": "work_area",
+            "role": "direct_manipulation",
+            "label": "Precision Work Area"
+          },
+          {
+            "h": 10,
+            "w": 58,
+            "x": 5,
+            "y": 71,
+            "id": "tool_rail",
+            "role": "tool_selection",
+            "label": "Tool Rail"
+          },
+          {
+            "h": 22,
+            "w": 29,
+            "x": 66,
+            "y": 71,
+            "id": "test_area",
+            "role": "state_action",
+            "label": "Test / Recovery"
+          }
+        ]
+      },
+      "states": [
+        "Inspect",
+        "Cut",
+        "Test",
+        "Diagnostic",
+        "Replace Confirm"
+      ],
+      "purpose": "Inspect the monster lock, hand-cut the selected blank, physically test it, then read diagnostic feedback and rework without turning the craft loop into menu choices.",
+      "feedback": [
+        {
+          "audio": "metal click",
+          "event": "inspect",
+          "haptic": "tick",
+          "visual": "pin highlight",
+          "source_refs": [
+            "feedback_system.inspect"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "audio": "file scrape",
+          "event": "cut",
+          "haptic": "texture",
+          "visual": "shavings/profile change",
+          "source_refs": [
+            "feedback_system.cut"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "audio": "dull nick",
+          "event": "overcut",
+          "haptic": "warning",
+          "visual": "warning edge",
+          "source_refs": [
+            "feedback_system.overcut"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "audio": "clicks",
+          "event": "test",
+          "haptic": "resistance",
+          "visual": "pins/contact/rotation",
+          "source_refs": [
+            "feedback_system.test"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "audio": "clean clack",
+          "event": "success",
+          "haptic": "success",
+          "visual": "full turn",
+          "source_refs": [
+            "feedback_system.success"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "components": [
+        {
+          "id": "timer",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 5,
+            "y": 4
+          },
+          "type": "counter",
+          "label": "Time",
+          "source_refs": [
+            "game_rules.time_limit_sec"
+          ],
+          "state_binding": "seconds remaining",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "blank_count",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 25,
+            "y": 4
+          },
+          "type": "counter",
+          "label": "Blanks",
+          "source_refs": [
+            "game_rules.blank_count"
+          ],
+          "state_binding": "usable blanks 0..2",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "test_count",
+          "box": {
+            "h": 7,
+            "w": 18,
+            "x": 45,
+            "y": 4
+          },
+          "type": "counter",
+          "label": "Tests",
+          "source_refs": [
+            "game_rules.test_limit"
+          ],
+          "state_binding": "tests used 0..3",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 85,
+            "y": 4
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "decision_note": "Pause access does not change craft rules.",
+          "state_binding": "always available outside terminal result",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "lock_cutaway",
+          "box": {
+            "h": 24,
+            "w": 88,
+            "x": 6,
+            "y": 15
+          },
+          "type": "simulation_view",
+          "label": "Lock Cutaway",
+          "source_refs": [
+            "content_model",
+            "core_player_verbs[0]",
+            "feedback_system.inspect"
+          ],
+          "state_binding": "4-pin target profile and contact response",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "lens",
+          "box": {
+            "h": 20,
+            "w": 24,
+            "x": 8,
+            "y": 17
+          },
+          "type": "drag_tool",
+          "label": "Inspection Lens",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "interaction_spec"
+          ],
+          "state_binding": "Inspect only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "key_profile",
+          "box": {
+            "h": 25,
+            "w": 86,
+            "x": 7,
+            "y": 42
+          },
+          "type": "craft_surface",
+          "label": "Key Blank Profile",
+          "source_refs": [
+            "game_rules.cut_rule",
+            "core_player_verbs[1]"
+          ],
+          "state_binding": "per-tooth depth 0..1; material removal only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "tooth_targets",
+          "box": {
+            "h": 18,
+            "w": 82,
+            "x": 9,
+            "y": 45
+          },
+          "type": "hit_targets",
+          "label": "Key Teeth",
+          "source_refs": [
+            "interaction_spec.cut.target"
+          ],
+          "state_binding": "minimum 44pt touch target per tooth",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "coarse_file",
+          "box": {
+            "h": 9,
+            "w": 25,
+            "x": 6,
+            "y": 72
+          },
+          "type": "drag_tool",
+          "label": "Coarse File",
+          "source_refs": [
+            "core_player_verbs[1]",
+            "interaction_spec.cut"
+          ],
+          "state_binding": "Cut only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "fine_file",
+          "box": {
+            "h": 9,
+            "w": 25,
+            "x": 34,
+            "y": 72
+          },
+          "type": "drag_tool",
+          "label": "Fine File",
+          "source_refs": [
+            "core_player_verbs[2]",
+            "interaction_spec.fine.step"
+          ],
+          "state_binding": "Cut only; 0.01 depth step",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start_cut",
+          "box": {
+            "h": 9,
+            "w": 28,
+            "x": 66,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Mount Blank",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "decision_note": "Makes the authored Inspect→Cut transition explicit without adding a new rule.",
+          "state_binding": "Inspect only; selected usable blank",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "insert_key",
+          "box": {
+            "h": 9,
+            "w": 28,
+            "x": 66,
+            "y": 72
+          },
+          "type": "drag_target",
+          "label": "Insert Key",
+          "source_refs": [
+            "interaction_spec.test.insert"
+          ],
+          "state_binding": "Cut only",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "rotation_arc",
+          "box": {
+            "h": 25,
+            "w": 28,
+            "x": 66,
+            "y": 42
+          },
+          "type": "arc_control",
+          "label": "Rotate",
+          "source_refs": [
+            "interaction_spec.test.rotate",
+            "game_rules.success"
+          ],
+          "state_binding": "Test only; 0..75 degrees",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "diagnostic_panel",
+          "box": {
+            "h": 11,
+            "w": 55,
+            "x": 6,
+            "y": 83
+          },
+          "type": "feedback_panel",
+          "label": "Pin Diagnostic",
+          "source_refs": [
+            "state_model[3]",
+            "known_risks"
+          ],
+          "state_binding": "Diagnostic only; high/low pin feedback",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "return_cut",
+          "box": {
+            "h": 9,
+            "w": 13,
+            "x": 66,
+            "y": 83
+          },
+          "type": "button",
+          "label": "Rework",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_note": "Direct return path for the authored Diagnostic→Cut recovery.",
+          "state_binding": "Diagnostic only",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "replace_blank",
+          "box": {
+            "h": 9,
+            "w": 13,
+            "x": 81,
+            "y": 83
+          },
+          "type": "hold_button",
+          "label": "Replace",
+          "source_refs": [
+            "interaction_spec.replacement",
+            "game_rules.blank_count"
+          ],
+          "state_binding": "Diagnostic only; spare blank required",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "replace_confirm",
+          "box": {
+            "h": 28,
+            "w": 64,
+            "x": 18,
+            "y": 34
+          },
+          "type": "confirm_overlay",
+          "label": "Use Spare Blank?",
+          "source_refs": [
+            "interaction_spec.replacement"
+          ],
+          "decision_note": "Hold-confirm presentation implements the authored explicit replacement confirmation.",
+          "state_binding": "Replace Confirm only",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "craft_status",
+          "box": {
+            "h": 4,
+            "w": 88,
+            "x": 6,
+            "y": 66
+          },
+          "type": "feedback_strip",
+          "label": "Craft Feedback",
+          "source_refs": [
+            "feedback_system"
+          ],
+          "decision_note": "Consolidates authored feedback channels without changing outcomes.",
+          "state_binding": "cut shavings / overcut warning / test torque",
+          "decision_origin": "wireframe_feedback"
+        }
+      ],
+      "edge_cases": [
+        "A cut can never add material back.",
+        "Lifting ends a stroke; it does not roll back material already removed by valid stroke steps.",
+        "A failed pre-snap insertion consumes no test.",
+        "Replacement cannot restore the consumed first blank.",
+        "Timer reaching zero immediately wins priority over recovery UI and routes to failure."
+      ],
+      "source_refs": [
+        "screen_inventory[1]",
+        "state_model",
+        "interaction_spec",
+        "feedback_system",
+        "wireframe_handoff"
+      ],
+      "transitions": [
+        {
+          "to": "Cut",
+          "from": "Inspect",
+          "trigger": "K2_MOUNT_BLANK",
+          "condition": "usable blank selected",
+          "source_refs": [
+            "state_model[0]"
+          ],
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "to": "Test",
+          "from": "Cut",
+          "trigger": "K2_INSERT_TEST",
+          "condition": "insertion reaches snap target",
+          "source_refs": [
+            "state_model[1]",
+            "interaction_spec.test.insert"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "K3 Result success",
+          "from": "Test",
+          "trigger": "K2_ROTATE_TEST",
+          "condition": "all pin errors <=0.08 and rotation reaches 75°",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Diagnostic",
+          "from": "Test",
+          "trigger": "K2_ROTATE_TEST",
+          "condition": "blocked and no terminal failure",
+          "source_refs": [
+            "state_model[2]",
+            "interaction_spec.test.blocked"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Cut",
+          "from": "Diagnostic",
+          "trigger": "K2_RETURN_REWORK",
+          "condition": "current blank usable",
+          "source_refs": [
+            "state_model[3]"
+          ],
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "to": "Replace Confirm",
+          "from": "Diagnostic",
+          "trigger": "replacement hold begins",
+          "condition": "spare blank exists",
+          "source_refs": [
+            "interaction_spec.replacement"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "Cut",
+          "from": "Replace Confirm",
+          "trigger": "hold confirm completes",
+          "condition": "spare blank exists",
+          "source_refs": [
+            "interaction_spec.replacement"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "K3 Result failure",
+          "from": "any K2",
+          "trigger": "terminal rule",
+          "condition": "timer=0 or both blanks unusable or no legal continuation after test limit",
+          "source_refs": [
+            "game_rules.failure",
+            "game_rules.test_limit"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "K4 Pause/Settings",
+          "from": "any nonterminal K2",
+          "trigger": "K2_PAUSE",
+          "condition": "not in terminal transition",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "K2_INSPECT_LENS",
+          "input": "drag",
+          "target": "lens over lock_cutaway",
+          "feedback": "pin highlight + metal tick/haptic",
+          "source_refs": [
+            "core_player_verbs[0]",
+            "feedback_system.inspect"
+          ],
+          "precondition": "state=Inspect",
+          "state_change": "reveals target pin heights/order under the lens; craft depth unchanged",
+          "gesture_rules": {
+            "single_pointer": true
+          },
+          "invalid_input": "drag outside lock cutaway reveals nothing and changes no craft state",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "K2_MOUNT_BLANK",
+          "input": "tap",
+          "target": "start_cut",
+          "feedback": "blank snaps into work position",
+          "source_refs": [
+            "state_model[0]",
+            "game_rules.blank_count"
+          ],
+          "precondition": "state=Inspect and at least one usable blank selected",
+          "state_change": "Inspect -> Cut; mounts the selected fresh blank",
+          "decision_note": "Closes the authored Inspect exit with an explicit local control.",
+          "invalid_input": "disabled when no usable blank exists",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "K2_COARSE_FILE",
+          "input": "drag stroke",
+          "target": "one valid key tooth",
+          "feedback": "visible shavings/profile change + scrape audio + texture haptic; warning edge when crossing target tolerance toward overcut",
+          "source_refs": [
+            "interaction_spec.cut",
+            "game_rules.cut_rule",
+            "feedback_system.cut",
+            "feedback_system.overcut"
+          ],
+          "precondition": "state=Cut and coarse_file selected",
+          "state_change": "irreversibly lowers the contacted tooth according to the authored coarse-file rule; depth remains clamped 0..1",
+          "gesture_rules": {
+            "priority": "active craft stroke over background pan",
+            "cancel_behavior": "lifting ends the current stroke"
+          },
+          "invalid_input": "stroke begun outside a tooth or outside the 44pt tooth target causes no cut",
+          "spatial_rules": {
+            "target": "44pt minimum tooth target"
+          },
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "K2_FINE_FILE",
+          "input": "short drag strokes",
+          "target": "one valid key tooth",
+          "feedback": "fine scrape + small shaving/profile increment",
+          "source_refs": [
+            "interaction_spec.fine",
+            "core_player_verbs[2]"
+          ],
+          "precondition": "state=Cut and fine_file selected",
+          "state_change": "each valid fine step irreversibly lowers depth by 0.01, clamped to 0..1",
+          "gesture_rules": {
+            "cancel_behavior": "lifting ends the active stroke"
+          },
+          "invalid_input": "outside-tooth stroke makes no state change",
+          "decision_origin": "game_design",
+          "resource_effects": {
+            "depth_delta": -0.01
+          }
+        },
+        {
+          "id": "K2_INSERT_TEST",
+          "input": "drag",
+          "target": "insert_key into lock_cutaway",
+          "feedback": "key snaps into lock; pin contacts become visible",
+          "source_refs": [
+            "interaction_spec.test.insert",
+            "state_model[1]"
+          ],
+          "precondition": "state=Cut and a blank is mounted",
+          "state_change": "Cut -> Test when insertion reaches snap target",
+          "invalid_input": "release before snap returns key to work position and consumes no test",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "K2_ROTATE_TEST",
+          "input": "clockwise arc drag",
+          "target": "rotation_arc",
+          "feedback": "pin contact + torque resistance + click/haptic; clean full-turn clack on success",
+          "source_refs": [
+            "game_rules.success",
+            "game_rules.tolerance",
+            "game_rules.test_limit",
+            "interaction_spec.test",
+            "feedback_system.test",
+            "feedback_system.success"
+          ],
+          "precondition": "state=Test and inserted key is snapped",
+          "state_change": "consumes one test; if every pin error <=0.08 and rotation reaches 75° -> K3 success; otherwise rotation stops proportional to worst error and state -> Diagnostic; terminal failure if test limit or timer/blank rule is exhausted",
+          "invalid_input": "reverse/outside arc does not advance rotation or consume an additional test",
+          "spatial_rules": {
+            "success_rotation_deg": 75
+          },
+          "decision_origin": "game_design",
+          "resource_effects": {
+            "test_count_delta": 1
+          }
+        },
+        {
+          "id": "K2_RETURN_REWORK",
+          "input": "tap",
+          "target": "return_cut",
+          "feedback": "diagnostic panel retracts; key returns to work position",
+          "source_refs": [
+            "state_model[3]",
+            "game_rules.overcut"
+          ],
+          "precondition": "state=Diagnostic and current blank remains usable",
+          "state_change": "Diagnostic -> Cut; preserves all irreversible cut depth",
+          "decision_note": "Implements the authored Diagnostic→Cut recovery without modifying craft state.",
+          "invalid_input": "disabled if terminal failure condition already applies",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "K2_REPLACE_BLANK",
+          "input": "hold-confirm",
+          "target": "replace_blank / replace_confirm",
+          "feedback": "explicit hold progress followed by fresh blank swap",
+          "source_refs": [
+            "interaction_spec.replacement",
+            "game_rules.blank_count",
+            "game_rules.scoring.replacement_penalty"
+          ],
+          "precondition": "state=Diagnostic and one spare blank remains",
+          "state_change": "Diagnostic -> Replace Confirm -> Cut; consumes one spare blank and resets tooth depths to a fresh blank",
+          "invalid_input": "release before confirm cancels with no resource change; unavailable with no spare blank",
+          "decision_origin": "game_design",
+          "resource_effects": {
+            "blank_delta": -1,
+            "score_penalty": 200
+          }
+        },
+        {
+          "id": "K2_PAUSE",
+          "input": "tap",
+          "target": "pause",
+          "feedback": "craft/timer freeze and pause overlay opens",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "precondition": "any nonterminal K2 state",
+          "state_change": "K2 -> K4 while preserving exact K2 state",
+          "decision_note": "Pause presentation preserves authored state.",
+          "invalid_input": "ignored during terminal transition to K3",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "K2V_INSPECT",
+          "name": "Inspect",
+          "notes": "The lock is the focus; no cutting occurs in this state.",
+          "condition": "state=Inspect",
+          "source_refs": [
+            "state_model[0]",
+            "core_player_verbs[0]"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "coarse_file",
+            "fine_file",
+            "insert_key",
+            "rotation_arc",
+            "diagnostic_panel",
+            "return_cut",
+            "replace_blank",
+            "replace_confirm"
+          ],
+          "feedback_overrides": {
+            "primary": "pin highlight/tick"
+          },
+          "component_overrides": {
+            "lens": {
+              "enabled": true
+            },
+            "start_cut": {
+              "enabled": true
+            },
+            "lock_cutaway": {
+              "emphasis": "primary"
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K2_INSPECT_LENS",
+              "K2_MOUNT_BLANK",
+              "K2_PAUSE"
+            ]
+          }
+        },
+        {
+          "id": "K2V_CUT",
+          "name": "Cut",
+          "notes": "Direct material removal dominates the screen.",
+          "condition": "state=Cut",
+          "source_refs": [
+            "state_model[1]",
+            "interaction_spec.cut",
+            "interaction_spec.fine"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "lens",
+            "start_cut",
+            "rotation_arc",
+            "diagnostic_panel",
+            "return_cut",
+            "replace_blank",
+            "replace_confirm"
+          ],
+          "feedback_overrides": {
+            "primary": "shavings/profile; overcut warning edge"
+          },
+          "component_overrides": {
+            "fine_file": {
+              "enabled": true
+            },
+            "insert_key": {
+              "enabled": true
+            },
+            "coarse_file": {
+              "enabled": true
+            },
+            "key_profile": {
+              "emphasis": "primary"
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K2_COARSE_FILE",
+              "K2_FINE_FILE",
+              "K2_INSERT_TEST",
+              "K2_PAUSE"
+            ]
+          }
+        },
+        {
+          "id": "K2V_TEST",
+          "name": "Test",
+          "notes": "The suspense comes from physically rotating the crafted key, not pressing a verdict button.",
+          "condition": "state=Test",
+          "source_refs": [
+            "state_model[2]",
+            "interaction_spec.test",
+            "player_fantasy"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "lens",
+            "start_cut",
+            "coarse_file",
+            "fine_file",
+            "insert_key",
+            "diagnostic_panel",
+            "return_cut",
+            "replace_blank",
+            "replace_confirm"
+          ],
+          "feedback_overrides": {
+            "primary": "pin contact + torque resistance"
+          },
+          "component_overrides": {
+            "lock_cutaway": {
+              "emphasis": "contact"
+            },
+            "rotation_arc": {
+              "enabled": true
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K2_ROTATE_TEST",
+              "K2_PAUSE"
+            ]
+          }
+        },
+        {
+          "id": "K2V_DIAGNOSTIC",
+          "name": "Diagnostic",
+          "notes": "Feedback informs the next craft decision without auto-solving, preserving the diagnostic-over-help risk constraint.",
+          "condition": "state=Diagnostic after blocked test",
+          "source_refs": [
+            "state_model[3]",
+            "known_risks",
+            "interaction_principles"
+          ],
+          "decision_origin": "game_design",
+          "hide_components": [
+            "lens",
+            "start_cut",
+            "coarse_file",
+            "fine_file",
+            "insert_key",
+            "rotation_arc",
+            "replace_confirm"
+          ],
+          "feedback_overrides": {
+            "primary": "high/low pin direction without revealing an exact solved depth"
+          },
+          "component_overrides": {
+            "return_cut": {
+              "enabled": true
+            },
+            "replace_blank": {
+              "enabled": "spare blank > 0"
+            },
+            "diagnostic_panel": {
+              "visible": true
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K2_RETURN_REWORK",
+              "K2_REPLACE_BLANK",
+              "K2_PAUSE"
+            ]
+          }
+        },
+        {
+          "id": "K2V_REPLACE",
+          "name": "Replace Confirm",
+          "notes": "Confirmation is intentionally explicit because replacement is irreversible and consumes the only spare blank.",
+          "condition": "replacement hold started from Diagnostic",
+          "source_refs": [
+            "interaction_spec.replacement",
+            "game_rules.blank_count"
+          ],
+          "decision_origin": "wireframe_completion",
+          "hide_components": [
+            "lens",
+            "start_cut",
+            "coarse_file",
+            "fine_file",
+            "insert_key",
+            "rotation_arc",
+            "return_cut"
+          ],
+          "feedback_overrides": {
+            "primary": "hold progress and explicit blank cost"
+          },
+          "component_overrides": {
+            "replace_confirm": {
+              "visible": true
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K2_REPLACE_BLANK"
+            ]
+          }
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": [
+        "Keep direct craft surfaces large enough to avoid finger occlusion.",
+        "Diagnostic feedback must indicate direction of error without exposing the exact solved depth.",
+        "Implementation Blueprint chooses Godot scene/node/script architecture."
+      ]
+    },
+    {
+      "id": "K3",
+      "name": "Result",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 46,
+            "w": 86,
+            "x": 7,
+            "y": 15,
+            "id": "result_summary",
+            "role": "outcome",
+            "label": "Result Summary"
+          },
+          {
+            "h": 20,
+            "w": 86,
+            "x": 7,
+            "y": 70,
+            "id": "actions",
+            "role": "navigation",
+            "label": "Result Actions"
+          }
+        ]
+      },
+      "states": [
+        "Success",
+        "Failure"
+      ],
+      "purpose": "Resolve the order with success/failure, accuracy, test/replacement cost and progression result without adding a new gameplay mechanic.",
+      "feedback": [
+        {
+          "audio": "clean clack",
+          "event": "success",
+          "haptic": "success",
+          "visual": "full-turn result emphasis",
+          "source_refs": [
+            "feedback_system.success"
+          ],
+          "decision_origin": "game_design"
+        }
+      ],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 10,
+            "w": 82,
+            "x": 9,
+            "y": 17
+          },
+          "type": "result_header",
+          "label": "Order Result",
+          "source_refs": [
+            "state_model[4]"
+          ],
+          "state_binding": "Success/Failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "accuracy",
+          "box": {
+            "h": 10,
+            "w": 82,
+            "x": 9,
+            "y": 31
+          },
+          "type": "meter",
+          "label": "Accuracy",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "final pin accuracy / best accuracy",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "score",
+          "box": {
+            "h": 14,
+            "w": 82,
+            "x": 9,
+            "y": 44
+          },
+          "type": "score_summary",
+          "label": "Score",
+          "source_refs": [
+            "game_rules.scoring"
+          ],
+          "state_binding": "1000 base - 80 test penalties - 200 replacement penalties",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 39,
+            "x": 52,
+            "y": 73
+          },
+          "type": "button",
+          "label": "Next Order",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_note": "Makes sequential unlock navigation explicit.",
+          "state_binding": "success and next order exists",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 39,
+            "x": 9,
+            "y": 73
+          },
+          "type": "button",
+          "label": "Retry",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "always available",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "board",
+          "box": {
+            "h": 8,
+            "w": 40,
+            "x": 30,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Order Board",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_note": "Navigation only; no game rule change.",
+          "state_binding": "always available",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [
+        "Final order success hides/disables Next Order.",
+        "Retry fully resets order-local timer, test count, blank state and cut depths."
+      ],
+      "source_refs": [
+        "screen_inventory[2]",
+        "state_model[4]",
+        "progression",
+        "game_rules.scoring"
+      ],
+      "transitions": [
+        {
+          "to": "K2 Inspect",
+          "from": "K3",
+          "trigger": "Retry",
+          "condition": "same order",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "game_design"
+        },
+        {
+          "to": "K2 Inspect",
+          "from": "K3 Success",
+          "trigger": "Next Order",
+          "condition": "next order exists",
+          "source_refs": [
+            "progression"
+          ],
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "to": "K1",
+          "from": "K3",
+          "trigger": "Order Board",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "K3_RETRY",
+          "input": "tap",
+          "target": "retry",
+          "feedback": "result clears and fresh order workbench loads",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "Result",
+          "state_change": "restart same order at K2 Inspect with fresh authored order-local state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "K3_NEXT",
+          "input": "tap",
+          "target": "next",
+          "feedback": "next order loads",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "Success and next order unlocked/exists",
+          "state_change": "open next order at K2 Inspect",
+          "invalid_input": "disabled on failure or final order",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "K3_BOARD",
+          "input": "tap",
+          "target": "board",
+          "feedback": "returns to order board",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "precondition": "Result",
+          "state_change": "K3 -> K1",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "K3V_SUCCESS",
+          "name": "Success",
+          "notes": "Stores best accuracy and unlocks the next authored order.",
+          "condition": "all pin errors <=0.08 and 75° rotation completed",
+          "source_refs": [
+            "game_rules.success",
+            "progression"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "clean full-turn success feedback"
+          },
+          "component_overrides": {
+            "next": {
+              "enabled": true
+            },
+            "outcome": {
+              "label": "Success"
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K3_RETRY",
+              "K3_NEXT",
+              "K3_BOARD"
+            ]
+          }
+        },
+        {
+          "id": "K3V_FAILURE",
+          "name": "Failure",
+          "notes": "No next-order unlock on failure.",
+          "condition": "timer expires or blanks become unusable / no legal continuation",
+          "source_refs": [
+            "game_rules.failure",
+            "progression"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "primary": "terminal failure reason without changing craft history"
+          },
+          "component_overrides": {
+            "next": {
+              "enabled": false
+            },
+            "outcome": {
+              "label": "Order Failed"
+            }
+          },
+          "interaction_overrides": {
+            "enabled": [
+              "K3_RETRY",
+              "K3_BOARD"
+            ]
+          }
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "K4",
+      "name": "Pause / Settings",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 58,
+            "w": 72,
+            "x": 14,
+            "y": 20,
+            "id": "pause_panel",
+            "role": "overlay",
+            "label": "Pause Panel"
+          }
+        ]
+      },
+      "states": [
+        "Paused"
+      ],
+      "purpose": "Pause the active order without changing any craft state, then resume the exact prior Workbench state.",
+      "feedback": [
+        {
+          "audio": "none required",
+          "event": "pause",
+          "haptic": "none required",
+          "visual": "dim workbench beneath modal",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "decision_origin": "wireframe_feedback"
+        }
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 11,
+            "w": 50,
+            "x": 25,
+            "y": 31
+          },
+          "type": "button",
+          "label": "Resume",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "state_binding": "Paused",
+          "decision_origin": "wireframe_completion"
+        },
+        {
+          "id": "settings",
+          "box": {
+            "h": 18,
+            "w": 60,
+            "x": 20,
+            "y": 47
+          },
+          "type": "settings_group",
+          "label": "Audio / Haptics",
+          "source_refs": [
+            "screen_inventory[3]"
+          ],
+          "decision_note": "Settings affect presentation only, not gameplay rules.",
+          "state_binding": "presentation preferences only",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "edge_cases": [
+        "Pause freezes the 180-second timer.",
+        "Pause never resets active cut depth, test count, blank count or current diagnostic state."
+      ],
+      "source_refs": [
+        "screen_inventory[3]",
+        "global_states.Pause"
+      ],
+      "transitions": [
+        {
+          "to": "exact previous K2 state",
+          "from": "K4",
+          "trigger": "Resume",
+          "condition": "always",
+          "source_refs": [
+            "screen_flow.pause"
+          ],
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "K4_RESUME",
+          "input": "tap",
+          "target": "resume",
+          "feedback": "overlay closes; timer/craft interaction resume from frozen values",
+          "source_refs": [
+            "global_states.Pause",
+            "screen_flow.pause"
+          ],
+          "precondition": "Paused",
+          "state_change": "K4 -> exact previous K2 state",
+          "invalid_input": "none",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "decision_note": "Pause/Settings is presentation and state preservation only.",
+      "state_variants": [],
+      "decision_origin": "wireframe_completion",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "346e3091-434f-4e90-b8a8-05444cf93eef",
+  "input_map": {
+    "cancel": "lifting ends active stroke; invalid drag makes no state change",
+    "priority": [
+      "Pause",
+      "active craft stroke",
+      "test gesture",
+      "inspection"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_note": "Explicit cancellation closes local UX only.",
+    "single_pointer": true,
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T07:33:15.128759+00:00",
+  "edge_cases": {
+    "items": [
+      "timer expiry is terminal",
+      "test limit cannot be exceeded",
+      "irreversible over-removal remains irreversible",
+      "spent replacement cannot be restored"
+    ],
+    "source_refs": [
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T07:33:15.128759+00:00",
+  "core_screen": "K2 Workbench",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "K1",
+    "pause": "K2 -> K4 -> exact K2 state",
+    "guards": [
+      "tests<=3",
+      "replacement requires spare blank"
+    ],
+    "normal": [
+      "K1",
+      "K2 Inspect",
+      "K2 Cut",
+      "K2 Test",
+      "K3"
+    ],
+    "failure": [
+      "timer0 or blanks unusable -> K3"
+    ],
+    "recovery": [
+      "blocked Test -> Diagnostic -> Cut or Replace -> Test"
+    ],
+    "source_refs": [
+      "screen_flow",
+      "game_rules"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 9,
+  "screen_count": 4,
+  "global_states": {
+    "Pause": {
+      "effect": "freeze timer and interaction; preserve exact state",
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "decision_note": "Pause presentation preserves state.",
+      "decision_origin": "wireframe_completion"
+    }
+  },
+  "pack_markdown": "# Interaction Wireframe Pack v0.3 — Monster Key Cutter\n\n## Fun Promise\nInspect a strange mechanical lock, shape its matching key by hand, then feel the suspense of physically testing the result.\n\n## Screen Inventory\n- K1 Order Board — select an unlocked authored order.\n- K2 Workbench — Inspect → Cut → Test → Diagnostic / Replace Confirm. This is the core direct-manipulation screen.\n- K3 Result — success/failure, accuracy, score, retry/next/board.\n- K4 Pause / Settings — freeze and resume the exact Workbench state.\n\n## Core Interaction\nPin inspection → irreversible tooth cutting → insert-and-rotate physical test → blocked-pin diagnostic → rework or explicit spare-blank replacement.\n\n## Core Rules Preserved\n4 pins; tolerance ±0.08; depth 0..1 material removal only; 2 blanks; maximum 3 tests; 180 second timer; success requires all pin errors within tolerance and 75° rotation. Fine filing changes depth in 0.01 steps. Replacement costs the spare blank and 200 score; tests carry the authored 80-point penalty.\n\n## Structural Integrity Repair\nThe stored pack now contains all 4 declared screens. core_screen=K2 Workbench exists in the actual screens array, all screen-flow references resolve, and the 9 declared UI states are represented across K1–K4.\n",
+  "source_run_at": "2026-09-30T07:33:15.128759+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": 4,
+    "coordinates": "0..100 screen-percent",
+    "fun_promise": "Inspect a strange mechanical puzzle, shape its matching piece by hand, then feel the suspense of testing the result.",
+    "source_refs": [
+      "product_definition",
+      "player_fantasy",
+      "wireframe_handoff"
+    ],
+    "decision_note": "Layout prioritizes direct craft without changing rules.",
+    "decision_origin": "wireframe_layout",
+    "coverage_summary": [
+      "Order Board",
+      "Inspect",
+      "Cut",
+      "Test",
+      "Diagnostic",
+      "Result",
+      "Pause",
+      "12 authored profiles"
+    ]
+  },
+  "developer_handoff": {
+    "fun_promise": "The tactile loop is inspect, shape by hand, physically test — not menu-driven crafting.",
+    "source_refs": [
+      "content_model",
+      "progression",
+      "wireframe_handoff"
+    ],
+    "required_data": [
+      "12 authored profiles",
+      "unlock and best accuracy",
+      "blank/test/timer counters"
+    ],
+    "decision_origin": "game_design",
+    "state_ownership": [
+      "progress persistent",
+      "craft state order-local"
+    ],
+    "upstream_issues": [],
+    "content_templates": [
+      "authored 4-pin profile template"
+    ],
+    "architecture_boundary": "Implementation Blueprint chooses Godot architecture."
+  },
+  "acceptance_criteria": [
+    "All inventory screens and all authored states are observable.",
+    "Core craft interactions expose valid and invalid input feedback.",
+    "Exact authored tolerance, depth, test, blank and timer semantics are preserved.",
+    "All 12 authored profiles reuse one interaction template."
+  ],
+  "primary_interaction": "핀 관찰 → 열쇠 홈 직접 절삭 → 삽입·회전 테스트",
+  "interaction_principles": [
+    "Direct manipulation is primary",
+    "Irreversible craft changes stay legible",
+    "Diagnostics inform without auto-solving",
+    "Workbench dominates the viewport"
+  ]
+}

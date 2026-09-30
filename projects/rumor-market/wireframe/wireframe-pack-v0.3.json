@@ -1,0 +1,1194 @@
+{
+  "id": "64859919-206f-4106-a1e2-bf76cce1c968",
+  "title": "Rumor Market",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "1b53baba-c389-45ee-82b7-18a533905fd7",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Scenario Select",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "START"
+      ],
+      "purpose": "Choose unlocked scenario",
+      "feedback": [],
+      "components": [
+        {
+          "id": "cards",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 14
+          },
+          "type": "card_list",
+          "label": "Scenario Cards",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "3 linear unlock",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 11,
+            "w": 38,
+            "x": 56,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Open",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "selected unlocked",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[0]"
+      ],
+      "transitions": [],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S2",
+      "name": "Scenario Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "START"
+      ],
+      "purpose": "Preview objectives/network/resources",
+      "feedback": [],
+      "components": [
+        {
+          "id": "objectives",
+          "box": {
+            "h": 18,
+            "w": 88,
+            "x": 6,
+            "y": 10
+          },
+          "type": "panel",
+          "label": "2 Objectives",
+          "source_refs": [
+            "content_model.scenario"
+          ],
+          "state_binding": "scenario",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "network",
+          "box": {
+            "h": 32,
+            "w": 88,
+            "x": 6,
+            "y": 31
+          },
+          "type": "graph",
+          "label": "Network Preview",
+          "source_refs": [
+            "content_model.edge"
+          ],
+          "state_binding": "directed trust/type",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 11,
+            "w": 42,
+            "x": 52,
+            "y": 80
+          },
+          "type": "button",
+          "label": "Start Day1",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "loaded",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[1]"
+      ],
+      "transitions": [],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S3",
+      "name": "Town Planning",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "PLANNING"
+      ],
+      "purpose": "Observe and choose intervention",
+      "feedback": [],
+      "components": [
+        {
+          "id": "status",
+          "box": {
+            "h": 8,
+            "w": 77,
+            "x": 4,
+            "y": 3
+          },
+          "type": "status",
+          "label": "Day/Objectives/Influence/Reputation",
+          "source_refs": [
+            "round_structure",
+            "economy"
+          ],
+          "state_binding": "live run",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 12,
+            "x": 84,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "state_model"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "town",
+          "box": {
+            "h": 52,
+            "w": 92,
+            "x": 4,
+            "y": 14
+          },
+          "type": "network_board",
+          "label": "NPC+Shop Board",
+          "source_refs": [
+            "content_model.npc"
+          ],
+          "state_binding": "6-8 actors",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "hand",
+          "box": {
+            "h": 12,
+            "w": 92,
+            "x": 4,
+            "y": 69
+          },
+          "type": "card_tray",
+          "label": "Rumor Hand",
+          "source_refs": [
+            "round_structure"
+          ],
+          "state_binding": "4 fragments",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "seed",
+          "box": {
+            "h": 11,
+            "w": 44,
+            "x": 4,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Seed",
+          "source_refs": [
+            "interaction_spec.seed"
+          ],
+          "state_binding": "valid selection + Influence>=1 + not seeded",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "advance",
+          "box": {
+            "h": 11,
+            "w": 44,
+            "x": 52,
+            "y": 84
+          },
+          "type": "button",
+          "label": "Advance / No Seed",
+          "source_refs": [
+            "game_rules.recovery"
+          ],
+          "state_binding": "legal no-seed",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[2]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "inspect",
+          "input": "tap",
+          "target": "NPC/shop",
+          "feedback": "fact card: interest/skepticism/trust/price/objective relevance",
+          "source_refs": [
+            "core_player_verbs.observe",
+            "interaction_spec.planning"
+          ],
+          "precondition": "PLANNING",
+          "state_change": "known info only; no mutation",
+          "invalid_input": "non-target does nothing",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "seed",
+          "input": "tap after rumor+NPC selection",
+          "target": "Seed",
+          "feedback": "rumor→NPC summary and cost",
+          "source_refs": [
+            "core_player_verbs.seed",
+            "interaction_spec.seed"
+          ],
+          "precondition": "Influence>=1 and no seed today",
+          "state_change": "open confirmation; confirm consumes Influence1 and enters PROPAGATION",
+          "invalid_input": "Influence0/second seed exact reason; zero mutation",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "no_seed",
+          "input": "tap",
+          "target": "Advance / No Seed",
+          "feedback": "explicit no-seed state",
+          "source_refs": [
+            "game_rules.recovery",
+            "screen_flow"
+          ],
+          "precondition": "no seed committed",
+          "state_change": "enter PROPAGATION without active rumor",
+          "invalid_input": "none; legal at Influence0",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "late_dense",
+          "name": "Dense Rival Network",
+          "notes": "Same deterministic rules.",
+          "condition": "later 7-8 NPC scenario",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "town": "rival edges distinct; no hidden odds"
+          },
+          "component_overrides": {
+            "town": {
+              "state_binding": "7-8 actors, rival/mixed skepticism"
+            }
+          },
+          "interaction_overrides": {}
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S4",
+      "name": "Rumor Detail",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "PLANNING"
+      ],
+      "purpose": "Inspect rumor without mutation",
+      "feedback": [],
+      "components": [
+        {
+          "id": "detail",
+          "box": {
+            "h": 48,
+            "w": 86,
+            "x": 7,
+            "y": 12
+          },
+          "type": "detail",
+          "label": "Rumor Fields",
+          "source_refs": [
+            "content_model.rumor"
+          ],
+          "state_binding": "subject/claim/polarity/truth/potency/source",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "close",
+          "box": {
+            "h": 12,
+            "w": 86,
+            "x": 7,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Close",
+          "source_refs": [
+            "screen_flow"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[3]"
+      ],
+      "transitions": [],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S5",
+      "name": "Seed Confirmation",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "SEEDING"
+      ],
+      "purpose": "Commit daily seed",
+      "feedback": [],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 35,
+            "w": 86,
+            "x": 7,
+            "y": 14
+          },
+          "type": "panel",
+          "label": "Rumor→NPC + acceptance inputs",
+          "source_refs": [
+            "game_rules.acceptance"
+          ],
+          "state_binding": "selection",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cost",
+          "box": {
+            "h": 10,
+            "w": 86,
+            "x": 7,
+            "y": 52
+          },
+          "type": "status",
+          "label": "Influence -1",
+          "source_refs": [
+            "economy"
+          ],
+          "state_binding": "on confirm",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "cancel",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 7,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Cancel",
+          "source_refs": [
+            "interaction_spec.invalid"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "confirm",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 53,
+            "y": 76
+          },
+          "type": "button",
+          "label": "Confirm",
+          "source_refs": [
+            "interaction_spec.seed"
+          ],
+          "state_binding": "valid first seed",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[4]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "confirm",
+          "input": "tap",
+          "target": "Confirm",
+          "feedback": "source commit",
+          "source_refs": [
+            "interaction_spec.seed",
+            "economy"
+          ],
+          "precondition": "valid first seed",
+          "state_change": "Influence-1; active rumor; PROPAGATION",
+          "invalid_input": "exact reason; zero mutation",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S6",
+      "name": "Propagation View",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "PROPAGATION"
+      ],
+      "purpose": "Show deterministic causal path",
+      "feedback": [],
+      "components": [
+        {
+          "id": "hop",
+          "box": {
+            "h": 8,
+            "w": 28,
+            "x": 4,
+            "y": 3
+          },
+          "type": "status",
+          "label": "Hop 0/1/2",
+          "source_refs": [
+            "game_rules.propagation"
+          ],
+          "state_binding": "current",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 8,
+            "w": 12,
+            "x": 84,
+            "y": 3
+          },
+          "type": "button",
+          "label": "Pause",
+          "source_refs": [
+            "interaction_spec.resolve"
+          ],
+          "state_binding": "hop boundary",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "network",
+          "box": {
+            "h": 58,
+            "w": 92,
+            "x": 4,
+            "y": 14
+          },
+          "type": "network_board",
+          "label": "Live Network",
+          "source_refs": [
+            "game_rules.propagation"
+          ],
+          "state_binding": "path/edges/recipients",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "event",
+          "box": {
+            "h": 18,
+            "w": 92,
+            "x": 4,
+            "y": 75
+          },
+          "type": "event_strip",
+          "label": "Causal Event Strip",
+          "source_refs": [
+            "wireframe_handoff[3]"
+          ],
+          "state_binding": "accept→forward/flip→effect→exposure",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[5]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "resolve_hop",
+          "input": "system",
+          "target": "current recipient/network edge",
+          "feedback": "accept/reject→edge/flip→effect→exposure",
+          "source_refs": [
+            "game_rules.acceptance",
+            "game_rules.propagation",
+            "game_rules.mutation",
+            "wireframe_handoff[3]"
+          ],
+          "precondition": "PROPAGATION",
+          "state_change": "accept if potency+interest+source_trust-skepticism>=3; accepted recipient forwards on highest-trust eligible edge, stable-id tie; max2 hops/no duplicate; false rival crossing flips once",
+          "timing_rules": "atomic hop; pause only between hops",
+          "invalid_input": "invalid data halts without extra mutation",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause",
+          "input": "tap",
+          "target": "Pause",
+          "feedback": "freeze current causal path",
+          "source_refs": [
+            "interaction_spec.resolve",
+            "state_model.PAUSED"
+          ],
+          "precondition": "between atomic hops",
+          "state_change": "PAUSED with exact resume point",
+          "invalid_input": "request during hop waits for boundary",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "reject",
+          "name": "Rejected",
+          "notes": "No forward.",
+          "condition": "acceptance score<3",
+          "source_refs": [
+            "game_rules.acceptance"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "network": "reject marker"
+          },
+          "component_overrides": {
+            "event": {
+              "state_binding": "show inputs and rejection"
+            }
+          },
+          "interaction_overrides": {
+            "resolve_hop": {
+              "state_change": "stop this path"
+            }
+          }
+        },
+        {
+          "id": "rival_flip",
+          "name": "One-time Rival Flip",
+          "notes": "Truthful never flips.",
+          "condition": "false rumor crosses rival edge and has not flipped",
+          "source_refs": [
+            "game_rules.mutation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "network": "rival edge + flip marker"
+          },
+          "component_overrides": {
+            "event": {
+              "state_binding": "show polarity flip"
+            }
+          },
+          "interaction_overrides": {
+            "resolve_hop": {
+              "state_change": "flip once before downstream effect"
+            }
+          }
+        },
+        {
+          "id": "exposure",
+          "name": "Exposure",
+          "notes": "Required causal order.",
+          "condition": "false reaches subject or source_trust2 witness",
+          "source_refs": [
+            "game_rules.exposure"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "network": "exposure after effect"
+          },
+          "component_overrides": {
+            "event": {
+              "state_binding": "effect then exposure"
+            }
+          },
+          "interaction_overrides": {
+            "resolve_hop": {
+              "state_change": "Reputation-1; remove temporary price/desire; attitude retained"
+            }
+          }
+        }
+      ],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S7",
+      "name": "Day Result / Causal Ledger",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "RESULT"
+      ],
+      "purpose": "Explain deltas and advance day",
+      "feedback": [],
+      "components": [
+        {
+          "id": "ledger",
+          "box": {
+            "h": 50,
+            "w": 90,
+            "x": 5,
+            "y": 9
+          },
+          "type": "ledger",
+          "label": "Causal Ledger",
+          "source_refs": [
+            "feedback_system.after"
+          ],
+          "state_binding": "exact path/deltas",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "objectives",
+          "box": {
+            "h": 12,
+            "w": 90,
+            "x": 5,
+            "y": 62
+          },
+          "type": "panel",
+          "label": "Objectives",
+          "source_refs": [
+            "content_model.scenario"
+          ],
+          "state_binding": "2 states",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "continue",
+          "box": {
+            "h": 12,
+            "w": 42,
+            "x": 53,
+            "y": 79
+          },
+          "type": "button",
+          "label": "Continue",
+          "source_refs": [
+            "state_model.RESULT"
+          ],
+          "state_binding": "day<5 and Reputation>0",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[6]"
+      ],
+      "transitions": [],
+      "interactions": [
+        {
+          "id": "continue",
+          "input": "tap",
+          "target": "Continue",
+          "feedback": "resource/day deltas",
+          "source_refs": [
+            "economy",
+            "state_model.RESULT"
+          ],
+          "precondition": "nonterminal",
+          "state_change": "Influence+1 cap3; newly met objective +1 cap3; next day PLANNING",
+          "invalid_input": "terminal routes Run Result",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S8",
+      "name": "Pause Overlay",
+      "order": 8,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "PAUSED"
+      ],
+      "purpose": "Exact resume",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 36
+          },
+          "type": "button",
+          "label": "Resume",
+          "source_refs": [
+            "state_model.PAUSED"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 12,
+            "w": 60,
+            "x": 20,
+            "y": 54
+          },
+          "type": "button",
+          "label": "Quit",
+          "source_refs": [
+            "state_model.PAUSED"
+          ],
+          "state_binding": "enabled",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[7]"
+      ],
+      "transitions": [],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    },
+    {
+      "id": "S9",
+      "name": "Run Result",
+      "order": 9,
+      "layout": {
+        "regions": [
+          {
+            "h": 94,
+            "w": 92,
+            "x": 4,
+            "y": 3,
+            "id": "safe",
+            "role": "content",
+            "label": "Safe Area",
+            "source_refs": [
+              "visual_direction_brief"
+            ],
+            "decision_note": "Safe-area only.",
+            "decision_origin": "wireframe_layout"
+          }
+        ]
+      },
+      "states": [
+        "RUN_END"
+      ],
+      "purpose": "Terminal success/failure and retry",
+      "feedback": [],
+      "components": [
+        {
+          "id": "outcome",
+          "box": {
+            "h": 16,
+            "w": 86,
+            "x": 7,
+            "y": 12
+          },
+          "type": "banner",
+          "label": "Outcome",
+          "source_refs": [
+            "round_structure"
+          ],
+          "state_binding": "day5 2/2 success or failure/Reputation0",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "summary",
+          "box": {
+            "h": 30,
+            "w": 86,
+            "x": 7,
+            "y": 32
+          },
+          "type": "summary",
+          "label": "Run Summary",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "objectives/day/reputation",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 7,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Retry Day1",
+          "source_refs": [
+            "game_rules.recovery"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select",
+          "box": {
+            "h": 12,
+            "w": 40,
+            "x": 53,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Scenario Select",
+          "source_refs": [
+            "progression"
+          ],
+          "state_binding": "always",
+          "decision_origin": "game_design"
+        }
+      ],
+      "edge_cases": [],
+      "source_refs": [
+        "screen_inventory[8]"
+      ],
+      "transitions": [],
+      "interactions": [],
+      "state_variants": [],
+      "decision_origin": "game_design",
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "7c31b077-07d9-42a3-bee4-fb6f0bc5264a",
+  "input_map": {
+    "cancel": "seed cancel/detail close zero mutation",
+    "gesture": "tap",
+    "conflict": "atomic propagation locks mutation input; second seed rejected zero mutation",
+    "priority": [
+      "pause boundary",
+      "modal confirm",
+      "planning selection"
+    ],
+    "multitouch": "not required",
+    "source_refs": [
+      "interaction_spec"
+    ],
+    "decision_note": "Closes pointer conflict UX only.",
+    "decision_origin": "wireframe_completion"
+  },
+  "created_at": "2026-09-30T13:31:33.58825+00:00",
+  "edge_cases": {
+    "items": [
+      "Influence0 no-seed legal",
+      "score<3 stops",
+      "no trust>=1 edge stops",
+      "duplicate recipient forbidden",
+      "one-day temporary effects expire visibly",
+      "unreachable objective pairs rejected by content validation"
+    ],
+    "source_refs": [
+      "game_rules",
+      "known_risks"
+    ],
+    "decision_origin": "game_design"
+  },
+  "updated_at": "2026-09-30T13:31:33.58825+00:00",
+  "core_screen": "S3",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      "seed Influence>=1 + max1/day",
+      "no-seed legal",
+      "max2 deterministic hops",
+      "Reputation0 immediate RUN_END",
+      "day5 RUN_END"
+    ],
+    "routes": [
+      "S1>S2>S3",
+      "S3>S4>S3",
+      "S3>S5>S6>S7>S3",
+      "S3>S6>S7>S3",
+      "S3/S6>S8>S3/S6",
+      "S7>S9",
+      "S9>S3",
+      "S9>S1"
+    ],
+    "source_refs": [
+      "screen_flow",
+      "state_model"
+    ],
+    "decision_origin": "game_design"
+  },
+  "state_count": 7,
+  "screen_count": 9,
+  "global_states": {
+    "START": {
+      "source_refs": [
+        "state_model[0]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "PAUSED": {
+      "source_refs": [
+        "state_model[5]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "RESULT": {
+      "source_refs": [
+        "state_model[4]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "RUN_END": {
+      "source_refs": [
+        "state_model[6]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "SEEDING": {
+      "source_refs": [
+        "state_model[2]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "PLANNING": {
+      "source_refs": [
+        "state_model[1]"
+      ],
+      "decision_origin": "game_design"
+    },
+    "PROPAGATION": {
+      "source_refs": [
+        "state_model[3]"
+      ],
+      "decision_origin": "game_design"
+    }
+  },
+  "pack_markdown": "# Rumor Market — Interaction Wireframe Pack v0.3\n\nPortrait whole-MVP pack covering all 9 inventory screens and 7 states. Fun promise: 한 사람에게 흘린 소문의 결정론적 관계망 파장을 예측하고, 때로 한 번 뒤집히는 정보가 가격·행동·관계를 바꾸는 결과를 이용하는 재미.\n\nCore UX exposes topology and acceptance inputs before the single daily seed, then renders deterministic propagation in causal order. Early sparse and later dense/rival scenarios reuse the same rules. Implementation architecture is intentionally deferred to Implementation Blueprint.",
+  "source_run_at": "2026-09-30T13:31:33.58825+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "safe_area": 4,
+    "coordinates": "0..100 screen-percent",
+    "fun_promise": "한 사람에게 흘린 소문의 결정론적 관계망 파장을 예측하고, 때로 한 번 뒤집히는 정보가 가격·행동·관계를 바꾸는 결과를 이용하는 재미.",
+    "source_refs": [
+      "visual_direction_brief",
+      "wireframe_handoff"
+    ],
+    "causal_order": "accept→forward/mutation→effect→exposure",
+    "decision_note": "Presentation only.",
+    "decision_origin": "wireframe_layout"
+  },
+  "developer_handoff": {
+    "fun_promise": "한 사람에게 흘린 소문의 결정론적 관계망 파장을 예측하고, 때로 한 번 뒤집히는 정보가 가격·행동·관계를 바꾸는 결과를 이용하는 재미.",
+    "source_refs": [
+      "wireframe_handoff",
+      "content_model"
+    ],
+    "required_data": [
+      "3 scenarios",
+      "6-8 NPC + directed trust/type",
+      "rumors",
+      "shops",
+      "2 objectives",
+      "day/Influence/Reputation"
+    ],
+    "responsibility": "Implementation Blueprint chooses Godot architecture.",
+    "decision_origin": "game_design",
+    "upstream_issues": [],
+    "coverage_summary": "9 screens, 7 states, seed/no-seed, accept/reject, 2-hop, rival flip, effects/exposure, day5/Reputation0 endings, pause/retry, 3 scenarios."
+  },
+  "acceptance_criteria": [
+    "9 screens exactly match Screen Inventory.",
+    "S3 supports non-mutating inspect, valid seed, invalid zero-mutation and legal no-seed.",
+    "S6 shows deterministic acceptance/highest-trust forwarding/stable-id tie/max2 hops/no duplicates.",
+    "False rival crossing flips once; truthful never flips.",
+    "Exposure occurs after effects: Reputation-1, temp price/desire removed, attitude retained.",
+    "S7 shows exact causal ledger and end-day Influence/objective bonuses cap3.",
+    "Day5 objectives2/2 success, Reputation0 failure, exact pause resume and clean retry are reachable."
+  ],
+  "primary_interaction": "관계망 관찰→소문/NPC seed→deterministic 2-hop 파장 읽기",
+  "interaction_principles": [
+    "Expose topology before commitment",
+    "Only seed confirmation spends Influence",
+    "Render causal order explicitly",
+    "Direct actor/rumor selection"
+  ]
+}

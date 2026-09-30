@@ -1,0 +1,409 @@
+{
+  "id": "0665bfe8-d61d-46c5-a924-9995504700c7",
+  "title": "Haunted Record Press",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "economy": "Not required. Attempts는 mission-local 기회 수이며 화폐가 아니다.",
+  "idea_id": "22cd1908-2f81-4e86-b286-2edad742b7d4",
+  "version": "v0.1",
+  "one_line": "유령의 목표 파형을 읽고 회전하는 레코드의 구간별 홈 깊이와 흔들림을 직접 새겨 잃어버린 노래를 복원하는 모바일 정밀 제작 퍼즐.",
+  "core_loop": "Mission Brief → 각 segment에서 Preview → Pressure 선택 → start-to-end Carve → Replay/Review → score 70 이상이면 Accept, 아니면 남은 attempt로 Correct → 모든 segment를 통과하면 Full Playback과 Result → 다음 record 해금 또는 Retry.",
+  "mvp_scope": "10 authored restoration missions, 각 3–6 ordered segments. Clean Melody/Wavering Voice/Pressure Phrase/Tempo Phrase/Composite Record 5 content classes. 32-sample normalized trace judging, pressure 1–3, target duration 1.5–5.0s, attempts 3/segment, pass70/perfect90, Review/Correction, Full Playback, 1–3 stars, linear unlock, pause/retry/best score 저장을 포함한다.",
+  "created_at": "2026-09-29T20:19:36.420352+00:00",
+  "game_rules": {
+    "target": {
+      "each_segment": "32 target lateral offsets v[-1,1], target_pressure 1..3, target_duration_seconds, start/end markers"
+    },
+    "hazards": {
+      "static": "none; challenge is precision, pressure and tempo, not random failure"
+    },
+    "mission": {
+      "pause": "freezes playback, timers and carving; if paused during Carving, current carve is cancelled without attempt cost and returns Carve Ready",
+      "retry": "resets all segment traces/scores/attempts and mission progress",
+      "rating": "final_score=rounded mean of accepted segment scores; 1 star=success, 2 stars>=80, 3 stars>=90",
+      "success": "all segments accepted with score>=70"
+    },
+    "scoring": {
+      "pass": 70,
+      "score": "round(100*(1-(0.65*shape_error+0.20*pressure_error+0.15*tempo_error)))",
+      "perfect": 90,
+      "shape_error": "mean absolute difference of 32 player_v vs target_v, clamped 0..1",
+      "tempo_error": "min(abs(player_duration-target_duration)/target_duration,1)",
+      "pressure_error": "abs(player_pressure-target_pressure)/2"
+    },
+    "attempts": {
+      "start": 3,
+      "failure": "if score<70 and attempts_left=0, mission fails immediately after Review",
+      "correction": "Review retry allowed only if attempts_left>0; clears trace but preserves target",
+      "consumption": "a valid completed carve consumes one attempt immediately"
+    },
+    "measurement": {
+      "speed": "elapsed carve time in seconds measured from valid start touch to valid end release",
+      "pressure": "integer 1..3 fixed for one carve attempt",
+      "sampling": "while dragging, resample pointer path to exactly 32 evenly spaced u samples by linear interpolation",
+      "segment_space": "u=0 at authored arc start, u=1 at arc end; lateral offset v is signed normalized distance perpendicular to authored centerline; segment half-width=1",
+      "record_rotation": "visual rotation only; judging coordinates use normalized local segment space, not screen/world rotation"
+    },
+    "valid_carve": {
+      "end": "release within end zone radius 0.12 and at least 80% of authored arc traversed",
+      "start": "pointer down within logical start zone radius 0.12 segment-width units",
+      "invalid": "invalid carve consumes no attempt and returns Carve Ready",
+      "progress": "u must never decrease by more than 0.08 between raw samples"
+    }
+  },
+  "not_in_mvp": [
+    "Real audio waveform analysis",
+    "Microphone input",
+    "Freeform song import",
+    "Procedural target generation",
+    "Currency/shop",
+    "Cosmetics",
+    "Branching narrative",
+    "Online leaderboard",
+    "Multi-touch carving",
+    "More than one stylus path at once"
+  ],
+  "updated_at": "2026-09-30T09:36:00.284415+00:00",
+  "archived_at": null,
+  "known_risks": [
+    "Finger occlusion can hide the target trace",
+    "Precision scoring may feel harsher than the visual suggests",
+    "Synthetic comparison audio may not match perceived score without careful sound design",
+    "Long wavering traces may amplify touch jitter",
+    "Ten missions need authored target traces that are distinct without introducing undeclared mechanics"
+  ],
+  "progression": "10개 mission은 선형 해금된다. Mission 1만 최초 해금. 성공하면 다음 mission을 해금하며 각 mission의 best stars(1–3)와 best score를 저장한다. 별은 물리/판정 능력을 강화하지 않으며 재도전 동기와 완료 표시만 제공한다.",
+  "screen_flow": "Record Shelf → Mission Brief → Gameplay Inspect → Carve Ready → Carving → Review. Pass+Accept는 다음 segment Inspect, failed score+attempts는 Correct→Carve Ready, score<70+attempts0은 failure Result. 마지막 Accept→Full Playback→success Result. Success Next는 다음 Mission Brief, Retry는 같은 mission 초기화, Shelf는 선택 화면 복귀. Pause는 Gameplay/Full Playback에서 현재 의미를 보존하며 Carving 중에는 미완성 carve만 무비용 취소한다.",
+  "state_model": [
+    {
+      "exit": "record selected",
+      "next": "Mission Brief",
+      "enter": "Home or Result",
+      "state": "Mission Select",
+      "variables": [
+        "unlock_index",
+        "best_stars"
+      ],
+      "allowed_inputs": [
+        "select unlocked record"
+      ],
+      "failure_cancel": "back to Home"
+    },
+    {
+      "exit": "start",
+      "next": "Inspect",
+      "enter": "record selected",
+      "state": "Mission Brief",
+      "variables": [
+        "segment_count",
+        "difficulty traits"
+      ],
+      "allowed_inputs": [
+        "start",
+        "back"
+      ],
+      "failure_cancel": "back to Mission Select"
+    },
+    {
+      "exit": "continue",
+      "next": "Carve Ready",
+      "enter": "mission start or prior segment accepted",
+      "state": "Inspect",
+      "variables": [
+        "segment_index",
+        "target data"
+      ],
+      "allowed_inputs": [
+        "preview",
+        "continue",
+        "pause"
+      ],
+      "failure_cancel": "pause resumes same state"
+    },
+    {
+      "exit": "valid start touch",
+      "next": "Carving",
+      "enter": "Inspect continue or correction or paused-carve cancel",
+      "state": "Carve Ready",
+      "variables": [
+        "pressure",
+        "attempts_left"
+      ],
+      "allowed_inputs": [
+        "preview",
+        "set pressure",
+        "start carve",
+        "pause"
+      ],
+      "failure_cancel": "invalid start no change"
+    },
+    {
+      "exit": "valid end release",
+      "next": "Review or Carve Ready",
+      "enter": "valid start",
+      "state": "Carving",
+      "variables": [
+        "raw path",
+        "elapsed time"
+      ],
+      "allowed_inputs": [
+        "drag",
+        "release",
+        "pause"
+      ],
+      "failure_cancel": "invalid release clears trace no cost; pause cancels no cost"
+    },
+    {
+      "exit": "accept/retry or automatic fail when score<70 and attempts=0",
+      "next": "Inspect next segment, Carve Ready, or Result",
+      "enter": "valid carve complete",
+      "state": "Review",
+      "variables": [
+        "score",
+        "errors",
+        "attempts_left"
+      ],
+      "allowed_inputs": [
+        "replay",
+        "accept if pass",
+        "retry if attempts remain",
+        "pause"
+      ],
+      "failure_cancel": "pause resumes Review"
+    },
+    {
+      "exit": "continue or playback end",
+      "next": "Result",
+      "enter": "last segment accepted",
+      "state": "Full Playback",
+      "variables": [
+        "accepted segment scores"
+      ],
+      "allowed_inputs": [
+        "listen",
+        "continue",
+        "pause"
+      ],
+      "failure_cancel": "pause freezes playback"
+    },
+    {
+      "exit": "choice",
+      "next": "Mission Brief or Mission Select",
+      "enter": "Full Playback complete/continue or mission failure",
+      "state": "Result",
+      "variables": [
+        "success",
+        "final_score",
+        "stars"
+      ],
+      "allowed_inputs": [
+        "retry",
+        "next if success",
+        "mission select"
+      ],
+      "failure_cancel": "none"
+    }
+  ],
+  "archive_path": null,
+  "archive_repo": null,
+  "content_unit": "haunted record restoration mission",
+  "content_model": {
+    "unit": "haunted record restoration mission",
+    "classes": [
+      {
+        "type": "Clean Melody",
+        "difference": "3–4 segments; straight/low-amplitude target traces; pressure target fixed per segment; base interactions"
+      },
+      {
+        "type": "Wavering Voice",
+        "difference": "target v alternates sign frequently; same states/interactions, higher shape precision demand"
+      },
+      {
+        "type": "Pressure Phrase",
+        "difference": "segments vary target_pressure 1/2/3; forces pressure choice before carve; no new state"
+      },
+      {
+        "type": "Tempo Phrase",
+        "difference": "target durations vary 1.5–5.0s; tempo error materially affects score; no new state"
+      },
+      {
+        "type": "Composite Record",
+        "difference": "5–6 segments combining wavering shape, pressure and tempo targets; Full Playback emphasizes reconstructed whole song"
+      }
+    ],
+    "coverage": "all later missions reuse the same state graph and interactions; only target data and combinations change",
+    "topology": "each mission is an ordered linear list of 3–6 segments; segment i+1 cannot open until i is accepted; no branching",
+    "mvp_count": "10 missions",
+    "data_schema": "mission_id,title,segment_order; per segment: 32 target_v samples,target_pressure,target_duration_seconds",
+    "variation_axes": [
+      "segment count",
+      "target trace amplitude/frequency",
+      "target pressure",
+      "target duration",
+      "pass margin via authored target complexity"
+    ]
+  },
+  "source_run_at": "2026-09-29T20:19:36.420352+00:00",
+  "archive_commit": null,
+  "human_priority": false,
+  "player_fantasy": "플레이어는 폐점 후 음반 공장의 마지막 커팅 기사다. 유령이 남긴 허밍을 시각적 파형과 촉각적 조각 규칙으로 번역해 망가진 노래를 다시 들리게 만드는 장인 숙련감과 복원 완료의 정서적 보상을 느낀다.",
+  "session_length": "3–6분",
+  "test_scenarios": [
+    "Valid carve with shape_error0.10 pressure_error0 tempo_error0.10 yields score 92 and can Accept.",
+    "Valid carve consumes exactly one attempt; invalid start/end/progress consumes zero.",
+    "Three valid sub-70 attempts reduce attempts 3→2→1→0 and third Review reaches failure Result.",
+    "Pause during Carving cancels current uncommitted trace without attempt cost and returns Carve Ready.",
+    "Pressure target 3 with player pressure1 produces pressure_error1 and lowers score by exactly 20 weighted points before other errors.",
+    "All five content classes run through the same state graph without requiring a new interaction.",
+    "Last accepted segment enters Full Playback then success Result and unlocks exactly next mission.",
+    "Retry resets all traces, scores and attempts while preserving meta unlock/best records."
+  ],
+  "design_markdown": "# Playable Game Design Spec v0.1 — Haunted Record Press\n\n## 1. Product Definition\n유령의 목표 파형을 읽고 회전하는 레코드의 구간별 홈 깊이와 흔들림을 직접 새겨 잃어버린 노래를 복원하는 portrait mobile 정밀 제작 퍼즐. Mission 3–6분. 목표 감각은 듣고 본 패턴을 손의 궤적·압력·속도로 번역하는 장인 숙련감이다. Non-goals: 실제 오디오 분석, 마이크 입력, 자유곡 import, 화폐/상점, 온라인 경쟁.\n\n## 2. Player Fantasy\n플레이어는 폐점 후 음반 공장의 마지막 커팅 기사다. 유령이 남긴 허밍을 시각적 파형과 촉각적 조각 규칙으로 번역해 망가진 노래를 다시 들리게 만드는 숙련과 복원 완료의 정서적 보상을 느낀다.\n\n## 3. Core Player Verbs\nPreview는 현재 target phrase를 듣고 본다. Set Pressure는 1/2/3 깊이를 선택한다. Carve는 active arc start에서 end까지 한 손가락으로 홈을 긋는다. Replay는 target/player 결과를 비교한다. Correct는 실패/비완벽 trace를 지우고 남은 attempt로 다시 새긴다. Accept는 score>=70 segment를 잠그고 다음으로 진행한다.\n\n## 4. Core Loop\nMission Brief → Preview → Pressure → Carve → Replay/Review → score>=70 Accept 또는 Correct → 모든 segment 복원 → Full Playback → Result → 다음 record/Retry.\n\n## 5. Round / Session Structure\nMission은 ordered segment 3–6개. 각 segment attempts 3. Inspect→Carve Ready→Carving→Review. Valid carve는 attempt 1을 소비한다. score>=70이면 Accept 가능. score<70이고 attempts가 남으면 Correct. score<70이고 attempts=0이면 즉시 mission failure. 모든 segment Accept면 success. 평균 3–6분.\n\n## 6. Game Rules\n판정 좌표는 회전 화면이 아니라 segment local normalized space다. u=0 start, u=1 end; v는 authored centerline에 수직인 signed normalized offset이며 segment half-width=1. Drag path는 u 기준 32개 등간격 sample로 보간한다. Pressure는 attempt 동안 고정 integer 1–3. Duration은 valid start touch부터 valid end release까지 초 단위.\n\n각 target은 32 target_v, target_pressure, target_duration_seconds를 가진다. Valid start/end zone radius는 0.12 segment-width units. Raw sample 사이 u가 0.08보다 크게 역행하면 invalid. End release는 end zone 안이며 authored arc의 80% 이상을 진행해야 한다. Invalid carve는 attempt를 소비하지 않는다.\n\nshape_error=mean(abs(player_v-target_v)) clamped0..1. pressure_error=abs(player_pressure-target_pressure)/2. tempo_error=min(abs(player_duration-target_duration)/target_duration,1). score=round(100*(1-(0.65*shape_error+0.20*pressure_error+0.15*tempo_error))). Pass70, Perfect90.\n\nValid carve 완료 즉시 attempts_left-1. score<70이고 attempts_left=0이면 failure. Success는 모든 segment Accept. Success rating은 accepted segment score 평균: 1 star=success, 2>=80, 3>=90. Pause는 playback/timer를 정지한다. Carving 중 Pause는 미완성 carve를 무비용 취소하고 Carve Ready로 복귀한다. Retry는 mission-local trace/score/attempt/progress를 reset한다.\n\n## 7. State Model\nMission Select→Mission Brief→Inspect→Carve Ready→Carving→Review. Review에서 Accept는 다음 Inspect, Retry는 Carve Ready, attempts0+fail은 Result. 마지막 Accept는 Full Playback→Result. Pause는 현재 상태를 보존하되 Carving만 무비용 cancel semantics를 가진다.\n\n## 8. Interaction Spec\nPreview tap/hold. Pressure vertical drag를 1/2/3으로 quantize. Carve는 single pointer; valid/invalid는 Game Rules 기준. Active carve가 pointer priority를 가진다. Review Accept는 score>=70, Retry는 attempts_left>0. Invalid action은 state change 없음.\n\n## 9. Content Model\nMVP 10 missions. Content classes: Clean Melody(기본), Wavering Voice(잦은 v 부호 변화), Pressure Phrase(target pressure 변화), Tempo Phrase(target duration 1.5–5.0s 변화), Composite Record(5–6 segments에서 세 축 결합). Mission topology는 ordered linear segments이며 이전 Accept 전 다음 segment는 열리지 않는다. Variation axes는 segment count, trace amplitude/frequency, pressure, duration, target complexity다. 모든 후반 content는 동일 state graph/interaction을 재사용한다.\n\n## 10. Difficulty / Variation\n1–2 Clean, 3–4 Wavering, 5–6 Pressure, 7–8 Tempo, 9–10 Composite. 난도는 랜덤/시간제한이 아니라 목표 궤적·pressure·duration 조합으로 증가한다.\n\n## 11. Progression\nMission1 최초 해금. 성공 시 정확히 다음 mission 해금. mission별 best score와 best stars 저장. Stars는 판정 능력을 변경하지 않는다.\n\n## 12. Economy\nNot required. Attempts는 mission-local 기회이며 화폐가 아니다.\n\n## 13. Screen Inventory\nRecord Shelf / Mission Select, Mission Brief, Record Carving Gameplay, Full Playback, Mission Result.\n\n## 14. Screen Flow\nShelf→Brief→Inspect→Ready→Carving→Review. Accept→next segment, Correct→Ready, third failed valid attempt→failure Result. Last Accept→Full Playback→success Result. Next→next Brief, Retry→same mission reset, Shelf→select. Pause semantics는 section6과 동일.\n\n## 15. Feedback System\nPreview는 ghost hum/target trace. Carve는 groove와 cutting texture. Invalid는 scratch reject+no cost. Review는 mismatch region과 shape/pressure/tempo component를 보여준다. Accept는 restored segment. Full Playback은 assembled song. Failure는 failed segment에서 복원 중단을 명확히 전달한다.\n\n## 16. Visual Direction Brief\nPortrait mobile. 중심은 회전 record/current groove segment. finger path, target trace, start/end, pressure가 판독되어야 한다. 판정은 normalized local space로 결정론적이다. 어두운 공장과 제한된 ghost glow. 구체 UI 좌표는 Wireframe 책임이다.\n\n## 17. MVP Scope\n10 authored missions, 3–6 segments each, 5 content classes, 32-sample trace judging, pressure1–3, target duration1.5–5.0s, attempts3, pass70/perfect90, correction, Full Playback, stars, linear unlock, pause/retry/best score. NOT IN MVP: real audio analysis, microphone, freeform import, procedural targets, currency/shop, cosmetics, branching narrative, leaderboard, multi-touch carve.\n\n## 18. Test Scenarios\nshape_error0.10/pressure0/tempo0.10 valid carve는 score92로 pass. Valid carve만 attempt 소비. 세 번 sub70 valid carve로 3→2→1→0 failure. Carving Pause는 no-cost cancel. pressure target3/player1은 pressure weighted penalty20. 5 classes는 same state graph. Last Accept→Full Playback→success+next unlock. Retry는 mission-local reset, meta progress 보존.\n\n## 19. Known Risks\nFinger occlusion, scoring harshness, synthetic audio와 점수 체감 불일치, long trace touch jitter, authored target 다양성 생산 부담.\n\n## 20. Wireframe Handoff\n5 screen types와 Inspect/Ready/Carving/Review/Full Playback/Result/Pause를 표현한다. Target/player groove, start/end validity, pressure1–3, attempts3, component error/score, invalid no-cost reset, valid attempt consumption, Accept/Correct, 5 content variations, Carving pause cancel, third-fail Result, Full Playback, linear unlock/star variants를 전체 MVP 범위에서 표현한다.",
+  "feedback_system": {
+    "carve": {
+      "audio": "cutting texture",
+      "state": "raw path/time capture",
+      "haptic": "light continuous texture where supported",
+      "visual": "groove appears continuously behind pointer"
+    },
+    "accept": {
+      "audio": "phrase resolves",
+      "state": "segment locked",
+      "haptic": "success tick",
+      "visual": "segment becomes restored part of record"
+    },
+    "review": {
+      "audio": "player carve phrase compared with ghost target",
+      "state": "score visible",
+      "haptic": "pass/fail pulse",
+      "visual": "shape mismatch regions plus pressure/tempo component results"
+    },
+    "failure": {
+      "audio": "broken phrase sting",
+      "state": "Result failure",
+      "haptic": "error pattern",
+      "visual": "record restoration halts at failed segment"
+    },
+    "invalid": {
+      "audio": "short scratch reject",
+      "state": "no attempt cost",
+      "haptic": "single reject tick",
+      "visual": "start/end/progress reject and trace clears"
+    },
+    "preview": {
+      "audio": "ghost hum target phrase",
+      "state": "no score change",
+      "haptic": "none",
+      "visual": "target waveform/trace reference pulses"
+    },
+    "full_playback": {
+      "audio": "assembled authored song approximation",
+      "state": "success presentation",
+      "haptic": "none",
+      "visual": "whole record spins with all restored grooves"
+    }
+  },
+  "round_structure": "한 mission은 3~6개의 authored groove segment로 구성된다. 각 segment는 Inspect → Carve Ready → Carving → Review → Accept/Correct 순서다. 기본 attempts는 segment당 3회이며 실패한 carve도 1회를 소비한다. 모든 segment를 score>=70으로 Accept하면 mission success. attempts가 0인데 score<70이면 mission failure. 평균 mission 3~6분.",
+  "interaction_spec": {
+    "carve": {
+      "input": "single-pointer drag",
+      "valid": "start/end/progress rules in Game Rules",
+      "cancel": "pause or invalid release",
+      "change": "on valid completion attempts_left-1 and score computed",
+      "target": "active segment start→end",
+      "invalid": "trace cleared, no attempt spent",
+      "priority": "active carve owns pointer; all other gameplay input blocked"
+    },
+    "pause": {
+      "input": "pause",
+      "change": "freeze; Carving specifically cancels current uncommitted carve without cost"
+    },
+    "review": {
+      "input": "tap replay/accept/retry",
+      "valid": "accept requires score>=70; retry requires attempts_left>0",
+      "change": "segment lock or trace reset",
+      "invalid": "disabled action changes nothing"
+    },
+    "preview": {
+      "input": "tap/hold",
+      "valid": "Inspect/Carve Ready",
+      "cancel": "release stops preview",
+      "change": "none"
+    },
+    "pressure": {
+      "input": "vertical drag quantized to 1/2/3",
+      "valid": "Carve Ready only",
+      "cancel": "release outside control keeps previous level",
+      "change": "pressure_level"
+    }
+  },
+  "screen_inventory": [
+    "Record Shelf / Mission Select",
+    "Mission Brief",
+    "Record Carving Gameplay",
+    "Full Playback",
+    "Mission Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "Preview",
+      "input": "tap/hold preview",
+      "target": "current segment",
+      "feedback": "target trace and ghost hum",
+      "condition": "Inspect or Carve Ready",
+      "state_change": "no score change; target pattern audition/visual reference plays"
+    },
+    {
+      "verb": "Set Pressure",
+      "input": "vertical drag",
+      "target": "stylus pressure control",
+      "feedback": "stylus depth indicator changes",
+      "condition": "Carve Ready",
+      "state_change": "pressure_level becomes 1,2,or3"
+    },
+    {
+      "verb": "Carve",
+      "input": "drag along active arc from start marker to end marker",
+      "target": "current record segment",
+      "feedback": "groove appears under finger",
+      "condition": "Carve Ready and attempt remaining",
+      "state_change": "sampled groove trace stored; segment enters Review"
+    },
+    {
+      "verb": "Replay",
+      "input": "tap replay",
+      "target": "completed carve",
+      "feedback": "mismatch regions highlighted",
+      "condition": "Review",
+      "state_change": "no score change; target/player comparison playback runs"
+    },
+    {
+      "verb": "Correct",
+      "input": "tap retry segment",
+      "target": "failed/non-perfect segment",
+      "feedback": "groove resets",
+      "condition": "Review and attempts_left>0",
+      "state_change": "previous trace cleared; attempts_left-1; returns Carve Ready"
+    },
+    {
+      "verb": "Accept",
+      "input": "tap accept",
+      "target": "passing segment",
+      "feedback": "segment seals and song reconstruction advances",
+      "condition": "Review and segment_score>=70",
+      "state_change": "segment locks; next segment opens"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "Represent all five screen types and Inspect/Carve Ready/Carving/Review/Full Playback/Result/Pause states.",
+    "Represent the normalized segment concept visually without exposing implementation coordinates as UI layout.",
+    "Show target trace, player groove, start/end validity, pressure1–3, attempts3, component errors and total score.",
+    "Show invalid carve as no-cost reset, valid carve as attempt consumption, pass Accept and failed Correct paths.",
+    "Show Clean/Wavering/Pressure/Tempo/Composite content variations without inventing new rules.",
+    "Show pause semantics including Carving cancel-without-cost, mission failure after third sub-70 valid attempt, final Full Playback and linear unlock/star Result variants."
+  ],
+  "primary_interaction": "압력 레벨을 선택하고 회전 레코드의 active arc를 start→end로 한 손가락 drag해 목표 홈 궤적을 재현",
+  "difficulty_variation": "초반 1–2는 Clean Melody로 start/end와 shape를 학습한다. 3–4는 Wavering Voice로 곡률 변화, 5–6은 Pressure Phrase로 깊이 선택, 7–8은 Tempo Phrase로 시간 정확도를 추가한다. 9–10은 Composite로 세 축을 동시에 요구한다. 제한시간 단축이나 랜덤 판정은 사용하지 않는다.",
+  "visual_direction_brief": "Portrait mobile. 중심은 회전하는 레코드와 현재 groove segment이며 손가락 궤적, 목표 trace, start/end, 홈 깊이 상태가 작은 화면에서도 겹쳐 읽혀야 한다. 실제 판정은 회전 화면 좌표가 아니라 normalized segment local space를 사용해 결정론적으로 유지한다. 공장은 어둡고 유령의 파형은 제한된 발광 요소로 사용한다. Shelf/Brief/Result는 같은 음반 공장 세계를 유지하되 구체 좌표와 패널 배치는 Wireframe 책임이다."
+}

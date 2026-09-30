@@ -1,0 +1,1183 @@
+{
+  "id": "c0386e17-b8cc-43f7-bf13-181b54e554a9",
+  "title": "Moving City Blocks",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "834b33c8-0026-444d-af0d-3fc7d7118f42",
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Session Select / Day Map",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "id": "day_map",
+            "box": {
+              "h": 60,
+              "w": 90,
+              "x": 5,
+              "y": 12
+            }
+          },
+          {
+            "id": "start_day",
+            "box": {
+              "h": 9,
+              "w": 40,
+              "x": 55,
+              "y": 84
+            }
+          }
+        ]
+      },
+      "states": [
+        "available",
+        "locked",
+        "selected"
+      ],
+      "purpose": "Select an unlocked/current day and start from its pre-planning snapshot.",
+      "feedback": [
+        "selected/locked state"
+      ],
+      "components": [
+        {
+          "id": "day_map",
+          "box": {
+            "h": 60,
+            "w": 90,
+            "x": 5,
+            "y": 12
+          }
+        },
+        {
+          "id": "start_day",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 55,
+            "y": 84
+          }
+        }
+      ],
+      "edge_cases": [
+        "linear unlock"
+      ],
+      "transitions": [
+        "S2"
+      ],
+      "interactions": [
+        {
+          "id": "select_day",
+          "input": "tap",
+          "target": "day_map",
+          "feedback": "rule/attempt summary updates",
+          "source_refs": [
+            "progression"
+          ],
+          "precondition": "day unlocked",
+          "state_change": "selected day changes",
+          "invalid_input": "locked day unchanged",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "start_day_action",
+          "input": "tap",
+          "target": "start_day",
+          "feedback": "pre-planning snapshot loads",
+          "source_refs": [
+            "state_model"
+          ],
+          "precondition": "available day selected",
+          "state_change": "session_setup→planning",
+          "decision_note": "navigation completion only",
+          "invalid_input": "disabled otherwise",
+          "decision_origin": "wireframe_completion"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "five-day run"
+      ]
+    },
+    {
+      "id": "S2",
+      "name": "Planning Board",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "id": "forecast_panel",
+            "box": {
+              "h": 10,
+              "w": 94,
+              "x": 3,
+              "y": 2
+            }
+          },
+          {
+            "id": "city_grid",
+            "box": {
+              "h": 58,
+              "w": 72,
+              "x": 3,
+              "y": 14
+            }
+          },
+          {
+            "id": "network_legend",
+            "box": {
+              "h": 24,
+              "w": 20,
+              "x": 77,
+              "y": 14
+            }
+          },
+          {
+            "id": "move_queue",
+            "box": {
+              "h": 14,
+              "w": 94,
+              "x": 3,
+              "y": 74
+            }
+          },
+          {
+            "id": "commit_button",
+            "box": {
+              "h": 8,
+              "w": 42,
+              "x": 55,
+              "y": 90
+            }
+          },
+          {
+            "id": "pause_button",
+            "box": {
+              "h": 8,
+              "w": 12,
+              "x": 3,
+              "y": 90
+            }
+          }
+        ]
+      },
+      "states": [
+        "planning",
+        "building_selected",
+        "queue_edited",
+        "previewing"
+      ],
+      "purpose": "Inspect forecast and deterministic topology, order any subset of eligible movers, then commit.",
+      "feedback": [
+        "current/projected topology distinct",
+        "automatic tail visible"
+      ],
+      "components": [
+        {
+          "id": "forecast_panel",
+          "box": {
+            "h": 10,
+            "w": 94,
+            "x": 3,
+            "y": 2
+          }
+        },
+        {
+          "id": "city_grid",
+          "box": {
+            "h": 58,
+            "w": 72,
+            "x": 3,
+            "y": 14
+          }
+        },
+        {
+          "id": "network_legend",
+          "box": {
+            "h": 24,
+            "w": 20,
+            "x": 77,
+            "y": 14
+          }
+        },
+        {
+          "id": "move_queue",
+          "box": {
+            "h": 14,
+            "w": 94,
+            "x": 3,
+            "y": 74
+          }
+        },
+        {
+          "id": "commit_button",
+          "box": {
+            "h": 8,
+            "w": 42,
+            "x": 55,
+            "y": 90
+          }
+        },
+        {
+          "id": "pause_button",
+          "box": {
+            "h": 8,
+            "w": 12,
+            "x": 3,
+            "y": 90
+          }
+        }
+      ],
+      "edge_cases": [
+        "exact-step blocked destinations previewed"
+      ],
+      "transitions": [
+        "S3",
+        "S7"
+      ],
+      "interactions": [
+        {
+          "id": "inspect_building",
+          "input": "tap building",
+          "target": "city_grid",
+          "feedback": "ghost one-cell destination, legality, affected road/power/service",
+          "source_refs": [
+            "core_player_verbs.inspect"
+          ],
+          "precondition": "planning",
+          "state_change": "selection only",
+          "invalid_input": "non-eligible may inspect but not queue",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "schedule_building",
+          "input": "tap eligible building then order slot",
+          "target": "city_grid",
+          "feedback": "numbered order + projected topology",
+          "source_refs": [
+            "core_player_verbs.schedule",
+            "game_rules.queue"
+          ],
+          "precondition": "unused eligible action",
+          "state_change": "add to scheduled prefix; remainder stays automatic tail",
+          "invalid_input": "duplicate rejected",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "reorder_queue",
+          "input": "drag queued action vertically",
+          "target": "move_queue",
+          "feedback": "numbers/ghost destinations/network/service refresh",
+          "source_refs": [
+            "interaction_spec.queue editing"
+          ],
+          "precondition": "queued item exists",
+          "state_change": "reorder scheduled prefix; recompute sequential legality",
+          "invalid_input": "invalid drop returns prior slot",
+          "decision_origin": "game_design",
+          "interaction_semantics": {
+            "axis": "y",
+            "kind": "drag",
+            "cancel": "return_origin",
+            "target_component_id": "move_queue"
+          }
+        },
+        {
+          "id": "remove_from_queue",
+          "input": "tap remove",
+          "target": "move_queue",
+          "feedback": "preview recomputes",
+          "source_refs": [
+            "game_rules.queue"
+          ],
+          "precondition": "item in scheduled prefix",
+          "state_change": "return mover to visible row-major automatic tail",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "commit_plan",
+          "input": "tap confirm",
+          "target": "commit_button",
+          "feedback": "locked queue begins sequential resolution",
+          "source_refs": [
+            "core_player_verbs.commit"
+          ],
+          "precondition": "every eligible mover represented by prefix or automatic tail",
+          "state_change": "planning→night_resolution; queue locks",
+          "invalid_input": "no transition if representation incomplete",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause_planning",
+          "input": "tap",
+          "target": "pause_button",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "planning",
+          "state_change": "planning→paused",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V2A",
+          "name": "Single Moving Class",
+          "notes": "early day",
+          "condition": "one eligible class",
+          "source_refs": [
+            "difficulty_variation"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "forecast_panel": "class + cardinal direction + 1-cell distance"
+          },
+          "interaction_overrides": {}
+        },
+        {
+          "id": "V2B",
+          "name": "Multi-class Order Conflict",
+          "notes": "later-day ordering case preserved",
+          "condition": "2+ eligible classes or occupancy-order conflict",
+          "source_refs": [
+            "difficulty_variation",
+            "known_risks"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "city_grid": "distinguish current/projected topology"
+          },
+          "component_overrides": {
+            "move_queue": "scheduled prefix + visible row-major automatic tail",
+            "forecast_panel": "all eligible classes/direction"
+          },
+          "interaction_overrides": {
+            "reorder_queue": "recompute exact sequential legality"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "orthogonal only",
+        "night move exactly one cell"
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Night Resolution",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "id": "resolution_grid",
+            "box": {
+              "h": 68,
+              "w": 94,
+              "x": 3,
+              "y": 10
+            }
+          },
+          {
+            "id": "locked_queue",
+            "box": {
+              "h": 10,
+              "w": 94,
+              "x": 3,
+              "y": 80
+            }
+          },
+          {
+            "id": "pause_resolution",
+            "box": {
+              "h": 7,
+              "w": 12,
+              "x": 85,
+              "y": 2
+            }
+          }
+        ]
+      },
+      "states": [
+        "resolving",
+        "blocked_action",
+        "resolution_complete"
+      ],
+      "purpose": "Resolve each eligible action once in locked order and show cascading topology changes.",
+      "feedback": [
+        "one move at a time",
+        "edges/service recompute after each",
+        "blocked reason persists"
+      ],
+      "components": [
+        {
+          "id": "resolution_grid",
+          "box": {
+            "h": 68,
+            "w": 94,
+            "x": 3,
+            "y": 10
+          }
+        },
+        {
+          "id": "locked_queue",
+          "box": {
+            "h": 10,
+            "w": 94,
+            "x": 3,
+            "y": 80
+          }
+        },
+        {
+          "id": "pause_resolution",
+          "box": {
+            "h": 7,
+            "w": 12,
+            "x": 85,
+            "y": 2
+          }
+        }
+      ],
+      "edge_cases": [
+        "illegal exact-step move skipped but consumes action"
+      ],
+      "transitions": [
+        "S4",
+        "S5",
+        "S7"
+      ],
+      "interactions": [
+        {
+          "id": "pause_resolution_action",
+          "input": "tap",
+          "target": "pause_resolution",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "resolution active",
+          "state_change": "pause animation/resolution; queue remains locked",
+          "invalid_input": "no queue edit",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "queue immutable"
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Repair Phase",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "id": "repair_grid",
+            "box": {
+              "h": 64,
+              "w": 94,
+              "x": 3,
+              "y": 12
+            }
+          },
+          {
+            "id": "repair_status",
+            "box": {
+              "h": 7,
+              "w": 70,
+              "x": 3,
+              "y": 3
+            }
+          },
+          {
+            "id": "confirm_repair",
+            "box": {
+              "h": 8,
+              "w": 45,
+              "x": 52,
+              "y": 82
+            }
+          },
+          {
+            "id": "evaluate_without_repair",
+            "box": {
+              "h": 8,
+              "w": 45,
+              "x": 3,
+              "y": 82
+            }
+          },
+          {
+            "id": "pause_repair",
+            "box": {
+              "h": 7,
+              "w": 12,
+              "x": 85,
+              "y": 3
+            }
+          }
+        ]
+      },
+      "states": [
+        "repair_available",
+        "building_selected",
+        "destination_selected"
+      ],
+      "purpose": "Use at most one optional adjacent relocation of a non-critical building, then evaluate.",
+      "feedback": [
+        "legal cells highlighted",
+        "confirmed recomputation"
+      ],
+      "components": [
+        {
+          "id": "repair_grid",
+          "box": {
+            "h": 64,
+            "w": 94,
+            "x": 3,
+            "y": 12
+          }
+        },
+        {
+          "id": "repair_status",
+          "box": {
+            "h": 7,
+            "w": 70,
+            "x": 3,
+            "y": 3
+          }
+        },
+        {
+          "id": "confirm_repair",
+          "box": {
+            "h": 8,
+            "w": 45,
+            "x": 52,
+            "y": 82
+          }
+        },
+        {
+          "id": "evaluate_without_repair",
+          "box": {
+            "h": 8,
+            "w": 45,
+            "x": 3,
+            "y": 82
+          }
+        },
+        {
+          "id": "pause_repair",
+          "box": {
+            "h": 7,
+            "w": 12,
+            "x": 85,
+            "y": 3
+          }
+        }
+      ],
+      "edge_cases": [
+        "repair non-bankable",
+        "may bypass if no topology-changing repair"
+      ],
+      "transitions": [
+        "S5",
+        "S7"
+      ],
+      "interactions": [
+        {
+          "id": "select_repair_building",
+          "input": "tap non-critical building",
+          "target": "repair_grid",
+          "feedback": "legal orthogonal adjacent empty cells highlight",
+          "source_refs": [
+            "game_rules.repair"
+          ],
+          "precondition": "repair charge available",
+          "state_change": "select candidate",
+          "invalid_input": "hub/clinic/power source rejected",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "select_repair_destination",
+          "input": "tap highlighted cell",
+          "target": "repair_grid",
+          "feedback": "projected networks recompute",
+          "source_refs": [
+            "game_rules.repair"
+          ],
+          "precondition": "eligible candidate selected",
+          "state_change": "stage relocation",
+          "invalid_input": "non-adjacent/occupied/out-of-bounds ignored",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "confirm_repair_action",
+          "input": "tap confirm",
+          "target": "confirm_repair",
+          "feedback": "immediate network/service update",
+          "source_refs": [
+            "core_player_verbs.repair"
+          ],
+          "precondition": "legal staged relocation",
+          "state_change": "relocate one cell; consume daily repair; evaluate",
+          "invalid_input": "disabled until legal",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "skip_repair",
+          "input": "tap evaluate",
+          "target": "evaluate_without_repair",
+          "feedback": "evaluation follows",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "precondition": "repair phase",
+          "state_change": "evaluate without consuming repair",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "pause_repair_action",
+          "input": "tap",
+          "target": "pause_repair",
+          "feedback": "pause overlay",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "repair active",
+          "state_change": "repair→paused",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "confirm prevents accidental consumption"
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "Day Result",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "id": "day_summary",
+            "box": {
+              "h": 62,
+              "w": 90,
+              "x": 5,
+              "y": 10
+            }
+          },
+          {
+            "id": "primary_result_action",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 53,
+              "y": 82
+            }
+          },
+          {
+            "id": "secondary_result_action",
+            "box": {
+              "h": 9,
+              "w": 42,
+              "x": 5,
+              "y": 82
+            }
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure_retryable",
+        "failure_terminal"
+      ],
+      "purpose": "Explain exact pass/fail and expose legal continue/retry.",
+      "feedback": [
+        "served ratio",
+        "critical connectivity",
+        "repair use",
+        "blocked moves",
+        "attempt"
+      ],
+      "components": [
+        {
+          "id": "day_summary",
+          "box": {
+            "h": 62,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          }
+        },
+        {
+          "id": "primary_result_action",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 53,
+            "y": 82
+          }
+        },
+        {
+          "id": "secondary_result_action",
+          "box": {
+            "h": 9,
+            "w": 42,
+            "x": 5,
+            "y": 82
+          }
+        }
+      ],
+      "edge_cases": [
+        "final day required for win"
+      ],
+      "transitions": [
+        "S2",
+        "S6"
+      ],
+      "interactions": [
+        {
+          "id": "continue_day",
+          "input": "tap",
+          "target": "primary_result_action",
+          "feedback": "next forecast/session summary",
+          "source_refs": [
+            "core_player_verbs.advance"
+          ],
+          "precondition": "success",
+          "state_change": "advance day or day5→session result",
+          "invalid_input": "hidden on failure",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "retry_day",
+          "input": "tap",
+          "target": "primary_result_action",
+          "feedback": "visible board restore",
+          "source_refs": [
+            "interaction_spec.retry"
+          ],
+          "precondition": "failure and attempts<3",
+          "state_change": "restore exact pre-planning snapshot including rule/repair; increment attempt",
+          "invalid_input": "unavailable after third",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "V5A",
+          "name": "Success",
+          "notes": "power source itself need not be powered",
+          "condition": "served>=70% AND all critical buildings road-connected to civic hub",
+          "source_refs": [
+            "game_rules.success"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "day_summary": "pass reasons"
+          },
+          "component_overrides": {
+            "day_summary": "ratio, connectivity, repair, blocked moves, attempt"
+          },
+          "interaction_overrides": {
+            "primary_result_action": "continue"
+          }
+        },
+        {
+          "id": "V5B",
+          "name": "Retryable Failure",
+          "notes": "retry increments attempt",
+          "condition": "failed attempts <3",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {
+            "day_summary": "failure reasons"
+          },
+          "component_overrides": {
+            "day_summary": "failed conditions + attempt"
+          },
+          "interaction_overrides": {
+            "primary_result_action": "retry exact snapshot"
+          }
+        },
+        {
+          "id": "V5C",
+          "name": "Third Failure",
+          "notes": "no fourth retry",
+          "condition": "third failed attempt",
+          "source_refs": [
+            "game_rules.failure"
+          ],
+          "decision_origin": "game_design",
+          "feedback_overrides": {},
+          "component_overrides": {
+            "day_summary": "terminal failure"
+          },
+          "interaction_overrides": {
+            "primary_result_action": "session result"
+          }
+        }
+      ],
+      "implementation_notes": [
+        "70% exact threshold"
+      ]
+    },
+    {
+      "id": "S6",
+      "name": "Session Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "id": "session_summary",
+            "box": {
+              "h": 68,
+              "w": 90,
+              "x": 5,
+              "y": 10
+            }
+          },
+          {
+            "id": "new_run",
+            "box": {
+              "h": 9,
+              "w": 40,
+              "x": 30,
+              "y": 84
+            }
+          }
+        ]
+      },
+      "states": [
+        "session_win",
+        "session_fail"
+      ],
+      "purpose": "Show five-day outcome and feedback-only best metrics.",
+      "feedback": [
+        "cleared days",
+        "final-day outcome",
+        "best metrics"
+      ],
+      "components": [
+        {
+          "id": "session_summary",
+          "box": {
+            "h": 68,
+            "w": 90,
+            "x": 5,
+            "y": 10
+          }
+        },
+        {
+          "id": "new_run",
+          "box": {
+            "h": 9,
+            "w": 40,
+            "x": 30,
+            "y": 84
+          }
+        }
+      ],
+      "edge_cases": [
+        "win requires >=4 clears and final-day clear"
+      ],
+      "transitions": [
+        "S1"
+      ],
+      "interactions": [
+        {
+          "id": "new_run_action",
+          "input": "tap",
+          "target": "new_run",
+          "feedback": "day map",
+          "source_refs": [
+            "state_model"
+          ],
+          "precondition": "session result",
+          "state_change": "session_result→session_setup",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "no upgrades"
+      ]
+    },
+    {
+      "id": "S7",
+      "name": "Pause Overlay",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "id": "resume_button",
+            "box": {
+              "h": 10,
+              "w": 50,
+              "x": 25,
+              "y": 42
+            }
+          },
+          {
+            "id": "exit_day",
+            "box": {
+              "h": 10,
+              "w": 50,
+              "x": 25,
+              "y": 57
+            }
+          }
+        ]
+      },
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze active context; resume exact prior state or exit to pre-planning persistence.",
+      "feedback": [
+        "paused"
+      ],
+      "components": [
+        {
+          "id": "resume_button",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 42
+          }
+        },
+        {
+          "id": "exit_day",
+          "box": {
+            "h": 10,
+            "w": 50,
+            "x": 25,
+            "y": 57
+          }
+        }
+      ],
+      "edge_cases": [
+        "resolution queue cannot edit"
+      ],
+      "transitions": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "interactions": [
+        {
+          "id": "resume_action",
+          "input": "tap",
+          "target": "resume_button",
+          "feedback": "overlay closes",
+          "source_refs": [
+            "game_rules.pause"
+          ],
+          "precondition": "paused",
+          "state_change": "return exact prior state",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        },
+        {
+          "id": "exit_day_action",
+          "input": "tap",
+          "target": "exit_day",
+          "feedback": "day map",
+          "source_refs": [
+            "test_scenarios.Pause/exit"
+          ],
+          "precondition": "paused",
+          "state_change": "leave; persisted resume is pre-planning snapshot",
+          "invalid_input": "none",
+          "decision_origin": "game_design"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "never persist partial resolution"
+      ]
+    }
+  ],
+  "version": "v0.3",
+  "design_id": "25a2fb8e-5b99-477f-a37a-492e7c145fe7",
+  "input_map": {
+    "tap": "inspect/select/schedule/confirm/repair/result/pause",
+    "drag": "move_queue reorder only",
+    "cancel": {
+      "queue_drag": "return_origin"
+    },
+    "priority": [
+      "pause overlay",
+      "confirmation controls",
+      "queue drag",
+      "city-grid selection"
+    ],
+    "conflicts": [
+      "queue drag suppresses grid taps",
+      "resolution locks queue",
+      "repair requires confirmation"
+    ],
+    "source_refs": [
+      "interaction_spec"
+    ]
+  },
+  "created_at": "2026-09-30T19:27:15.540175+00:00",
+  "edge_cases": {
+    "cases": [
+      "orthogonal adjacency only",
+      "destination legality at exact sequential step",
+      "blocked move consumes action",
+      "automatic tail row-major and visible",
+      "repair excludes critical buildings",
+      "exit resumes pre-planning snapshot",
+      "authored day solvable with at most one repair"
+    ],
+    "source_refs": [
+      "game_rules",
+      "content_model",
+      "known_risks"
+    ]
+  },
+  "updated_at": "2026-09-30T19:27:15.540175+00:00",
+  "core_screen": "S2",
+  "orientation": "portrait",
+  "screen_flow": {
+    "entry": "S1",
+    "guards": [
+      {
+        "to": "S3",
+        "from": "S2",
+        "when": "explicit commit"
+      },
+      {
+        "to": "S4",
+        "from": "S3",
+        "when": "resolution complete and repair applicable"
+      },
+      {
+        "to": "S5",
+        "from": "S3/S4",
+        "when": "evaluation reached"
+      },
+      {
+        "to": "S2",
+        "from": "S5",
+        "when": "success before final day or retryable failure"
+      },
+      {
+        "to": "S6",
+        "from": "S5",
+        "when": "day5 completion or third failed attempt"
+      },
+      {
+        "to": "S7",
+        "from": "S2/S3/S4",
+        "when": "pause"
+      },
+      {
+        "to": "prior",
+        "from": "S7",
+        "when": "resume"
+      }
+    ],
+    "sequence": "S1→S2→S3→S4(optional)→S5→S2/S6; S7 overlays S2/S3/S4",
+    "source_refs": [
+      "screen_flow",
+      "state_model",
+      "round_structure"
+    ]
+  },
+  "state_count": 8,
+  "screen_count": 7,
+  "global_states": {
+    "states": [
+      "session_setup",
+      "planning",
+      "night_resolution",
+      "repair",
+      "evaluation",
+      "day_result",
+      "paused",
+      "session_result"
+    ],
+    "retry_rule": "exact pre-planning snapshot; third failed attempt ends session",
+    "source_refs": [
+      "state_model",
+      "game_rules.success",
+      "game_rules.failure"
+    ],
+    "success_rule": "served>=70% and all critical buildings road-connected to civic hub"
+  },
+  "pack_markdown": "# Moving City Blocks — Interaction Wireframe Pack v0.3\nFun promise: 예측한 이동 순서가 도시의 도로·전력·서비스망을 실제로 끊고 다시 잇는 연쇄 결과를 읽는 재미.\nCoverage: Session Select → Planning → Night Resolution → optional Repair → Day Result → next/retry → Session Result, with Pause.\nCore: S2 Planning, S3 Resolution, S4 Repair. Planning keeps automatic tail visible and distinguishes current vs projected topology. Queue reordering uses semantic drag; grid inspection/repair remain explicit structured interactions.",
+  "source_run_at": "2026-09-30T19:27:15.540175+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "boxes": "0-100 screen-percent",
+    "safe_area": true,
+    "source_refs": [
+      "visual_direction_brief",
+      "known_risks"
+    ],
+    "decision_note": "visual separation exposes existing topology without changing rules",
+    "decision_origin": "wireframe_layout",
+    "network_channels": [
+      "road",
+      "power",
+      "residence service"
+    ]
+  },
+  "developer_handoff": {
+    "fun_promise": "예측한 건물 이동 순서를 직접 짜고 그 순서 때문에 도시망이 연쇄적으로 끊기고 다시 연결되는 결과를 보는 재미.",
+    "source_refs": [
+      "wireframe_handoff",
+      "content_model",
+      "difficulty_variation"
+    ],
+    "upstream_issues": [],
+    "content_variation": {
+      "classes": [
+        "residence",
+        "road segment",
+        "civic hub",
+        "clinic",
+        "power source",
+        "power-link building",
+        "neutral blocker"
+      ],
+      "difficulty": "dependency density rises across five days; preserve multi-class/order-conflict cases"
+    },
+    "responsibility_boundary": "UX semantics/state visibility/component identities fixed here; Godot architecture belongs to Fidelity Blueprint Compiler."
+  },
+  "acceptance_criteria": [
+    "7 required screen types exist as S1-S7",
+    "Planning exposes eligible classes, direction, one-cell move, scheduled prefix, visible row-major automatic tail and deterministic topology/service preview",
+    "Resolution processes each eligible building exactly once sequentially; blocked actions remain visible and consume action",
+    "Road/power/service recompute after every resolved action",
+    "Repair permits at most one optional orthogonal one-cell relocation of a non-critical building into an empty legal cell",
+    "Evaluation uses exact 70% served threshold plus critical road connectivity",
+    "Retry restores exact pre-planning snapshot and third failed attempt ends session",
+    "Five-day session win requires at least 4 cleared days and final day cleared",
+    "Pause resumes exact prior state; exit resumes from pre-planning snapshot",
+    "all interaction_semantics component references resolve within same screen"
+  ],
+  "primary_interaction": "Inspect forecast, order building moves, commit, then optionally relocate one building to repair network continuity.",
+  "interaction_principles": [
+    "prediction before commitment",
+    "current vs projected topology distinct",
+    "automatic tail always visible",
+    "sequential consequences readable",
+    "explicit irreversible confirmation"
+  ]
+}

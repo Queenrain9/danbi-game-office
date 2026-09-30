@@ -1,0 +1,1245 @@
+{
+  "id": "15311cd0-ceab-4199-9176-7f5451fa0c97",
+  "title": "Moonlight Window Washer",
+  "source": "chat_automation",
+  "status": "wireframe",
+  "idea_id": "e81b6fbe-b020-49e4-884c-4d796285e604",
+  "screens": [
+    {
+      "id": "night_route",
+      "name": "Night Route",
+      "order": 1,
+      "layout": {
+        "regions": [
+          {
+            "h": 70,
+            "w": 88,
+            "x": 6,
+            "y": 8,
+            "id": "route",
+            "role": "selection",
+            "label": "Route"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "route",
+          "ui": "route",
+          "enter": "app/result",
+          "allowed_input": "tap"
+        },
+        {
+          "id": "selected",
+          "ui": "selection",
+          "enter": "pane tap",
+          "allowed_input": "open"
+        }
+      ],
+      "purpose": "route progress and pane selection",
+      "feedback": [],
+      "components": [
+        {
+          "id": "panes",
+          "box": {
+            "h": 70,
+            "w": 88,
+            "x": 6,
+            "y": 8
+          },
+          "type": "route_cards",
+          "label": "Pane Cards",
+          "enabled_when": "unlocked",
+          "state_binding": "route",
+          "interaction_role": "select"
+        },
+        {
+          "id": "open",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 83
+          },
+          "type": "button",
+          "label": "VIEW",
+          "enabled_when": "selected",
+          "state_binding": "selected",
+          "interaction_role": "advance"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "pane_brief",
+          "from": "selected",
+          "trigger": "open",
+          "animation": "slide",
+          "condition": "selected"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "select pane",
+          "target": "panes",
+          "feedback": "outline",
+          "precondition": "unlocked",
+          "state_change": "selected",
+          "invalid_input": "locked cue"
+        },
+        {
+          "input": "tap",
+          "action": "open brief",
+          "target": "open",
+          "feedback": "press",
+          "precondition": "selected",
+          "state_change": "brief",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "pane_brief",
+      "name": "Pane Brief",
+      "order": 2,
+      "layout": {
+        "regions": [
+          {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 8,
+            "id": "preview",
+            "role": "preview",
+            "label": "Pane"
+          },
+          {
+            "h": 24,
+            "w": 84,
+            "x": 8,
+            "y": 54,
+            "id": "goals",
+            "role": "brief",
+            "label": "Goals"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "brief",
+          "ui": "goals",
+          "enter": "pane selected",
+          "allowed_input": "start/back"
+        }
+      ],
+      "purpose": "goals/discovery/hazard brief",
+      "feedback": [],
+      "components": [
+        {
+          "id": "preview",
+          "box": {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 8
+          },
+          "type": "preview",
+          "label": "Pane Preview",
+          "state_binding": "brief"
+        },
+        {
+          "id": "goals",
+          "box": {
+            "h": 24,
+            "w": 84,
+            "x": 8,
+            "y": 54
+          },
+          "type": "goal_card",
+          "label": "90% + discovery",
+          "state_binding": "brief"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 8,
+            "y": 83
+          },
+          "type": "button",
+          "label": "BACK",
+          "state_binding": "brief",
+          "interaction_role": "back"
+        },
+        {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 44,
+            "x": 48,
+            "y": 83
+          },
+          "type": "button",
+          "label": "START",
+          "enabled_when": "loaded",
+          "state_binding": "brief",
+          "interaction_role": "start"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "window_cleaning",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "fade",
+          "condition": "loaded"
+        },
+        {
+          "to": "night_route",
+          "from": "brief",
+          "trigger": "back",
+          "animation": "slide",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "instantiate masks/nodes/hazards",
+          "target": "start",
+          "feedback": "fade",
+          "precondition": "loaded",
+          "state_change": "cleaning_idle",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "window_cleaning",
+      "name": "Window Cleaning",
+      "order": 3,
+      "layout": {
+        "regions": [
+          {
+            "h": 7,
+            "w": 92,
+            "x": 4,
+            "y": 4,
+            "id": "hud",
+            "role": "status",
+            "label": "Metrics"
+          },
+          {
+            "h": 68,
+            "w": 78,
+            "x": 5,
+            "y": 13,
+            "id": "glass",
+            "role": "play",
+            "label": "Glass"
+          },
+          {
+            "h": 68,
+            "w": 10,
+            "x": 85,
+            "y": 13,
+            "id": "rope",
+            "role": "reposition",
+            "label": "Rope"
+          },
+          {
+            "h": 13,
+            "w": 66,
+            "x": 5,
+            "y": 83,
+            "id": "dock",
+            "role": "tools",
+            "label": "Tools"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "cleaning_idle",
+          "ui": "glass/rope/tools",
+          "enter": "start/release/overlay close",
+          "allowed_input": "reposition/tool/gesture/node/finish/pause"
+        },
+        {
+          "id": "tool_gesture",
+          "ui": "current tool locked",
+          "enter": "valid cleaning gesture",
+          "allowed_input": "continue/release"
+        },
+        {
+          "id": "hazard_warning",
+          "ui": "warning+latch",
+          "enter": "telegraph",
+          "allowed_input": "latch"
+        }
+      ],
+      "purpose": "core cleaning/reach/discovery workspace",
+      "feedback": [
+        "mist",
+        "scrub texture",
+        "glide",
+        "streak",
+        "limit arc",
+        "hazard creak"
+      ],
+      "components": [
+        {
+          "id": "glass",
+          "box": {
+            "h": 68,
+            "w": 78,
+            "x": 5,
+            "y": 13
+          },
+          "type": "mask_canvas",
+          "label": "Surface",
+          "enabled_when": "!hazard_warning",
+          "state_binding": "cleaning_idle|tool_gesture",
+          "interaction_role": "spray/scrub/squeegee/node"
+        },
+        {
+          "id": "reach",
+          "box": {
+            "h": 36,
+            "w": 78,
+            "x": 5,
+            "y": 24
+          },
+          "type": "reach_overlay",
+          "label": "Reach Band",
+          "state_binding": "cleaning_idle",
+          "interaction_role": "spatial constraint"
+        },
+        {
+          "id": "rope",
+          "box": {
+            "h": 68,
+            "w": 10,
+            "x": 85,
+            "y": 13
+          },
+          "type": "vertical_handle",
+          "label": "Carriage",
+          "enabled_when": "!tool_gesture&&!hazard_warning",
+          "state_binding": "cleaning_idle",
+          "interaction_role": "vertical reposition"
+        },
+        {
+          "id": "clean",
+          "box": {
+            "h": 7,
+            "w": 28,
+            "x": 5,
+            "y": 4
+          },
+          "type": "meter",
+          "label": "Clean %",
+          "state_binding": "cleaning_idle|tool_gesture"
+        },
+        {
+          "id": "streak",
+          "box": {
+            "h": 7,
+            "w": 24,
+            "x": 36,
+            "y": 4
+          },
+          "type": "meter",
+          "label": "Streak %",
+          "state_binding": "cleaning_idle|tool_gesture"
+        },
+        {
+          "id": "tools",
+          "box": {
+            "h": 13,
+            "w": 66,
+            "x": 5,
+            "y": 83
+          },
+          "type": "tool_tray",
+          "label": "Spray Sponge Squeegee",
+          "enabled_when": "!tool_gesture&&!hazard_warning",
+          "state_binding": "cleaning_idle",
+          "interaction_role": "select tool"
+        },
+        {
+          "id": "finish",
+          "box": {
+            "h": 8,
+            "w": 22,
+            "x": 73,
+            "y": 83
+          },
+          "type": "button",
+          "label": "FINISH",
+          "enabled_when": "cleanliness>=0.90&&discovery_complete",
+          "state_binding": "cleaning_idle",
+          "interaction_role": "finish"
+        },
+        {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 85,
+            "y": 4
+          },
+          "type": "button",
+          "label": "II",
+          "enabled_when": "!tool_gesture&&!hazard_warning",
+          "state_binding": "cleaning_idle",
+          "interaction_role": "pause"
+        },
+        {
+          "id": "latch",
+          "box": {
+            "h": 14,
+            "w": 12,
+            "x": 84,
+            "y": 65
+          },
+          "type": "latch",
+          "label": "SAFETY",
+          "enabled_when": "hazard_warning",
+          "state_binding": "hazard_warning",
+          "interaction_role": "highest priority"
+        }
+      ],
+      "edge_cases": [
+        "hazard waits for active gesture release",
+        "third miss fails"
+      ],
+      "transitions": [
+        {
+          "to": "tool_gesture",
+          "from": "cleaning_idle",
+          "trigger": "cleaning gesture",
+          "animation": "none",
+          "condition": "tool+reach"
+        },
+        {
+          "to": "cleaning_idle",
+          "from": "tool_gesture",
+          "trigger": "release",
+          "animation": "none",
+          "condition": "always"
+        },
+        {
+          "to": "discovery_overlay",
+          "from": "cleaning_idle",
+          "trigger": "revealed node",
+          "animation": "stars",
+          "condition": "local reveal>=0.70"
+        },
+        {
+          "to": "hazard_warning",
+          "from": "cleaning_idle",
+          "trigger": "hazard schedule",
+          "animation": "telegraph",
+          "condition": "hazard pane"
+        },
+        {
+          "to": "cleaning_idle",
+          "from": "hazard_warning",
+          "trigger": "latch/miss resolution",
+          "animation": "none",
+          "condition": "resolved"
+        },
+        {
+          "to": "pause",
+          "from": "cleaning_idle",
+          "trigger": "pause",
+          "animation": "modal",
+          "condition": "idle"
+        },
+        {
+          "to": "pane_result",
+          "from": "cleaning_idle",
+          "trigger": "finish",
+          "animation": "fade",
+          "condition": "enabled"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "hold-drag",
+          "action": "apply wet mask",
+          "target": "glass",
+          "feedback": "sheen/droplets",
+          "precondition": "spray selected && in reach",
+          "state_change": "dry→wet",
+          "invalid_input": "outside reach unchanged + limit arc"
+        },
+        {
+          "input": "rub path",
+          "action": "reduce dirt strength",
+          "target": "glass",
+          "feedback": "erase/squeak",
+          "precondition": "sponge selected && in reach",
+          "state_change": "wet→loosened",
+          "invalid_input": "dry hard dirt very low effect + scrape"
+        },
+        {
+          "input": "directional drag",
+          "action": "sweep blade path",
+          "target": "glass",
+          "feedback": "clean band/glide",
+          "precondition": "squeegee selected && in reach",
+          "state_change": "wet/loosened→clear or streak",
+          "invalid_input": "clip at reach boundary"
+        },
+        {
+          "input": "vertical drag",
+          "action": "move carriage/reach",
+          "target": "rope",
+          "feedback": "tension/band shift",
+          "precondition": "idle",
+          "state_change": "working zone",
+          "invalid_input": "bounds clamp"
+        },
+        {
+          "input": "tap",
+          "action": "lock carriage",
+          "target": "latch",
+          "feedback": "tighten/tick",
+          "precondition": "hazard_warning",
+          "state_change": "cleaning_idle",
+          "invalid_input": "other taps ignored"
+        },
+        {
+          "input": "tap",
+          "action": "score pane",
+          "target": "finish",
+          "feedback": "press",
+          "precondition": "finish requirements",
+          "state_change": "result",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "wet",
+          "name": "Wet",
+          "notes": "wet mask exact path",
+          "condition": "spray path",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "glass": {
+              "state_binding": "wet"
+            }
+          }
+        },
+        {
+          "id": "loosened",
+          "name": "Loosened",
+          "notes": "strength decreases in 18dp radius",
+          "condition": "wet dirt scrubbed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "glass": {
+              "state_binding": "loosened"
+            }
+          }
+        },
+        {
+          "id": "clear",
+          "name": "Clear",
+          "notes": "blade-width band",
+          "condition": "squeegee over prepared area",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "glass": {
+              "state_binding": "clear"
+            }
+          }
+        },
+        {
+          "id": "streaked",
+          "name": "Streaked",
+          "notes": "persistent score state",
+          "condition": "dirty blade/abrupt reversal",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "glass": {
+              "state_binding": "streaked"
+            }
+          }
+        },
+        {
+          "id": "out_of_reach",
+          "name": "Reach Limit",
+          "notes": "no surface mutation",
+          "condition": "pointer outside band",
+          "components": [
+            {
+              "id": "limit_arc",
+              "box": {
+                "h": 68,
+                "w": 78,
+                "x": 5,
+                "y": 13
+              },
+              "type": "boundary",
+              "label": "Rope Limit",
+              "state_binding": "out_of_reach"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        {
+          "id": "finish_ready",
+          "name": "Finish Ready",
+          "notes": "actionable",
+          "condition": "clean>=90% and discovery complete",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "finish": {
+              "state_binding": "enabled"
+            }
+          }
+        }
+      ],
+      "implementation_notes": [
+        "priority hazard > active tool > discovery node > rope > background",
+        "surface masks are authoritative state"
+      ]
+    },
+    {
+      "id": "discovery_overlay",
+      "name": "Discovery Overlay",
+      "order": 4,
+      "layout": {
+        "regions": [
+          {
+            "h": 62,
+            "w": 72,
+            "x": 8,
+            "y": 16,
+            "id": "stars",
+            "role": "trace",
+            "label": "Nodes"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "discovery",
+          "ui": "eligible nodes",
+          "enter": "revealed node",
+          "allowed_input": "trace/close"
+        },
+        {
+          "id": "tracing",
+          "ui": "chain",
+          "enter": "first valid node",
+          "allowed_input": "trace/release"
+        }
+      ],
+      "purpose": "trace revealed constellation on same pane state",
+      "feedback": [
+        "node bloom",
+        "completion phrase"
+      ],
+      "components": [
+        {
+          "id": "nodes",
+          "box": {
+            "h": 62,
+            "w": 72,
+            "x": 8,
+            "y": 16
+          },
+          "type": "node_graph",
+          "label": "Nodes",
+          "enabled_when": "local_reveal>=0.70",
+          "state_binding": "discovery",
+          "interaction_role": "node +14dp trace"
+        },
+        {
+          "id": "chain",
+          "box": {
+            "h": 62,
+            "w": 72,
+            "x": 8,
+            "y": 16
+          },
+          "type": "path",
+          "label": "Chain",
+          "state_binding": "tracing"
+        },
+        {
+          "id": "close",
+          "box": {
+            "h": 9,
+            "w": 23,
+            "x": 72,
+            "y": 84
+          },
+          "type": "button",
+          "label": "CLOSE",
+          "state_binding": "discovery",
+          "interaction_role": "close"
+        }
+      ],
+      "edge_cases": [
+        "hidden node no input"
+      ],
+      "transitions": [
+        {
+          "to": "window_cleaning",
+          "from": "discovery",
+          "trigger": "close/complete",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "node drag",
+          "action": "connect ordered nodes",
+          "target": "nodes",
+          "feedback": "starlight/bell",
+          "precondition": "revealed",
+          "state_change": "chain advances",
+          "invalid_input": "wrong node pulses; chain preserved"
+        },
+        {
+          "input": "drag leaves radius",
+          "action": "retract extension",
+          "target": "nodes",
+          "feedback": "line retract",
+          "precondition": "tracing",
+          "state_change": "last valid preserved",
+          "invalid_input": "no pane loss"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "revealed",
+          "name": "Revealed",
+          "notes": "interactive",
+          "condition": "local reveal>=0.70",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "nodes": {
+              "state_binding": "revealed"
+            }
+          }
+        },
+        {
+          "id": "connected",
+          "name": "Connected",
+          "notes": "persists",
+          "condition": "all required nodes ordered",
+          "components": [
+            {
+              "id": "creature",
+              "box": {
+                "h": 45,
+                "w": 58,
+                "x": 15,
+                "y": 22
+              },
+              "type": "success_reveal",
+              "label": "Creature",
+              "state_binding": "complete"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        }
+      ],
+      "implementation_notes": [
+        "shares PaneRuntime"
+      ]
+    },
+    {
+      "id": "pause",
+      "name": "Pause Overlay",
+      "order": 5,
+      "layout": {
+        "regions": [
+          {
+            "h": 34,
+            "w": 70,
+            "x": 15,
+            "y": 32,
+            "id": "panel",
+            "role": "modal",
+            "label": "Pause"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "paused",
+          "ui": "blocked pane",
+          "enter": "pause",
+          "allowed_input": "resume/quit"
+        }
+      ],
+      "purpose": "pause pane",
+      "feedback": [],
+      "components": [
+        {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 41
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused",
+          "interaction_role": "resume"
+        },
+        {
+          "id": "quit",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 54
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused",
+          "interaction_role": "quit"
+        }
+      ],
+      "edge_cases": [
+        "background blocked"
+      ],
+      "transitions": [
+        {
+          "to": "window_cleaning",
+          "from": "paused",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        },
+        {
+          "to": "night_route",
+          "from": "paused",
+          "trigger": "confirmed quit",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "restore pane",
+          "target": "resume",
+          "feedback": "fade",
+          "precondition": "paused",
+          "state_change": "cleaning_idle",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "pane_result",
+      "name": "Pane Result",
+      "order": 6,
+      "layout": {
+        "regions": [
+          {
+            "h": 62,
+            "w": 84,
+            "x": 8,
+            "y": 12,
+            "id": "metrics",
+            "role": "result",
+            "label": "Metrics"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "result",
+          "ui": "metrics",
+          "enter": "finish/3 misses",
+          "allowed_input": "retry/next"
+        }
+      ],
+      "purpose": "metrics and retry/next",
+      "feedback": [],
+      "components": [
+        {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 50,
+            "x": 25,
+            "y": 12
+          },
+          "type": "rating",
+          "label": "1-3 Stars",
+          "state_binding": "result"
+        },
+        {
+          "id": "metrics",
+          "box": {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 32
+          },
+          "type": "metric_grid",
+          "label": "Clean Streak Usage Discovery",
+          "state_binding": "result"
+        },
+        {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 82
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "result",
+          "interaction_role": "retry"
+        },
+        {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "NEXT",
+          "enabled_when": "success",
+          "state_binding": "result",
+          "interaction_role": "next"
+        }
+      ],
+      "edge_cases": [
+        "reset masks/discovery/hazards"
+      ],
+      "transitions": [
+        {
+          "to": "pane_brief",
+          "from": "result",
+          "trigger": "retry/next",
+          "animation": "fade",
+          "condition": "route remains"
+        },
+        {
+          "to": "route_complete",
+          "from": "result",
+          "trigger": "next",
+          "animation": "fade",
+          "condition": "third route pane complete"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "reset pane runtime",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "brief",
+          "invalid_input": "none"
+        },
+        {
+          "input": "tap",
+          "action": "advance route",
+          "target": "next",
+          "feedback": "unlock",
+          "precondition": "success",
+          "state_change": "brief/route_complete",
+          "invalid_input": "disabled"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    },
+    {
+      "id": "route_complete",
+      "name": "Route Complete",
+      "order": 7,
+      "layout": {
+        "regions": [
+          {
+            "h": 50,
+            "w": 80,
+            "x": 10,
+            "y": 18,
+            "id": "summary",
+            "role": "summary",
+            "label": "Summary"
+          }
+        ]
+      },
+      "states": [
+        {
+          "id": "route_complete",
+          "ui": "summary",
+          "enter": "third success",
+          "allowed_input": "return"
+        }
+      ],
+      "purpose": "close 3-pane route",
+      "feedback": [],
+      "components": [
+        {
+          "id": "summary",
+          "box": {
+            "h": 50,
+            "w": 80,
+            "x": 10,
+            "y": 18
+          },
+          "type": "summary",
+          "label": "Route Summary",
+          "state_binding": "route_complete"
+        },
+        {
+          "id": "back",
+          "box": {
+            "h": 10,
+            "w": 64,
+            "x": 18,
+            "y": 78
+          },
+          "type": "button",
+          "label": "BACK TO ROUTE",
+          "state_binding": "route_complete",
+          "interaction_role": "return"
+        }
+      ],
+      "edge_cases": [],
+      "transitions": [
+        {
+          "to": "night_route",
+          "from": "route_complete",
+          "trigger": "return",
+          "animation": "fade",
+          "condition": "always"
+        }
+      ],
+      "interactions": [
+        {
+          "input": "tap",
+          "action": "return route",
+          "target": "back",
+          "feedback": "press",
+          "precondition": "complete",
+          "state_change": "route",
+          "invalid_input": "none"
+        }
+      ],
+      "state_variants": [],
+      "implementation_notes": []
+    }
+  ],
+  "version": "v0.2",
+  "design_id": "87eb607d-75a3-4681-9d9a-1e9f412c1b81",
+  "input_map": [
+    {
+      "input": "latch tap",
+      "cancel": "none",
+      "priority": 6
+    },
+    {
+      "input": "active cleaning gesture",
+      "cancel": "release commits path",
+      "priority": 5
+    },
+    {
+      "input": "node drag",
+      "cancel": "preserve last valid chain",
+      "priority": 4
+    },
+    {
+      "input": "rope drag",
+      "cancel": "snap band",
+      "priority": 3
+    },
+    {
+      "input": "tool tap",
+      "cancel": "none",
+      "priority": 2
+    }
+  ],
+  "created_at": "2026-09-29T14:32:22.16922+00:00",
+  "edge_cases": [
+    {
+      "case": "outside reach",
+      "recovery": "clip/reject unchanged"
+    },
+    {
+      "case": "dry scrub",
+      "recovery": "low effect + scrape"
+    },
+    {
+      "case": "wrong node",
+      "recovery": "pulse; preserve chain"
+    },
+    {
+      "case": "hazard during gesture",
+      "recovery": "defer to release"
+    },
+    {
+      "case": "pane change",
+      "recovery": "reset runtime"
+    }
+  ],
+  "updated_at": "2026-09-29T14:32:22.16922+00:00",
+  "core_screen": "Window Cleaning",
+  "orientation": "portrait",
+  "screen_flow": {
+    "guards": [
+      "finish cleanliness>=0.90 and discovery complete",
+      "node local reveal>=0.70",
+      "reposition disabled during tool gesture"
+    ],
+    "normal": [
+      "night_route",
+      "pane_brief",
+      "window_cleaning",
+      "pane_result",
+      "pane_brief|route_complete"
+    ],
+    "branches": [
+      "window_cleaning→discovery_overlay→window_cleaning",
+      "window_cleaning→hazard_warning→window_cleaning",
+      "window_cleaning→pause→window_cleaning"
+    ],
+    "recovery": [
+      "out-of-reach unchanged",
+      "invalid node preserves chain",
+      "release commits tool path"
+    ]
+  },
+  "state_count": 17,
+  "screen_count": 7,
+  "global_states": [
+    {
+      "id": "paused",
+      "rule": "freeze pane runtime"
+    },
+    {
+      "id": "hazard_warning",
+      "rule": "latch exclusive"
+    },
+    {
+      "id": "tool_lock",
+      "rule": "active tool locks switch/reposition"
+    },
+    {
+      "id": "failure",
+      "rule": "third hazard miss→result"
+    }
+  ],
+  "pack_markdown": "# Moonlight Window Washer — Interaction Wireframe Pack v0.2\n\nPortrait greybox. Seven inventory surfaces preserved. Core screen uses authoritative surface masks, explicit reach band, three distinct cleaning gestures, shared-state discovery, hazard priority and finish gating.",
+  "source_run_at": "2026-09-29T14:32:22.16922+00:00",
+  "target_device": "mobile",
+  "global_ui_rules": {
+    "glass": "70-80%",
+    "camera": "fixed",
+    "coords": "0-100%",
+    "min_touch": "44dp",
+    "safe_area": "4%",
+    "tool_dock": "bottom",
+    "rope_gutter": "right"
+  },
+  "developer_handoff": {
+    "persistence": "route/discovery collection only; pane runtime transient",
+    "required_data": [
+      "PaneCase",
+      "SurfaceMaskState",
+      "ConstellationPattern",
+      "HazardSchedule",
+      "RouteProgress"
+    ],
+    "scene_hierarchy": [
+      "AppRoot",
+      "RouteRouter",
+      "PaneController",
+      "GlassSurface",
+      "RopeGutter",
+      "HUDLayer",
+      "ToolDock",
+      "DiscoveryLayer",
+      "OverlayLayer"
+    ],
+    "state_ownership": {
+      "RopeGutter": "reach",
+      "RouteRouter": "progress",
+      "GlassSurface": "dirt/water masks",
+      "DiscoveryLayer": "nodes on same runtime",
+      "PaneController": "metrics/hazard/finish"
+    },
+    "reusable_components": [
+      "SurfaceMaskController",
+      "SprayTool",
+      "ScrubTool",
+      "SqueegeeTool",
+      "ReachBand",
+      "RopeHandle",
+      "ConstellationGraph",
+      "SafetyLatch"
+    ],
+    "implementation_order": [
+      "data",
+      "routing",
+      "masks/reach",
+      "spray",
+      "scrub",
+      "squeegee",
+      "rope",
+      "discovery",
+      "hazard",
+      "score/reset"
+    ]
+  },
+  "acceptance_criteria": [
+    "All 7 inventory screens/overlays reachable",
+    "Spray, scrub and squeegee mutate the same pane through distinct path rules",
+    "Dry hardened dirt scrub has visibly lower effect",
+    "Out-of-reach input does not mutate surface",
+    "Rope reposition changes actual reachable band and is locked during tool gesture",
+    "Squeegee can create persistent streak state",
+    "Nodes interactive only after 70% local reveal and invalid node preserves chain",
+    "Finish disabled until 90% clean plus discovery complete",
+    "Hazard latch highest priority and third miss fails",
+    "Retry/next clears pane runtime"
+  ],
+  "primary_interaction": "spray → scrub → directional squeegee + rope reach → constellation trace",
+  "interaction_principles": [
+    "Surface state follows finger path",
+    "Active tool gesture owns input",
+    "Rope reach is hard spatial constraint",
+    "Discovery shares pane state",
+    "Hazard latch highest priority"
+  ]
+}

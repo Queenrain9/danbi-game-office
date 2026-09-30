@@ -1,0 +1,170 @@
+{
+  "id": "7c31b077-07d9-42a3-bee4-fb6f0bc5264a",
+  "title": "Rumor Market",
+  "source": "chat_automation",
+  "status": "design",
+  "economy": "Influence start3; seed-1; end-day+1 cap3; 신규 objective+1 cap3. Reputation=failure meter.",
+  "idea_id": "1b53baba-c389-45ee-82b7-18a533905fd7",
+  "version": "v0.1",
+  "one_line": "작은 마을에서 사실과 거짓이 섞인 소문을 사람 사이에 흘려 가격·관계·행동을 변화시키고 그 파장을 이용하는 정보 전략 게임.",
+  "core_loop": "관찰→소문 선택→seed→2-hop 전파/변형→가격·행동·관계 변화→목표 확인→다음 날.",
+  "mvp_scope": "3 scenarios; 6-8 NPC; 5 days; 3 claims; true/false; deterministic2-hop; rival mutation; effects; resources; objectives; pause/retry; ledger.",
+  "created_at": "2026-09-30T13:12:28.920097+00:00",
+  "game_rules": {
+    "effects": "price ±potency*10% next-day; desire action ±potency; reputation attitude ±potency capped3",
+    "exposure": "false reaches subject/source_trust2 witness => Reputation-1; remove temp price/desire",
+    "mutation": "false+rival flips once",
+    "recovery": "invalid zero mutation; no-seed legal; retry reset",
+    "acceptance": "potency+interest+source_trust-skepticism >=3",
+    "propagation": "deterministic max2 hops; highest trust edge; stable-id tie; no duplicate"
+  },
+  "not_in_mvp": [
+    "free-text rumor",
+    "procedural dialogue",
+    "multiplayer",
+    "open-world",
+    "combat",
+    "permanent upgrades",
+    "multiple seeds/day",
+    "hidden random propagation"
+  ],
+  "updated_at": "2026-09-30T13:12:45.013616+00:00",
+  "archived_at": "2026-09-30T13:12:45.013616+00:00",
+  "known_risks": [
+    "2-hop readability",
+    "over-predictable forwarding",
+    "exposure clarity",
+    "one-day effect visibility",
+    "objective reachability"
+  ],
+  "progression": "3 scenarios 선형 unlock; day1→5; permanent upgrade 없음.",
+  "screen_flow": "Select→Brief→Planning↔Detail→Confirm→Propagation→Result→next Planning; day5/Reputation0→Run Result; pause resume; retry day1.",
+  "state_model": [
+    {
+      "exit": "PLANNING",
+      "name": "START"
+    },
+    {
+      "exit": "SEEDING/PROPAGATION",
+      "name": "PLANNING"
+    },
+    {
+      "exit": "PROPAGATION",
+      "name": "SEEDING"
+    },
+    {
+      "exit": "RESULT/RUN_END",
+      "name": "PROPAGATION"
+    },
+    {
+      "exit": "PLANNING/RUN_END",
+      "name": "RESULT"
+    },
+    {
+      "exit": "previous",
+      "name": "PAUSED"
+    },
+    {
+      "exit": "START",
+      "name": "RUN_END"
+    }
+  ],
+  "archive_path": "projects/rumor-market/game-design",
+  "archive_repo": "Queenrain9/danbi-game-office",
+  "content_unit": "rumor fragment + directed NPC network + 2-objective 5-day scenario",
+  "content_model": {
+    "npc": "6-8 with skepticism/interests/actions/attitudes",
+    "edge": "directed trust0-3 + type",
+    "shop": "owner/base/temp modifier",
+    "rumor": "subject/claim/polarity/truth/potency/source",
+    "scenario": "network+fragments+2 objectives+5 days"
+  },
+  "source_run_at": "2026-09-30T13:12:28.920097+00:00",
+  "archive_commit": "0da485377027f5e387d08a2d92b0ffbaba08b851",
+  "human_priority": false,
+  "player_fantasy": "욕구와 관계를 읽고 한 문장으로 마을을 움직이는 소문 설계자.",
+  "session_length": "8-12 minutes",
+  "test_scenarios": [
+    "Success: potency3 price rumor reaches shopkeeper => -30%; day5 both goals true.",
+    "Failure: Reputation1 false rumor reaches subject => exposure =>0.",
+    "Mutation: false rumor rival-cross flips once.",
+    "Rejection score2 stops.",
+    "No-seed restores Influence end-day.",
+    "Invalid second seed zero mutation."
+  ],
+  "design_markdown": "# Rumor Market — Playable Game Design Spec v0.1\n## 1. Product Definition\n소문을 한 사람에게 흘리고 결정론적 관계망 파장으로 시장·행동·관계를 바꾸는 5일 정보 전략 게임.\n## 2. Player Fantasy\n욕구와 관계를 읽어 한 문장으로 마을을 움직이는 소문 설계자.\n## 3. Core Player Verbs\nObserve(tap NPC/shop→known info); Seed(select rumor+NPC, Influence>=1→Influence-1/active rumor); Advance(confirm→propagation/effects); Inspect(result→causal ledger, no mutation).\n## 4. Core Loop\n관찰→소문 선택→NPC seed→최대2-hop 전파/변형→가격·행동·관계 변화→목표 확인→다음 날 설계.\n## 5. Round / Session Structure\n5일. Planning→Seeding→Propagation→Result. Influence3, Reputation3, hand4, 하루 최대1 seed. Day5 objective2개 모두 true=success. Reputation0=즉시 fail. Pause exact resume; Retry day1 reset.\n## 6. Game Rules\nDirected edge trust0-3/type friend-rival-customer-supplier; trust>=1만 전파. Rumor=subject/claim(price,desire,reputation)/polarity/truth/potency1-3/source. Acceptance=potency+interest0-2+source_trust0-2-skepticism0-2; >=3 accept. Deterministic breadth-first max2 hops; accepter는 highest-trust eligible edge 하나로 forward, tie=stable NPC id, duplicate recipient 금지. False rumor가 rival edge를 건너면 polarity 1회만 flip; truthful은 flip 없음. Price=potency*10% next-day modifier; desire=action priority ±potency; reputation=attitude ±potency capped -3..3. False rumor가 named subject 또는 source_trust2 witness에 닿으면 effects 후 expose: Reputation-1, temporary price/desire 제거, attitude 유지. Influence start3; seed-1; end-day+1 cap3; 신규 objective+1 cap3. Invalid=zero mutation. Influence0은 no-seed 가능.\n## 7. State Model\nSCENARIO_START→PLANNING→SEEDING(or no-seed)→PROPAGATION→RESULT→next PLANNING/RUN_END. Reputation0→RUN_END. PAUSED→previous/quit. RUN_END→clean retry.\n## 8. Interaction Spec\nPlanning inspection non-mutating; seed confirm만 resource 소비; propagation은 atomic hop 사이 pause 외 input lock; invalid target/unowned/Influence0 seed/second seed zero mutation; Result inspect non-mutating.\n## 9. Content Model\nScenario=6-8 NPC(skepticism/interests/actions/attitudes)+directed typed trust edges+rumor fragments+shops(owner/base/temp modifier)+exactly2 measurable objectives. Topology가 판정에 직접 관여.\n## 10. Difficulty / Variation\n초반 sparse6/potency2-3/명확한 interests; 후반7-8/rival/mixed skepticism/potency1-3/indirect second-hop objectives. 속도 압박 없음.\n## 11. Progression\n3 scenarios 선형 unlock; scenario 내부 day1→5+objective states; permanent upgrades 없음.\n## 12. Economy\nInfluence only: start3, seed-1, end-day+1 cap3, 신규 objective+1 cap3. Reputation=failure meter.\n## 13. Screen Inventory\nScenario Select; Brief; Town Planning; Rumor Detail; Seed Confirmation; Propagation; Day Result/Causal Ledger; Pause; Run Result.\n## 14. Screen Flow\nSelect→Brief→Planning↔Detail→Confirm→Propagation→Result→next Planning. No-seed→Propagation. Day5/Reputation0→Run Result. Pause exact resume; Retry day1.\n## 15. Feedback System\nBefore: interests/trust/type/price/objectives. During: accept/reject/chosen edge/rival flip/exposure. After: exact deltas/objectives/Influence/Reputation/causal path. Invalid exact reason.\n## 16. Visual Direction Brief\nPortrait compact town information board. NPC/shop identity stable; relationship/rumor overlays contextual. 6-8 actors 비교와 causal readability 우선; 좌표 미확정.\n## 17. MVP Scope + NOT IN MVP\nMVP=3 scenarios, 6-8 NPC, 5 days, 3 claims, true/false, deterministic2-hop, rival mutation, price/action/attitude, resources, objectives, pause/retry, ledger. NOT=free-text rumor, generated dialogue, multiplayer, open-world, combat, permanent upgrades, multiple seeds/day, hidden random rolls.\n## 18. Test Scenarios\nSuccess: potency3 negative price rumor A accept→trust3 shopkeeper B→-30% next day; day5 both goals true/Reputation>=1. Failure: Reputation1 false reputation rumor reaches named subject→exposure→0. Mutation: false negative desire rival-cross→positive once. Rejection score2 stops. No-seed Influence0→end-day1. Invalid second seed zero mutation.\n## 19. Known Risks\n2-hop readability; over-predictable forwarding; exposure clarity; one-day effect visibility; unreachable objective pairs—scenario reachability validation required.\n## 20. Wireframe Handoff\nfun_promise: 한 사람에게 흘린 소문이 관계망에서 받아들여지고 때로 뒤집히며 가격·관계·행동을 바꾸는 파장을 예측하고 이용하는 재미. 9 screens/states, no-seed, exposure failure, day5 outcome, pause/retry를 표현. Directed trust, acceptance inputs, deterministic forward, 2-hop limit, one-time rival flip 보존. Feedback=accept→forward/mutation→effect→exposure. 새 random rule 금지.",
+  "feedback_system": {
+    "after": [
+      "deltas",
+      "causal path"
+    ],
+    "before": [
+      "interest",
+      "trust",
+      "price",
+      "objective"
+    ],
+    "during": [
+      "accept/reject",
+      "edge",
+      "flip",
+      "exposure"
+    ],
+    "invalid": "reason"
+  },
+  "round_structure": "5일; Planning→Seeding→Propagation→Result; Influence3/Reputation3/hand4; 하루1 seed; day5 objectives2/2 success; Reputation0 fail; pause exact resume; retry reset.",
+  "interaction_spec": {
+    "seed": "confirm consumes Influence1",
+    "result": "inspect ledger",
+    "invalid": "zero mutation",
+    "resolve": "system-driven; pause between hops",
+    "planning": "inspect non-mutating"
+  },
+  "screen_inventory": [
+    "Scenario Select",
+    "Scenario Brief",
+    "Town Planning",
+    "Rumor Detail",
+    "Seed Confirmation",
+    "Propagation View",
+    "Day Result/Causal Ledger",
+    "Pause Overlay",
+    "Run Result"
+  ],
+  "core_player_verbs": [
+    {
+      "verb": "observe",
+      "input": "tap",
+      "target": "NPC/shop",
+      "feedback": "fact card",
+      "condition": "planning",
+      "state_change": "known info"
+    },
+    {
+      "verb": "seed",
+      "input": "select rumor+NPC",
+      "target": "NPC",
+      "feedback": "reaction",
+      "condition": "Influence>=1",
+      "state_change": "Influence-1, active rumor"
+    },
+    {
+      "verb": "advance",
+      "input": "confirm",
+      "target": "day",
+      "feedback": "ledger",
+      "condition": "seed/no-seed",
+      "state_change": "propagate/effects"
+    }
+  ],
+  "human_priority_at": null,
+  "wireframe_handoff": [
+    "fun_promise: 한 사람에게 흘린 소문의 관계망 파장을 예측하고 이용하는 재미.",
+    "Represent all 9 screens/states, no-seed, exposure failure, day5 outcome, pause/retry.",
+    "Preserve directed trust, deterministic 2-hop, one-time rival flip.",
+    "Feedback order accept→forward/mutation→effect→exposure; no new random rules."
+  ],
+  "primary_interaction": "관계망을 관찰하고 소문 하나를 NPC 한 명에게 seed한 뒤 deterministic 2-hop 파장을 읽는다.",
+  "difficulty_variation": "초반 sparse6/potency2-3; 후반7-8/rival/mixed skepticism/potency1-3/indirect second-hop objective.",
+  "visual_direction_brief": "Portrait compact town information board; stable NPC/shop identity; contextual relationship/rumor overlays; causal readability first; no coordinates."
+}
