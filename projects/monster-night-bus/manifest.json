@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Monster Night Bus",
+  "slug": "monster-night-bus",
+  "idea_id": "33810b99-e8e6-4c1d-bf65-2faf54c32e0d",
+  "design_id": "0b832354-bf86-46c8-8ecd-7a851f5b7aeb",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/monster-night-bus",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/monster-night-bus/game-design/",
+    "wireframe": "projects/monster-night-bus/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/monster-night-bus/playtest/",
+    "visual": "projects/monster-night-bus/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "6a3d73ff-77a7-4a27-8ebc-9e63c7c6fbf0",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Parcel X-Ray Night Shift",
+  "slug": "parcel-x-ray-night-shift",
+  "idea_id": "422762b7-fdb5-446a-a939-bbcd755cbdb2",
+  "design_id": "8336d50a-9b52-4295-9b7c-f648010b776f",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/parcel-x-ray-night-shift",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/parcel-x-ray-night-shift/game-design/",
+    "wireframe": "projects/parcel-x-ray-night-shift/wireframe/",
+    "implementation": "projects/parcel-x-ray-night-shift/implementation/",
+    "build": "projects/parcel-x-ray-night-shift/build/",
+    "fidelity": "projects/parcel-x-ray-night-shift/fidelity/",
+    "playtest": "projects/parcel-x-ray-night-shift/playtest/",
+    "visual": "projects/parcel-x-ray-night-shift/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "e023e9c0-b1b7-4fc4-a0e7-996c7d95c099",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+        "version": "v0.1",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e"
+      }
+    ],
+    "builds": [
+      {
+        "id": "9cf75474-c24f-48e2-a91c-74de92df5946",
+        "status": "fidelity_pending",
+        "project_path": "builds/parcel-x-ray-night-shift",
+        "final_commit": "987a6c1095fbf9047702ea242a080c68ba003deb",
+        "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": [
+      {
+        "id": "f5e889d6-4608-4e75-ac6a-0708400e5845",
+        "round": 1,
+        "verdict": "fail",
+        "reviewed_commit": "9c32a6e5f2dea475be2b0e8ceafeb0ce862c0121",
+        "blueprint_hash": null
+      }
+    ]
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

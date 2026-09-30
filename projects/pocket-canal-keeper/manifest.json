@@ -1,0 +1,54 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Pocket Canal Keeper",
+  "slug": "pocket-canal-keeper",
+  "idea_id": "ae75ee43-2f25-40f6-9c27-a43030891f4e",
+  "design_id": "69cfd48e-f740-49c9-9f33-9171b44501b2",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/pocket-canal-keeper",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/pocket-canal-keeper/game-design/",
+    "wireframe": "projects/pocket-canal-keeper/wireframe/",
+    "implementation": "projects/pocket-canal-keeper/implementation/",
+    "build": "projects/pocket-canal-keeper/build/",
+    "fidelity": "projects/pocket-canal-keeper/fidelity/",
+    "playtest": "projects/pocket-canal-keeper/playtest/",
+    "visual": "projects/pocket-canal-keeper/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "882d0b63-7088-4055-a687-f84c62ec5b16",
+        "version": "v0.2",
+        "status": "build"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "b27929ee-4ad3-4381-8b09-2760ee458ea3",
+        "version": "v1.2",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c"
+      }
+    ],
+    "builds": [
+      {
+        "id": "c1ff6f34-f3ef-489d-a38f-818abe6b1750",
+        "status": "fidelity_pending",
+        "project_path": "builds/pocket-canal-keeper",
+        "final_commit": "078cf604d31416aa632f91d281e5e485635127ee",
+        "blueprint_hash": "4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

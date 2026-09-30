@@ -1,0 +1,54 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Clockwork Pet Dentist",
+  "slug": "clockwork-pet-dentist",
+  "idea_id": "f3b0fa40-a199-4eaa-9d1d-80f9271a5992",
+  "design_id": "6a8fbbea-11c0-461d-9a97-0757ad8d76a4",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/clockwork-pet-dentist",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/clockwork-pet-dentist/game-design/",
+    "wireframe": "projects/clockwork-pet-dentist/wireframe/",
+    "implementation": "projects/clockwork-pet-dentist/implementation/",
+    "build": "projects/clockwork-pet-dentist/build/",
+    "fidelity": "projects/clockwork-pet-dentist/fidelity/",
+    "playtest": "projects/clockwork-pet-dentist/playtest/",
+    "visual": "projects/clockwork-pet-dentist/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "dd91a7c2-0c9b-444d-bce1-e40fd0b1a926",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "439a4a1d-e8ee-4ca0-83aa-606bdb68321c",
+        "version": "v1.2",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f"
+      }
+    ],
+    "builds": [
+      {
+        "id": "d3360d00-3c47-4ef6-9f74-48935c7f0962",
+        "status": "fidelity_pending",
+        "project_path": "builds/clockwork-pet-dentist",
+        "final_commit": "6848add6dca911f79732f677b774c76c5ae3a871",
+        "blueprint_hash": "34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

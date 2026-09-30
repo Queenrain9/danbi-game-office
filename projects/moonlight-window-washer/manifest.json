@@ -1,0 +1,45 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Moonlight Window Washer",
+  "slug": "moonlight-window-washer",
+  "idea_id": "e81b6fbe-b020-49e4-884c-4d796285e604",
+  "design_id": "87eb607d-75a3-4681-9d9a-1e9f412c1b81",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/moonlight-window-washer",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/moonlight-window-washer/game-design/",
+    "wireframe": "projects/moonlight-window-washer/wireframe/",
+    "implementation": "projects/moonlight-window-washer/implementation/",
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/moonlight-window-washer/playtest/",
+    "visual": "projects/moonlight-window-washer/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "15311cd0-ceab-4199-9176-7f5451fa0c97",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "1fd3e174-ac15-4183-aa67-71c0a61c0970",
+        "version": "v1.2",
+        "status": "ready",
+        "blueprint_status": "approved",
+        "blueprint_hash": "9f4b2e1cc5d37cf36d253821a9f1d6de424c745bc7c1a9c5142ecec4795ecdb3"
+      }
+    ],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

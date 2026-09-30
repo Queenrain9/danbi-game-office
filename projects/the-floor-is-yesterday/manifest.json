@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "The Floor Is Yesterday",
+  "slug": "the-floor-is-yesterday",
+  "idea_id": "01ef32af-bcd3-4e44-839b-77133747b6d1",
+  "design_id": "176b4b99-2c01-4157-91f3-d5a4c71befc5",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/the-floor-is-yesterday",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/the-floor-is-yesterday/game-design/",
+    "wireframe": "projects/the-floor-is-yesterday/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/the-floor-is-yesterday/playtest/",
+    "visual": "projects/the-floor-is-yesterday/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "1d72ffd9-0ef4-4a88-a3d5-c476c1538375",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

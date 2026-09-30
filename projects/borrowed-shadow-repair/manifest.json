@@ -1,0 +1,62 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Borrowed Shadow Repair",
+  "slug": "borrowed-shadow-repair",
+  "idea_id": "29b950ca-2b83-45cc-8a8b-e18d13d84f4b",
+  "design_id": "c81b3420-2ff8-40a9-bf89-9e0a5d051dc6",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/borrowed-shadow-repair",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/borrowed-shadow-repair/game-design/",
+    "wireframe": "projects/borrowed-shadow-repair/wireframe/",
+    "implementation": "projects/borrowed-shadow-repair/implementation/",
+    "build": "projects/borrowed-shadow-repair/build/",
+    "fidelity": "projects/borrowed-shadow-repair/fidelity/",
+    "playtest": "projects/borrowed-shadow-repair/playtest/",
+    "visual": "projects/borrowed-shadow-repair/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "5cf372d5-5252-4f53-ab1f-2bf273202168",
+        "version": "v0.1",
+        "status": "build"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "bb27ce5f-06f3-49c7-8493-f6092fb4f83c",
+        "version": "v0.1",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b"
+      }
+    ],
+    "builds": [
+      {
+        "id": "3eb410a4-b4f2-4d21-b1de-557abb3787f6",
+        "status": "fidelity_pending",
+        "project_path": "builds/borrowed-shadow-repair",
+        "final_commit": "e4c9eb7f0574d3c0cc38e73e45da94574a3cbcf4",
+        "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": [
+      {
+        "id": "61129ed9-26dd-4fc0-bb26-6ca9beb356b1",
+        "round": 1,
+        "verdict": "fail",
+        "reviewed_commit": "92193ad85e9d1012a504c705e1dc969f94cb8020",
+        "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b"
+      }
+    ]
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

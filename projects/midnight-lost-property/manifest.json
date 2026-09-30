@@ -1,0 +1,54 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Midnight Lost Property",
+  "slug": "midnight-lost-property",
+  "idea_id": "84d59494-178a-40af-9b76-d6af8592895c",
+  "design_id": "cd44b43d-0022-45e5-9cad-7028ab8da75a",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/midnight-lost-property",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/midnight-lost-property/game-design/",
+    "wireframe": "projects/midnight-lost-property/wireframe/",
+    "implementation": "projects/midnight-lost-property/implementation/",
+    "build": "projects/midnight-lost-property/build/",
+    "fidelity": "projects/midnight-lost-property/fidelity/",
+    "playtest": "projects/midnight-lost-property/playtest/",
+    "visual": "projects/midnight-lost-property/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "9d510757-6ab2-4f80-96d8-adbcbbe542c3",
+        "version": "v0.1",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "f556078a-f98d-4509-b08a-26509a651d78",
+        "version": "v0.1",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0"
+      }
+    ],
+    "builds": [
+      {
+        "id": "0c4821f4-9db2-4ff9-985e-ad87ccf4ce73",
+        "status": "fidelity_pending",
+        "project_path": "builds/midnight-lost-property",
+        "final_commit": "4bc09d26e8e2917ea353875f06cae1e753b7909a",
+        "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

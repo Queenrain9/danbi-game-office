@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Orbit Shepherd",
+  "slug": "orbit-shepherd",
+  "idea_id": "5412ff64-e16c-4078-96cf-5d75f5ef444e",
+  "design_id": "f40804ba-b9fb-4fee-b1ad-26532a1d9400",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/orbit-shepherd",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/orbit-shepherd/game-design/",
+    "wireframe": "projects/orbit-shepherd/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/orbit-shepherd/playtest/",
+    "visual": "projects/orbit-shepherd/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "6d6fdb2e-c57a-48dc-a2ed-5c7a91f8b522",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

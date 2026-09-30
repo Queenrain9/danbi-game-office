@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Rooftop Laundry Tamer",
+  "slug": "rooftop-laundry-tamer",
+  "idea_id": "8ca14fe2-bdcd-474f-8b3f-e8cd8e10b128",
+  "design_id": "6569ba3e-8ba3-4660-8692-cd0a78893c95",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/rooftop-laundry-tamer",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/rooftop-laundry-tamer/game-design/",
+    "wireframe": "projects/rooftop-laundry-tamer/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/rooftop-laundry-tamer/playtest/",
+    "visual": "projects/rooftop-laundry-tamer/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "6ab53f08-acdf-46f5-8df7-e7291e510f5f",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

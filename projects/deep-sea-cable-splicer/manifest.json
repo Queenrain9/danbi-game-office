@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Deep Sea Cable Splicer",
+  "slug": "deep-sea-cable-splicer",
+  "idea_id": "11b17ea3-f686-4f14-8401-949c58675cf5",
+  "design_id": "e909c470-cbf0-472b-bf9b-da017b98aefc",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/deep-sea-cable-splicer",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/deep-sea-cable-splicer/game-design/",
+    "wireframe": "projects/deep-sea-cable-splicer/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/deep-sea-cable-splicer/playtest/",
+    "visual": "projects/deep-sea-cable-splicer/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "504d9a6a-39e0-4fbe-972d-c1fd562bdb35",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

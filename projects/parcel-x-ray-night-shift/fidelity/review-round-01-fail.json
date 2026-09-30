@@ -1,0 +1,1444 @@
+{
+  "id": "f5e889d6-4608-4e75-ac6a-0708400e5845",
+  "source": "chat_automation",
+  "status": "complete",
+  "results": [
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"criterion\": \"7개 inventory 화면/overlay가 모두 이동 가능\"}",
+      "observed": "The repository defines the screen/overlay construction paths, but main.gd assigns to screen five times without declaring var screen. Static GDScript review therefore indicates the main script cannot be accepted as navigable as committed.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:01",
+      "evidence_symbols": [
+        "screen assignments in show_hub/show_intake/show_inspect/show_result/show_summary",
+        "no var screen declaration"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"criterion\": \"Inspection에서 rotate/scan/pin/classify가 서로 충돌 없이 작동\"}",
+      "observed": "Rotate and scan code exist, but pin hit-testing diverges from visible transformed shapes after pitch offset, and classification valid-drop geometry is unreachable.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:02",
+      "evidence_symbols": [
+        "_on_parcel_input",
+        "_on_rail_input",
+        "_try_pin",
+        "_lane_under_parcel"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"criterion\": \"유효 레인 밖 release는 table로 복귀\"}",
+      "observed": "When _lane_under_parcel returns empty, _finish_classification tweens parcel.position back to box_home and stays in Inspection.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:03",
+      "evidence_symbols": [
+        "acceptance_criteria[3]"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"criterion\": \"Rule Manual은 background 입력을 차단\"}",
+      "observed": "_modal creates a full-rect ColorRect with MOUSE_FILTER_STOP on OverlayLayer, blocking background GUI input.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:04",
+      "evidence_symbols": [
+        "acceptance_criteria[4]"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"criterion\": \"valid lane release 후 result까지 gameplay 입력 잠금\"}",
+      "observed": "input_locked is set before result evaluation, but the only path that sets it requires a valid lane release; the current threshold/center geometry makes that release unreachable.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:05",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"criterion\": \"8개 처리 후 Summary로 이동\"}",
+      "observed": "ShiftState.advance reaches Summary at eight cases, but the committed Inspection cannot produce a valid classification release, so eight processed cases are not reachable.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "ACC:06",
+      "evidence_symbols": [
+        "acceptance_criteria[6]"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"required_data\": [\"ParcelCase\", \"HazardRules\", \"ShiftProgress\"]}",
+      "observed": "Equivalent data responsibilities are present: CaseData supplies ParcelCase records, HazardEvaluator supplies hazard rules, and ShiftState stores shift progress/score.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd",
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd"
+      ],
+      "requirement_id": "ARC:required_data",
+      "evidence_symbols": [
+        "developer_handoff.required_data"
+      ]
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "{\"reusable_components\": [\"ParcelView\", \"ScanRail\", \"EvidencePin\", \"DropLane\", \"RuleChip\", \"ResultStamp\"]}",
+      "observed": "The named reusable units ParcelView, ScanRail, EvidencePin, DropLane, RuleChip, and ResultStamp do not exist as reusable scenes/scripts/classes; most are constructed ad hoc inside main.gd.",
+      "rationale": "No implementation unit satisfying this atomic requirement was found at the reviewed commit.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd",
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd"
+      ],
+      "requirement_id": "ARC:reusable_components",
+      "evidence_symbols": [
+        "show_inspect dynamic construction",
+        "add_button",
+        "no ParcelView/ScanRail/EvidencePin/DropLane/RuleChip/ResultStamp units"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"scene_hierarchy\": [\"AppRoot\", \"ShiftController\", \"CaseRouter\", \"HUDLayer\", \"OverlayLayer\"]}",
+      "observed": "All required node names exist in main.tscn, but ShiftController and CaseRouter are empty placeholder Nodes; real screen/input responsibility remains in AppRoot main.gd.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd",
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd"
+      ],
+      "requirement_id": "ARC:scene_hierarchy",
+      "evidence_symbols": [
+        "AppRoot",
+        "ShiftController",
+        "CaseRouter",
+        "HUDLayer",
+        "OverlayLayer"
+      ]
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "{\"state_ownership\": \"ShiftController owns case index/score; Inspection owns transient gesture state\"}",
+      "observed": "The required ownership says ShiftController owns case index/score and Inspection owns transient gesture state. The ShiftController scene node owns nothing; AppRoot main.gd owns transient UI/input while a separate RefCounted ShiftState owns score/index.",
+      "rationale": "The implementation uses a materially different rule/ownership/condition than the source design.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/main.tscn",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd",
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd"
+      ],
+      "requirement_id": "ARC:state_ownership",
+      "evidence_symbols": [
+        "ShiftState.new()",
+        "main.gd screen/input variables",
+        "empty ShiftController node"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 9, \"w\": 64, \"x\": 18, \"y\": 83}, \"type\": \"button\", \"label\": \"NEXT PARCEL\", \"screen\": \"classification_result\", \"component\": \"continue\", \"enabled_when\": null, \"state_binding\": \"result\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:classification_result:continue",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 34, \"w\": 80, \"x\": 10, \"y\": 31}, \"type\": \"preview\", \"label\": \"Evidence Slice\", \"screen\": \"classification_result\", \"component\": \"evidence_replay\", \"enabled_when\": null, \"state_binding\": \"result\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:classification_result:evidence_replay",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 80, \"x\": 10, \"y\": 68}, \"type\": \"text_card\", \"label\": \"Why\", \"screen\": \"classification_result\", \"component\": \"reason\", \"enabled_when\": null, \"state_binding\": \"result\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:classification_result:reason",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 7, \"w\": 32, \"x\": 34, \"y\": 20}, \"type\": \"status\", \"label\": \"Score\", \"screen\": \"classification_result\", \"component\": \"score_delta\", \"enabled_when\": null, \"state_binding\": \"result\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:classification_result:score_delta",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 60, \"x\": 20, \"y\": 8}, \"type\": \"result_stamp\", \"label\": \"PASS / REPACK / ISOLATE\", \"screen\": \"classification_result\", \"component\": \"stamp\", \"enabled_when\": null, \"state_binding\": \"result\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:classification_result:stamp",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 56, \"x\": 5, \"y\": 5}, \"type\": \"chip\", \"label\": \"Rule chip\", \"screen\": \"inspection\", \"component\": \"case_rule\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": null}",
+      "observed": "No dedicated case_rule chip is created on Inspection; active rules are only reachable through the Rule Manual and generic info text.",
+      "rationale": "No implementation unit satisfying this atomic requirement was found at the reviewed commit.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:case_rule",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 13, \"w\": 28, \"x\": 67, \"y\": 78}, \"type\": \"drop_target\", \"label\": \"ISOLATE\", \"screen\": \"inspection\", \"component\": \"isolate_lane\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!input_lock\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:isolate_lane",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 8, \"x\": 87, \"y\": 5}, \"type\": \"button\", \"label\": \"?\", \"screen\": \"inspection\", \"component\": \"manual_btn\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!input_lock\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:manual_btn",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 13, \"w\": 28, \"x\": 5, \"y\": 78}, \"type\": \"drop_target\", \"label\": \"PASS\", \"screen\": \"inspection\", \"component\": \"pass_lane\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!input_lock\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:pass_lane",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 34, \"x\": 8, \"y\": 65}, \"type\": \"status\", \"label\": \"Evidence Pins 0/4\", \"screen\": \"inspection\", \"component\": \"pin_tray\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:pin_tray",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 13, \"w\": 28, \"x\": 36, \"y\": 78}, \"type\": \"drop_target\", \"label\": \"REPACK\", \"screen\": \"inspection\", \"component\": \"repack_lane\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!input_lock\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:repack_lane",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 20, \"x\": 64, \"y\": 5}, \"type\": \"status\", \"label\": \"Scans 0/4\", \"screen\": \"inspection\", \"component\": \"scan_count\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:scan_count",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 2, \"w\": 64, \"x\": 12, \"y\": 36}, \"type\": \"indicator\", \"label\": \"Slice Plane\", \"screen\": \"inspection\", \"component\": \"scan_plane\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:scan_plane",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 48, \"w\": 10, \"x\": 84, \"y\": 15}, \"type\": \"slider\", \"label\": \"Slice 0–100\", \"screen\": \"inspection\", \"component\": \"scan_rail\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!classifying\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:scan_rail",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 48, \"w\": 72, \"x\": 8, \"y\": 15}, \"type\": \"interactive_object\", \"label\": \"Parcel / X-ray\", \"screen\": \"inspection\", \"component\": \"xray_box\", \"enabled_when\": null, \"state_binding\": \"inspect\", \"interaction_role\": \"!classifying\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:inspection:xray_box",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 32, \"w\": 84, \"x\": 8, \"y\": 22}, \"type\": \"card\", \"label\": \"Night Shift 01\", \"screen\": \"night_hub\", \"component\": \"shift_card\", \"enabled_when\": null, \"state_binding\": \"hub\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:night_hub:shift_card",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 64, \"x\": 18, \"y\": 68}, \"type\": \"button\", \"label\": \"START SHIFT\", \"screen\": \"night_hub\", \"component\": \"start_shift\", \"enabled_when\": \"shift_available\", \"state_binding\": \"hub\", \"interaction_role\": \"start\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:night_hub:start_shift",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 64, \"x\": 18, \"y\": 76}, \"type\": \"button\", \"label\": \"BEGIN INSPECT\", \"screen\": \"parcel_intake\", \"component\": \"begin_inspect\", \"enabled_when\": \"case_loaded\", \"state_binding\": \"intake\", \"interaction_role\": \"start\"}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:parcel_intake:begin_inspect",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 22, \"x\": 6, \"y\": 5}, \"type\": \"status\", \"label\": \"1 / 8\", \"screen\": \"parcel_intake\", \"component\": \"case_counter\", \"enabled_when\": null, \"state_binding\": \"intake\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:parcel_intake:case_counter",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 32, \"w\": 84, \"x\": 8, \"y\": 18}, \"type\": \"card\", \"label\": \"Parcel Label\", \"screen\": \"parcel_intake\", \"component\": \"label_card\", \"enabled_when\": null, \"state_binding\": \"intake\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:parcel_intake:label_card",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 14, \"w\": 84, \"x\": 8, \"y\": 54}, \"type\": \"chip_group\", \"label\": \"Active Rules\", \"screen\": \"parcel_intake\", \"component\": \"rule_chips\", \"enabled_when\": null, \"state_binding\": \"intake\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:parcel_intake:rule_chips",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"box\": {\"h\": 100, \"w\": 100, \"x\": 0, \"y\": 0}, \"type\": \"overlay\", \"label\": \"Paused\", \"screen\": \"pause\", \"component\": \"pause_scrim\", \"enabled_when\": null, \"state_binding\": \"paused\", \"interaction_role\": null}",
+      "observed": "A full-rect ColorRect overlay is created and blocks input with MOUSE_FILTER_STOP, matching the scrim role and full-screen geometry.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:pause:pause_scrim",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 60, \"x\": 20, \"y\": 54}, \"type\": \"button\", \"label\": \"QUIT TO HUB\", \"screen\": \"pause\", \"component\": \"quit\", \"enabled_when\": null, \"state_binding\": \"paused\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:pause:quit",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 60, \"x\": 20, \"y\": 40}, \"type\": \"button\", \"label\": \"RESUME\", \"screen\": \"pause\", \"component\": \"resume\", \"enabled_when\": null, \"state_binding\": \"paused\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:pause:resume",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 7, \"w\": 18, \"x\": 70, \"y\": 74}, \"type\": \"button\", \"label\": \"CLOSE\", \"screen\": \"rule_manual\", \"component\": \"close_rule\", \"enabled_when\": null, \"state_binding\": \"rule_overlay\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:rule_manual:close_rule",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"box\": {\"h\": 100, \"w\": 100, \"x\": 0, \"y\": 0}, \"type\": \"overlay\", \"label\": \"Scrim\", \"screen\": \"rule_manual\", \"component\": \"modal_scrim\", \"enabled_when\": null, \"state_binding\": \"rule_overlay\", \"interaction_role\": null}",
+      "observed": "A full-rect ColorRect overlay is created and blocks input with MOUSE_FILTER_STOP, matching the scrim role and full-screen geometry.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:rule_manual:modal_scrim",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 66, \"w\": 84, \"x\": 8, \"y\": 16}, \"type\": \"modal\", \"label\": \"Rules\", \"screen\": \"rule_manual\", \"component\": \"rule_panel\", \"enabled_when\": null, \"state_binding\": \"rule_overlay\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:rule_manual:rule_panel",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 12, \"w\": 26, \"x\": 8, \"y\": 36}, \"type\": \"metric\", \"label\": \"Accuracy\", \"screen\": \"shift_summary\", \"component\": \"accuracy\", \"enabled_when\": null, \"state_binding\": \"summary\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:shift_summary:accuracy",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 12, \"w\": 26, \"x\": 37, \"y\": 36}, \"type\": \"metric\", \"label\": \"Critical Miss\", \"screen\": \"shift_summary\", \"component\": \"critical\", \"enabled_when\": null, \"state_binding\": \"summary\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:shift_summary:critical",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 12, \"w\": 26, \"x\": 66, \"y\": 36}, \"type\": \"metric\", \"label\": \"Efficiency\", \"screen\": \"shift_summary\", \"component\": \"efficiency\", \"enabled_when\": null, \"state_binding\": \"summary\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:shift_summary:efficiency",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 18, \"w\": 30, \"x\": 35, \"y\": 10}, \"type\": \"grade\", \"label\": \"GRADE\", \"screen\": \"shift_summary\", \"component\": \"grade\", \"enabled_when\": null, \"state_binding\": \"summary\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:shift_summary:grade",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"box\": {\"h\": 10, \"w\": 64, \"x\": 18, \"y\": 80}, \"type\": \"button\", \"label\": \"BACK TO HUB\", \"screen\": \"shift_summary\", \"component\": \"next\", \"enabled_when\": null, \"state_binding\": \"summary\", \"interaction_role\": null}",
+      "observed": "A semantically similar element is present or its text is merged into a generic Label/Button/Panel, but the committed UI is mostly VBox/HBox auto-layout and does not implement the specified component box geometry/state binding exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "CMP:shift_summary:next",
+      "evidence_symbols": [
+        "dynamic Control construction",
+        "VBox/HBox auto layout",
+        "component-specific node absent or geometry differs"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"mvp_scope\": \"세로 모바일 greybox 1개 Shift. 고정 상자 10개 중 8개 출제, primitive 내부 물체 6종, 위험 규칙 3개, 상자 회전, slice scan, evidence pin, 3레인 분류, 결과 설명, Shift Summary까지 실제 플레이 가능하게 구현.\", \"screen_inventory\": [\"Night Hub / Shift Select\", \"Parcel Intake\", \"X-Ray Inspection Table\", \"Classification Result\", \"Shift Summary\", \"Rule Manual Overlay\", \"Pause\"]}",
+      "observed": "The repository has 10 fixed cases, selects 8, represents six primitive kinds and three outcomes, and includes the seven conceptual screens/overlays. However the main script has an undeclared screen identifier and valid classification drop is geometrically unreachable, so the MVP is not statically demonstrated as fully playable.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd",
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd"
+      ],
+      "requirement_id": "CNT:mvp_scope",
+      "evidence_symbols": [
+        "mvp_scope"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"id\": \"input_lock\", \"rule\": \"valid classification release through result reveal\"}",
+      "observed": "The input_locked flag is coded after valid classification, but the valid classification path is unreachable with parcel.position.y >= 440 while the 360px parcel center must lie inside lanes at y 500..~596.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "GST:input_lock",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"id\": \"paused\", \"rule\": \"freeze shift state\"}",
+      "observed": "Pause is implemented as a blocking overlay over the still-mounted Inspection state; there is no autonomous gameplay process underneath that continues advancing.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "GST:paused",
+      "evidence_symbols": [
+        "input_locked/overlay handling"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"use\": \"classify\", \"input\": \"drag-release\", \"priority\": 5}",
+      "observed": "The static gesture routing gives classification precedence once a parcel drag crosses its threshold, scan owns rail-originated input, rotate handles parcel drags otherwise, and pin only fires for tap-sized parcel gestures.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INP:classify",
+      "evidence_symbols": [
+        "_on_parcel_input",
+        "_on_rail_input",
+        "GestureRouter"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"use\": \"pin\", \"input\": \"tap\", \"priority\": 2}",
+      "observed": "The static gesture routing gives classification precedence once a parcel drag crosses its threshold, scan owns rail-originated input, rotate handles parcel drags otherwise, and pin only fires for tap-sized parcel gestures.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INP:pin",
+      "evidence_symbols": [
+        "_on_parcel_input",
+        "_on_rail_input",
+        "GestureRouter"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"use\": \"rotate\", \"input\": \"drag\", \"priority\": 3}",
+      "observed": "The static gesture routing gives classification precedence once a parcel drag crosses its threshold, scan owns rail-originated input, rotate handles parcel drags otherwise, and pin only fires for tap-sized parcel gestures.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INP:rotate",
+      "evidence_symbols": [
+        "_on_parcel_input",
+        "_on_rail_input",
+        "GestureRouter"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"use\": \"scan\", \"input\": \"rail swipe\", \"priority\": 4}",
+      "observed": "The static gesture routing gives classification precedence once a parcel drag crosses its threshold, scan owns rail-originated input, rotate handles parcel drags otherwise, and pin only fires for tap-sized parcel gestures.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INP:scan",
+      "evidence_symbols": [
+        "_on_parcel_input",
+        "_on_rail_input",
+        "GestureRouter"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"input\": \"tap\", \"action\": \"advance\", \"screen\": \"classification_result\", \"target\": \"continue\", \"feedback\": \"press\", \"precondition\": \"result shown\", \"state_change\": \"next intake or summary\", \"invalid_input\": \"none\"}",
+      "observed": "NEXT PARCEL/SHIFT SUMMARY is a real Button callback to advance(), which selects next Intake or Summary from ShiftState.advance().",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:classification_result:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"input\": \"1-finger drag\", \"action\": \"rotate yaw/pitch\", \"screen\": \"inspection\", \"target\": \"xray_box\", \"feedback\": \"direct follow + friction audio\", \"precondition\": \"start inside box; not scan rail; !classifying\", \"state_change\": \"box_pose\", \"invalid_input\": \"UI/rail start ignored\"}",
+      "observed": "Parcel drag updates box_pose and changes actual rotation/scale/inner offset. However the specified friction audio feedback is absent and the +8% padded hit target is not implemented.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:inspection:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"input\": \"vertical swipe\", \"action\": \"map y to slice_depth\", \"screen\": \"inspection\", \"target\": \"scan_rail\", \"feedback\": \"scan plane + hum\", \"precondition\": \"gesture starts in rail; !classifying\", \"state_change\": \"slice_depth 0..100\", \"invalid_input\": \"disabled during box classification drag\"}",
+      "observed": "The VSlider maps 0..100 to slice_depth and updates the scan plane/internal shapes, and classification guards scan input. The specified hum feedback is absent.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:inspection:02",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"input\": \"tap\", \"action\": \"toggle evidence pin\", \"screen\": \"inspection\", \"target\": \"visible internal shape in xray_box\", \"feedback\": \"ring + light haptic\", \"precondition\": \"scan active; pins<4; no drag threshold crossed\", \"state_change\": \"pins\", \"invalid_input\": \"empty tap -> faint no-target pulse\"}",
+      "observed": "Pins are object-bound and toggleable, but visible shapes are shifted by parcel_visual.position.x during pitch while _hotspot_at and _redraw_pins use unshifted coordinates; the tap target can therefore disagree with what is visible. Ring/haptic/no-target pulse feedback is also incomplete.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:inspection:03",
+      "evidence_symbols": [
+        "parcel_visual.position.x",
+        "_hotspot_at",
+        "_redraw_pins"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"input\": \"drag-release\", \"action\": \"classify parcel\", \"screen\": \"inspection\", \"target\": \"xray_box → pass_lane/repack_lane/isolate_lane\", \"feedback\": \"lane outline + magnetic snap\", \"precondition\": \"unclassified\", \"state_change\": \"input_lock + result\", \"invalid_input\": \"release outside lane -> spring to table\"}",
+      "observed": "The parcel follows drag and invalid drops tween home, but valid lane release cannot occur: lane center acceptance requires parcel y roughly 320..416 for a 360px parcel over lanes y 500..~596, while _lane_under_parcel rejects every parcel y below 440.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:inspection:04",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"input\": \"tap\", \"action\": \"load first parcel\", \"screen\": \"night_hub\", \"target\": \"start_shift\", \"feedback\": \"button press + short fade\", \"precondition\": \"shift_available\", \"state_change\": \"intake\", \"invalid_input\": \"disabled if no shift data\"}",
+      "observed": "START SHIFT loads/shuffles cases and enters Intake, but there is no shift_available enabled/disabled guard and no short-fade transition.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:night_hub:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"input\": \"tap\", \"action\": \"enter inspection\", \"screen\": \"parcel_intake\", \"target\": \"begin_inspect\", \"feedback\": \"button depress\", \"precondition\": \"case_loaded\", \"state_change\": \"inspect\", \"invalid_input\": \"ignore while loading\"}",
+      "observed": "BEGIN INSPECT is a real button shown only after a case is loaded and enters Inspection.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:parcel_intake:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"input\": \"tap\", \"action\": \"resume prior state\", \"screen\": \"pause\", \"target\": \"resume\", \"feedback\": \"fade\", \"precondition\": null, \"state_change\": \"prior\", \"invalid_input\": \"none\"}",
+      "observed": "Resume closes the blocking overlay and reveals the preserved Inspection state.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:pause:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"input\": \"tap\", \"action\": \"abandon shift\", \"screen\": \"pause\", \"target\": \"quit\", \"feedback\": \"confirm then fade\", \"precondition\": null, \"state_change\": \"hub\", \"invalid_input\": \"none\"}",
+      "observed": "Quit opens a confirmation and ABANDON returns to Hub, but the requested fade feedback is absent.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:pause:02",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"input\": \"tap\", \"action\": \"dismiss\", \"screen\": \"rule_manual\", \"target\": \"close_rule\", \"feedback\": \"fade\", \"precondition\": \"overlay\", \"state_change\": \"inspect\", \"invalid_input\": \"background taps blocked\"}",
+      "observed": "CLOSE dismisses the blocking overlay and preserves Inspection, but the requested fade feedback is absent.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:rule_manual:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"input\": \"tap\", \"action\": \"return hub\", \"screen\": \"shift_summary\", \"target\": \"next\", \"feedback\": \"press\", \"precondition\": \"summary\", \"state_change\": \"hub\", \"invalid_input\": \"none\"}",
+      "observed": "BACK TO HUB is a real button callback to show_hub().",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "INT:shift_summary:01",
+      "evidence_symbols": [
+        "corresponding gui_input/button callback"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"combo\": \"연속 3정답부터 +10 accuracy streak, 오답 시 리셋\"}",
+      "observed": "ShiftState.record increments streak on correct answers, adds +10 from streak >= 3, and resets streak on an incorrect answer.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:combo",
+      "evidence_symbols": [
+        "game_rules.combo"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"failure\": \"Shift 즉시 실패 없음. 위험 상자를 PASS하면 Critical Miss 기록; 2회 이상이면 Shift grade 최대 C.\"}",
+      "observed": "There is no immediate Shift fail and grade is capped at C when critical >= 2. However Critical Miss increments only when PASSing an ISOLATE case; PASSing a REPACK hazard does not count.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:failure",
+      "evidence_symbols": [
+        "game_rules.failure"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"rule\": \"금속성 고밀도 물체가 완충재 없이 외벽 10% 이내면 REPACK\"}",
+      "observed": "HazardEvaluator checks dense objects at x <= 0.10 or x >= 0.90 and a global packed flag. It does not test top/bottom outer-wall proximity from y, so the full outer-wall 10% spatial rule is only partially represented.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd"
+      ],
+      "requirement_id": "RUL:hazard:01",
+      "evidence_symbols": [
+        "HazardEvaluator.expected_lane",
+        "dense_near_wall x-axis only",
+        "packed boolean"
+      ]
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "{\"rule\": \"서로 다른 두 고밀도 물체가 케이블형 구조로 연결되고 전원 셀과 접촉하면 ISOLATE\"}",
+      "observed": "ISOLATE depends on stored linked_pair and power_contact booleans plus object-kind presence/count rather than deriving cable linkage and power-cell contact from the object spatial relationship itself.",
+      "rationale": "The implementation uses a materially different rule/ownership/condition than the source design.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd"
+      ],
+      "requirement_id": "RUL:hazard:02",
+      "evidence_symbols": [
+        "HazardEvaluator.expected_lane",
+        "linked_pair boolean",
+        "power_contact boolean"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"rule\": \"위험 조건이 없으면 PASS\"}",
+      "observed": "HazardEvaluator returns PASS when neither ISOLATE nor REPACK conditions are met.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/hazard_evaluator.gd",
+        "builds/parcel-x-ray-night-shift/scripts/case_data.gd"
+      ],
+      "requirement_id": "RUL:hazard:03",
+      "evidence_symbols": [
+        "game_rules.initial_rules[3]"
+      ]
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "{\"scan_budget\": {\"penalty\": \"5회째부터 efficiency 점수 감소\", \"hard_limit\": null, \"soft_target\": 4}}",
+      "observed": "scan_uses is counted for display, but no scoring penalty is applied from the 5th scan onward; ShiftState.record only considers scan_reversals for the +20 efficiency bonus.",
+      "rationale": "No implementation unit satisfying this atomic requirement was found at the reviewed commit.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scan_budget",
+      "evidence_symbols": [
+        "scan_uses",
+        "scan_reversals",
+        "ShiftState.record"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"correct\": 100}",
+      "observed": "The numeric scoring branch in ShiftState.record matches this atomic rule in static code.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:correct",
+      "evidence_symbols": [
+        "game_rules.scoring.correct"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"critical_isolate\": 150}",
+      "observed": "The numeric scoring branch in ShiftState.record matches this atomic rule in static code.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:critical_isolate",
+      "evidence_symbols": [
+        "game_rules.scoring.critical_isolate"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"efficient_bonus\": \"<=3 scan reversals +20\"}",
+      "observed": "The numeric scoring branch in ShiftState.record matches this atomic rule in static code.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:efficient_bonus",
+      "evidence_symbols": [
+        "game_rules.scoring.efficient_bonus"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"false_pin\": -5}",
+      "observed": "The numeric scoring branch in ShiftState.record matches this atomic rule in static code.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:false_pin",
+      "evidence_symbols": [
+        "game_rules.scoring.false_pin"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"wrong_other\": -80}",
+      "observed": "The numeric scoring branch in ShiftState.record matches this atomic rule in static code.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:wrong_other",
+      "evidence_symbols": [
+        "game_rules.scoring.wrong_other"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"wrong_pass\": -180}",
+      "observed": "The -180 branch applies only when choice=PASS and expected=ISOLATE. A wrong PASS against REPACK falls into -80 wrong_other.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/shift_state.gd",
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "RUL:scoring:wrong_pass",
+      "evidence_symbols": [
+        "ShiftState.record wrong-pass branch"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"result\", \"ui\": \"stamp/reason\", \"exit\": \"continue\", \"enter\": \"decision lock\", \"allowed_input\": \"continue\"}",
+      "observed": "Result state exists with outcome/reason/score/evidence and a single continuation input, but the specified ResultStamp/Reason component structure is collapsed into generic title/label UI.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:classification_result:result",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"classifying\", \"ui\": \"lane highlight\", \"exit\": \"release/cancel\", \"enter\": \"box drag enters lane zone\", \"allowed_input\": \"drag/release\"}",
+      "observed": "A classification mode exists after a downward parcel drag, but entry is based on >80px drag rather than entering the bottom lane zone, and lanes are not visually highlighted as specified.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:inspection:classifying",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"id\": \"inspect\", \"ui\": \"all controls\", \"exit\": \"valid lane release\", \"enter\": \"begin\", \"allowed_input\": \"rotate/scan/pin/box drag/manual\"}",
+      "observed": "Inspection exposes rotate/scan/pin/manual/classification code, but its required exit via valid lane release is not reachable under the committed geometry.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:inspection:inspect",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"hub\", \"ui\": \"shift card visible\", \"exit\": \"start_shift\", \"enter\": \"app/start or summary exit\", \"allowed_input\": \"shift select/start\"}",
+      "observed": "Hub exists and exposes START SHIFT, but the shift card is only generic text and there is no distinct shift-select interaction.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:night_hub:hub",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"intake\", \"ui\": \"label/rules\", \"exit\": \"begin\", \"enter\": \"parcel loaded\", \"allowed_input\": \"label tap, begin\"}",
+      "observed": "Intake displays label/rules and BEGIN INSPECT, but the label itself is not tappable despite allowed_input including label tap.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:parcel_intake:intake",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"id\": \"paused\", \"ui\": \"game frozen\", \"exit\": \"resume/quit\", \"enter\": \"pause action\", \"allowed_input\": \"resume/quit\"}",
+      "observed": "Pause is a blocking overlay with Resume and Quit/confirmation, preserving the underlying Inspection state.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:pause:paused",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"id\": \"rule_overlay\", \"ui\": \"background blocked\", \"exit\": \"close\", \"enter\": \"manual tap\", \"allowed_input\": \"close\"}",
+      "observed": "Rule Manual is a blocking overlay with only its own close interaction reaching the underlying Inspection.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:rule_manual:rule_overlay",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "VERIFIED",
+      "expected": "{\"id\": \"summary\", \"ui\": \"metrics\", \"exit\": \"hub\", \"enter\": \"8 results\", \"allowed_input\": \"next\"}",
+      "observed": "Summary shows grade/accuracy/critical/efficiency/score and exposes only BACK TO HUB.",
+      "rationale": "Static code/scene/data directly supports the atomic requirement within the scope of non-runtime review.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "STA:shift_summary:summary",
+      "evidence_symbols": [
+        "show_* screen function",
+        "screen/gesture/input_locked state variables"
+      ]
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "{\"id\": \"classifying\", \"name\": \"CLASSIFYING\", \"notes\": \"lane drag priority > rotate > hotspot\", \"condition\": \"parcel drag enters bottom 22%\", \"component_overrides\": {\"xray_box\": {\"box\": {\"h\": 24, \"w\": 54, \"x\": 18, \"y\": 60}, \"label\": \"Parcel · Dragging\"}, \"pass_lane\": {\"label\": \"PASS · target\"}, \"repack_lane\": {\"label\": \"REPACK · target\"}, \"isolate_lane\": {\"label\": \"ISOLATE · target\"}}}",
+      "observed": "The source variant requires entry when the parcel reaches the bottom classification zone plus smaller dragging box and highlighted target lanes. Code enters after >80px downward drag, keeps parcel size, and only changes info text.",
+      "rationale": "The implementation uses a materially different rule/ownership/condition than the source design.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "VAR:inspection:classifying",
+      "evidence_symbols": [
+        "gesture/input_locked variables",
+        "info label feedback",
+        "no component override state layer"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"id\": \"input_locked\", \"name\": \"LOCKED\", \"notes\": \"all gameplay input disabled until result\", \"condition\": \"valid lane release\", \"component_overrides\": {\"xray_box\": {\"label\": \"Decision locked\"}}}",
+      "observed": "input_locked disables gameplay code once set, but the valid release that sets it is unreachable with current geometry and no Decision locked visual override is implemented.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "VAR:inspection:input_locked",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"rotating\", \"name\": \"ROTATING\", \"notes\": \"scan rail remains visible; hotspot tap suppressed\", \"condition\": \"box drag below classification zone\", \"component_overrides\": {\"xray_box\": {\"label\": \"Parcel · Rotating\"}}}",
+      "observed": "Rotation changes the parcel and suppresses tap after drag, but there is no explicit variant layer/label and classification threshold is >80px vertical drag rather than the documented zone behavior.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "VAR:inspection:rotating",
+      "evidence_symbols": [
+        "gesture/input_locked variables",
+        "info label feedback",
+        "no component override state layer"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"id\": \"scanning\", \"name\": \"SCANNING\", \"notes\": \"box rotate suppressed only while rail pointer held\", \"condition\": \"scan rail active\", \"component_overrides\": {\"scan_rail\": {\"label\": \"Slice · Active\"}, \"scan_plane\": {\"label\": \"Active Slice\"}}}",
+      "observed": "Rail-held input suppresses parcel rotation, but scan_active stays true after release and the specified Slice Active/Active Slice component overrides are not implemented.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "VAR:inspection:scanning",
+      "evidence_symbols": [
+        "gesture/input_locked variables",
+        "info label feedback",
+        "no component override state layer"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"parcel_intake\", \"from\": \"result\", \"trigger\": \"continue\", \"animation\": \"fade\", \"condition\": \"cases_done<8\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:classification_result:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"shift_summary\", \"from\": \"result\", \"trigger\": \"continue\", \"animation\": \"fade\", \"condition\": \"cases_done=8\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:classification_result:02",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "{\"to\": \"classification_result\", \"from\": \"inspect\", \"trigger\": \"valid lane release\", \"animation\": \"snap then stamp\", \"condition\": \"parcel center inside lane\"}",
+      "observed": "The transition callback exists, but the parcel-center lane condition is geometrically impossible under CLASSIFY_THRESHOLD_Y=440 and parcel height 360 over lanes at y 500..~596.",
+      "rationale": "Implementation code exists, but static parse/coordinate/state analysis shows the required behavior is not reachable or reliable.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:inspection:01",
+      "evidence_symbols": [
+        "CLASSIFY_THRESHOLD_Y = 440",
+        "parcel.size = Vector2(340,360)",
+        "lane_row.position.y = 500",
+        "lane_row height ~100",
+        "_lane_under_parcel",
+        "_finish_classification"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"rule_manual\", \"from\": \"inspect\", \"trigger\": \"tap manual_btn\", \"animation\": \"modal\", \"condition\": \"!input_lock\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:inspection:02",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"parcel_intake\", \"from\": \"hub\", \"trigger\": \"tap start_shift\", \"animation\": \"short fade\", \"condition\": \"shift_available\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:night_hub:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"inspection\", \"from\": \"intake\", \"trigger\": \"tap begin_inspect\", \"animation\": \"table push-in\", \"condition\": \"case_loaded\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:parcel_intake:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"inspection\", \"from\": \"paused\", \"trigger\": \"resume\", \"animation\": \"fade\", \"condition\": \"prior gameplay\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:pause:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"night_hub\", \"from\": \"paused\", \"trigger\": \"quit confirm\", \"animation\": \"fade\", \"condition\": \"always\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:pause:02",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"inspection\", \"from\": \"rule_overlay\", \"trigger\": \"close\", \"animation\": \"modal fade\", \"condition\": \"always\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:rule_manual:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "{\"to\": \"night_hub\", \"from\": \"summary\", \"trigger\": \"tap next\", \"animation\": \"fade\", \"condition\": \"always\"}",
+      "observed": "The destination callback/guard is represented in static code, but the specified fade/push-in/modal animation and/or explicit enabled guard is not implemented exactly.",
+      "rationale": "Part of the requirement is represented, but one or more exact geometry, feedback, guard, state, or architecture conditions are missing.",
+      "evidence_files": [
+        "builds/parcel-x-ray-night-shift/scripts/main.gd"
+      ],
+      "requirement_id": "TRN:shift_summary:01",
+      "evidence_symbols": [
+        "screen show_* functions",
+        "button callbacks",
+        "no requested transition animation"
+      ]
+    }
+  ],
+  "verdict": "fail",
+  "created_at": "2026-09-29T15:01:02.119375+00:00",
+  "contract_id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+  "broken_count": 10,
+  "build_job_id": "9cf75474-c24f-48e2-a91c-74de92df5946",
+  "completed_at": "2026-09-29T15:01:02.119375+00:00",
+  "review_round": 1,
+  "blocked_count": 0,
+  "missing_count": 3,
+  "partial_count": 54,
+  "source_run_at": "2026-09-29T15:01:02.119375+00:00",
+  "blueprint_hash": null,
+  "conflict_count": 3,
+  "review_summary": "SOFT_RESET:preproduction-reset-20260930 — superseded historical review. Independent Fidelity Gate FAIL. Reviewed 94/94 atomic requirements at commit 9c32a6e5. Key static failures: main.gd assigns to undeclared identifier screen (5 assignments, no declaration), so the main script is not accepted as runnable; classification valid-drop geometry is unreachable because parcel y must be >=440 while its center must fit lanes around y 500..596 with a 360px parcel; evidence hotspot/pin coordinates do not track parcel_visual pitch offset; scan-budget 5th-use penalty is absent; developer-handoff ownership/reusable architecture is largely placeholder/ad-hoc; many Wireframe box/state components are collapsed into generic auto-layout UI. Runtime QA was not executed; this review is static source fidelity only.",
+  "verified_count": 24,
+  "ambiguous_count": 0,
+  "manual_test_ids": [],
+  "reviewed_commit": "9c32a6e5f2dea475be2b0e8ceafeb0ce862c0121",
+  "inconclusive_count": 0,
+  "verification_scope": "superseded_reset"
+}

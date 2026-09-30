@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Last Light Caravan",
+  "slug": "last-light-caravan",
+  "idea_id": "ac06b45a-7b07-4e24-adee-24f7f438483a",
+  "design_id": "c9aaad40-6b42-4c00-bbb2-5c14ee688468",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/last-light-caravan",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/last-light-caravan/game-design/",
+    "wireframe": "projects/last-light-caravan/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/last-light-caravan/playtest/",
+    "visual": "projects/last-light-caravan/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "3aaa03fd-a52b-47f4-a835-ca60e0ac4cd5",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

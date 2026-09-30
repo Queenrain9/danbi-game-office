@@ -1,0 +1,54 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Pocket Weather Clerk",
+  "slug": "pocket-weather-clerk",
+  "idea_id": "b05bf62b-6849-434c-82a4-6787557d18ef",
+  "design_id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/pocket-weather-clerk",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/pocket-weather-clerk/game-design/",
+    "wireframe": "projects/pocket-weather-clerk/wireframe/",
+    "implementation": "projects/pocket-weather-clerk/implementation/",
+    "build": "projects/pocket-weather-clerk/build/",
+    "fidelity": "projects/pocket-weather-clerk/fidelity/",
+    "playtest": "projects/pocket-weather-clerk/playtest/",
+    "visual": "projects/pocket-weather-clerk/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "d794507b-5a40-4fdf-a2ae-0e719f8b7272",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "86480a6b-e712-4db9-b1ec-921fa4fbf3ec",
+        "version": "v1.2",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f"
+      }
+    ],
+    "builds": [
+      {
+        "id": "1be27891-9f2d-4795-ab6a-d7519354b2b4",
+        "status": "fidelity_pending",
+        "project_path": "builds/pocket-weather-clerk",
+        "final_commit": "fb53b3de4fc4e69830e2e8f946174ccfa81db075",
+        "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

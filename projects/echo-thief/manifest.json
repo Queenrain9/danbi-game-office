@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Echo Thief",
+  "slug": "echo-thief",
+  "idea_id": "5927f1aa-1576-4e06-a076-c53c6ce0d679",
+  "design_id": "bfca4c5d-f895-4762-bdd2-59b2bcb0cdec",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/echo-thief",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/echo-thief/game-design/",
+    "wireframe": "projects/echo-thief/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/echo-thief/playtest/",
+    "visual": "projects/echo-thief/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "ddb3d7a9-885c-4072-817d-b364e7f463bf",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

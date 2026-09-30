@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Moon Crane Dispatcher",
+  "slug": "moon-crane-dispatcher",
+  "idea_id": "e31edd98-382f-4fdb-a8a4-7bef91cba2a6",
+  "design_id": "ae8add10-d566-4a2e-915f-5878c7ca63e0",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/moon-crane-dispatcher",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/moon-crane-dispatcher/game-design/",
+    "wireframe": "projects/moon-crane-dispatcher/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/moon-crane-dispatcher/playtest/",
+    "visual": "projects/moon-crane-dispatcher/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "0873900b-547e-4928-9a89-6b6b72f4bd4b",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

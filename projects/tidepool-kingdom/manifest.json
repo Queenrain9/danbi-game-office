@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Tidepool Kingdom",
+  "slug": "tidepool-kingdom",
+  "idea_id": "a3c921ee-8a34-4bfe-aa27-6a8c86c773a5",
+  "design_id": "fb77c651-4178-4543-b93a-f462516b8a0d",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/tidepool-kingdom",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/tidepool-kingdom/game-design/",
+    "wireframe": "projects/tidepool-kingdom/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/tidepool-kingdom/playtest/",
+    "visual": "projects/tidepool-kingdom/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "f1127755-de6a-4810-8cc8-cfc7b1e4565a",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

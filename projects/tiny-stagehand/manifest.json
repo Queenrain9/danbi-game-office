@@ -1,0 +1,54 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Tiny Stagehand",
+  "slug": "tiny-stagehand",
+  "idea_id": "201b2137-fd0d-4acd-9daf-ea1559ba5553",
+  "design_id": "0798b6f0-7f9b-4fb9-966c-6f5db6f002b2",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/tiny-stagehand",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/tiny-stagehand/game-design/",
+    "wireframe": "projects/tiny-stagehand/wireframe/",
+    "implementation": "projects/tiny-stagehand/implementation/",
+    "build": "projects/tiny-stagehand/build/",
+    "fidelity": "projects/tiny-stagehand/fidelity/",
+    "playtest": "projects/tiny-stagehand/playtest/",
+    "visual": "projects/tiny-stagehand/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "6a8608cf-6df3-4ed1-a754-be4f659e80e3",
+        "version": "v0.2",
+        "status": "build"
+      }
+    ],
+    "implementations": [
+      {
+        "id": "fe893c5d-386c-490c-952d-556ffccfe6f1",
+        "version": "v1.2",
+        "status": "fidelity_pending",
+        "blueprint_status": "approved",
+        "blueprint_hash": "504a2c8f4ec38b9919866be08c1c4d14d26e76b375e0f61cc47e28e8f4e4ce2e"
+      }
+    ],
+    "builds": [
+      {
+        "id": "43480741-d32b-4f45-937f-88d6396af8e2",
+        "status": "fidelity_pending",
+        "project_path": "builds/tiny-stagehand",
+        "final_commit": "d60fcd9b0b14ef1046760afcb3987eee2ca43692",
+        "blueprint_hash": "504a2c8f4ec38b9919866be08c1c4d14d26e76b375e0f61cc47e28e8f4e4ce2e",
+        "fidelity_status": "pending"
+      }
+    ],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

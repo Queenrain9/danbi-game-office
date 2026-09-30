@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Candle Creature Keeper",
+  "slug": "candle-creature-keeper",
+  "idea_id": "a5b7a285-1c6d-44d1-ab73-cac9492a5233",
+  "design_id": "9e539239-f1b1-4a29-9128-23c37816c529",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/candle-creature-keeper",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/candle-creature-keeper/game-design/",
+    "wireframe": "projects/candle-creature-keeper/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/candle-creature-keeper/playtest/",
+    "visual": "projects/candle-creature-keeper/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "2a519ef3-428d-4ee3-90ea-c002f33378b3",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

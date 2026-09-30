@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Crowd Wave",
+  "slug": "crowd-wave",
+  "idea_id": "c04f37d4-ae36-4413-9914-b719b49056a4",
+  "design_id": "fedeb352-5141-4c2d-b3dc-710a0a8fb411",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/crowd-wave",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/crowd-wave/game-design/",
+    "wireframe": "projects/crowd-wave/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/crowd-wave/playtest/",
+    "visual": "projects/crowd-wave/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "14ab0c8f-fa3f-44a5-ba5d-7dbbce5d605f",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

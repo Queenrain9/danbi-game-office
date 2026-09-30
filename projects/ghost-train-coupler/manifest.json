@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Ghost Train Coupler",
+  "slug": "ghost-train-coupler",
+  "idea_id": "b18d1dde-2104-4085-bdb5-4349c2a110a0",
+  "design_id": "e5b1798d-221b-42b9-84a8-6f7fa68177a1",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/ghost-train-coupler",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/ghost-train-coupler/game-design/",
+    "wireframe": "projects/ghost-train-coupler/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/ghost-train-coupler/playtest/",
+    "visual": "projects/ghost-train-coupler/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "b020ca46-7d2e-445b-9944-b67741446926",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Paper Dragon Tailor",
+  "slug": "paper-dragon-tailor",
+  "idea_id": "1ce650fb-ce65-4c9a-9631-f29a8e0a7304",
+  "design_id": "a6316686-e269-493f-ba26-e543371669a4",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/paper-dragon-tailor",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/paper-dragon-tailor/game-design/",
+    "wireframe": "projects/paper-dragon-tailor/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/paper-dragon-tailor/playtest/",
+    "visual": "projects/paper-dragon-tailor/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "bfe4bc35-cef3-471c-bc58-60fa56b26bfe",
+        "version": "v0.2",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

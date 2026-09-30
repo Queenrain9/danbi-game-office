@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Monster Key Cutter",
+  "slug": "monster-key-cutter",
+  "idea_id": "24ab50fc-bdbe-4d56-86a1-75d4f6aa7a2f",
+  "design_id": "346e3091-434f-4e90-b8a8-05444cf93eef",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/monster-key-cutter",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/monster-key-cutter/game-design/",
+    "wireframe": "projects/monster-key-cutter/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/monster-key-cutter/playtest/",
+    "visual": "projects/monster-key-cutter/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "77c3d896-f530-4cea-a01b-c8f1437b9f94",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

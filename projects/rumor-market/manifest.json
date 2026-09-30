@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Rumor Market",
+  "slug": "rumor-market",
+  "idea_id": "1b53baba-c389-45ee-82b7-18a533905fd7",
+  "design_id": "7c31b077-07d9-42a3-bee4-fb6f0bc5264a",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/rumor-market",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/rumor-market/game-design/",
+    "wireframe": "projects/rumor-market/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/rumor-market/playtest/",
+    "visual": "projects/rumor-market/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "64859919-206f-4106-a1e2-bf76cce1c968",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Pocket Crime Scene Photographer",
+  "slug": "pocket-crime-scene-photographer",
+  "idea_id": "98630915-b22e-43b0-8d44-5707ccee7e8a",
+  "design_id": "3f2eb602-15f4-449a-b6ea-0109cfa329a1",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/pocket-crime-scene-photographer",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/pocket-crime-scene-photographer/game-design/",
+    "wireframe": "projects/pocket-crime-scene-photographer/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/pocket-crime-scene-photographer/playtest/",
+    "visual": "projects/pocket-crime-scene-photographer/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "c8ba96fd-f221-43ef-89d7-2543e5059ef5",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

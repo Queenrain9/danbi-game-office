@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Backseat Alibi",
+  "slug": "backseat-alibi",
+  "idea_id": "3b9c6327-a9e7-40c7-b178-c14c579b33dd",
+  "design_id": "659da5aa-9046-4e1a-bd54-f7d48547d24e",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/backseat-alibi",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/backseat-alibi/game-design/",
+    "wireframe": "projects/backseat-alibi/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/backseat-alibi/playtest/",
+    "visual": "projects/backseat-alibi/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "design",
+    "wireframes": [
+      {
+        "id": "6da9fbeb-2528-4e1f-8a15-a1d4c2ac952e",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

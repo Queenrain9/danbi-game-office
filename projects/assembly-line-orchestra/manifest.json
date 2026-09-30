@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Assembly Line Orchestra",
+  "slug": "assembly-line-orchestra",
+  "idea_id": "3551bec5-a3d6-4800-995d-7cf88375223e",
+  "design_id": "2a47f07e-e719-4c64-862f-b0ba3156b4c4",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/assembly-line-orchestra",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/assembly-line-orchestra/game-design/",
+    "wireframe": "projects/assembly-line-orchestra/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/assembly-line-orchestra/playtest/",
+    "visual": "projects/assembly-line-orchestra/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "5d4f9ba2-e4b9-449b-80ac-0224cbcc6357",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "One Room Time Loop",
+  "slug": "one-room-time-loop",
+  "idea_id": "97f1c1f8-400d-4cfe-b298-dcb91577614f",
+  "design_id": "e59e61e0-5f8b-421a-b39a-1fec306a0072",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/one-room-time-loop",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/one-room-time-loop/game-design/",
+    "wireframe": "projects/one-room-time-loop/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/one-room-time-loop/playtest/",
+    "visual": "projects/one-room-time-loop/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "71e423cd-09e0-4101-bb08-2b76178d5d85",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

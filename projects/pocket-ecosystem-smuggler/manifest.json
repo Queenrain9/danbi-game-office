@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Pocket Ecosystem Smuggler",
+  "slug": "pocket-ecosystem-smuggler",
+  "idea_id": "03e0f837-730f-4d24-895d-fff05e7c814f",
+  "design_id": "aa85fafe-aee1-4e79-8141-6f5d7da8c028",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/pocket-ecosystem-smuggler",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/pocket-ecosystem-smuggler/game-design/",
+    "wireframe": "projects/pocket-ecosystem-smuggler/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/pocket-ecosystem-smuggler/playtest/",
+    "visual": "projects/pocket-ecosystem-smuggler/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "e2d36d1a-b348-4764-9e60-f65d33b1c741",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}

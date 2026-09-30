@@ -1,0 +1,827 @@
+{
+  "id": "61129ed9-26dd-4fc0-bb26-6ca9beb356b1",
+  "source": "chat_automation",
+  "status": "complete",
+  "results": [
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"7개 화면/오버레이가 정의된 분기대로 이동한다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Dragging must move a selected shadow piece, show a following ghost, and restore the last valid transform on collision.",
+      "observed": "Pointer motion only changes a shared state string; no piece transform follows the pointer, no last-valid transform is stored, and a failed release only sets collision without a bounce/restore.",
+      "rationale": "A drag event path exists, but the core Place verb and its collision recovery are not spatially implemented.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "ACC:02"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"선택 조각은 two-finger 또는 ±15° 버튼으로 회전한다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:03"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Ghost snap and actual snap must occur only within 18 px position error and 12 degrees rotation error against the correct anchor.",
+      "observed": "Both snap-candidate and snap acceptance compare distance to SNAP_POSITION_PX * 4.0 (72 px), and rotation is checked against a synthetic modulo pattern rather than an anchor-specific target angle.",
+      "rationale": "The implemented acceptance region is four times the specified spatial tolerance and does not preserve the anchor-angle rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "ACC:04"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"정렬되지 않은 seam은 trace를 시작할 수 없다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:05"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "ACC:06"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"필수 seam 완료 전 Pose Test가 비활성이다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:07"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"0.6초 hold 완료 후에만 Test가 실행된다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:08"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"criterion\": \"첫 실패만 Rework로 돌아가며 두 번째 Test 후 Result가 확정된다\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ACC:09"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"implementation_order\": [\"flow/state machine\", \"piece drag\", \"rotation\", \"snap\", \"stitch trace\", \"pose test\", \"rework\", \"result\"]}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ARC:implementation_order"
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "The declared session data, completed-contract/unlock persistence, loading input lock, and pause-state preservation paths must have real data/state ownership and executable code.",
+      "observed": "The claimed implementation symbols are pass-only placeholders; the project has no ContractData/PieceData/AnchorGraph/SeamGraph/TestPose model, persistence path, loading lock path, or pause preservation path.",
+      "rationale": "These are named structural responsibilities with no implementation behind the claimed symbols, so the playtest project cannot exercise or preserve the specified state.",
+      "depends_on": [],
+      "repair_group": "g1_architecture",
+      "requirement_id": "ARC:persistence"
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "The declared session data, completed-contract/unlock persistence, loading input lock, and pause-state preservation paths must have real data/state ownership and executable code.",
+      "observed": "The claimed implementation symbols are pass-only placeholders; the project has no ContractData/PieceData/AnchorGraph/SeamGraph/TestPose model, persistence path, loading lock path, or pause preservation path.",
+      "rationale": "These are named structural responsibilities with no implementation behind the claimed symbols, so the playtest project cannot exercise or preserve the specified state.",
+      "depends_on": [],
+      "repair_group": "g1_architecture",
+      "requirement_id": "ARC:required_data"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"reusable\": [\"ShadowPiece\", \"AnchorNode\", \"SeamPath\", \"HoldButton\", \"ResultPanel\"]}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ARC:reusable"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"scene_hierarchy\": [\"AppRoot\", \"ContractController\", \"WorkbenchScene\", \"GestureLayer\", \"HUDLayer\", \"ModalLayer\"]}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ARC:scene_hierarchy"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"state_owner\": \"ContractSessionState\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "ARC:state_owner"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 8, \"w\": 60, \"x\": 20, \"y\": 86}, \"component\": \"begin\", \"label\": \"수선 시작\", \"screen\": \"customer_intake\", \"state_binding\": \"diagnosed\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:customer_intake:begin"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 44, \"w\": 64, \"x\": 18, \"y\": 8}, \"component\": \"customer\", \"label\": \"손님+어긋난 그림자\", \"screen\": \"customer_intake\", \"state_binding\": \"\", \"type\": \"object\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:customer_intake:customer"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 14, \"w\": 76, \"x\": 12, \"y\": 63}, \"component\": \"symptom_targets\", \"label\": \"증상 포인트\", \"screen\": \"customer_intake\", \"state_binding\": \"\", \"type\": \"hotspots\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:customer_intake:symptom_targets"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 9, \"w\": 64, \"x\": 18, \"y\": 83}, \"component\": \"client_btn\", \"label\": \"다음 손님 받기\", \"screen\": \"night_workshop\", \"state_binding\": \"\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:night_workshop:client_btn"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 6, \"w\": 20, \"x\": 70, \"y\": 7}, \"component\": \"progress\", \"label\": \"의뢰 1/5\", \"screen\": \"night_workshop\", \"state_binding\": \"\", \"type\": \"status\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:night_workshop:progress"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 9, \"w\": 64, \"x\": 18, \"y\": 81}, \"component\": \"hold_test\", \"label\": \"0.6초 눌러 테스트\", \"screen\": \"pose_test\", \"state_binding\": \"enabled\", \"type\": \"hold_button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:pose_test:hold_test"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 53, \"w\": 70, \"x\": 15, \"y\": 12}, \"component\": \"pose_pair\", \"label\": \"몸 + 그림자\", \"screen\": \"pose_test\", \"state_binding\": \"idle|testing|pass|fail\", \"type\": \"animation\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:pose_test:pose_pair"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 32, \"w\": 76, \"x\": 12, \"y\": 33}, \"component\": \"behavior\", \"label\": \"복구 전/후\", \"screen\": \"result\", \"state_binding\": \"\", \"type\": \"comparison\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:result:behavior"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 9, \"w\": 60, \"x\": 20, \"y\": 80}, \"component\": \"continue\", \"label\": \"다음 의뢰\", \"screen\": \"result\", \"state_binding\": \"\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:result:continue"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 13, \"w\": 40, \"x\": 30, \"y\": 10}, \"component\": \"grade\", \"label\": \"등급\", \"screen\": \"result\", \"state_binding\": \"\", \"type\": \"status\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:result:grade"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 20, \"w\": 60, \"x\": 20, \"y\": 30}, \"component\": \"error_anchor\", \"label\": \"오류 위치 미리보기\", \"screen\": \"rework_overlay\", \"state_binding\": \"\", \"type\": \"preview\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:rework_overlay:error_anchor"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 9, \"w\": 60, \"x\": 20, \"y\": 57}, \"component\": \"rework_btn\", \"label\": \"1회 재수선\", \"screen\": \"rework_overlay\", \"state_binding\": \"rework_available\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:rework_overlay:rework_btn"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 8, \"w\": 84, \"x\": 8, \"y\": 78}, \"component\": \"piece_tray\", \"label\": \"조각 트레이\", \"screen\": \"shadow_workbench\", \"state_binding\": \"\", \"type\": \"tray\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:shadow_workbench:piece_tray"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 7, \"w\": 18, \"x\": 8, \"y\": 90}, \"component\": \"rotate_left\", \"label\": \"-15°\", \"screen\": \"shadow_workbench\", \"state_binding\": \"piece_selected\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:shadow_workbench:rotate_left"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 7, \"w\": 18, \"x\": 28, \"y\": 90}, \"component\": \"rotate_right\", \"label\": \"+15°\", \"screen\": \"shadow_workbench\", \"state_binding\": \"piece_selected\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:shadow_workbench:rotate_right"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 50, \"w\": 80, \"x\": 10, \"y\": 18}, \"component\": \"silhouette\", \"label\": \"Base Silhouette\", \"screen\": \"shadow_workbench\", \"state_binding\": \"repair\", \"type\": \"canvas\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:shadow_workbench:silhouette"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 7, \"w\": 34, \"x\": 58, \"y\": 90}, \"component\": \"stitch_btn\", \"label\": \"봉합 모드\", \"screen\": \"shadow_workbench\", \"state_binding\": \"required_snaps_done\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:shadow_workbench:stitch_btn"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 58, \"w\": 82, \"x\": 9, \"y\": 17}, \"component\": \"seam_canvas\", \"label\": \"정렬된 그림자\", \"screen\": \"stitch_mode\", \"state_binding\": \"stitch\", \"type\": \"canvas\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:stitch_mode:seam_canvas"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"box\": {\"h\": 8, \"w\": 60, \"x\": 20, \"y\": 87}, \"component\": \"test_btn\", \"label\": \"Pose Test\", \"screen\": \"stitch_mode\", \"state_binding\": \"all_required_locked\", \"type\": \"button\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CMP:stitch_mode:test_btn"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Five orders must use 2-6 independently manipulable shadow pieces and include the MVP rule modules (base anchor, rotation lock, and stitch order).",
+      "observed": "The order counter and required_pieces integer grow from 2 to 6, but one tray-wide input surface repeatedly increments the same counter; pieces have no independent transforms/anchors, and rotation-lock/stitch-order modules are absent.",
+      "rationale": "The quantity is displayed and counted, but the rule-relevant content and independent piece behavior are not implemented.",
+      "depends_on": [],
+      "repair_group": "g2_state_rules",
+      "requirement_id": "CNT:mvp_scope"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"screen_inventory\": [\"Night Workshop — 의뢰 시작\", \"Customer Intake — 증상/목표\", \"Shadow Workbench — 배치·회전\", \"Stitch Mode — 봉합\", \"Pose Test — 동기화 테스트\", \"Rework Overlay — 오류 수정\", \"Result — 등급/행동 변화\"]}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "CNT:screen_inventory"
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "The declared session data, completed-contract/unlock persistence, loading input lock, and pause-state preservation paths must have real data/state ownership and executable code.",
+      "observed": "The claimed implementation symbols are pass-only placeholders; the project has no ContractData/PieceData/AnchorGraph/SeamGraph/TestPose model, persistence path, loading lock path, or pause preservation path.",
+      "rationale": "These are named structural responsibilities with no implementation behind the claimed symbols, so the playtest project cannot exercise or preserve the specified state.",
+      "depends_on": [],
+      "repair_group": "g1_architecture",
+      "requirement_id": "GST:loading"
+    },
+    {
+      "verdict": "MISSING",
+      "expected": "The declared session data, completed-contract/unlock persistence, loading input lock, and pause-state preservation paths must have real data/state ownership and executable code.",
+      "observed": "The claimed implementation symbols are pass-only placeholders; the project has no ContractData/PieceData/AnchorGraph/SeamGraph/TestPose model, persistence path, loading lock path, or pause preservation path.",
+      "rationale": "These are named structural responsibilities with no implementation behind the claimed symbols, so the playtest project cannot exercise or preserve the specified state.",
+      "depends_on": [],
+      "repair_group": "g1_architecture",
+      "requirement_id": "GST:pause"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"id\": \"rework_used\", \"rule\": \"의뢰당 1회만 true 전환\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "GST:rework_used"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Only actual symptom hotspots may diagnose; taps in non-symptom space must be ignored.",
+      "observed": "The entire symptom_targets rectangle is one input surface and every press calls diagnose_at without testing any hotspot geometry.",
+      "rationale": "The invalid-input rule and target-specific spatial hit test are not preserved.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INP:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Dragging must move a selected shadow piece, show a following ghost, and restore the last valid transform on collision.",
+      "observed": "Pointer motion only changes a shared state string; no piece transform follows the pointer, no last-valid transform is stored, and a failed release only sets collision without a bounce/restore.",
+      "rationale": "A drag event path exists, but the core Place verb and its collision recovery are not spatially implemented.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INP:02"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Selected-piece rotation must support a two-finger twist with deterministic cancellation that keeps the last valid angle.",
+      "observed": "The code maps InputEventMagnifyGesture and InputEventPanGesture to rotation deltas; it has no twist-angle measurement or cancel/restore path.",
+      "rationale": "Pan/magnify are different gestures from the specified two-finger twist and do not implement its cancel semantics.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INP:03"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INP:04"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"input\": \"hold 0.6s\", \"priority\": 5, \"use\": \"pose test\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "INP:05"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Only actual symptom hotspots may diagnose; taps in non-symptom space must be ignored.",
+      "observed": "The entire symptom_targets rectangle is one input surface and every press calls diagnose_at without testing any hotspot geometry.",
+      "rationale": "The invalid-input rule and target-specific spatial hit test are not preserved.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:customer_intake:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "INT:night_workshop:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "INT:pose_test:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "INT:result:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "INT:rework_overlay:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Dragging must move a selected shadow piece, show a following ghost, and restore the last valid transform on collision.",
+      "observed": "Pointer motion only changes a shared state string; no piece transform follows the pointer, no last-valid transform is stored, and a failed release only sets collision without a bounce/restore.",
+      "rationale": "A drag event path exists, but the core Place verb and its collision recovery are not spatially implemented.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:shadow_workbench:01"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Selected-piece rotation must support a two-finger twist with deterministic cancellation that keeps the last valid angle.",
+      "observed": "The code maps InputEventMagnifyGesture and InputEventPanGesture to rotation deltas; it has no twist-angle measurement or cancel/restore path.",
+      "rationale": "Pan/magnify are different gestures from the specified two-finger twist and do not implement its cancel semantics.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:shadow_workbench:02"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The selected piece must rotate exactly -15 or +15 degrees through the corresponding button, with tick/light-haptic feedback and disabled behavior when no piece is selected.",
+      "observed": "Buttons call one shared handler and update a scalar angle, but there is no piece transform, tick, or haptic; direction depends on viewport focus-owner inference.",
+      "rationale": "The button path and gating exist, but spatial rotation and required feedback are incomplete.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:shadow_workbench:03"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Ghost snap and actual snap must occur only within 18 px position error and 12 degrees rotation error against the correct anchor.",
+      "observed": "Both snap-candidate and snap acceptance compare distance to SNAP_POSITION_PX * 4.0 (72 px), and rotation is checked against a synthetic modulo pattern rather than an anchor-specific target angle.",
+      "rationale": "The implemented acceptance region is four times the specified spatial tolerance and does not preserve the anchor-angle rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:shadow_workbench:04"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:stitch_mode:01"
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "Seam release may lock only after a complete valid trace reaches the seam end; incomplete traces must reset.",
+      "observed": "begin_trace initializes quality to 1.0 and end_trace locks whenever quality remains >= 0.55; pressing and immediately releasing without any trace motion can lock the seam and award points.",
+      "rationale": "The completion/endpoint invariant is absent, allowing the central Stitch verb to be bypassed.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "INT:stitch_mode:02"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"failure\": \"진행 차단 대신 낮은 등급과 잔여 이상 행동\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "RUL:failure"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"grades\": {\"A\": 80, \"B\": 65, \"C\": 0, \"S\": 95}}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "RUL:grades"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Five orders must use 2-6 independently manipulable shadow pieces and include the MVP rule modules (base anchor, rotation lock, and stitch order).",
+      "observed": "The order counter and required_pieces integer grow from 2 to 6, but one tray-wide input surface repeatedly increments the same counter; pieces have no independent transforms/anchors, and rotation-lock/stitch-order modules are absent.",
+      "rationale": "The quantity is displayed and counted, but the rule-relevant content and independent piece behavior are not implemented.",
+      "depends_on": [],
+      "repair_group": "g2_state_rules",
+      "requirement_id": "RUL:pieces"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"rework_limit\": 1}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "RUL:rework_limit"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"score\": {\"alignment\": 50, \"diagnosis\": 20, \"rework\": -10, \"stitch\": 30}}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "RUL:score"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Ghost snap and actual snap must occur only within 18 px position error and 12 degrees rotation error against the correct anchor.",
+      "observed": "Both snap-candidate and snap acceptance compare distance to SNAP_POSITION_PX * 4.0 (72 px), and rotation is checked against a synthetic modulo pattern rather than an anchor-specific target angle.",
+      "rationale": "The implemented acceptance region is four times the specified spatial tolerance and does not preserve the anchor-angle rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "RUL:snap"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "RUL:stitch_trace_deviation_px"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"증상을 관찰하고 수선 목표를 고정\", \"screen\": \"customer_intake\", \"state\": \"diagnosed\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:customer_intake:diagnosed"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"증상을 관찰하고 수선 목표를 고정\", \"screen\": \"customer_intake\", \"state\": \"observing\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:customer_intake:observing"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"의뢰 시작과 현재 진행 확인\", \"screen\": \"night_workshop\", \"state\": \"ready\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:night_workshop:ready"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "STA:pose_test:active"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "STA:pose_test:fail"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"몸과 그림자의 동기화를 0.6초 hold로 검증\", \"screen\": \"pose_test\", \"state\": \"holding\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:pose_test:holding"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"몸과 그림자의 동기화를 0.6초 hold로 검증\", \"screen\": \"pose_test\", \"state\": \"idle\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:pose_test:idle"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "STA:pose_test:pass"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"등급과 손님의 행동 변화 확인\", \"screen\": \"result\", \"state\": \"result\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:result:result"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "The interactions and states must expose their specified fade/haptic/pose-animation/result/rework feedback and make active/pass/fail/consumed states observable.",
+      "observed": "Control flow exists, but there is no fade, haptic, pose animation, synchronized body/shadow motion, or distinct consumed-state presentation; pose active/pass/fail are assigned and immediately replaced by a screen transition.",
+      "rationale": "The required feedback and observable state presentation are missing even though handlers and state names exist.",
+      "depends_on": [],
+      "repair_group": "g4_presentation_feedback",
+      "requirement_id": "STA:rework_overlay:consumed"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"첫 실패의 오류 anchor를 알려주고 1회 수정으로 복귀\", \"screen\": \"rework_overlay\", \"state\": \"shown\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:rework_overlay:shown"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Dragging must move a selected shadow piece, show a following ghost, and restore the last valid transform on collision.",
+      "observed": "Pointer motion only changes a shared state string; no piece transform follows the pointer, no last-valid transform is stored, and a failed release only sets collision without a bounce/restore.",
+      "rationale": "A drag event path exists, but the core Place verb and its collision recovery are not spatially implemented.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "STA:shadow_workbench:collision"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Dragging must move a selected shadow piece, show a following ghost, and restore the last valid transform on collision.",
+      "observed": "Pointer motion only changes a shared state string; no piece transform follows the pointer, no last-valid transform is stored, and a failed release only sets collision without a bounce/restore.",
+      "rationale": "A drag event path exists, but the core Place verb and its collision recovery are not spatially implemented.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "STA:shadow_workbench:dragging"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"그림자 조각을 drag/rotate하여 anchor에 정렬\", \"screen\": \"shadow_workbench\", \"state\": \"idle\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:shadow_workbench:idle"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"그림자 조각을 drag/rotate하여 anchor에 정렬\", \"screen\": \"shadow_workbench\", \"state\": \"selected\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:shadow_workbench:selected"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"그림자 조각을 drag/rotate하여 anchor에 정렬\", \"screen\": \"shadow_workbench\", \"state\": \"snap_candidate\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:shadow_workbench:snap_candidate"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"그림자 조각을 drag/rotate하여 anchor에 정렬\", \"screen\": \"shadow_workbench\", \"state\": \"snapped\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:shadow_workbench:snapped"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"정렬된 경계를 손가락으로 따라 봉합\", \"screen\": \"stitch_mode\", \"state\": \"available\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:stitch_mode:available"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "STA:stitch_mode:error"
+    },
+    {
+      "verdict": "BROKEN",
+      "expected": "Seam release may lock only after a complete valid trace reaches the seam end; incomplete traces must reset.",
+      "observed": "begin_trace initializes quality to 1.0 and end_trace locks whenever quality remains >= 0.55; pressing and immediately releasing without any trace motion can lock the seam and award points.",
+      "rationale": "The completion/endpoint invariant is absent, allowing the central Stitch verb to be bypassed.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "STA:stitch_mode:locked"
+    },
+    {
+      "verdict": "CONFLICT",
+      "expected": "Trace must stay inside a 20 px corridor and leave/cancel into an observable error state as soon as the path exits it.",
+      "observed": "Trace quality divides deviation by 80 px and later accepts quality >= 0.55, allowing roughly 36 px deviation; leaving 20 px does not cancel immediately and the error state has no distinct feedback.",
+      "rationale": "The numeric corridor and cancel semantics are looser than the source rule.",
+      "depends_on": [],
+      "repair_group": "g3_input_spatial",
+      "requirement_id": "STA:stitch_mode:tracing"
+    },
+    {
+      "verdict": "INCONCLUSIVE",
+      "expected": "{\"purpose\": \"정렬된 경계를 손가락으로 따라 봉합\", \"screen\": \"stitch_mode\", \"state\": \"unavailable\"}",
+      "observed": "The official structural CLI passed and the referenced code/scene symbol exists, but this failed semantic run did not create a passed independent Gate evidence bundle.",
+      "rationale": "Without a matching passed Gate evidence UUID, this requirement cannot be recorded as VERIFIED in danbi_apply_review; it is not asserted as a confirmed defect.",
+      "evidence_ids": [],
+      "requirement_id": "STA:stitch_mode:unavailable"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:customer_intake:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:night_workshop:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:pose_test:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:pose_test:02"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:pose_test:03"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:result:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:rework_overlay:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:shadow_workbench:01"
+    },
+    {
+      "verdict": "PARTIAL",
+      "expected": "Each transition must preserve its from/to/trigger/guard and execute the specified short fade.",
+      "observed": "The guarded destination calls generally exist, but show_screen switches visibility immediately and no transition implements the required short fade animation.",
+      "rationale": "Flow routing is structurally connected, while the specified transition presentation is absent.",
+      "depends_on": [],
+      "repair_group": "g5_integration_traceability",
+      "requirement_id": "TRN:stitch_mode:01"
+    }
+  ],
+  "verdict": "fail",
+  "created_at": "2026-09-30T14:03:29.794289+00:00",
+  "contract_id": "bb27ce5f-06f3-49c7-8493-f6092fb4f83c",
+  "broken_count": 2,
+  "build_job_id": "3eb410a4-b4f2-4d21-b1de-557abb3787f6",
+  "completed_at": "2026-09-30T14:03:29.794289+00:00",
+  "review_round": 1,
+  "blocked_count": 0,
+  "missing_count": 4,
+  "partial_count": 25,
+  "source_run_at": "2026-09-30T14:03:29.794289+00:00",
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "conflict_count": 13,
+  "review_summary": "Independent static Gate at game commit 92193ad85e9d1012a504c705e1dc969f94cb8020: official check-blueprint/check-build reported 0 structural errors, but semantic code review found confirmed architecture, piece-drag, snap-tolerance, seam-trace, gesture, feedback, and transition defects. verification_scope=static_playtest_readiness; runtime_qa_performed=false; manual_playtest_required=true. No passed Gate bundle/evidence was created.",
+  "verified_count": 0,
+  "ambiguous_count": 0,
+  "manual_test_ids": [
+    "MANUAL:INT:customer_intake:01",
+    "MANUAL:INT:night_workshop:01",
+    "MANUAL:INT:pose_test:01",
+    "MANUAL:INT:result:01",
+    "MANUAL:INT:rework_overlay:01",
+    "MANUAL:INT:shadow_workbench:01",
+    "MANUAL:INT:shadow_workbench:02",
+    "MANUAL:INT:shadow_workbench:03",
+    "MANUAL:INT:shadow_workbench:04",
+    "MANUAL:INT:stitch_mode:01",
+    "MANUAL:INT:stitch_mode:02"
+  ],
+  "reviewed_commit": "92193ad85e9d1012a504c705e1dc969f94cb8020",
+  "inconclusive_count": 49,
+  "verification_scope": "static"
+}

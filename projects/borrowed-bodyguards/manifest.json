@@ -1,0 +1,37 @@
+{
+  "schema_version": "danbi-project-archive-v1",
+  "title": "Borrowed Bodyguards",
+  "slug": "borrowed-bodyguards",
+  "idea_id": "d636fc0d-6580-4a46-b221-aa652ab9365e",
+  "design_id": "83e894d6-7c3c-476b-88b6-094e9fe7fe2b",
+  "repository": "Queenrain9/danbi-game-office",
+  "project_root": "projects/borrowed-bodyguards",
+  "roles": {
+    "operational_state": "Supabase DB",
+    "durable_project_archive": "GitHub project tree"
+  },
+  "artifacts": {
+    "game_design": "projects/borrowed-bodyguards/game-design/",
+    "wireframe": "projects/borrowed-bodyguards/wireframe/",
+    "implementation": null,
+    "build": null,
+    "fidelity": null,
+    "playtest": "projects/borrowed-bodyguards/playtest/",
+    "visual": "projects/borrowed-bodyguards/visual/"
+  },
+  "latest": {
+    "design_version": "v0.1",
+    "design_status": "wireframe",
+    "wireframes": [
+      {
+        "id": "652cb43a-34a4-4023-ab33-9a0323572f99",
+        "version": "v0.3",
+        "status": "wireframe"
+      }
+    ],
+    "implementations": [],
+    "builds": [],
+    "fidelity_reviews": []
+  },
+  "policy": "Supabase drives live queues/status. GitHub preserves the durable per-game artifact tree. Existing canonical build/evidence paths remain valid."
+}
