@@ -1,0 +1,24 @@
+{
+  "role": "builder",
+  "kind": "static",
+  "status": "passed",
+  "verification_scope": "static",
+  "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+  "commit": "fb53b3de4fc4e69830e2e8f946174ccfa81db075",
+  "adapter_bindings": "legacy approved blueprint: none",
+  "checks": [
+    "Godot project and main scene",
+    "six approved screens",
+    "screen geometry",
+    "cloud drag with clamp",
+    "8-way circular wind control",
+    "5-percent vertical humidity control",
+    "pointer release adjustment commit",
+    "settling/evaluating states",
+    "pause reset/exit",
+    "result retry/next",
+    "three-order shift completion",
+    "156/156 implementation claims"
+  ],
+  "runtime_qa": "not executed; manual Godot/Xogot playtest required"
+}

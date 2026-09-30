@@ -1,0 +1,219 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource path="res://scripts/main.gd" type="Script" id="1"]
+[node name="AppRoot" type="Control"]
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1")
+[node name="shift_board" type="Control" parent="."]
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="shift_progress" type="Label" parent="shift_board"]
+offset_left=43.2
+offset_top=57.6
+offset_right=496.8
+offset_bottom=115.2
+text="Pocket Weather Clerk — Shift 1"
+[node name="order_cards" type="Button" parent="shift_board"]
+offset_left=54.0
+offset_top=192.0
+offset_right=486.0
+offset_bottom=691.2
+text="ORDER 01\n맑은 시장 · 바람 약하게\nTap to inspect"
+[node name="hard_lock" type="Label" parent="shift_board"]
+offset_left=54.0
+offset_top=739.2
+offset_right=486.0
+offset_bottom=806.4
+text="Next orders unlock after resolution"
+[node name="order_brief" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="district_preview" type="Panel" parent="order_brief"]
+offset_left=43.2
+offset_top=96.0
+offset_right=496.8
+offset_bottom=441.6
+[node name="target_chips" type="Label" parent="order_brief"]
+offset_left=54.0
+offset_top=480.0
+offset_right=486.0
+offset_bottom=556.8
+text="TARGET  Cloud 45% · Wind NE 1 · Humidity 55%"
+[node name="constraint_chips" type="Label" parent="order_brief"]
+offset_left=54.0
+offset_top=576.0
+offset_right=486.0
+offset_bottom=652.8
+text="CONSTRAINT  ≤ 8 adjustments"
+[node name="start_btn" type="Button" parent="order_brief"]
+offset_left=286.2
+offset_top=816.0
+offset_right=496.8
+offset_bottom=892.8
+text="업무 시작"
+[node name="back_btn" type="Button" parent="order_brief"]
+offset_left=43.2
+offset_top=816.0
+offset_right=253.8
+offset_bottom=892.8
+text="뒤로"
+[node name="weather_desk" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="target_strip" type="Label" parent="weather_desk"]
+offset_left=32.4
+offset_top=38.4
+offset_right=507.6
+offset_bottom=96.0
+text="TARGET: cloud 45 · NE wind · humidity 55"
+[node name="district_world" type="Panel" parent="weather_desk"]
+offset_left=32.4
+offset_top=124.8
+offset_right=507.6
+offset_bottom=624.0
+[node name="cloud_bank" type="Button" parent="weather_desk"]
+offset_left=86.4
+offset_top=201.6
+offset_right=280.8
+offset_bottom=364.8
+text="☁ CLOUD"
+[node name="wind_nozzle" type="Button" parent="weather_desk"]
+offset_left=329.4
+offset_top=403.2
+offset_right=464.4
+offset_bottom=537.6
+text="WIND ↗"
+[node name="humidity_valve" type="Button" parent="weather_desk"]
+offset_left=43.2
+offset_top=393.6
+offset_right=118.8
+offset_bottom=576.0
+text="H\nU\nM"
+[node name="adjust_count" type="Label" parent="weather_desk"]
+offset_left=43.2
+offset_top=652.8
+offset_right=237.6
+offset_bottom=710.4
+text="ADJUST 0 / 8"
+[node name="settle_meter" type="ProgressBar" parent="weather_desk"]
+offset_left=280.8
+offset_top=662.4
+offset_right=496.8
+offset_bottom=700.8
+value=100.0
+[node name="observe_btn" type="Button" parent="weather_desk"]
+offset_left=43.2
+offset_top=748.8
+offset_right=237.6
+offset_bottom=825.6
+text="관찰"
+[node name="submit_btn" type="Button" parent="weather_desk"]
+offset_left=302.4
+offset_top=748.8
+offset_right=496.8
+offset_bottom=825.6
+text="제출"
+[node name="pause_btn" type="Button" parent="weather_desk"]
+offset_left=442.8
+offset_top=864.0
+offset_right=507.6
+offset_bottom=921.6
+text="Ⅱ"
+[node name="pause_overlay" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="resume" type="Button" parent="pause_overlay"]
+offset_left=108.0
+offset_top=316.8
+offset_right=432.0
+offset_bottom=393.6
+text="계속"
+[node name="restart" type="Button" parent="pause_overlay"]
+offset_left=108.0
+offset_top=422.4
+offset_right=432.0
+offset_bottom=499.2
+text="현재 주문 재시작"
+[node name="exit" type="Button" parent="pause_overlay"]
+offset_left=108.0
+offset_top=528.0
+offset_right=432.0
+offset_bottom=604.8
+text="주문 포기"
+[node name="order_result" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="result_title" type="Label" parent="order_result"]
+offset_left=81.0
+offset_top=96.0
+offset_right=459.0
+offset_bottom=192.0
+text="DISTRICT RESULT"
+[node name="stars" type="Label" parent="order_result"]
+offset_left=135.0
+offset_top=220.8
+offset_right=405.0
+offset_bottom=316.8
+text="★★★"
+[node name="district_rows" type="Panel" parent="order_result"]
+offset_left=54.0
+offset_top=355.2
+offset_right=486.0
+offset_bottom=681.6
+[node name="retry" type="Button" parent="order_result"]
+offset_left=43.2
+offset_top=796.8
+offset_right=253.8
+offset_bottom=873.6
+text="다시 조정"
+[node name="next" type="Button" parent="order_result"]
+offset_left=286.2
+offset_top=796.8
+offset_right=496.8
+offset_bottom=873.6
+text="다음 주문"
+[node name="shift_complete" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="shift_stats" type="Label" parent="shift_complete"]
+offset_left=54.0
+offset_top=192.0
+offset_right=486.0
+offset_bottom=489.6
+text="SHIFT COMPLETE\n3 / 3 orders resolved"
+[node name="unlock" type="Label" parent="shift_complete"]
+offset_left=54.0
+offset_top=547.2
+offset_right=486.0
+offset_bottom=672.0
+text="New district forecast unlocked"
+[node name="continue" type="Button" parent="shift_complete"]
+offset_left=108.0
+offset_top=796.8
+offset_right=432.0
+offset_bottom=873.6
+text="보드로"
+[connection signal="pressed" from="shift_board/order_cards" to="." method="action_shift_board_0"]
+[connection signal="pressed" from="order_brief/start_btn" to="." method="action_order_brief_0"]
+[connection signal="pressed" from="order_brief/back_btn" to="." method="action_order_brief_1"]
+[connection signal="pressed" from="weather_desk/observe_btn" to="." method="action_weather_desk_3"]
+[connection signal="pressed" from="weather_desk/submit_btn" to="." method="action_weather_desk_4"]
+[connection signal="pressed" from="weather_desk/pause_btn" to="." method="pause_game"]
+[connection signal="pressed" from="pause_overlay/resume" to="." method="action_pause_overlay_0"]
+[connection signal="pressed" from="pause_overlay/restart" to="." method="action_pause_overlay_1"]
+[connection signal="pressed" from="pause_overlay/exit" to="." method="action_pause_overlay_2"]
+[connection signal="pressed" from="order_result/retry" to="." method="action_order_result_0"]
+[connection signal="pressed" from="order_result/next" to="." method="action_order_result_1"]
+[connection signal="pressed" from="shift_complete/continue" to="." method="action_shift_complete_0"]

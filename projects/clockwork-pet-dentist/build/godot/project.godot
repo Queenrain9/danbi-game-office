@@ -1,0 +1,9 @@
+[application]
+config/name="Clockwork Pet Dentist"
+run/main_scene="res://scenes/main.tscn"
+[display]
+window/size/viewport_width=540
+window/size/viewport_height=960
+window/stretch/mode="canvas_items"
+[rendering]
+renderer/rendering_method="gl_compatibility"

@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "1be27891-9f2d-4795-ab6a-d7519354b2b4",
+  "contract_id": "86480a6b-e712-4db9-b1ec-921fa4fbf3ec",
+  "design_id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
+  "title": "Pocket Weather Clerk",
+  "slug": "pocket-weather-clerk",
+  "canonical_project_path": "builds/pocket-weather-clerk",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "fb53b3de4fc4e69830e2e8f946174ccfa81db075",
+  "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/pocket-weather-clerk/build/godot",
+  "archived_file_count": 3,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}

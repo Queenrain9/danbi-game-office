@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "0c4821f4-9db2-4ff9-985e-ad87ccf4ce73",
+  "contract_id": "f556078a-f98d-4509-b08a-26509a651d78",
+  "design_id": "cd44b43d-0022-45e5-9cad-7028ab8da75a",
+  "title": "Midnight Lost Property",
+  "slug": "midnight-lost-property",
+  "canonical_project_path": "builds/midnight-lost-property",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "4bc09d26e8e2917ea353875f06cae1e753b7909a",
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/midnight-lost-property/build/godot",
+  "archived_file_count": 10,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}

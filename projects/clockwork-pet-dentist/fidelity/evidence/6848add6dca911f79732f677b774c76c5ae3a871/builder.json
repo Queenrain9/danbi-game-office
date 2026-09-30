@@ -1,0 +1,25 @@
+{
+  "role": "builder",
+  "kind": "static",
+  "status": "passed",
+  "verification_scope": "static",
+  "blueprint_hash": "34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f",
+  "commit": "6848add6dca911f79732f677b774c76c5ae3a871",
+  "adapter_bindings": "legacy approved blueprint: none",
+  "checks": [
+    "project/main scene",
+    "patient select and brief",
+    "treatment mouth/gear/tool/parts/test nodes",
+    "pinch-pan camera path",
+    "probe diagnostic path",
+    "axis extraction guard",
+    "lubrication",
+    "3-degree circular phase",
+    "drag-release install",
+    "hold test",
+    "part bench grind",
+    "pause/result retry/next",
+    "137/137 claims"
+  ],
+  "runtime_qa": "not executed; manual playtest required"
+}

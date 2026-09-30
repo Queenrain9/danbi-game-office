@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "c1ff6f34-f3ef-489d-a38f-818abe6b1750",
+  "contract_id": "b27929ee-4ad3-4381-8b09-2760ee458ea3",
+  "design_id": "69cfd48e-f740-49c9-9f33-9171b44501b2",
+  "title": "Pocket Canal Keeper",
+  "slug": "pocket-canal-keeper",
+  "canonical_project_path": "builds/pocket-canal-keeper",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "078cf604d31416aa632f91d281e5e485635127ee",
+  "blueprint_hash": "4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/pocket-canal-keeper/build/godot",
+  "archived_file_count": 3,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}
