@@ -556,6 +556,46 @@
 @media(max-width:800px){.pt-build-box{grid-template-columns:1fr}.pt-art-grid{grid-template-columns:1fr}.pt-art-visual{aspect-ratio:16/10}.pt-hero{flex-direction:column}.pt-stage{padding:15px}}
 @media(max-width:560px){.pt-queue{grid-template-columns:1fr}.pt-title{font-size:20px}.pt-ident{grid-template-columns:86px minmax(0,1fr)}}
 
+
+/* Post-playtest Studio v0.1 */
+.pt-art-card.choice{outline:2px solid rgba(111,160,226,.75);box-shadow:0 0 0 4px rgba(111,160,226,.08)}
+.pt-verdict{margin-top:18px;border:1px solid rgba(120,160,208,.12);background:rgba(17,27,42,.72);border-radius:15px;padding:15px}
+.pt-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.pt-verdict-head strong{font-size:12px;color:#e5eefb}
+.pt-verdict-head span{display:block;font-size:9px;line-height:1.55;color:#7188a1;margin-top:4px}
+.pt-verdict textarea{width:100%;min-height:88px;resize:vertical;background:#0b1420;border:1px solid rgba(130,163,201,.14);border-radius:11px;color:#dce8f6;padding:11px;font:inherit;font-size:11px;line-height:1.6;box-sizing:border-box}
+.pt-verdict-actions{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:8px;margin-top:10px}
+.pt-verdict-actions .btn{min-height:40px}
+.pt-route-note{margin-top:8px;font-size:9px;color:#627a93;line-height:1.5}
+.pt-results{margin-top:24px}
+.pt-result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pt-result-col{border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.018);border-radius:14px;padding:12px;min-height:120px}
+.pt-result-col h3{font-size:10px;color:#d8e5f5;margin:0 0 4px}
+.pt-result-col>span{font-size:8px;color:#617991}
+.pt-result-item{margin-top:9px;padding:9px;border-radius:9px;background:rgba(13,21,32,.75);border:1px solid rgba(255,255,255,.04)}
+.pt-result-item b{display:block;font-size:10px;color:#b9cadc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-result-item span{display:block;font-size:8px;color:#617991;margin-top:4px;line-height:1.4}
+.studio-workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.studio-step{border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:12px;background:rgba(255,255,255,.018)}
+.studio-step .n{font-size:8px;letter-spacing:.12em;color:#6181a7}
+.studio-step b{display:block;margin-top:5px;font-size:11px;color:#dce8f7}
+.studio-step span{display:block;margin-top:5px;font-size:9px;line-height:1.5;color:#6e849b}
+.ops-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ops-card{border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);border-radius:15px;padding:15px}
+.ops-card .kicker{margin-bottom:6px}
+.ops-card h3{font-size:14px;color:#e4edf9;margin:0 0 6px}
+.ops-card p{font-size:10px;line-height:1.65;color:#778da5;margin:0}
+.ops-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.ops-meta span{font-size:8px;color:#7690aa;border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:4px 7px}
+.dept-empty{padding:34px 20px;text-align:center;border:1px dashed rgba(126,160,201,.13);border-radius:14px;color:#70859d;font-size:10px;line-height:1.6}
+.dept-empty b{display:block;color:#aec0d4;font-size:12px;margin-bottom:5px}
+.settings-real{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.settings-real .panel{margin:0}
+.settings-value{margin-top:8px;padding:9px 10px;border-radius:9px;background:rgba(9,16,25,.7);color:#9bb2ca;font-size:9px;overflow-wrap:anywhere}
+@media(max-width:980px){.pt-result-grid,.studio-workflow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.pt-verdict-actions{grid-template-columns:1fr 1fr}.ops-grid,.settings-real{grid-template-columns:1fr}}
+@media(max-width:520px){.pt-result-grid,.studio-workflow{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -568,7 +608,7 @@
     <div id="nav"></div>
     <div class="sidebar-bottom">
       <div><span class="status-dot"></span><strong style="font-size:12px">Studio online</strong></div>
-      <div class="small">앞단 제작은 자동으로 흐르고,<br>플레이테스트 이후부터 대표가 직접 개입합니다.</div>
+      <div class="small">자동 제작 → Human Gate →<br>고도화·아트 파이프라인으로 이어집니다.</div>
       <div id="cloudStatus" class="small" style="margin-top:12px;color:#9bc0ff">☁ Cloud 연결 중…</div>
     </div>
   </aside>
@@ -610,18 +650,24 @@ const NAV = [
   ["AI 제작본부", [
     ["implementation","≣","구현 설계실"],
     ["build","⌘","빌드 팜"],
-    ["fidelity","✓","설계 검수실"]
+    ["fidelity","✓","설계 검수실"],
+    ["diagnostic","⌁","빌드 진단실"],
+    ["enhancement","◆","게임 고도화실"]
   ]],
   ["단비 업무실", [
-    ["review","▶","플레이테스트실"],
-    ["directed","◆","디렉팅 개발실"]
+    ["review","▶","플레이테스트실"]
   ]],
-  ["제품 제작", [
-    ["visual","✦","비주얼 개발실"]
+  ["AI 아트 제작본부", [
+    ["art_direction","✦","아트 디렉션실"],
+    ["asset_spec","▤","에셋 설계실"],
+    ["asset_production","◇","에셋 제작실"],
+    ["visual_integration","⌘","비주얼 통합실"]
   ]],
-  ["운영", [
-    ["archive","□","프로젝트 보관소"],
-    ["activity","≋","제작 활동 로그"],
+  ["스튜디오 기록", [
+    ["graveyard","□","폐기작 기록실"],
+    ["activity","≋","제작 활동 로그"]
+  ]],
+  ["시스템", [
     ["settings","⚙","스튜디오 설정"]
   ]]
 ];
@@ -653,6 +699,12 @@ let repairTickets = [];
 let playtestShowcases = [];
 let playtestReadyBuilds = [];
 let playtestFocusId = null;
+let playtestDecisions = [];
+let playtestDiagnostics = [];
+let enhancementProjects = [];
+let artProjects = [];
+let graveyardProjects = [];
+let playtestDraft = {};
 let ceoDashboardSnapshot = null;
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
@@ -1075,6 +1127,89 @@ function shortHash(v,n=8){
   return v?String(v).slice(0,n):"-";
 }
 
+
+async function loadPostPlaytest(showToast=false){
+  try{
+    const res=await fetch(CLOUD_URL+"?view=post_playtest&limit=200",{method:"GET",headers:publicHeaders(),cache:"no-store"});
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    playtestDecisions=Array.isArray(payload.decisions)?payload.decisions:[];
+    playtestDiagnostics=Array.isArray(payload.diagnostics)?payload.diagnostics:[];
+    enhancementProjects=Array.isArray(payload.enhancements)?payload.enhancements:[];
+    artProjects=Array.isArray(payload.art_projects)?payload.art_projects:[];
+    graveyardProjects=Array.isArray(payload.graveyard)?payload.graveyard:[];
+    if(["review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard","dashboard"].includes(current)) render();
+    if(showToast) toast("후반 제작 파이프라인 새로고침");
+  }catch(err){
+    console.error("Post-playtest load failed",err);
+    if(showToast) toast("후반 제작 파이프라인 불러오기 실패");
+  }
+}
+
+function playtestDecisionFor(showcaseId){
+  return showcaseId?playtestDecisions.find(x=>x.showcase_id===showcaseId)||null:null;
+}
+function playtestPendingRows(){
+  return playtestRows().filter(x=>!x.id || !playtestDecisionFor(x.id));
+}
+function playtestProcessed(decision){
+  return playtestDecisions.filter(x=>x.decision===decision);
+}
+function playtestRowByShowcase(showcaseId){
+  return playtestRows().find(x=>x.id===showcaseId)||playtestShowcases.find(x=>x.id===showcaseId)||null;
+}
+function verdictLabel(v){
+  return ({UNJUDGEABLE:"판단 불가",KEEP:"KEEP",MAYBE:"MAYBE",KILL:"KILL"})[v]||v;
+}
+function setPlaytestArtChoice(showcaseId,choice){
+  playtestDraft[showcaseId]=playtestDraft[showcaseId]||{};
+  playtestDraft[showcaseId].art=choice||null;
+  render();
+}
+function setPlaytestNote(showcaseId,value){
+  playtestDraft[showcaseId]=playtestDraft[showcaseId]||{};
+  playtestDraft[showcaseId].note=value;
+}
+async function submitPlaytestDecision(showcaseId,decision){
+  const row=playtestShowcases.find(x=>x.id===showcaseId);
+  if(!row){toast("아직 쇼룸 입고가 완료되지 않았습니다.");return;}
+  const draft=playtestDraft[showcaseId]||{};
+  const noteEl=document.getElementById("playtestDecisionNote");
+  const note=(noteEl?noteEl.value:draft.note||"").trim();
+  const art=draft.art||null;
+  if(decision==="UNJUDGEABLE" && !note){
+    toast("판단할 수 없었던 문제를 짧게 적어주세요.");
+    noteEl?.focus();
+    return;
+  }
+  if(decision==="KEEP" && !art && !note){
+    toast("아트 A/B/C를 고르거나 원하는 방향을 메모해주세요.");
+    noteEl?.focus();
+    return;
+  }
+  try{
+    await cloudRequest("POST",{
+      action:"submit_playtest_decision",
+      showcase_id:showcaseId,
+      decision,
+      selected_art_option:art,
+      decision_note:note
+    });
+    delete playtestDraft[showcaseId];
+    await Promise.all([loadPostPlaytest(false),loadPlaytestShowcase(false)]);
+    const pending=playtestPendingRows();
+    playtestFocusId=pending[0]?.build_job_id||null;
+    render();
+    toast(decision==="UNJUDGEABLE"?"빌드 진단실로 인계됨":decision==="KEEP"?"게임 고도화실 + 아트 제작본부로 인계됨":decision==="KILL"?"폐기작 기록실로 이동됨":"재검토로 보류됨");
+  }catch(err){
+    console.error("Playtest decision failed",err);
+    toast("플레이테스트 판단 저장 실패");
+  }
+}
+
 function startPipelinePolling(){
   clearInterval(pipelinePollTimer);
   pipelinePollTimer=setInterval(()=>{
@@ -1087,6 +1222,7 @@ function startPipelinePolling(){
     loadFidelityReviews(false);
     loadRepairTickets(false);
     loadPlaytestShowcase(false);
+    loadPostPlaytest(false);
     loadCeoDashboard(false);
   },60000);
 }
@@ -1102,7 +1238,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadPlaytestShowcase(false),loadCeoDashboard(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadPlaytestShowcase(false),loadPostPlaytest(false),loadCeoDashboard(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -1135,17 +1271,20 @@ function toast(msg){ const e=document.getElementById("toast"); e.textContent=msg
 function navRender(){
   document.getElementById("nav").innerHTML = NAV.map(([group,items])=>`
     <div class="nav-group"><div class="nav-label">${group}</div>
-    ${items.map(([id,ic,label])=>`<button class="nav-item ${current===id?"active":""}" onclick="go('${id}')"><span class="nav-icon">${ic}</span>${label}${id==="review"&&count("playtest")?`<span style="margin-left:auto;font-size:9px;background:#325d98;color:#dceaff;padding:3px 6px;border-radius:999px">${count("playtest")}</span>`:""}</button>`).join("")}
+    ${items.map(([id,ic,label])=>`<button class="nav-item ${current===id?"active":""}" onclick="go('${id}')"><span class="nav-icon">${ic}</span>${label}${(["review","diagnostic","enhancement"].includes(id)&&count(id==="review"?"playtest":id))?`<span style="margin-left:auto;font-size:9px;background:#325d98;color:#dceaff;padding:3px 6px;border-radius:999px">${count(id==="review"?"playtest":id)}</span>`:""}</button>`).join("")}
     </div>`).join("");
 }
-function go(id){ current=id; location.hash=id; render(); if(id==="dashboard") loadCeoDashboard(false); if(id==="review") loadPlaytestShowcase(false); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
+function go(id){ current=id; location.hash=id; render(); if(id==="dashboard") loadCeoDashboard(false); if(id==="review") loadPlaytestShowcase(false); if(["review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard"].includes(id)) loadPostPlaytest(false); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
 function count(stage){
   if(stage==="idea") return promotedIdeas.length;
   if(stage==="design") return gameDesigns.length;
   if(stage==="wireframe") return wireframePacks.length;
   if(stage==="build") return buildJobs.filter(b=>!isHistoricalBuild(b)).length;
   if(stage==="fidelity") return fidelityReviews.filter(r=>!isSupersededReview(r)).length;
-  if(stage==="playtest") return playtestRows().length;
+  if(stage==="playtest") return playtestPendingRows().length;
+  if(stage==="diagnostic") return playtestDiagnostics.filter(x=>x.status!=="closed").length;
+  if(stage==="enhancement") return enhancementProjects.filter(x=>x.status!=="archived").length;
+  if(stage==="graveyard") return graveyardProjects.length;
   return state.projects.filter(p=>p.stage===stage).length;
 }
 function titleInfo(){
@@ -1158,10 +1297,14 @@ function titleInfo(){
     implementation:["구현 설계실","Wireframe을 구현 설계도로 컴파일하고, 독립 검수를 통과한 설계만 Build Farm으로 넘깁니다."],
     build:["빌드 팜","Implementation Contract를 실제 Godot playable로 구현합니다."],
     fidelity:["설계 검수실","Wireframe + Contract와 실제 코드를 독립적으로 대조하고 실패하면 Build Farm으로 반송합니다."],
-    review:["플레이테스트실","설계 검수를 통과한 Graybox와 GPT 아트 3안을 한 화면에서 비교합니다."],
-    directed:["디렉팅 개발실","살아남은 게임만 대표의 지시를 받아 제품 수준으로 발전시킵니다."],
-    visual:["비주얼 개발실","KEEP 이후 살아남은 게임에만 실제 비주얼·에셋 제작 비용을 사용합니다."],
-    archive:["프로젝트 보관소","KILL 또는 보류된 프로젝트를 기록하고 필요할 때 되살립니다."],
+    review:["플레이테스트실","플레이 가능 여부를 먼저 확인하고, 판단 결과를 정확한 다음 공정으로 보냅니다."],
+    diagnostic:["빌드 진단실","판단 불가 빌드를 재현·진단하고 올바른 제작 공정으로 되돌립니다."],
+    enhancement:["게임 고도화실","KEEP된 게임을 반복 개발하고 재플레이하며 완성도를 끌어올립니다."],
+    art_direction:["아트 디렉션실","선택 시안과 대표 메모를 게임 전체 Visual DNA로 고정합니다."],
+    asset_spec:["에셋 설계실","최소 에셋 명세를 실제 제작 가능한 Asset Manifest로 번역합니다."],
+    asset_production:["에셋 제작실","승인된 기준으로 실제 게임용 에셋을 생산하고 검수합니다."],
+    visual_integration:["비주얼 통합실","완성 에셋을 Godot에 연결하고 실제 플레이 화면에서 검증합니다."],
+    graveyard:["폐기작 기록실","빌드까지 갔지만 KILL된 게임을 실패 데이터로 보존합니다."],
     activity:["제작 활동 로그","자율 제작 라인에서 일어난 일을 시간순으로 확인합니다."],
     settings:["스튜디오 설정","어디까지 AI가 자율적으로 진행할지 제작 정책을 정합니다."]
   }; return map[current]||map.dashboard;
@@ -2230,43 +2373,72 @@ function buildPage(){
   '<div class="cards">'+(buildOutputs.map(buildCard).join("") || '<div class="empty">현재 Build Farm에 Godot Build가 없습니다.<br>새 Blueprint가 승인되면 이곳에서 제작됩니다.</div>')+'</div>';
 }
 
+function reviewResultColumn(decision,title,sub){
+  const rows=playtestProcessed(decision);
+  const items=rows.slice(0,5).map(d=>{
+    const r=playtestRowByShowcase(d.showcase_id);
+    const extra=d.selected_art_option?"Art "+d.selected_art_option:(d.decision_note||"메모 없음");
+    return '<div class="pt-result-item"><b>'+esc(r?.title||"처리된 게임")+'</b><span>'+esc(extra)+'</span></div>';
+  }).join("");
+  return '<div class="pt-result-col"><h3>'+esc(title)+' · '+rows.length+'</h3><span>'+esc(sub)+'</span>'+(items||'<div class="pt-result-item"><span>아직 없음</span></div>')+'</div>';
+}
+
 function reviewPage(){
-  const rows=playtestRows();
-  if(!rows.length){
-    return genericHeader("Playtest Showroom","Static Fidelity PASS 이후 Graybox playable과 GPT 아트 3안이 이곳에 입고됩니다.")+
-      '<div class="pt-empty"><strong>아직 플레이테스트 입고물이 없습니다.</strong><span>설계 검수실에서 PLAYTEST READY가 나오면 Playtest Intake가 Graybox + 아트 3안을 준비해 여기에 표시합니다.</span></div>';
+  const rows=playtestPendingRows();
+  const focus=rows.find(x=>x.build_job_id===playtestFocusId)||rows[0]||null;
+  if(focus) playtestFocusId=focus.build_job_id;
+
+  let showroom="";
+  if(!focus){
+    showroom='<div class="pt-empty"><strong>현재 판단 대기 게임이 없습니다.</strong><span>PLAYTEST READY 빌드가 쇼룸에 입고되면 Graybox + 아트 3안과 함께 여기 나타납니다.</span></div>';
+  }else{
+    const status=playtestStatusMeta(focus);
+    const opts=playtestOptions(focus);
+    const completed=opts.filter(x=>playtestArtUrl(focus,x)).length;
+    const repo=focus.repo_full_name||"Queenrain9/danbi-game-office";
+    const projectPath=focus.build?.project_path||focus.project_path||"-";
+    const buildUrl=playtestBuildUrl(focus);
+    const draft=focus.id?(playtestDraft[focus.id]||{}):{};
+
+    const queue='<aside class="pt-sidebar"><div class="pt-side-head"><strong>판단 대기 · '+rows.length+'</strong><span>실제로 플레이한 뒤에만 분류합니다.</span></div><div class="pt-queue">'+rows.map(r=>{
+      const m=playtestStatusMeta(r);
+      const n=playtestOptions(r).filter(x=>playtestArtUrl(r,x)).length;
+      return '<button class="'+(r.build_job_id===focus.build_job_id?'active':'')+'" onclick="setPlaytestFocus(\''+esc(r.build_job_id)+'\')"><div class="pt-queue-title">'+esc(r.title)+'</div><div class="pt-queue-meta"><span class="pt-dot '+m.dot+'"></span><span>'+esc(m.label)+'</span><span>·</span><span>ART '+n+'/3</span></div></button>';
+    }).join("")+'</div></aside>';
+
+    const art='<div class="pt-art-head"><div><h2>Visual Direction A / B / C</h2><p>KEEP이면 하나를 고르거나 아래 메모에 원하는 방향을 직접 적을 수 있습니다.</p></div><div class="pt-art-count">'+completed+'/3 READY</div></div>'+
+      '<div class="pt-art-grid">'+opts.map(o=>{
+        const url=playtestArtUrl(focus,o);
+        const chosen=draft.art===o.id;
+        const title=o.title||("Art "+o.id);
+        const summary=o.direction_summary||(url?"Visual direction preview":"Playtest Intake가 이 방향을 생성 중입니다.");
+        const choose=focus.id&&url?' onclick="setPlaytestArtChoice(\''+esc(focus.id)+'\',\''+esc(o.id)+'\')"':'';
+        return '<article class="pt-art-card '+(chosen?'choice':'')+'"'+choose+'><div class="pt-art-visual">'+
+          (url?'<img src="'+esc(url)+'" alt="'+esc(title)+'" loading="lazy">':'<div class="pt-art-empty"><i></i><span>'+esc(focus.status==="awaiting_intake"?"입고 대기":"이미지 생성 중")+'</span></div>')+
+          '</div><div class="pt-art-copy"><div class="pt-art-row"><span class="pt-art-letter">OPTION '+esc(o.id)+'</span>'+(chosen?'<span class="pt-pill good">SELECTED</span>':url?'<span class="pt-pill good">READY</span>':'<span class="pt-pill warn">PENDING</span>')+'</div><div class="pt-art-title">'+esc(title)+'</div><div class="pt-art-summary">'+esc(summary)+'</div></div></article>';
+      }).join("")+'</div>';
+
+    const verdict=focus.id&&focus.status==="ready"
+      ? '<div class="pt-verdict"><div class="pt-verdict-head"><div><strong>플레이테스트 판단</strong><span>고장이라 평가할 수 없으면 취향 평가를 하지 말고 빌드 진단실로 보냅니다.</span></div></div>'+
+        '<textarea id="playtestDecisionNote" oninput="setPlaytestNote(\''+esc(focus.id)+'\',this.value)" placeholder="문제 상황, 좋았던 점, 싫었던 점, 원하는 아트 방향 등을 적어두세요.">'+esc(draft.note||"")+'</textarea>'+
+        '<div class="pt-verdict-actions"><button class="btn warn" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'UNJUDGEABLE\')">⚠ 판단 불가</button><button class="btn good" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'KEEP\')">♥ KEEP</button><button class="btn" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'MAYBE\')">? MAYBE</button><button class="btn bad" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'KILL\')">× KILL</button></div>'+
+        '<div class="pt-route-note">판단 불가 → 빌드 진단실 · KEEP → 게임 고도화실 + AI 아트 제작본부 · MAYBE → 플레이테스트 보류 · KILL → 폐기작 기록실</div></div>'
+      : '<div class="pt-verdict"><div class="pt-verdict-head"><div><strong>입고 준비 중</strong><span>A/B/C와 showcase 기록이 준비되면 판단 버튼이 열립니다.</span></div></div></div>';
+
+    const stage='<section class="pt-stage"><div class="pt-hero"><div class="pt-hero-main"><div class="pt-eyebrow">PLAYTEST SHOWROOM</div><div class="pt-title">'+esc(focus.title)+'</div><div class="pt-oneline">'+esc(focus.one_line||focus.build?.build_summary||"설계 검수를 통과한 Graybox playable입니다.")+'</div><div class="pt-status"><span class="pt-pill good">GRAYBOX</span><span class="pt-pill good">FIDELITY PASS</span><span class="pt-pill '+status.cls+'">'+esc(status.label)+'</span></div></div></div>'+
+      '<div class="pt-build-box"><div class="pt-build-card"><h3>실제 플레이 빌드</h3><div class="pt-ident"><span>Repository</span><b>'+esc(repo)+'</b><span>Godot path</span><b>'+esc(projectPath)+'</b><span>Final commit</span><b>'+esc(shortHash(focus.final_commit,12))+'</b><span>Blueprint</span><b>'+esc(shortHash(focus.blueprint_hash,12))+'</b></div><div class="pt-build-actions"><button class="btn primary" onclick="window.open(\''+esc(buildUrl)+'\',\'_blank\')">GitHub 빌드 열기 ↗</button><button class="btn ghost" onclick="copyPlaytestPath(\''+esc(focus.build_job_id)+'\')">프로젝트 경로 복사</button></div></div>'+
+      '<div class="pt-note-card"><h3>입고 상태</h3><p>'+esc(focus.generation_note||"Graybox playable + 3 GPT concept previews; no art applied to build.")+'</p>'+(focus.last_error?'<div class="pt-error">'+esc(focus.last_error)+'</div>':'')+'</div></div>'+art+verdict+'</section>';
+    showroom='<div class="pt-shell">'+queue+stage+'</div>';
   }
-  const focus=rows.find(x=>x.build_job_id===playtestFocusId)||rows[0];
-  playtestFocusId=focus.build_job_id;
-  const status=playtestStatusMeta(focus);
-  const opts=playtestOptions(focus);
-  const completed=opts.filter(x=>playtestArtUrl(focus,x)).length;
-  const repo=focus.repo_full_name||"Queenrain9/danbi-game-office";
-  const projectPath=focus.build?.project_path||focus.project_path||"-";
-  const buildUrl=playtestBuildUrl(focus);
 
-  const queue='<aside class="pt-sidebar"><div class="pt-side-head"><strong>플레이테스트 대기열</strong><span>설계 검수를 통과한 실제 Godot 빌드 기준</span></div><div class="pt-queue">'+rows.map(r=>{
-    const m=playtestStatusMeta(r);
-    const n=playtestOptions(r).filter(x=>playtestArtUrl(r,x)).length;
-    return '<button class="'+(r.build_job_id===focus.build_job_id?'active':'')+'" onclick="setPlaytestFocus(\''+esc(r.build_job_id)+'\')"><div class="pt-queue-title">'+esc(r.title)+'</div><div class="pt-queue-meta"><span class="pt-dot '+m.dot+'"></span><span>'+esc(m.label)+'</span><span>·</span><span>ART '+n+'/3</span></div></button>';
-  }).join("")+'</div></aside>';
+  const results='<div class="pt-results"><div class="section-head"><div><h2>처리 결과</h2><p>쇼룸 판단은 사라지지 않고 다음 공간으로 인계된 기록으로 남습니다.</p></div></div><div class="pt-result-grid">'+
+    reviewResultColumn("UNJUDGEABLE","판단 불가","빌드 진단실")+
+    reviewResultColumn("KEEP","KEEP","고도화 + 아트")+
+    reviewResultColumn("MAYBE","MAYBE","재검토 보류")+
+    reviewResultColumn("KILL","KILL","폐기작 기록실")+
+    '</div></div>';
 
-  const art='<div class="pt-art-head"><div><h2>Visual Direction A / B / C</h2><p>같은 게임 · 같은 핵심 플레이 상황을 서로 다른 Visual DNA로 비교합니다.</p></div><div class="pt-art-count">'+completed+'/3 READY</div></div>'+
-    '<div class="pt-art-grid">'+opts.map(o=>{
-      const url=playtestArtUrl(focus,o);
-      const title=o.title||("Art "+o.id);
-      const summary=o.direction_summary||(url?"Visual direction preview":"Playtest Intake가 이 방향을 생성 중입니다.");
-      return '<article class="pt-art-card"><div class="pt-art-visual">'+
-        (url?'<img src="'+esc(url)+'" alt="'+esc(title)+'" loading="lazy">':'<div class="pt-art-empty"><i></i><span>'+esc(focus.status==="awaiting_intake"?"입고 대기":"이미지 생성 중")+'</span></div>')+
-        '</div><div class="pt-art-copy"><div class="pt-art-row"><span class="pt-art-letter">OPTION '+esc(o.id)+'</span>'+(url?'<span class="pt-pill good">READY</span>':'<span class="pt-pill warn">PENDING</span>')+'</div><div class="pt-art-title">'+esc(title)+'</div><div class="pt-art-summary">'+esc(summary)+'</div>'+(o.repo_path?'<div class="pt-art-path">'+esc(o.repo_path)+'</div>':'')+'</div></article>';
-    }).join("")+'</div>';
-
-  const stage='<section class="pt-stage"><div class="pt-hero"><div class="pt-hero-main"><div class="pt-eyebrow">PLAYTEST SHOWROOM</div><div class="pt-title">'+esc(focus.title)+'</div><div class="pt-oneline">'+esc(focus.one_line||focus.build?.build_summary||"설계 검수를 통과한 Graybox playable입니다.")+'</div><div class="pt-status"><span class="pt-pill good">GRAYBOX PLAYABLE</span><span class="pt-pill good">FIDELITY PASS</span><span class="pt-pill '+status.cls+'">'+esc(status.label)+'</span></div></div></div>'+
-    '<div class="pt-build-box"><div class="pt-build-card"><h3>실제 플레이 빌드</h3><div class="pt-ident"><span>Repository</span><b>'+esc(repo)+'</b><span>Godot path</span><b>'+esc(projectPath)+'</b><span>Final commit</span><b>'+esc(shortHash(focus.final_commit,12))+'</b><span>Blueprint</span><b>'+esc(shortHash(focus.blueprint_hash,12))+'</b></div><div class="pt-build-actions"><button class="btn primary" onclick="window.open(\''+esc(buildUrl)+'\',\'_blank\')">GitHub 빌드 열기 ↗</button><button class="btn ghost" onclick="copyPlaytestPath(\''+esc(focus.build_job_id)+'\')">프로젝트 경로 복사</button></div></div>'+
-    '<div class="pt-note-card"><h3>입고 상태</h3><p>'+esc(focus.generation_note||"Graybox playable + 3 GPT concept previews; no art applied to build.")+'</p>'+(focus.last_error?'<div class="pt-error">'+esc(focus.last_error)+'</div>':'')+'</div></div>'+art+'</section>';
-
-  return genericHeader("Playtest Showroom","Graybox를 직접 플레이하고, 완성 모습을 상상하기 위한 아트 3안을 옆에서 비교하는 대표 검수실입니다.")+
-    '<div class="pt-shell">'+queue+stage+'</div>';
+  return genericHeader("Playtest Showroom","먼저 플레이 가능한지 확인하고, 그 다음에 게임을 살릴지 판단합니다.")+showroom+results;
 }
 
 function directedCard(p){
@@ -2289,31 +2461,112 @@ function visualPage(){
 }
 function archivePage(){ const ps=state.projects.filter(p=>p.stage==="archive"); return genericHeader("Archive","버린 아이디어도 기록은 남습니다. 실패를 싸게 만드는 것이 이 공장의 장점입니다.")+`<div class="cards">${ps.map(p=>`<div class="game-card"><div class="card-title">${esc(p.title)}</div><div class="card-desc">${esc(p.desc)}</div><div class="meta"><span>${esc(p.decision||"ARCHIVED")}</span><span>${esc(p.genre)}</span></div><div class="card-actions"><span class="badge">ARCHIVED</span></div></div>`).join("") || `<div class="empty">Archive가 비어 있습니다.</div>`}</div>`; }
 function activityPage(){ return genericHeader("Studio Activity","자동 생성·승격·빌드와 대표 결정이 모두 기록됩니다.",`<button class="btn bad" onclick="clearLog()">로그 비우기</button>`)+`<div class="panel">${activityList(80)}</div>`; }
+
+function departmentHeader(title,desc,steps){
+  const flow=(steps||[]).map((x,i)=>'<div class="studio-step"><span class="n">0'+(i+1)+'</span><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div>').join("");
+  return genericHeader(title,desc)+(flow?'<div class="studio-workflow">'+flow+'</div>':'');
+}
+function diagnosticPage(){
+  const active=playtestDiagnostics.filter(x=>x.status!=="closed");
+  const cards=active.map(x=>'<div class="ops-card"><div class="kicker">BUILD DIAGNOSTIC · '+esc(String(x.status||"open").toUpperCase())+'</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.issue_note||"문제 메모 없음")+'</p><div class="ops-meta"><span>'+esc(x.issue_type||"unknown")+'</span><span>'+(x.route_target?esc(x.route_target):"라우팅 미정")+'</span></div></div>').join("");
+  return departmentHeader("빌드 진단실","플레이테스트에서 게임 평가 자체가 불가능했던 빌드를 격리하고 원인을 찾아 올바른 공정으로 돌려보냅니다.",[
+    ["재현","어디서 어떻게 망가지는지 확인"],
+    ["진단","코드·설계·환경 중 원인 분류"],
+    ["라우팅","Build / Implementation / Fidelity 등으로 반송"],
+    ["재입고","고친 빌드는 Showroom에서 다시 판단"]
+  ])+'<div class="ops-grid">'+(cards||'<div class="dept-empty"><b>진단 대기 없음</b>Showroom에서 ‘판단 불가’로 보낸 게임이 이곳에 들어옵니다.</div>')+'</div>';
+}
+function enhancementPage(){
+  const cards=enhancementProjects.filter(x=>x.status!=="archived").map(x=>{
+    const art=x.selected_art_option?"Art "+x.selected_art_option:"아트 메모 기준";
+    return '<div class="ops-card"><div class="kicker">GAME ENHANCEMENT · '+esc(String(x.status||"intake").toUpperCase())+'</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.direction_note||x.one_line||"대표 고도화 방향 대기")+'</p><div class="ops-meta"><span>'+esc(art)+'</span><span>Minimum Asset Spec · '+esc(x.asset_spec_status||"pending")+'</span><span>Playtest #'+Number(x.playtest_round||1)+'</span></div></div>';
+  }).join("");
+  return departmentHeader("게임 고도화실","KEEP된 Graybox를 반복 개발해 ‘설계대로 작동하는 게임’에서 ‘계속 만들 가치가 있는 게임’으로 끌어올립니다.",[
+    ["입고","플레이테스트 결론 + 아트 방향 수신"],
+    ["최소 에셋 명세","고도화에 꼭 필요한 시각 자산만 먼저 정의"],
+    ["반복 고도화","게임성 · UX · 콘텐츠 · 피드백 개선"],
+    ["재플레이","새 빌드를 다시 Showroom에서 검증"]
+  ])+'<div class="ops-grid">'+(cards||'<div class="dept-empty"><b>KEEP 게임 없음</b>Showroom에서 KEEP한 첫 게임부터 이곳에서 장기 고도화를 시작합니다.</div>')+'</div>';
+}
+function artStagePage(stage,title,desc,steps){
+  const rows=artProjects.filter(x=>x.stage===stage && x.status!=="archived");
+  const cards=rows.map(x=>'<div class="ops-card"><div class="kicker">ART PIPELINE · '+esc(String(x.status||"waiting").toUpperCase())+'</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.art_direction_note||"플레이테스트에서 선택한 방향을 기준으로 작업합니다.")+'</p><div class="ops-meta"><span>'+(x.selected_art_option?"Showroom "+esc(x.selected_art_option):"Custom direction")+'</span><span>'+esc(stage)+'</span></div></div>').join("");
+  return departmentHeader(title,desc,steps)+'<div class="ops-grid">'+(cards||'<div class="dept-empty"><b>현재 작업 없음</b>KEEP된 게임의 아트 파이프라인이 이 단계에 도달하면 표시됩니다.</div>')+'</div>';
+}
+function artDirectionPage(){
+  return artStagePage("direction","아트 디렉션실","쇼룸의 A/B/C 선택 또는 대표 메모를 실제 게임 전체에 적용 가능한 Visual DNA로 고정합니다.",[
+    ["입력","선택 시안 + 대표 메모"],
+    ["Visual DNA","형태 · 재질 · 팔레트 · 카메라 · UI 원칙"],
+    ["기준 승인","뒤 공정이 임의로 재해석하지 않을 기준"],
+    ["에셋 설계","실제 제작 목록으로 전달"]
+  ]);
+}
+function assetSpecPage(){
+  return artStagePage("asset_spec","에셋 설계실","Minimum Asset Spec을 실제 제작 가능한 에셋 단위·우선순위·재사용 규칙으로 번역합니다.",[
+    ["최소 명세","플레이를 완성하는 필수 자산"],
+    ["분해","캐릭터 · 환경 · 아이템 · UI 등 제작 단위"],
+    ["우선순위","없으면 플레이가 깨지는 것부터"],
+    ["Manifest","에셋 제작실에 넘길 생산 목록"]
+  ]);
+}
+function assetProductionPage(){
+  return artStagePage("production","에셋 제작실","승인된 Visual DNA와 Asset Manifest를 기준으로 실제 게임용 이미지를 생산·검수합니다.",[
+    ["제작","에셋 생성"],
+    ["일관성 검수","Master 방향과 비교"],
+    ["수정","실사용 크기·가독성 보정"],
+    ["승인","통합 가능한 자산만 전달"]
+  ]);
+}
+function visualIntegrationPage(){
+  return artStagePage("integration","비주얼 통합실","승인 에셋을 Godot 프로젝트에 연결하고 실제 플레이 화면에서 크기·상태·피드백을 검증합니다.",[
+    ["연결","에셋을 실제 노드/UI에 적용"],
+    ["상태 검증","게임 상태별 이미지 대응"],
+    ["플레이 검수","실기기 가독성·시선 흐름 확인"],
+    ["완료","고도화 빌드와 합쳐 재플레이"]
+  ]);
+}
+function graveyardPage(){
+  const cards=graveyardProjects.map(x=>'<div class="ops-card"><div class="kicker">KILLED AFTER BUILD · '+esc(x.reached_stage||"playtest")+'</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.kill_reason||"대표 KILL 사유 미기록")+'</p><div class="ops-meta"><span>'+esc(shortHash(x.final_commit,8))+'</span><span>'+esc(x.project_path||"-")+'</span></div></div>').join("");
+  return departmentHeader("폐기작 기록실","플레이 가능한 상태까지 갔지만 대표 판단으로 중단한 게임을 분석 가능한 실패 데이터로 보존합니다.",[
+    ["보존","최종 Build · 설계 · 판단 이유 유지"],
+    ["분류","왜 죽었는지 패턴화"],
+    ["분석","빌드까지 간 실패의 공통점 찾기"],
+    ["환류","Idea Lab / Game Design 품질 개선에 재사용"]
+  ])+'<div class="ops-grid">'+(cards||'<div class="dept-empty"><b>아직 폐기작 없음</b>KILL된 첫 빌드부터 여기에서 회사의 실패 데이터로 남습니다.</div>')+'</div>';
+}
+
 function settingsPage(){
-  const rows=[
-    ["autoBuild","Godot Build 자동화","Wireframe-ready 프로젝트를 playable greybox로 보냅니다."],
-    ["humanGate","Playtest 이후 Human Gate","KEEP 이후 핵심 방향 변경과 비주얼 제작은 대표 판단을 기준으로 합니다."]
-  ];
-  return genericHeader("Studio Policy","자율 제작의 범위를 정합니다.")+`
-  <div class="two-col">
-    <div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled + cloud</span></div>
-      <div class="detail-box" style="margin-bottom:12px"><h3>Scheduled production line</h3><p>Idea Lab → Game Design → Pre-production → Implementation Contract → Build Farm → Fidelity Gate까지 실제 예약 작업 + Supabase 데이터로 연결합니다. Static Fidelity 통과 후에만 PLAYTEST READY로 보냅니다.</p></div>
-      ${rows.map(([k,t,d])=>`<div class="switch-row"><div><strong>${t}</strong><span>${d}</span></div><button class="switch ${state.settings[k]?"on":""}" onclick="toggleSetting('${k}')"><i></i></button></div>`).join("")}
-    </div>
-    <div class="panel"><div class="panel-title"><strong>Cloud Access</strong><span>open access</span></div>
-      <div class="detail-box"><h3>다른 PC에서도 같은 회사 열기</h3><p>배포 주소를 열면 별도 연결키나 로그인 없이 Supabase의 동일한 회사 상태와 제작 파이프라인 데이터를 자동으로 불러옵니다.</p></div>
-      <div class="human-gate" style="margin-top:12px"><b>현재 운영 모드</b><br>초기 제작 단계라 접근 보호를 잠시 두지 않습니다. 주소만 알면 동일한 회사 데이터를 볼 수 있습니다.</div>
-      <div class="detail-box" style="margin-top:12px"><h3>Studio Principle</h3><p>Human-directed, AI-produced. AI는 후보를 많이 만들고 싸게 실패합니다. 대표는 제품 가치 판단, 플레이 감각, 미감, 범위 결정을 담당합니다.</p></div>
-      <div style="margin-top:16px"><button class="btn bad" onclick="resetStudio()">로컬 상태 초기화</button></div>
-    </div>
-  </div>`;
+  return genericHeader("스튜디오 설정","가짜 토글 대신 실제 제작 시스템에서 사용하는 기준과 연결 상태만 보여줍니다.")+
+    '<div class="settings-real">'+
+      '<div class="panel"><div class="panel-title"><strong>Source of Truth</strong><span>production data</span></div><div class="detail-box"><h3>운영 DB</h3><p>Supabase가 현재 큐·상태·판단·인계 기록을 관리합니다.</p></div><div class="settings-value">hmblaasagxyntyfrfztg</div></div>'+
+      '<div class="panel"><div class="panel-title"><strong>Project Archive</strong><span>durable files</span></div><div class="detail-box"><h3>게임별 영구 기록</h3><p>게임 하나의 산출물은 GitHub의 projects/&lt;slug&gt;/ 아래에 누적합니다.</p></div><div class="settings-value">Queenrain9/danbi-game-office · main</div></div>'+
+      '<div class="panel"><div class="panel-title"><strong>Human Gate</strong><span>playtest policy</span></div><div class="detail-box"><h3>평가 가능성 우선</h3><p>고장난 빌드는 취향 평가하지 않습니다. 판단 불가 → 빌드 진단, KEEP → 고도화 + 아트, KILL → 폐기작 기록으로 보냅니다.</p></div></div>'+
+      '<div class="panel"><div class="panel-title"><strong>Showroom Art</strong><span>preview policy</span></div><div class="detail-box"><h3>아트 3안은 방향 탐색용</h3><p>Showroom A/B/C는 실제 Build에 자동 적용하지 않고 선택·메모를 다음 아트 공정의 입력으로 사용합니다.</p></div></div>'+
+      '<div class="panel"><div class="panel-title"><strong>Automation</strong><span>scheduled jobs</span></div><div class="detail-box"><h3>예약 작업은 외부 작업 스케줄이 Source of Truth</h3><p>사이트 안의 장식용 ON/OFF 토글은 제거했습니다. 실제 예약 작업의 활성화 여부가 운영 상태입니다.</p></div></div>'+
+      '<div class="panel"><div class="panel-title"><strong>Access</strong><span>development phase</span></div><div class="detail-box"><h3>현재 개발 중 공개 접근 구조</h3><p>사이트는 아직 제작 단계라 인증 강화를 우선하지 않습니다. 정식 운영 전 접근 제어를 별도 적용해야 합니다.</p></div></div>'+
+    '</div>';
 }
 function render(){
-  if(!["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
+  const routes=["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard","activity","settings"];
+  if(!routes.includes(current)) current="dashboard";
   navRender();
-  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; const sub=document.getElementById("pageSubtitle"); sub.textContent=s; sub.style.display=s?"":"none"; const topActions=document.querySelector(".top-actions"); topActions.innerHTML=current==="ideas"?`<button class="btn ghost" title="아이디어는 매시간 자동 생성됩니다. 사이트 직접 실행은 아직 연결 전입니다." onclick="ideaRunUnavailable()">지금 생성</button><button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>`:current==="review"?`<button class="btn ghost" onclick="loadPlaytestShowcase(true)">↻ 새로고침</button>`:"";
-  const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,implementation:implementationPage,build:buildPage,fidelity:fidelityPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
-  document.getElementById("content").innerHTML = pages[current]();
+  const [t,s]=titleInfo();
+  document.getElementById("pageTitle").textContent=t;
+  const sub=document.getElementById("pageSubtitle");
+  sub.textContent=s;
+  sub.style.display=s?"":"none";
+  const topActions=document.querySelector(".top-actions");
+  if(current==="ideas") topActions.innerHTML='<button class="btn ghost" title="아이디어는 매시간 자동 생성됩니다. 사이트 직접 실행은 아직 연결 전입니다." onclick="ideaRunUnavailable()">지금 생성</button><button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>';
+  else if(["review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard"].includes(current)) topActions.innerHTML='<button class="btn ghost" onclick="Promise.all([loadPlaytestShowcase(false),loadPostPlaytest(false)]).then(()=>toast(\'새로고침 완료\'))">↻ 새로고침</button>';
+  else topActions.innerHTML="";
+  const pages={
+    dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,
+    implementation:implementationPage,build:buildPage,fidelity:fidelityPage,review:reviewPage,
+    diagnostic:diagnosticPage,enhancement:enhancementPage,art_direction:artDirectionPage,
+    asset_spec:assetSpecPage,asset_production:assetProductionPage,visual_integration:visualIntegrationPage,
+    graveyard:graveyardPage,activity:activityPage,settings:settingsPage
+  };
+  document.getElementById("content").innerHTML=pages[current]();
 }
 function getP(id){ return state.projects.find(p=>p.id===id); }
 function promote(id,stage){
