@@ -3,6 +3,9 @@ extends Control
 var pressed := false
 var hold_elapsed := 0.0
 var last_angle := 0.0
+var touches:Dictionary={}
+var twist_start_angle:=0.0
+var twist_piece_angle:=0.0
 
 func root_game(): return get_node_or_null("/root/AppRoot")
 
@@ -25,20 +28,31 @@ func _process(delta: float) -> void:
 func _gui_input(event: InputEvent) -> void:
     var game = root_game()
     if not game or game.input_locked: return
+    if event is InputEventScreenTouch:
+        if event.pressed: touches[event.index]=event.position
+        else: touches.erase(event.index)
+        if name=="piece_tray" and event.pressed and touches.size()==1: game.begin_piece_drag(_piece_index_at(event.position))
+        elif name=="piece_tray" and not event.pressed and touches.size()==0: game.end_piece_drag(event.position+global_position)
+        if touches.size()==2:
+            var pts=touches.values(); twist_start_angle=(pts[1]-pts[0]).angle(); twist_piece_angle=game.piece_angles[game.selected_piece] if game.selected_piece>=0 else 0.0
+        accept_event(); return
+    if event is InputEventScreenDrag:
+        if touches.has(event.index): touches[event.index]=event.position
+        if name=="piece_tray" and touches.size()==1: game.update_piece_drag(event.position+global_position)
+        elif name=="piece_tray" and touches.size()==2 and game.selected_piece>=0:
+            var pts=touches.values(); var delta=rad_to_deg((pts[1]-pts[0]).angle()-twist_start_angle); game.piece_angles[game.selected_piece]=twist_piece_angle+delta; game.piece_nodes[game.selected_piece].rotation_degrees=game.piece_angles[game.selected_piece]
+        accept_event(); return
     if name == "symptom_targets" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
         game.diagnose_at(event.position); accept_event()
     elif name == "piece_tray":
         if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
             pressed = event.pressed
-            if pressed: game.begin_piece_drag()
+            if pressed: game.begin_piece_drag(_piece_index_at(event.position))
             else: game.end_piece_drag(event.global_position)
             accept_event()
         elif event is InputEventMouseMotion and pressed:
             game.update_piece_drag(event.global_position); accept_event()
-        elif event is InputEventMagnifyGesture:
-            game.rotate_piece(event.factor * 15.0); accept_event()
-        elif event is InputEventPanGesture:
-            game.rotate_piece(event.delta.x * 15.0); accept_event()
+
     elif name == "silhouette" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
         game.end_piece_drag(event.global_position); accept_event()
     elif name == "seam_canvas":
@@ -55,6 +69,11 @@ func _gui_input(event: InputEvent) -> void:
         if pressed: game.set_state("holding")
         elif hold_elapsed < 0.6: game.set_state("idle")
         queue_redraw(); accept_event()
+
+func _piece_index_at(p:Vector2)->int:
+    var game=root_game(); if not game:return -1
+    var width=maxf(size.x/float(maxi(game.required_pieces,1)),1.0)
+    return clampi(int(p.x/width),0,game.required_pieces-1)
 
 func _draw() -> void:
     var game = root_game()
@@ -92,7 +111,7 @@ func on_customer_intake_01_item() -> void:
     if game: game.diagnose_at(Vector2.ZERO)
 func on_shadow_workbench_01_item() -> void:
     var game=root_game()
-    if game: game.begin_piece_drag()
+    if game: game.begin_piece_drag(0)
 func on_shadow_workbench_02_item() -> void:
     var game=root_game()
     if game: game.rotate_piece(15.0)
