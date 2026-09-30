@@ -587,6 +587,7 @@ let implementationContracts = [];
 let buildJobs = [];
 let fidelityReviews = [];
 let repairTickets = [];
+let ceoDashboardSnapshot = null;
 let state = load();
 let current = (location.hash || "#dashboard").slice(1);
 
@@ -620,6 +621,28 @@ async function cloudRequest(method, body){
     throw new Error(payload.error || ("HTTP "+res.status));
   }
   return res.json();
+}
+
+
+async function loadCeoDashboard(showToast=false){
+  try{
+    const res=await fetch(CLOUD_URL+"?view=ceo_dashboard",{
+      method:"GET",
+      headers:publicHeaders(),
+      cache:"no-store"
+    });
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    ceoDashboardSnapshot=payload.dashboard||null;
+    if(current==="dashboard") render();
+    if(showToast) toast("대표 대시보드 집계 새로고침");
+  }catch(err){
+    console.error("CEO dashboard load failed",err);
+    if(showToast) toast("대표 대시보드 집계 불러오기 실패");
+  }
 }
 
 async function loadPromotedIdeas(showToast=false){
@@ -889,6 +912,7 @@ function startPipelinePolling(){
     loadBuildJobs(false);
     loadFidelityReviews(false);
     loadRepairTickets(false);
+    loadCeoDashboard(false);
   },60000);
 }
 
@@ -903,7 +927,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadCeoDashboard(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -939,7 +963,7 @@ function navRender(){
     ${items.map(([id,ic,label])=>`<button class="nav-item ${current===id?"active":""}" onclick="go('${id}')"><span class="nav-icon">${ic}</span>${label}${id==="review"&&count("playtest")?`<span style="margin-left:auto;font-size:9px;background:#325d98;color:#dceaff;padding:3px 6px;border-radius:999px">${count("playtest")}</span>`:""}</button>`).join("")}
     </div>`).join("");
 }
-function go(id){ current=id; location.hash=id; render(); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
+function go(id){ current=id; location.hash=id; render(); if(id==="dashboard") loadCeoDashboard(false); document.getElementById("sidebar").classList.remove("open"); window.scrollTo(0,0); }
 function count(stage){
   if(stage==="idea") return promotedIdeas.length;
   if(stage==="design") return gameDesigns.length;
@@ -978,6 +1002,7 @@ function metricData(){
 }
 
 
+
 function ceoAge(raw){
   if(!raw) return "기록 없음";
   const t=new Date(raw).getTime();
@@ -995,303 +1020,165 @@ function ceoClock(raw){
   if(Number.isNaN(d.getTime())) return "";
   return d.toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
 }
-function ceoLatest(items,fields){
-  let best=null;
-  (Array.isArray(items)?items:[]).forEach(x=>{
-    for(const f of fields){
-      if(!x || !x[f]) continue;
-      const t=new Date(x[f]).getTime();
-      if(Number.isFinite(t) && (!best || t>best.t)) best={t,raw:x[f],item:x};
-      break;
-    }
-  });
-  return best;
+function ceoHealthLabel(h){
+  return ({
+    success:"정상",noop:"할 일 없음",running:"실행 중",blocked:"차단",failed:"실패",
+    stale:"지연",stale_running:"장시간 실행 중",unknown:"기록 없음"
+  })[h]||h||"기록 없음";
 }
-function ceoCurrentBuilds(){
-  return buildJobs.filter(b=>!isHistoricalBuild(b) && !!b.contract_id);
+function ceoSnapshotStatus(s){
+  const rows=Array.isArray(s.factory_status)?s.factory_status:[];
+  const attention=rows.filter(x=>["failed","blocked","stale","stale_running"].includes(x.health));
+  const known=rows.filter(x=>x.health!=="unknown");
+  const headline=attention.length ? "자동화 상태 · 주의 "+attention.length+"곳" : known.length ? "자동화 heartbeat 정상" : "자동화 heartbeat 연결 대기";
+  const warn=attention.length>0;
+  return '<section class="ceo-status">'+
+    '<div class="ceo-status-summary"><span class="ceo-lamp '+(warn?'warn':'')+'"></span><div><strong>'+esc(headline)+'</strong><span>예약 작업 실행 기록 + 마지막 산출물</span></div></div>'+
+    '<div class="ceo-dept-grid">'+rows.map(x=>{
+      const bad=["failed","blocked","stale","stale_running"].includes(x.health);
+      const run=x.last_run;
+      const meta=run
+        ? '마지막 실행 '+esc(ceoAge(run.finished_at||run.started_at))+' · '+esc(ceoHealthLabel(x.health))+(run.produced_count!==undefined?' · 산출 '+Number(run.produced_count||0):'')
+        : 'heartbeat 기록 없음'+(x.last_output_at?' · 마지막 산출물 '+esc(ceoAge(x.last_output_at)):'');
+      return '<div class="ceo-dept"><div class="ceo-dept-head"><span class="ceo-dot '+(bad?'warn':'')+'"></span>'+esc(x.label)+'</div><div class="ceo-dept-meta '+(bad?'warn':'')+'">'+meta+'</div></div>';
+    }).join("")+'</div></section>';
 }
-function ceoCurrentReviews(){
-  const ids=new Set(ceoCurrentBuilds().map(b=>b.id));
-  return fidelityReviews.filter(r=>!isSupersededReview(r) && ids.has(r.build_job_id));
-}
-function ceoPlaytestReady(){
-  return ceoCurrentBuilds().filter(b=>b.status==="playtest_ready" || b.status==="qa_ready");
-}
-function ceoWip(){
-  const contracts=implementationContracts.filter(c=>c.status!=="archived");
-  const builds=ceoCurrentBuilds();
-  const buildContractIds=new Set(builds.map(b=>b.contract_id).filter(Boolean));
-  const contractWireIds=new Set(contracts.map(c=>c.wireframe_pack_id).filter(Boolean));
-  const pendingWire=wireframePacks.filter(w=>w.status==="wireframe" && !contractWireIds.has(w.id));
-  const review=contracts.filter(c=>c.blueprint_status==="pending_review" || c.blueprint_status==="blocked");
-  const buildWaiting=contracts.filter(c=>c.status==="ready" && c.blueprint_status==="approved" && !buildContractIds.has(c.id));
-  const building=builds.filter(b=>["queued","building","repair","blocked"].includes(b.status));
-  const gate=builds.filter(b=>b.status==="fidelity_pending" || b.fidelity_status==="reviewing" || b.fidelity_status==="pending");
-  const ready=ceoPlaytestReady();
-  return {
-    idea:promotedIdeas.filter(x=>x.status==="idea_lab").length,
-    design:gameDesigns.filter(x=>x.status==="design").length,
-    wire:pendingWire.length,
-    review:review.length,
-    buildWaiting:buildWaiting.length,
-    building:building.length,
-    gate:gate.length,
-    ready:ready.length,
-    pendingWire,reviewContracts:review,buildWaitingContracts:buildWaiting,buildingBuilds:building,gateBuilds:gate,readyBuilds:ready
-  };
-}
-function ceoHumanBlockers(){
-  const rows=[];
-  ceoCurrentBuilds().forEach(b=>{
-    const blockers=Array.isArray(b.blockers)?b.blockers:[];
-    blockers.forEach(x=>{
-      if(x && typeof x==="object" && (x.requires_human===true || x.human_required===true || x.owner==="human" || x.blocker_type==="human_decision")){
-        rows.push({title:b.title,blocker:x});
-      }
-    });
-  });
-  return rows;
-}
-function ceoStatusDepartments(){
-  const currentBuilds=ceoCurrentBuilds();
-  const currentReviews=ceoCurrentReviews();
-  const defs=[
-    ["아이디어 연구소",promotedIdeas,["source_run_at","created_at"]],
-    ["게임 디자인실",gameDesigns,["source_run_at","created_at"]],
-    ["프리프로덕션",wireframePacks,["source_run_at","created_at"]],
-    ["구현 설계실",implementationContracts,["source_run_at","updated_at","created_at"]],
-    ["빌드 팜",currentBuilds,["source_run_at","updated_at","created_at"]],
-    ["설계 검수실",currentReviews,["source_run_at","completed_at","created_at"]]
-  ];
-  return defs.map(([name,items,fields])=>{
-    const last=ceoLatest(items,fields);
-    const stale=last ? Date.now()-last.t > 2.5*60*60*1000 : true;
-    return {name,last,stale};
-  });
-}
-function ceoWatchRows(w){
-  const fixed=repairTickets.filter(x=>x.status==="fixed").length;
-  const open=repairTickets.filter(x=>x.status==="open").length;
+function ceoSnapshotInbox(s){
+  const i=s.ceo_inbox||{};
   const rows=[
-    ["설계도 자동 검토",w.review+"건"],
-    ["Gate 재검수 대기",w.gate+"건"],
-    ["빌드 대기 설계도",w.buildWaiting+"건"],
-    ["미해결 수리 항목",open+"건"+(fixed?" · "+fixed+"건 수리 완료":"")]
-  ];
-  return rows;
-}
-function ceoInbox(w){
-  const unclassified=promotedIdeas.filter(x=>x.status==="idea_lab" && !x.curation_bucket);
-  const ready=ceoPlaytestReady();
-  const priority=[
-    ...promotedIdeas.filter(x=>x.status==="idea_lab" && x.human_priority),
-    ...gameDesigns.filter(x=>x.status==="design" && x.human_priority)
-  ];
-  const blockers=ceoHumanBlockers();
-  const rows=[
-    {n:unclassified.length,title:"아이디어 분류",sub:unclassified.length?unclassified.slice(0,3).map(x=>x.title).join(", ")+(unclassified.length>3?" 외 "+(unclassified.length-3)+"개":""):"분류할 후보가 없습니다.",go:"ideas",button:"분류하기"},
-    {n:ready.length,title:"플레이테스트",sub:ready.length?ready.slice(0,2).map(x=>x.title).join(", "):"PLAYTEST READY 게임이 도착하면 여기서 직접 판단합니다.",go:"review",button:"플레이테스트실"},
-    {n:priority.length,title:"우선 처리 지정",sub:priority.length?priority.slice(0,2).map(x=>x.title).join(", "):"대표가 따로 순서를 바꿀 항목이 없습니다.",go:"planning",button:"기획본부"},
-    {n:blockers.length,title:"사람 판단 차단",sub:blockers.length?blockers.slice(0,2).map(x=>x.title).join(", "):"현재 사람 결정이 필요한 blocker가 없습니다.",go:"build",button:"제작본부"}
-  ];
-  const decisionCount=unclassified.length+ready.length+priority.length+blockers.length;
+    {key:"unclassified_ideas",title:"아이디어 분류",go:"ideas",button:"분류하기",empty:"분류할 후보가 없습니다."},
+    {key:"playtest_ready",title:"플레이테스트",go:"review",button:"플레이테스트실",empty:"PLAYTEST READY 게임이 아직 없습니다."},
+    {key:"priority_items",title:"우선 처리 지정",go:"planning",button:"기획본부",empty:"대표 우선 처리 지정이 없습니다."},
+    {key:"human_blockers",title:"사람 판단 차단",go:"build",button:"제작본부",empty:"사람 판단이 필요한 blocker가 없습니다."}
+  ].map(r=>{
+    const d=i[r.key]||{count:0,items:[]};
+    const names=(d.items||[]).map(x=>x.title).filter(Boolean);
+    return {...r,n:Number(d.count||0),sub:names.length?names.slice(0,3).join(", ")+(names.length>3?" 외 "+(names.length-3)+"개":""):r.empty};
+  });
+  const decisionCount=rows.reduce((n,r)=>n+r.n,0);
+  const w=s.watch||{};
   return '<div class="ceo-panel-head"><h2>대표 결재함</h2><span>대표만 할 수 있는 결정</span></div>'+
     (decisionCount===0?'<div class="ceo-empty-ok">결재할 것 없음 ✓</div>':
       '<div class="ceo-inbox">'+rows.map(r=>
-        '<div class="ceo-inbox-row '+(r.n?"attn":"")+'">'+
-          '<div class="ceo-inbox-num">'+r.n+'</div>'+
-          '<div class="ceo-inbox-copy"><b>'+esc(r.title)+'</b><span>'+esc(r.sub)+'</span></div>'+
-          '<button class="btn '+(r.n?"":"ghost")+'" onclick="go(\''+r.go+'\')">'+esc(r.button)+'</button>'+
-        '</div>').join("")+'</div>')+
+        '<div class="ceo-inbox-row '+(r.n?'attn':'')+'"><div class="ceo-inbox-num">'+r.n+'</div><div class="ceo-inbox-copy"><b>'+esc(r.title)+'</b><span>'+esc(r.sub)+'</span></div><button class="btn '+(r.n?'':'ghost')+'" onclick="go(\''+r.go+'\')">'+esc(r.button)+'</button></div>'
+      ).join("")+'</div>')+
     '<div class="ceo-watch"><div class="ceo-watch-title">지켜보기 · 자동 처리 중</div>'+
-      ceoWatchRows(w).map(r=>'<div class="ceo-watch-row"><span>자동 · '+esc(r[0])+'</span><b>'+esc(r[1])+'</b></div>').join("")+
+      '<div class="ceo-watch-row"><span>자동 · 설계도 검토</span><b>'+Number(w.blueprint_review||0)+'건</b></div>'+
+      '<div class="ceo-watch-row"><span>자동 · Gate 재검수 대기</span><b>'+Number(w.gate_recheck||0)+'건</b></div>'+
+      '<div class="ceo-watch-row"><span>자동 · 빌드 대기 설계도</span><b>'+Number(w.build_waiting||0)+'건</b></div>'+
+      '<div class="ceo-watch-row"><span>자동 · 미해결 수리</span><b>'+Number(w.open_repairs||0)+'건'+(w.fixed_repairs?' · '+Number(w.fixed_repairs)+'건 수리 완료':'')+'</b></div>'+
     '</div>';
 }
-function ceoReviewForBuild(buildId){
-  return ceoCurrentReviews().filter(r=>r.build_job_id===buildId).sort((a,b)=>Number(a.review_round||0)-Number(b.review_round||0));
-}
-function ceoRepairStats(buildId){
-  const rows=repairTickets.filter(x=>x.build_job_id===buildId);
-  return {
-    fixed:rows.filter(x=>x.status==="fixed").length,
-    open:rows.filter(x=>x.status==="open").length,
-    waived:rows.filter(x=>x.status==="waived").length,
-    latest:ceoLatest(rows,["updated_at","created_at"])
-  };
-}
-function ceoClosestCandidate(w){
-  if(w.gateBuilds.length) return w.gateBuilds[0];
-  if(w.buildingBuilds.length) return w.buildingBuilds[0];
-  if(w.buildWaitingContracts.length) return w.buildWaitingContracts[0];
-  if(w.reviewContracts.length) return w.reviewContracts[0];
-  if(w.pendingWire.length) return w.pendingWire[0];
-  return null;
-}
-function ceoIssueChips(r){
+function ceoIssueChipsSnapshot(r){
   if(!r) return "";
   const chips=[
-    ["검증",Number(r.verified_count||0)],
-    ["부분",Number(r.partial_count||0)],
-    ["누락",Number(r.missing_count||0)],
-    ["충돌",Number(r.conflict_count||0)],
-    ["고장",Number(r.broken_count||0)]
+    ["검증",Number(r.verified_count||0)],["부분",Number(r.partial_count||0)],
+    ["누락",Number(r.missing_count||0)],["충돌",Number(r.conflict_count||0)],["고장",Number(r.broken_count||0)]
   ];
   return '<div class="ceo-issue-chips">'+chips.map(x=>'<span class="ceo-issue-chip">'+x[0]+' '+x[1]+'</span>').join("")+'</div>';
 }
-function ceoShipping(w){
-  const ready=ceoPlaytestReady();
+function ceoSnapshotShipping(s){
+  const shipping=s.shipping||{};
+  const ready=Array.isArray(shipping.playtest_ready)?shipping.playtest_ready:[];
   if(ready.length){
     return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY '+ready.length+'</span></div>'+
       '<div class="ceo-ready-grid">'+ready.slice(0,4).map(b=>
         '<div class="ceo-ready-card"><div class="kicker">PLAYTEST READY</div><h3>'+esc(b.title)+'</h3><p>사람 플레이테스트를 시작할 준비가 된 실제 빌드입니다.</p><button class="btn good" onclick="go(\'review\')">▶ 플레이테스트실</button></div>'
       ).join("")+'</div>';
   }
+  const c=shipping.closest_to_ship;
+  if(!c) return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY 0</span></div><div class="empty">아직 출하 후보가 없습니다.</div>';
 
-  const candidate=ceoClosestCandidate(w);
-  if(!candidate){
-    return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY 0</span></div><div class="empty">아직 출하 후보가 없습니다.</div>';
-  }
-
-  const isBuild=!!candidate.contract_id && !!candidate.current_stage;
-  const contract=isBuild ? implementationContracts.find(c=>c.id===candidate.contract_id) : (candidate.requirement_count!==undefined?candidate:null);
-  const title=candidate.title||contract?.title||"출하 후보";
-  const reviews=isBuild?ceoReviewForBuild(candidate.id):[];
-  const firstFail=reviews.find(r=>r.verdict==="fail");
-  const repairs=isBuild?ceoRepairStats(candidate.id):{fixed:0,open:0,latest:null};
-  const currentStage=isBuild && (candidate.status==="fidelity_pending" || candidate.fidelity_status==="pending") ? "Gate 재검수 대기" :
-    isBuild && ["queued","building","repair","blocked"].includes(candidate.status) ? "빌드 진행 중" :
-    contract && contract.blueprint_status==="approved" ? "빌드 대기" :
-    contract && (contract.blueprint_status==="pending_review" || contract.blueprint_status==="blocked") ? "설계도 검토 대기" : "구현 설계 대기";
-
+  const labels={
+    gate:"Gate 재검수 대기",building:"빌드 진행 중",build_waiting:"빌드 대기",
+    blueprint_review:"설계도 검토 대기",wireframe:"구현 설계 대기"
+  };
+  const current=labels[c.kind]||"자동 파이프라인 진행 중";
   let steps='';
-  if(contract){
-    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 · 구현 설계 완료</b><span>요구사항 '+Number(contract.requirement_count||0)+'</span></div>';
+  if(c.requirement_count){
+    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 · 구현 설계 완료</b><span>요구사항 '+Number(c.requirement_count)+'</span></div>';
   }else{
-    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 완료</b><span>자동 제작 라인을 통과 중</span></div>';
+    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 완료</b><span>다음 자동 공정 대기</span></div>';
   }
-  if(isBuild){
-    steps+='<div class="ceo-step done"><b>첫 빌드 완료</b><span class="ceo-step-time">'+esc(ceoClock(candidate.created_at))+'</span><span>Godot 프로젝트 시공 완료</span></div>';
+  if(c.build_job_id){
+    steps+='<div class="ceo-step done"><b>첫 빌드 생성</b><span class="ceo-step-time">'+esc(ceoClock(c.created_at))+'</span><span>Godot 프로젝트 시공 이력 있음</span></div>';
   }
-  if(firstFail){
-    const issueTotal=Number(firstFail.partial_count||0)+Number(firstFail.missing_count||0)+Number(firstFail.conflict_count||0)+Number(firstFail.broken_count||0);
-    steps+='<div class="ceo-step fail"><b>Gate '+Number(firstFail.review_round||1)+'차 불합격</b><span class="ceo-step-time">'+esc(ceoClock(firstFail.completed_at||firstFail.created_at))+'</span><span>요구사항 대조에서 '+issueTotal+'개 결함 판정</span>'+ceoIssueChips(firstFail)+'</div>';
+  if(c.first_failed_review){
+    const r=c.first_failed_review;
+    const total=Number(r.partial_count||0)+Number(r.missing_count||0)+Number(r.conflict_count||0)+Number(r.broken_count||0);
+    steps+='<div class="ceo-step fail"><b>Gate '+Number(r.review_round||1)+'차 불합격</b><span>요구사항 대조에서 '+total+'개 결함 판정</span>'+ceoIssueChipsSnapshot(r)+'</div>';
   }
+  const repairs=c.repair_stats||{};
   if(repairs.fixed){
-    steps+='<div class="ceo-step done"><b>수리 '+repairs.fixed+'건 완료</b><span class="ceo-step-time">'+esc(ceoClock(repairs.latest?.raw))+'</span><span>'+(repairs.open?'미해결 '+repairs.open+'건 남음':'미해결 수리 항목 없음')+'</span></div>';
+    steps+='<div class="ceo-step done"><b>수리 '+Number(repairs.fixed)+'건 완료</b><span>'+Number(repairs.open||0)+'건 미해결</span></div>';
   }
-  steps+='<div class="ceo-step now"><b>'+esc(currentStage)+'</b><span>현재 자동 파이프라인 상태</span></div>';
+  steps+='<div class="ceo-step now"><b>'+esc(current)+'</b><span>현재 자동 파이프라인 상태</span></div>';
   steps+='<div class="ceo-step future"><b>PLAYTEST READY → 진열대</b><span>통과 후 대표가 직접 플레이테스트</span></div>';
 
-  const next=w.buildWaitingContracts.filter(c=>c.title!==title).slice(0,4);
+  const next=Array.isArray(shipping.next_build_waiting)?shipping.next_build_waiting.filter(x=>x.title!==c.title).slice(0,4):[];
   return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY 0</span></div>'+
-    '<div class="ceo-ship-empty-label">첫 출하에 가장 가까운 게임</div>'+
-    '<div class="ceo-ship-title">'+esc(title)+'</div>'+
-    '<div class="ceo-ship-sub">'+esc(currentStage)+'</div>'+
+    '<div class="ceo-ship-empty-label">첫 출하에 가장 가까운 게임</div><div class="ceo-ship-title">'+esc(c.title||"출하 후보")+'</div><div class="ceo-ship-sub">'+esc(current)+'</div>'+
     '<div class="ceo-timeline">'+steps+'</div>'+
-    (next.length?'<div class="ceo-next-builds"><span>다음 빌드 대기</span>'+next.map(c=>'<span class="ceo-next-build">'+esc(c.title)+' · '+Number(c.requirement_count||0)+'</span>').join("")+'</div>':'');
+    (next.length?'<div class="ceo-next-builds"><span>다음 빌드 대기</span>'+next.map(x=>'<span class="ceo-next-build">'+esc(x.title)+' · '+Number(x.requirement_count||0)+'</span>').join("")+'</div>':'');
 }
-function ceoGrowth(){
-  const reviews=ceoCurrentReviews();
-  const first=reviews.filter(r=>Number(r.review_round||1)===1);
-  const firstPass=first.length ? Math.round(first.filter(r=>r.verdict==="pass").length/first.length*100)+"%" : "—";
-
-  const byBuild={};
-  reviews.forEach(r=>{
-    const k=r.build_job_id||"";
-    if(!k) return;
-    if(!byBuild[k]) byBuild[k]=0;
-    if(r.verdict==="fail") byBuild[k]+=1;
-  });
-  const rounds=Object.values(byBuild);
-  const avgRounds=rounds.length ? (rounds.reduce((a,b)=>a+b,0)/rounds.length).toFixed(1).replace(".0","")+"회" : "—";
-  const reqs=implementationContracts.map(c=>Number(c.requirement_count||0)).filter(n=>n>0);
-  const avgReq=reqs.length?Math.round(reqs.reduce((a,b)=>a+b,0)/reqs.length):null;
+function ceoSnapshotGrowth(s){
+  const g=s.growth||{};
+  const pct=g.first_gate_pass_rate===null||g.first_gate_pass_rate===undefined?"—":Math.round(Number(g.first_gate_pass_rate)*100)+"%";
+  const rounds=g.average_repair_rounds===null||g.average_repair_rounds===undefined?"—":Number(g.average_repair_rounds)+"회";
   const kpis=[
-    ["아이디어 → PLAYTEST READY","—","첫 실제 출하부터 측정"],
-    ["첫 Gate 통과율",firstPass,first.length?first.length+"개 1차 Gate 기준":"측정 가능한 Gate 없음"],
-    ["평균 수리 라운드",avgRounds,rounds.length+"개 현재 빌드 기준"],
+    ["아이디어 → PLAYTEST READY",g.lead_time_hours===null?"—":Number(g.lead_time_hours).toFixed(1)+"h",g.lead_time_reason==="no_playtest_ready_yet"?"첫 출하 후 측정":"READY 도달 시각 계측 필요"],
+    ["첫 Gate 통과율",pct,Number(g.first_gate_sample_size||0)+"개 1차 Gate 기준"],
+    ["평균 수리 라운드",rounds,"현재 계약 기반 빌드"],
     ["공용 부품 사용률","—","Interaction Library 계측 연결 후"],
     ["Fallback 비율","—","fallback_reason 계측 연결 후"]
   ];
   return '<div class="ceo-panel-head"><h2>공장 성장</h2><span>반복할수록 빨라지고, 조립 중심이 되어 가는가</span></div>'+
     '<div class="ceo-growth-grid">'+kpis.map(k=>'<div class="ceo-kpi"><div class="ceo-kpi-label">'+esc(k[0])+'</div><div class="ceo-kpi-value">'+esc(k[1])+'</div><div class="ceo-kpi-sub">'+esc(k[2])+'</div></div>').join("")+'</div>'+
-    '<div class="ceo-secondary">보조 지표 · 게임당 요구사항 '+(avgReq===null?"—":avgReq+" 평균")+'</div>';
+    '<div class="ceo-secondary">보조 지표 · 게임당 요구사항 '+(g.average_requirements===null||g.average_requirements===undefined?"—":Number(g.average_requirements)+" 평균")+'</div>';
 }
-function ceoMajorEvents(){
-  const events=[];
-  const builds=ceoCurrentBuilds();
-  const buildMap=new Map(builds.map(b=>[b.id,b]));
-
-  ceoPlaytestReady().forEach(b=>events.push({raw:b.updated_at||b.source_run_at||b.created_at,kind:"출하",cls:"good",copy:b.title+" · PLAYTEST READY"}));
-  ceoCurrentReviews().forEach(r=>{
-    const b=buildMap.get(r.build_job_id);
-    if(!b) return;
-    events.push({
-      raw:r.completed_at||r.source_run_at||r.created_at,
-      kind:r.verdict==="pass"?"통과":"불합격",
-      cls:r.verdict==="pass"?"good":"fail",
-      copy:b.title+" · Gate "+Number(r.review_round||1)+"차"+(r.verdict==="fail"?" · 부분 "+Number(r.partial_count||0)+" · 누락 "+Number(r.missing_count||0)+" · 충돌 "+Number(r.conflict_count||0)+" · 고장 "+Number(r.broken_count||0):"")
-    });
-  });
-  builds.forEach(b=>{
-    const rs=ceoRepairStats(b.id);
-    if(rs.fixed && rs.open===0) events.push({raw:rs.latest?.raw,kind:"수리",cls:"repair",copy:b.title+" · 수리 "+rs.fixed+"건 완료 → 재검수 가능"});
-    if(b.created_at) events.push({raw:b.created_at,kind:"빌드",cls:"",copy:b.title+" · 첫 빌드 생성"});
-  });
-  implementationContracts.filter(c=>c.blueprint_status==="approved" && c.status==="ready").forEach(c=>{
-    events.push({raw:c.updated_at||c.source_run_at||c.created_at,kind:"승인",cls:"good",copy:"설계도 승인 · "+c.title});
-  });
-
-  const rows=events.filter(e=>e.raw).sort((a,b)=>new Date(b.raw)-new Date(a.raw)).slice(0,5);
+function ceoSnapshotEvents(s){
+  const rows=Array.isArray(s.major_events)?s.major_events:[];
+  const label={playtest_ready:"출하",gate_passed:"통과",gate_failed:"불합격",repair_completed:"수리",blueprint_approved:"승인"};
+  const cls={playtest_ready:"good",gate_passed:"good",gate_failed:"fail",repair_completed:"repair",blueprint_approved:"good"};
   return '<div class="ceo-panel-head"><h2>주요 사건</h2><span>승인 · 불합격 · 수리 · 출하만</span></div>'+
-    (rows.length?'<div class="ceo-events">'+rows.map(e=>
-      '<div class="ceo-event"><div class="ceo-event-time">'+esc(ceoClock(e.raw))+'</div><div class="ceo-event-kind '+esc(e.cls)+'">'+esc(e.kind)+'</div><div class="ceo-event-copy">'+esc(e.copy)+'</div></div>'
-    ).join("")+'</div>':'<div class="empty">아직 주요 사건이 없습니다.</div>');
+    (rows.length?'<div class="ceo-events">'+rows.map(e=>{
+      let copy=e.title||"";
+      if(e.type==="gate_failed") copy+=' · Gate '+Number(e.review_round||1)+'차 · 부분 '+Number(e.partial_count||0)+' · 누락 '+Number(e.missing_count||0)+' · 충돌 '+Number(e.conflict_count||0)+' · 고장 '+Number(e.broken_count||0);
+      if(e.type==="repair_completed") copy+=' · 수리 '+Number(e.fixed_count||0)+'건 완료';
+      return '<div class="ceo-event"><div class="ceo-event-time">'+esc(ceoClock(e.at))+'</div><div class="ceo-event-kind '+(cls[e.type]||'')+'">'+esc(label[e.type]||e.type)+'</div><div class="ceo-event-copy">'+esc(copy)+'</div></div>';
+    }).join("")+'</div>':'<div class="empty">아직 주요 사건이 없습니다.</div>');
 }
 function dashboard(){
-  const w=ceoWip();
-  const depts=ceoStatusDepartments();
-  const staleCount=depts.filter(d=>d.stale).length;
+  const s=ceoDashboardSnapshot;
+  if(!s){
+    return '<div class="ceo-shell"><section class="ceo-panel"><div class="empty">대표 대시보드 집계를 불러오는 중입니다…</div></section></div>';
+  }
+  const p=s.pipeline_wip||{};
   const stages=[
-    ["기획","아이디어 연구",w.idea,"분류 대기"],
-    ["기획","와이어프레임 대기",w.design,"게임 설계 완료"],
-    ["제작","구현 설계 대기",w.wire,"계약 없는 Pack"],
-    ["제작","설계도 검토",w.review,"pending_review"],
-    ["제작","빌드 대기",w.buildWaiting,"승인된 설계도"],
-    ["제작","빌드 중",w.building,"Builder 작업"],
-    ["검수","설계 검수 (Gate)",w.gate,"재검수 포함"],
-    ["출하","PLAYTEST READY",w.ready,"대표 플레이"]
+    ["기획","아이디어 연구",Number(p.idea||0),"분류 대기"],
+    ["기획","와이어프레임 대기",Number(p.design||0),"게임 설계 완료"],
+    ["제작","구현 설계 대기",Number(p.wireframe_to_contract||0),"계약 없는 Pack"],
+    ["제작","설계도 검토",Number(p.blueprint_review||0),"pending_review"],
+    ["제작","빌드 대기",Number(p.build_waiting||0),"승인된 설계도"],
+    ["제작","빌드 중",Number(p.building||0),"Builder 작업"],
+    ["검수","설계 검수 (Gate)",Number(p.gate||0),"재검수 포함"],
+    ["출하","PLAYTEST READY",Number(p.playtest_ready||0),"대표 플레이"]
   ];
-  const max=Math.max(1,...stages.map(s=>s[2]));
-  const bottleneckIndex=stages.reduce((best,s,i)=>s[2]>stages[best][2]?i:best,0);
-
+  const max=Math.max(1,...stages.map(x=>x[2]));
+  const bottleneckIndex=stages.reduce((best,x,i)=>x[2]>stages[best][2]?i:best,0);
+  const exclusions=s.exclusions||{};
   return '<div class="ceo-shell">'+
-    '<section class="ceo-status">'+
-      '<div class="ceo-status-summary"><span class="ceo-lamp '+(staleCount?"warn":"")+'"></span><div><strong>'+(staleCount?"산출물 흐름 · 주의 "+staleCount+"곳":"최근 산출물 흐름 정상")+'</strong><span>실행 heartbeat 미연결 · 가동 여부가 아니라 마지막 산출물 기준</span></div></div>'+
-      '<div class="ceo-dept-grid">'+depts.map(d=>
-        '<div class="ceo-dept"><div class="ceo-dept-head"><span class="ceo-dot '+(d.stale?"warn":"")+'"></span>'+esc(d.name)+'</div><div class="ceo-dept-meta '+(d.stale?"warn":"")+'">'+(d.last?('마지막 산출물 '+esc(ceoAge(d.last.raw))):'산출물 기록 없음')+(d.stale?' · 실행 여부 미확인':'')+'</div></div>'
+    ceoSnapshotStatus(s)+
+    '<div class="ceo-top-grid"><section class="ceo-panel">'+ceoSnapshotInbox(s)+'</section><section class="ceo-panel">'+ceoSnapshotShipping(s)+'</section></div>'+
+    '<section class="ceo-panel ceo-line-wrap"><div class="ceo-panel-head"><h2>생산 라인</h2><span>백엔드 집계 기준 · 현재 WIP</span></div>'+
+      '<div class="ceo-line-grid">'+stages.map((x,i)=>
+        '<div class="ceo-stage '+(i===bottleneckIndex&&x[2]?'bottleneck ':'')+(i===7?'ready':'')+'"><div class="ceo-stage-group">'+esc(x[0])+'</div><div class="ceo-stage-name">'+esc(x[1])+'</div><div class="ceo-stage-count">'+x[2]+'</div><div class="ceo-stage-note">'+esc(x[3])+'</div><div class="ceo-stage-bar"><i style="width:'+Math.round(x[2]/max*100)+'%"></i></div></div>'
       ).join("")+'</div>'+
+      (Number(p.wireframe_to_contract||0)?'<div class="ceo-bottleneck-note">● <b>적체:</b>&nbsp; 구현 설계 앞에 와이어프레임 '+Number(p.wireframe_to_contract)+'개가 대기 중입니다.</div>':'')+
     '</section>'+
-
-    '<div class="ceo-top-grid">'+
-      '<section class="ceo-panel">'+ceoInbox(w)+'</section>'+
-      '<section class="ceo-panel">'+ceoShipping(w)+'</section>'+
-    '</div>'+
-
-    '<section class="ceo-panel ceo-line-wrap">'+
-      '<div class="ceo-panel-head"><h2>생산 라인</h2><span>현재 상태별 대기 · 누적 생산량 아님</span></div>'+
-      '<div class="ceo-line-grid">'+stages.map((s,i)=>
-        '<div class="ceo-stage '+(i===bottleneckIndex&&s[2]?"bottleneck ":"")+(i===7?"ready":"")+'">'+
-          '<div class="ceo-stage-group">'+esc(s[0])+'</div><div class="ceo-stage-name">'+esc(s[1])+'</div><div class="ceo-stage-count">'+s[2]+'</div><div class="ceo-stage-note">'+esc(s[3])+'</div>'+
-          '<div class="ceo-stage-bar"><i style="width:'+Math.round(s[2]/max*100)+'%"></i></div>'+
-        '</div>'
-      ).join("")+'</div>'+
-      (w.wire?'<div class="ceo-bottleneck-note">● <b>적체:</b>&nbsp; 구현 설계 앞에 와이어프레임 '+w.wire+'개가 대기 중입니다. 한 회차 처리량과 다음 공정 속도를 함께 봐야 합니다.</div>':'')+
-    '</section>'+
-
-    '<section class="ceo-panel">'+ceoGrowth()+'</section>'+
-    '<section class="ceo-panel">'+ceoMajorEvents()+'</section>'+
-    '<div class="ceo-data-note"><b>데이터</b> · Supabase의 실제 Idea / Design / Wireframe / Contract / Build / Fidelity / Repair 데이터만 사용합니다. archived·soft-reset 이력과 계약 이전 legacy build는 현재 생산 라인에서 제외합니다.<br><b>상태 한계</b> · 예약 작업 heartbeat가 아직 없어 상단은 “작업 실행 성공”이 아니라 “마지막 산출물 신선도”만 표시합니다. 공용 부품 사용률·fallback 비율도 계측이 연결되기 전까지 — 로 표시합니다.</div>'+
+    '<section class="ceo-panel">'+ceoSnapshotGrowth(s)+'</section>'+
+    '<section class="ceo-panel">'+ceoSnapshotEvents(s)+'</section>'+
+    '<div class="ceo-data-note"><b>집계 Source of Truth</b> · Edge Function의 <code>view=ceo_dashboard</code>가 WIP·결재함·출하 후보·성장 지표를 계산합니다. 브라우저는 받은 스냅샷을 표시만 합니다.<br><b>제외</b> · archived '+Number(exclusions.archived_builds||0)+'건 · 계약 이전 legacy build '+Number(exclusions.legacy_builds_without_contract||0)+'건 · superseded review '+Number(exclusions.superseded_reviews||0)+'건.</div>'+
   '</div>';
 }
 
