@@ -1,0 +1,23 @@
+{
+  "role": "builder",
+  "kind": "static",
+  "status": "passed",
+  "verification_scope": "static",
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "commit": "4bc09d26e8e2917ea353875f06cae1e753b7909a",
+  "adapter_bindings": "legacy approved blueprint: none",
+  "checks": [
+    "540x960 viewport and main scene",
+    "required eight-screen hierarchy",
+    "screen_percent reference pixel geometry",
+    "drag rotation and pinch zoom paths",
+    "hotspot clue path",
+    "question budget",
+    "evidence comparison slots",
+    "RETURN/HOLD/REPORT decision state",
+    "horizontal confirm rail",
+    "three-case outcome and shift summary flow",
+    "106/106 implementation claims"
+  ],
+  "runtime_qa": "not executed; manual playtest required"
+}
