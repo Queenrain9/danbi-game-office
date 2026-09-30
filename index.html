@@ -817,7 +817,7 @@ async function loadGameDesigns(showToast=false){
     }
     const payload=await res.json();
     gameDesigns=Array.isArray(payload.designs)?payload.designs:[];
-    if(current==="design" || current==="dashboard" || current==="wireframe" || current==="implementation") render();
+    if(current==="design" || current==="dashboard" || current==="wireframe" || current==="implementation" || current==="build") render();
     if(showToast) toast(`Game Design 새로고침 · ${gameDesigns.length}개`);
   }catch(err){
     console.error("Game Design load failed",err);
@@ -2005,6 +2005,7 @@ function fidelityPage(){
 
 function buildCard(p){
   const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"Implementation Complete"};
+  const brief=implementationGameBrief(p);
   const status=String(p.status||"").toLowerCase();
   const statusLabels={building:"빌드 중",repair:"수리 중",blocked:"작업 중단",fidelity_pending:"Godot 빌드 완료 · 설계 검수 대기"};
   const blockers=Array.isArray(p.blockers)?p.blockers:[];
@@ -2013,6 +2014,7 @@ function buildCard(p){
   const kicker=historical?"HISTORICAL BUILD · DO NOT REUSE":status==="fidelity_pending"?"GODOT BUILD":"GODOT BUILD JOB";
   const badge=softReset?"SUPERSEDED":(statusLabels[status]||p.status);
   return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+(historical?'amber':status==="fidelity_pending"?'green':'blue')+'">'+esc(badge)+'</span></div>'+
+  '<div class="card-desc" style="margin-top:8px">'+esc(brief)+'</div>'+
   '<div class="meta"><span>'+esc(p.build_version||"-")+'</span><span>'+esc(labels[p.current_stage]||p.current_stage||"-")+'</span><span>Godot 4.x</span></div>'+
   '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>설계 요구사항 구현</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
   (status==="fidelity_pending"?'<div class="human-gate" style="margin-top:12px"><b>Godot 빌드 완료</b><br>Build Farm 시공이 끝났습니다. 독립 설계 검수를 기다리고 있습니다.</div>':softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>현재 작업</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
@@ -2021,7 +2023,7 @@ function buildCard(p){
 }
 function buildPage(){
   const buildOutputs=buildJobs.filter(b=>!isHistoricalBuild(b) && ["building","repair","blocked","fidelity_pending"].includes(String(b.status||"").toLowerCase()));
-  return genericHeader("Build Farm","승인된 Implementation Blueprint를 실제 Godot playable로 만들고, 완성된 Build를 설계 검수 전까지 보관합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
+  return genericHeader("Build Farm","승인된 Implementation Blueprint를 실제 Godot playable로 만들고, 완성된 Build를 설계 검수 전까지 보관합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false),loadGameDesigns(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
   '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active build limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Blueprint → Godot Build</span><span>완료 → 설계 검수 대기</span><span>검수 FAIL → Repair</span></div></div>'+
   '<div class="section-head"><div><h2>Godot Build</h2><p>현재 제작·수리 중인 Build와 설계 검수를 기다리는 완성 Build입니다.</p></div></div>'+
   '<div class="cards">'+(buildOutputs.map(buildCard).join("") || '<div class="empty">현재 Build Farm에 Godot Build가 없습니다.<br>새 Blueprint가 승인되면 이곳에서 제작됩니다.</div>')+'</div>';
