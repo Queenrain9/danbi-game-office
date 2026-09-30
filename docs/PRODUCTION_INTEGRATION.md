@@ -108,3 +108,24 @@ Within one scheduled run, game A must reach a complete checkpoint before game B 
 Large Contract/Blueprint payloads must be passed as structured JSON or safely encoded/escaped before JSONB conversion. Do not construct megabyte-scale raw SQL JSON literals from free text. Transport/serialization failures such as an unescaped newline are retryable local failures; they must not become semantic blockers or cause the Compiler to skip to the next game.
 
 A genuine `blueprint_status='blocked'` item does not starve the rest of production. Its issue record remains available for repair while new eligible Wireframes may continue through the Compiler.
+
+
+## Interaction Runtime Library v1
+
+Planning language and Godot implementation now meet at a stable semantic boundary.
+
+- Game Design owns what/why and never names runtime adapters.
+- Wireframe may add `interaction_semantics`: `kind`, component ids, axis/cancel/timing/distance/tolerance, and optional `completion:{kind:'snap',target_component_id,tolerance_px,rotation_tolerance_deg}`.
+- Blueprint Compiler maps those semantics through `construction.INTERACTION_ADAPTERS`.
+- Build Farm copies only used scripts from `production/godot/interaction_runtime/` to `res://runtime/interaction/`.
+- Static Fidelity verifies requirement → semantics → adapter id/params → host node/script/action/state.
+- Unknown mechanics use `explicit_script_v1` only with `fallback_reason`.
+
+First stable primitives: `drag_v1`, `snap_v1`, `hold_v1`, `swipe_v1`, `trace_v1`, `pinch_v1`.
+
+When Godot CLI is available, run:
+`godot --headless --path production/godot/interaction_runtime --script res://headless_tests.gd`
+
+The shared runtime test proves adapter behavior only. Game-specific critical paths can add small headless tests under `builds/<slug>/tests/`. Runtime evidence is additive; never fabricate it when Godot is unavailable.
+
+Legacy Wireframes without `interaction_semantics` and already-approved Blueprints remain valid through `explicit_script_v1`. New structured interactions should compile to `adapter_host_v1` + `adapter_bindings` whenever supported.

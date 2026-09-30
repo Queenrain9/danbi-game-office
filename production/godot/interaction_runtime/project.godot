@@ -1,0 +1,8 @@
+[application]
+config/name="Danbi Interaction Runtime Tests"
+[display]
+window/size/viewport_width=540
+window/size/viewport_height=960
+window/stretch/mode="canvas_items"
+[rendering]
+renderer/rendering_method="gl_compatibility"

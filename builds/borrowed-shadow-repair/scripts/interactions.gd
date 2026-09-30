@@ -1,5 +1,10 @@
 extends Control
 
+const DragV1 = preload("res://runtime/interaction/drag_v1.gd")
+const HoldV1 = preload("res://runtime/interaction/hold_v1.gd")
+var drag_adapter = DragV1.new()
+var hold_adapter = HoldV1.new()
+
 var pressed := false
 var hold_elapsed := 0.0
 var last_angle := 0.0
@@ -10,6 +15,7 @@ var twist_piece_angle:=0.0
 func root_game(): return get_node_or_null("/root/AppRoot")
 
 func _ready() -> void:
+    hold_adapter.configure({"hold_ms":600,"movement_tolerance_px":18.0})
     set_process(true)
     set_process_input(true)
     if name in ["symptom_targets", "piece_tray", "silhouette", "seam_canvas", "hold_test"]:
@@ -20,10 +26,11 @@ func _process(delta: float) -> void:
     if name == "hold_test" and pressed:
         hold_elapsed += delta
         queue_redraw()
-        if hold_elapsed >= 0.6:
-            pressed = false
-            var game = root_game()
-            if game: game.complete_pose_test()
+        var held=hold_adapter.update(Time.get_ticks_msec(),Vector2.ZERO)
+        if held.get("completed",false):
+            pressed=false
+            var game=root_game()
+            if game:game.complete_pose_test()
 
 func _gui_input(event: InputEvent) -> void:
     var game = root_game()
@@ -46,12 +53,17 @@ func _gui_input(event: InputEvent) -> void:
         game.diagnose_at(event.position); accept_event()
     elif name == "piece_tray":
         if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-            pressed = event.pressed
-            if pressed: game.begin_piece_drag(_piece_index_at(event.position))
-            else: game.end_piece_drag(event.global_position)
+            pressed=event.pressed
+            if pressed:
+                drag_adapter.begin(-1,event.global_position,event.global_position)
+                game.begin_piece_drag(_piece_index_at(event.position))
+            else:
+                var released=drag_adapter.release(-1,event.global_position)
+                game.end_piece_drag(released.get("position",event.global_position))
             accept_event()
         elif event is InputEventMouseMotion and pressed:
-            game.update_piece_drag(event.global_position); accept_event()
+            var moved=drag_adapter.update(-1,event.global_position)
+            game.update_piece_drag(moved.get("position",event.global_position));accept_event()
 
     elif name == "silhouette" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
         game.end_piece_drag(event.global_position); accept_event()
@@ -64,11 +76,15 @@ func _gui_input(event: InputEvent) -> void:
         elif event is InputEventMouseMotion and pressed:
             game.update_trace(event.position, size); queue_redraw(); accept_event()
     elif name == "hold_test" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-        pressed = event.pressed
-        hold_elapsed = 0.0 if pressed else hold_elapsed
-        if pressed: game.set_state("holding")
-        elif hold_elapsed < 0.6: game.set_state("idle")
-        queue_redraw(); accept_event()
+        pressed=event.pressed
+        hold_elapsed=0.0 if pressed else hold_elapsed
+        if pressed:
+            hold_adapter.begin(Time.get_ticks_msec(),event.position)
+            game.set_state("holding")
+        else:
+            var released=hold_adapter.release(Time.get_ticks_msec(),event.position)
+            if not released.get("completed",false):game.set_state("idle")
+        queue_redraw();accept_event()
 
 func _piece_index_at(p:Vector2)->int:
     var game=root_game(); if not game:return -1

@@ -20,6 +20,16 @@ PATTERNS = {
     'button_tap_v1': {'types': ['Button'], 'mouse_filter': 0, 'signal': 'pressed'},
     'modal_scrim_v1': {'types': ['Control', 'ColorRect', 'Panel'], 'mouse_filter': 0},
     'explicit_script_v1': {'types': ['Control', 'Button', 'Panel', 'ColorRect', 'TextureRect', 'Label', 'ProgressBar'], 'mouse_filter': 0, 'script_required': True},
+    'adapter_host_v1': {'types': ['Control', 'Button', 'Panel', 'ColorRect', 'TextureRect'], 'mouse_filter': 0, 'script_required': True},
+}
+
+INTERACTION_ADAPTERS = {
+    'drag_v1': {'semantic_kind':'drag','source_path':'production/godot/interaction_runtime/drag_v1.gd','script_path':'res://runtime/interaction/drag_v1.gd','entry_symbol':'handle_event','required_params':[]},
+    'snap_v1': {'semantic_kind':'snap','source_path':'production/godot/interaction_runtime/snap_v1.gd','script_path':'res://runtime/interaction/snap_v1.gd','entry_symbol':'evaluate_transform','required_params':['tolerance_px']},
+    'hold_v1': {'semantic_kind':'hold','source_path':'production/godot/interaction_runtime/hold_v1.gd','script_path':'res://runtime/interaction/hold_v1.gd','entry_symbol':'update','required_params':['hold_ms']},
+    'swipe_v1': {'semantic_kind':'swipe','source_path':'production/godot/interaction_runtime/swipe_v1.gd','script_path':'res://runtime/interaction/swipe_v1.gd','entry_symbol':'release','required_params':['min_distance_px']},
+    'trace_v1': {'semantic_kind':'trace','source_path':'production/godot/interaction_runtime/trace_v1.gd','script_path':'res://runtime/interaction/trace_v1.gd','entry_symbol':'append_point','required_params':['tolerance_px']},
+    'pinch_v1': {'semantic_kind':'pinch','source_path':'production/godot/interaction_runtime/pinch_v1.gd','script_path':'res://runtime/interaction/pinch_v1.gd','entry_symbol':'drag','required_params':[]},
 }
 CHECKS = {'file', 'node', 'symbol', 'geometry', 'connection', 'resources'}
 NAME = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
@@ -78,7 +88,7 @@ _component_types(
     'manipulation_zone map mask_canvas node_graph part_tray path polygon_surface rail rope rotary '
     'route_selector scripted_sim slider spline_playfield tool vertical_handle vertical_slider '
     'vertical_swipe_control viewport wipe world_entities world_entity world_object world_targets',
-    'Control', 'explicit_script_v1', ('absolute_control_v1',)
+    'Control', 'explicit_script_v1', ('absolute_control_v1', 'adapter_host_v1')
 )
 
 
@@ -167,6 +177,36 @@ def resolve_interaction_target(screen, source_target):
         return {'component_ids': [hosts[0]['id']], 'selector': target}
 
     raise ValueError('No unique component owner for interaction target: ' + target)
+
+
+def interaction_semantics(interaction):
+    if not isinstance(interaction, dict):
+        return None
+    value = interaction.get('interaction_semantics')
+    return value if isinstance(value, dict) else None
+
+
+def compile_interaction_adapters(interaction):
+    sem = interaction_semantics(interaction)
+    if not sem:
+        return {'adapter_bindings': [], 'fallback_reason': 'legacy_unstructured_interaction'}
+    kind = str(sem.get('kind') or '').strip().lower()
+    kind_to_adapter = {v['semantic_kind']: k for k, v in INTERACTION_ADAPTERS.items()}
+    adapter_id = kind_to_adapter.get(kind)
+    if not adapter_id or kind == 'snap':
+        return {'adapter_bindings': [], 'fallback_reason': 'unsupported_semantic_kind:' + (kind or 'missing')}
+    params = {}
+    for key in ('axis','cancel','min_distance_px','max_duration_ms','hold_ms','movement_tolerance_px','tolerance_px','min_coverage','min_value','max_value'):
+        if key in sem:
+            params[key] = sem[key]
+    plan = [{'adapter_id': adapter_id, 'script_path': INTERACTION_ADAPTERS[adapter_id]['script_path'], 'params': params}]
+    completion = sem.get('completion')
+    if isinstance(completion, dict) and str(completion.get('kind') or '').lower() == 'snap':
+        snap_params = {k: completion[k] for k in ('tolerance_px','rotation_tolerance_deg') if k in completion}
+        if 'tolerance_px' not in snap_params:
+            return {'adapter_bindings': [], 'fallback_reason': 'snap_requires_tolerance_px'}
+        plan.append({'adapter_id': 'snap_v1', 'script_path': INTERACTION_ADAPTERS['snap_v1']['script_path'], 'params': snap_params})
+    return {'adapter_bindings': plan, 'fallback_reason': None}
 
 
 def canonical_reference_size(pack):
@@ -480,15 +520,45 @@ def validate(b, project=None, claims=None, commit=None):
                 if target.get('construction_pattern')=='button_tap_v1':
                     if not any(c.get('from')==path and c.get('signal')=='pressed' and c.get('method')==v.get('action_symbol') and nodes.get(c.get('to'),{}).get('script_path')==v.get('action_script') for c in conns):
                         error('CONNECTION',path,'Button tap requires pressed bound to the exact action owner')
-                elif target.get('construction_pattern')=='explicit_script_v1':
+                elif target.get('construction_pattern') in ('explicit_script_v1','adapter_host_v1'):
                     if not v.get('input_handler') or target.get('script_path') is None:
-                        error('INPUT_MODALITY',path,'Non-Button tap requires explicit_script_v1 with a reviewed input_handler')
+                        error('INPUT_MODALITY',path,'Non-Button tap requires a scripted host with a reviewed input_handler')
                 else:
-                    error('INPUT_MODALITY',path,'Tap target must use button_tap_v1 or explicit_script_v1')
+                    error('INPUT_MODALITY',path,'Tap target must use button_tap_v1 or a scripted adapter host')
         else:
             primary=nodes.get(primary_path,{})
-            if primary.get('construction_pattern')!='explicit_script_v1' or not v.get('input_handler') or primary.get('script_path') is None:
-                error('INPUT_MODALITY',primary_path,'Non-tap gesture requires explicit_script_v1 on the primary target with a reviewed input_handler')
+            if primary.get('construction_pattern') not in ('explicit_script_v1','adapter_host_v1') or not v.get('input_handler') or primary.get('script_path') is None:
+                error('INPUT_MODALITY',primary_path,'Non-tap gesture requires a scripted host on the primary target with a reviewed input_handler')
+        sem = interaction_semantics(src)
+        adapters = v.get('adapter_bindings', [])
+        fallback_reason = v.get('fallback_reason')
+        if sem:
+            plan = compile_interaction_adapters(src)
+            expected_adapters = plan.get('adapter_bindings', [])
+            if plan.get('fallback_reason'):
+                if not fallback_reason:
+                    error('ADAPTER_FALLBACK', primary_path, 'Unsupported semantic interaction requires explicit fallback_reason')
+            else:
+                if fallback_reason:
+                    error('ADAPTER_FALLBACK', primary_path, 'Known semantic interaction must use standard adapters instead of fallback')
+                if [x.get('adapter_id') for x in adapters] != [x.get('adapter_id') for x in expected_adapters]:
+                    error('ADAPTER_MAPPING', primary_path, 'Adapter ids differ from canonical semantic mapping')
+                for a, expected in zip(adapters, expected_adapters):
+                    spec = INTERACTION_ADAPTERS.get(a.get('adapter_id'))
+                    if not spec:
+                        error('ADAPTER_MAPPING', primary_path, 'Unknown interaction adapter')
+                        continue
+                    if a.get('script_path') != spec['script_path']:
+                        error('ADAPTER_PATH', primary_path, 'Adapter script path differs from canonical runtime path')
+                    params = a.get('params') if isinstance(a.get('params'), dict) else {}
+                    for key in spec.get('required_params', []):
+                        if key not in params:
+                            error('ADAPTER_PARAMS', primary_path, 'Missing required adapter parameter ' + key)
+                    for key, value in expected.get('params', {}).items():
+                        if params.get(key) != value:
+                            error('ADAPTER_PARAMS', primary_path, 'Adapter parameter '+key+' differs from Wireframe semantics')
+                if primary.get('construction_pattern') != 'adapter_host_v1':
+                    error('ADAPTER_HOST', primary_path, 'Structured standard interaction must use adapter_host_v1')
     impl=bindings.get('implementations',{})
     if set(impl)!=set(ids): error('IMPLEMENTATION_COVERAGE','','Every requirement needs explicit implementation references')
     refs=[]
@@ -513,6 +583,10 @@ def validate(b, project=None, claims=None, commit=None):
         if v.get('action_script'): refs.append({'file':v['action_script'],'symbol':v.get('action_symbol'),'kind':'func'})
         if v.get('input_handler') and nodes.get(v.get('target_node'),{}).get('script_path'):
             refs.append({'file':nodes.get(v.get('target_node'),{}).get('script_path'),'symbol':v['input_handler'],'kind':'func'})
+        for a in v.get('adapter_bindings',[]) if isinstance(v.get('adapter_bindings'),list) else []:
+            spec = INTERACTION_ADAPTERS.get(a.get('adapter_id'), {})
+            if a.get('script_path'):
+                refs.append({'file':a['script_path'],'symbol':spec.get('entry_symbol'),'kind':'func'})
     for ref in refs:
         try: resource_path(ref.get('file'))
         except ValueError as exc: error('PATH',ref.get('file'),str(exc))
@@ -652,10 +726,11 @@ def verify_commit(project, commit):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['validate','construct','seal','registry'])
+    parser.add_argument('command',choices=['validate','construct','seal','registry','adapter-registry'])
     parser.add_argument('--blueprint');parser.add_argument('--project');parser.add_argument('--claims');parser.add_argument('--commit');parser.add_argument('--output')
     args=parser.parse_args()
     if args.command=='registry': result=json.dumps(PATTERNS,indent=2)
+    elif args.command=='adapter-registry': result=json.dumps(INTERACTION_ADAPTERS,indent=2)
     else:
         b=json.loads(Path(args.blueprint).read_text())
         if args.command=='seal': result=json.dumps(seal(b),ensure_ascii=False,indent=2)
