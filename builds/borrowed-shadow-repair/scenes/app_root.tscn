@@ -507,8 +507,8 @@ mouse_filter = 0
 script = ExtResource("5")
 
 [connection signal="pressed" from="Screens/night_workshop/client_btn" to="InteractionController" method="on_night_workshop_01_item"]
-[connection signal="pressed" from="Screens/shadow_workbench/rotate_left" to="InteractionController" method="on_shadow_workbench_03_n_15"]
-[connection signal="pressed" from="Screens/shadow_workbench/rotate_right" to="InteractionController" method="on_shadow_workbench_03_n_15"]
+[connection signal="pressed" from="Screens/shadow_workbench/rotate_left" to="InteractionController" method="rotate_left_pressed"]
+[connection signal="pressed" from="Screens/shadow_workbench/rotate_right" to="InteractionController" method="rotate_right_pressed"]
 [connection signal="pressed" from="Screens/rework_overlay/rework_btn" to="InteractionController" method="on_rework_overlay_01_anchor"]
 [connection signal="pressed" from="Screens/result/continue" to="InteractionController" method="on_result_01_item"]
 
