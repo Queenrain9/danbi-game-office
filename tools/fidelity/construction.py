@@ -81,18 +81,41 @@ def select_production_adapter(semantic_kind, adapters=None):
 
 
 def registry_transition_issues(previous, current):
-    """Enforce immutability after the first production promotion."""
+    """Enforce candidate -> production -> deprecated and freeze after production."""
     issues = []
     before = (previous or {}).get('adapters', {})
     after = (current or {}).get('adapters', {})
+
+    for adapter_id, new in after.items():
+        if adapter_id not in before and new.get('status') != 'candidate':
+            issues.append({
+                'code':'ADAPTER_LIFECYCLE',
+                'path':adapter_id,
+                'message':'New adapter must enter the registry as candidate before production',
+            })
+
     for adapter_id, old in before.items():
-        if old.get('status') not in FROZEN_ADAPTER_STATUSES:
-            continue
         new = after.get(adapter_id)
+        old_status = old.get('status')
+
+        # Candidate implementations are intentionally mutable and may be abandoned.
+        if old_status == 'candidate':
+            if new is None:
+                continue
+            if new.get('status') not in {'candidate','production'}:
+                issues.append({
+                    'code':'ADAPTER_LIFECYCLE',
+                    'path':adapter_id,
+                    'message':'Candidate adapter may remain candidate or promote to production only',
+                })
+            continue
+
+        if old_status not in FROZEN_ADAPTER_STATUSES:
+            continue
         if not new:
             issues.append({'code':'ADAPTER_FROZEN','path':adapter_id,'message':'Frozen adapter cannot be removed'})
             continue
-        allowed = {'production','deprecated'} if old.get('status') == 'production' else {'deprecated'}
+        allowed = {'production','deprecated'} if old_status == 'production' else {'deprecated'}
         if new.get('status') not in allowed:
             issues.append({'code':'ADAPTER_FROZEN','path':adapter_id,'message':'Frozen adapter lifecycle cannot move backward'})
         for field in ADAPTER_IMMUTABLE_FIELDS:
@@ -112,13 +135,35 @@ def verify_adapter_registry(repo_root=None, baseline_registry=None):
     registry = load_adapter_registry(root / 'production/godot/interaction_runtime/registry.json')
     issues = []
     production_by_kind = {}
+    class_owners = {}
     adapters = registry['adapters']
     for adapter_id, entry in adapters.items():
         path = adapter_id
         if entry.get('adapter_id') != adapter_id:
             issues.append({'code':'ADAPTER_REGISTRY','path':path,'message':'Registry key and adapter_id differ'})
-        if not re.fullmatch(r'[a-z][a-z0-9_]*_v[1-9][0-9]*', adapter_id or ''):
+        version_match = re.fullmatch(r'[a-z][a-z0-9_]*_v([1-9][0-9]*)', adapter_id or '')
+        if not version_match:
             issues.append({'code':'ADAPTER_VERSION','path':path,'message':'Adapter id must end in an explicit _vN version'})
+        else:
+            class_name = str(entry.get('class_name') or '')
+            expected_suffix = 'V' + version_match.group(1)
+            if not class_name.endswith(expected_suffix):
+                issues.append({
+                    'code':'ADAPTER_CLASS_VERSION',
+                    'path':path,
+                    'message':'class_name must carry the same version suffix as adapter_id',
+                })
+        class_name = str(entry.get('class_name') or '')
+        if class_name:
+            previous_owner = class_owners.get(class_name)
+            if previous_owner and previous_owner != adapter_id:
+                issues.append({
+                    'code':'ADAPTER_CLASS_VERSION',
+                    'path':path,
+                    'message':'Godot class_name must be unique across adapter versions',
+                })
+            else:
+                class_owners[class_name] = adapter_id
         status = entry.get('status')
         if status not in ADAPTER_LIFECYCLE:
             issues.append({'code':'ADAPTER_LIFECYCLE','path':path,'message':'Unknown adapter lifecycle status'})
