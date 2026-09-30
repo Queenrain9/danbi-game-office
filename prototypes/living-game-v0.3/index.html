@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Living Game v0.3 — Game Invention Prototype</title>
+<style>
+:root{--bg:#07090d;--panel:#0f1218;--text:#f5f6f1;--muted:#8e95a5;--accent:#d9f56e;--line:rgba(255,255,255,.11)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow-x:hidden}.app{min-height:100vh;display:grid;place-items:center;padding:18px}.shell{width:min(1120px,100%);min-height:720px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:rgba(8,10,14,.97);box-shadow:0 30px 120px rgba(0,0,0,.5)}
+.top{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line)}.brand{font-size:12px;font-weight:900;letter-spacing:.16em}.brand b{color:var(--accent)}
+button{font:inherit}.ghost{border:1px solid var(--line);background:transparent;color:#aeb4c1;border-radius:999px;padding:9px 13px;cursor:pointer}
+main{padding:26px}.hero{min-height:590px;display:flex;flex-direction:column;justify-content:center;max-width:800px;margin:auto}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:13px}
+h1{font-size:clamp(44px,8vw,88px);line-height:.92;letter-spacing:-.06em;margin:0 0 22px}h2{font-size:clamp(30px,5vw,58px);line-height:1;letter-spacing:-.05em;margin:0 0 16px}h3{letter-spacing:-.02em}p{line-height:1.68;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:30px}.primary,.secondary{border-radius:18px;padding:21px 22px;text-align:left;cursor:pointer}.primary{border:0;background:var(--accent);color:#0d1009;font-weight:900}.secondary{border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);font-weight:800}.meta{font-size:12px;font-weight:500;opacity:.62;margin-top:7px}
+.workbench{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}.stage{position:relative;min-height:610px;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#080a0f;touch-action:none;user-select:none}.stage canvas{display:block;width:100%;height:610px}
+.hud{position:absolute;left:16px;right:16px;top:15px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(4,6,10,.62);backdrop-filter:blur(8px);font-size:10px;color:#aab0bd}.live{color:var(--accent)}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);margin-right:6px;animation:p 1.2s infinite}@keyframes p{50%{opacity:.28}}
+.side{border:1px solid var(--line);border-radius:24px;padding:20px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;min-height:610px}.side h3{font-size:24px;line-height:1.08;margin:2px 0 12px}.thought{margin:16px 0;padding:14px;border:1px solid rgba(216,245,110,.14);border-radius:15px;background:rgba(216,245,110,.035);font-size:12px;color:#aab1be;line-height:1.6}.stack{display:flex;flex-wrap:wrap;gap:6px}.chip{font-size:10px;border-radius:999px;padding:6px 8px;background:rgba(255,255,255,.045);color:#a8afbc;border:1px solid rgba(255,255,255,.06)}.chip.on{color:var(--accent);border-color:rgba(216,245,110,.2);background:rgba(216,245,110,.055)}.log{margin-top:16px;display:grid;gap:8px;font-size:11px;color:#757d8d}.log-item{padding-left:10px;border-left:1px solid rgba(255,255,255,.1);line-height:1.45}.footnote{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);font-size:11px;line-height:1.55;color:#707888}
+.crystal{max-width:980px;margin:10px auto}.lock{display:inline-flex;align-items:center;gap:7px;border-radius:999px;border:1px solid rgba(216,245,110,.25);background:rgba(216,245,110,.05);padding:8px 10px;color:var(--accent);font-size:10px;font-weight:900}.spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}.spec{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.02)}.spec b{display:block;margin-bottom:6px}.spec span{font-size:12px;line-height:1.5;color:#9198a8}
+.art-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}.art-card{overflow:hidden;border:1px solid var(--line);border-radius:22px;background:#0d1016;color:var(--text);cursor:pointer;text-align:left;transition:.18s}.art-card:hover{transform:translateY(-4px);border-color:rgba(216,245,110,.5)}.preview{height:220px;position:relative;overflow:hidden}.preview .shape{position:absolute;left:42%;top:42%;width:58px;height:34px;border-radius:50% 55% 45% 52%;transform:rotate(-9deg)}.preview .sat{position:absolute;right:26%;top:28%;width:18px;height:18px;border-radius:50%}
+.neon{background:radial-gradient(circle at 72% 35%,rgba(62,80,180,.65),transparent 18%),linear-gradient(150deg,#070711,#191046 55%,#07131b)}.neon .shape{background:#e9ff77;box-shadow:0 0 38px #b8ff5a}.neon .sat{background:#ff4eb9;box-shadow:0 0 24px #ff4eb9}
+.ink{background:linear-gradient(145deg,#e7ddc7,#c8b393)}.ink .shape{background:#27231e;box-shadow:9px 10px 0 rgba(65,48,35,.12)}.ink .sat{background:#a44e3d}
+.machine{background:linear-gradient(145deg,#10161b,#202b31)}.machine:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 40px,rgba(255,255,255,.035) 41px 42px)}.machine .shape{background:#cbd4d9;box-shadow:0 0 22px rgba(150,205,230,.35)}.machine .sat{background:#f0a55a;box-shadow:0 0 18px rgba(240,165,90,.5)}
+.art-body{padding:16px}.art-body h3{font-size:19px;margin:0 0 5px}.art-body p{font-size:12px;margin:0}
+.play{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px}.play-stage{position:relative;min-height:600px;border:1px solid var(--line);border-radius:23px;overflow:hidden;background:#080a0e}.play-stage canvas{display:block;width:100%;height:600px;touch-action:none}.play-side{border:1px solid var(--line);border-radius:23px;padding:20px;background:rgba(255,255,255,.02)}.score{font-size:48px;font-weight:900;letter-spacing:-.055em}.objective{padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);font-size:12px;line-height:1.55;color:#a7aebb}.pack{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}.game-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(255,255,255,.024);color:var(--text);cursor:pointer;text-align:left}.game-card h3{font-size:22px;margin:4px 0 8px}.small{font-size:11px;color:#767e8d;line-height:1.55}
+@media(max-width:820px){.app{padding:0}.shell{min-height:100vh;border:0;border-radius:0}.top{height:58px}main{padding:16px}.actions,.workbench,.spec-grid,.art-grid,.play,.pack{grid-template-columns:1fr}.stage,.side{min-height:auto}.stage canvas{height:520px}.side{min-height:220px}.preview{height:150px}.play-stage canvas{height:520px}}
+</style>
+</head>
+<body><div class="app"><div class="shell"><div class="top"><div class="brand">LIVING <b>GAME</b> / v0.3</div><button class="ghost" id="homeBtn">처음으로</button></div><main id="root"></main></div></div>
+<script>
+const root=document.getElementById("root"), STORE="living_game_pack_v03";
+document.getElementById("homeBtn").onclick=home;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>crypto?.randomUUID?.()||("g-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+function loadPack(){try{return JSON.parse(localStorage.getItem(STORE)||"[]")}catch{return[]}}
+function savePack(v){localStorage.setItem(STORE,JSON.stringify(v))}
+let s=null,raf=0,gameRaf=0;
+
+const MUTATIONS=[
+ {id:"trail",kind:"system",label:"흔적",requires:w=>!w.systems.includes("trail"),score:m=>m.distance*1.4+m.curve*1.8},
+ {id:"inertia",kind:"control",label:"관성",requires:w=>w.control==="direct",score:m=>m.fast*2+m.distance*.7},
+ {id:"target",kind:"entity",label:"움직이는 타깃",requires:w=>!w.entities.includes("target"),score:m=>m.fast*1.6+m.taps*.25+m.distance*.5},
+ {id:"collect",kind:"system",label:"수집",requires:w=>!w.systems.includes("collect"),score:m=>m.edge*.7+m.distance*.5+m.taps*.2},
+ {id:"companion",kind:"entity",label:"동행자",requires:w=>!w.entities.includes("companion"),score:m=>m.idle*.45+m.proximity*1.1+m.slow*.6},
+ {id:"hazards",kind:"entity",label:"위험지형",requires:w=>!w.entities.includes("hazards"),score:m=>m.fast*1.3+m.edge*.55+m.retries*.8},
+ {id:"depth",kind:"space",label:"입체감",requires:w=>w.space==="flat",score:m=>m.edge*.9+m.curve*.8+m.distance*.5},
+ {id:"base",kind:"entity",label:"거점",requires:w=>!w.entities.includes("base")&&w.systems.includes("collect"),score:m=>m.collects*1.8+m.returns*1.4+.3},
+ {id:"resource",kind:"system",label:"자원",requires:w=>!w.systems.includes("resource")&&(w.systems.includes("collect")||w.entities.includes("base")),score:m=>m.collects*1.5+m.taps*.25+.4},
+ {id:"upgrade",kind:"system",label:"업그레이드",requires:w=>!w.systems.includes("upgrade")&&w.systems.includes("resource"),score:m=>m.returns*2+m.collects*.8+.2},
+ {id:"npc",kind:"entity",label:"NPC",requires:w=>!w.entities.includes("npc"),score:m=>m.proximity*1.4+m.idle*.25+m.taps*.18},
+ {id:"dialogue",kind:"system",label:"대화",requires:w=>!w.systems.includes("dialogue")&&w.entities.includes("npc"),score:m=>m.proximity*1.7+m.idle*.4},
+ {id:"projectile",kind:"system",label:"발사",requires:w=>!w.systems.includes("projectile")&&w.entities.includes("target"),score:m=>m.taps*.45+m.targetHits*1.7},
+ {id:"construction",kind:"system",label:"건설",requires:w=>!w.systems.includes("construction")&&w.systems.includes("resource"),score:m=>m.returns*1.1+m.idle*.25+m.collects*.5},
+ {id:"rounds",kind:"time",label:"라운드",requires:w=>w.time==="continuous"&&(w.entities.includes("hazards")||w.entities.includes("target")),score:m=>m.retries*1.4+m.fast*.8},
+ {id:"worldmap",kind:"space",label:"확장공간",requires:w=>w.space!=="worldmap"&&mature(w),score:m=>m.edge*1.4+m.distance*.4}
+];
+function mature(w){return w.systems.length+w.entities.length>=5}
+function freshMetrics(){return{distance:0,fast:0,slow:0,idle:0,edge:0,taps:0,curve:0,proximity:0,targetHits:0,collects:0,returns:0,retries:0}}
+function world(){return{control:"direct",space:"flat",time:"continuous",entities:["player"],systems:[],goal:null,visualForm:"dot",mutations:[]}}
+
+function home(){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);
+ const n=loadPack().length;
+ root.innerHTML=`<section class="hero"><div class="eyebrow">START FROM NOTHING</div><h1>점 하나만<br>먼저 줄게요.</h1><p>어떤 게임을 만들지 미리 정하지 않습니다. 당신이 노는 방식을 보고, 시스템이 다음에 무엇을 추가하거나 바꿀지 매번 다시 판단합니다.</p><div class="actions"><button class="primary" id="startBtn">새 게임<div class="meta">점 하나에서 시작</div></button><button class="secondary" id="packBtn">내 게임팩<div class="meta">${n}개의 게임</div></button></div></section>`;
+ document.getElementById("startBtn").onclick=start;document.getElementById("packBtn").onclick=showPack;
+}
+function start(){
+ s={started:performance.now(),phaseStarted:performance.now(),phase:0,maxPhases:7,w:world(),m:freshMetrics(),total:freshMetrics(),p:{x:.5,y:.5,vx:0,vy:0},ptr:{x:.5,y:.5,down:false},lastPos:{x:.5,y:.5},entities:[],trail:[],resources:0,thought:"아직 아무 가설도 없습니다. 먼저 움직임 자체를 관찰합니다.",history:[]};
+ renderWorkbench();spawnForWorld();loop(performance.now());
+}
+function renderWorkbench(){
+ root.innerHTML=`<section class="workbench"><div class="stage" id="stage"><canvas id="cv"></canvas><div class="hud"><span class="pill live">AI가 다음 세계를 결정 중</span><span class="pill" id="phasePill">0 / ${s.maxPhases}</span></div></div><aside class="side"><div class="eyebrow">CURRENT WORLD</div><h3 id="worldTitle">아직 게임이 아닙니다.</h3><p id="worldDesc">점 하나만 있습니다. 무엇을 해야 하는지는 정해져 있지 않습니다.</p><div class="thought" id="thought">${s.thought}</div><div class="stack" id="stack"></div><div class="log" id="log"></div><div class="footnote">여기서 쌓이는 건 장르 점수가 아니라 실제 세계의 문법입니다. 조작·공간·엔티티·시스템이 매번 달라질 수 있습니다.</div></aside></section>`;
+ const c=document.getElementById("cv"),st=document.getElementById("stage");resizeCanvas(c,st,610);
+ bindPointer(c,s.ptr);
+ updateSide();
+ window.onresize=()=>resizeCanvas(c,st,innerWidth<820?520:610);
+}
+function resizeCanvas(c,st,hpx){const d=Math.min(2,devicePixelRatio||1),r=st.getBoundingClientRect();c.width=Math.max(320,Math.floor(r.width*d));c.height=Math.floor(hpx*d);c._d=d}
+function bindPointer(c,ptr){
+ const pos=e=>{const r=c.getBoundingClientRect(),q=e.touches?.[0]||e;return{x:clamp((q.clientX-r.left)/r.width,0,1),y:clamp((q.clientY-r.top)/r.height,0,1)}};
+ const dn=e=>{e.preventDefault();Object.assign(ptr,pos(e),{down:true});s.m.taps++;s.total.taps++};
+ const mv=e=>{if(!ptr.down)return;e.preventDefault();Object.assign(ptr,pos(e))};const up=()=>ptr.down=false;
+ c.onpointerdown=dn;c.onpointermove=mv;window.onpointerup=up;c.ontouchstart=dn;c.ontouchmove=mv;window.ontouchend=up;
+}
+function addUnique(arr,x){if(!arr.includes(x))arr.push(x)}
+function applyMutation(id){
+ const w=s.w;w.mutations.push(id);s.history.push(id);
+ if(id==="trail")addUnique(w.systems,"trail");
+ if(id==="inertia")w.control="inertia";
+ if(id==="target")addUnique(w.entities,"target");
+ if(id==="collect")addUnique(w.systems,"collect");
+ if(id==="companion")addUnique(w.entities,"companion");
+ if(id==="hazards")addUnique(w.entities,"hazards");
+ if(id==="depth")w.space="depth";
+ if(id==="base")addUnique(w.entities,"base");
+ if(id==="resource")addUnique(w.systems,"resource");
+ if(id==="upgrade")addUnique(w.systems,"upgrade");
+ if(id==="npc")addUnique(w.entities,"npc");
+ if(id==="dialogue")addUnique(w.systems,"dialogue");
+ if(id==="projectile")addUnique(w.systems,"projectile");
+ if(id==="construction")addUnique(w.systems,"construction");
+ if(id==="rounds")w.time="rounds";
+ if(id==="worldmap")w.space="worldmap";
+ w.visualForm=deriveForm(w);
+ spawnForWorld();s.thought=explainMutation(id);updateSide();
+}
+function deriveForm(w){
+ if(w.systems.includes("construction"))return"builder";
+ if(w.systems.includes("projectile"))return"ship";
+ if(w.entities.includes("companion")&&w.systems.includes("dialogue"))return"creature";
+ if(w.systems.includes("upgrade")&&w.control==="inertia")return"rover";
+ if(w.space==="depth"&&w.control==="inertia")return"glider";
+ return w.mutations.length<2?"dot":"agent";
+}
+function explainMutation(id){
+ const t={
+  trail:"움직임의 모양 자체가 정보가 될 것 같아서, 이제 세계가 궤적을 기억하게 합니다.",
+  inertia:"빠르게 움직이는 방식이 반복되어 직접 위치 이동 대신 관성을 시험합니다.",
+  target:"이동 그 자체와 추적 욕구를 구분하기 위해 움직이는 존재를 추가합니다.",
+  collect:"공간을 훑는 행동이 보여서, 발견한 것을 '소유'로 바꾸면 반응이 달라지는지 봅니다.",
+  companion:"멈추거나 가까이 머무는 행동이 보여, 목표물이 아닌 동행자를 만들어 봅니다.",
+  hazards:"이동이 충분히 능동적이라서, 이제 정교한 회피를 요구해 봅니다.",
+  depth:"평면 가장자리를 자주 쓰고 있어 공간 자체를 넓혀 입체감에 반응하는지 봅니다.",
+  base:"모은 뒤 다시 돌아오는 구조를 만들면 탐색이 루프로 변하는지 시험합니다.",
+  resource:"수집한 것을 숫자 자원으로 바꿔 소유와 최적화가 생기는지 봅니다.",
+  upgrade:"자원을 다시 성능으로 돌려주는 성장 루프를 추가합니다.",
+  npc:"목표물이 아닌 '의도를 가진 타인'을 넣어 관계 반응을 봅니다.",
+  dialogue:"NPC 곁에 머무는 행동이 있어 대화를 시스템으로 승격합니다.",
+  projectile:"추적만이 아니라 거리에서 직접 개입하는 행동을 허용해 봅니다.",
+  construction:"모은 자원을 세계 자체를 바꾸는 데 쓰게 해 봅니다.",
+  rounds:"반복 도전이 보여 연속 흐름을 명확한 라운드 구조로 바꿉니다.",
+  worldmap:"경계 탐색이 계속되어 한 화면 바깥까지 공간을 확장합니다."
+ };return t[id]||"현재 행동을 설명하기 위해 새로운 규칙을 추가합니다.";
+}
+function chooseMutation(){
+ const viable=MUTATIONS.filter(x=>x.requires(s.w));
+ const novelty=new Set(s.history.slice(-3));
+ const scored=viable.map(x=>({id:x.id,score:x.score(s.m)+(novelty.has(x.id)?-3:0)+Math.random()*.8}));
+ scored.sort((a,b)=>b.score-a.score);
+ return scored[0]?.id||"trail";
+}
+function spawnForWorld(){
+ s.entities=[];
+ const W=s.w;
+ if(W.entities.includes("target"))s.entities.push({type:"target",x:.75,y:.35,vx:.0014,vy:.001});
+ if(W.entities.includes("companion"))s.entities.push({type:"companion",x:.4,y:.55});
+ if(W.entities.includes("npc"))s.entities.push({type:"npc",x:.68,y:.58,speech:"..."});
+ if(W.systems.includes("collect"))for(let i=0;i<8;i++)s.entities.push({type:"collect",x:.09+Math.random()*.82,y:.12+Math.random()*.76,on:true});
+ if(W.entities.includes("hazards"))for(let i=0;i<5;i++)s.entities.push({type:"hazard",x:.16+i*.17,y:.25+Math.random()*.5,w:.03,h:.18+Math.random()*.1});
+ if(W.entities.includes("base"))s.entities.push({type:"base",x:.12,y:.82,r:.07});
+}
+function updateSide(){
+ const w=s.w, stack=document.getElementById("stack"),log=document.getElementById("log"),pill=document.getElementById("phasePill"),thought=document.getElementById("thought"),title=document.getElementById("worldTitle"),desc=document.getElementById("worldDesc");
+ if(!stack)return;
+ const chips=[["CONTROL",w.control],["SPACE",w.space],["TIME",w.time],...w.entities.filter(x=>x!=="player").map(x=>["ENTITY",x]),...w.systems.map(x=>["SYSTEM",x])];
+ stack.innerHTML=chips.map(([a,b])=>`<span class="chip on">${a}: ${b}</span>`).join("");
+ log.innerHTML=s.history.slice(-5).reverse().map(id=>`<div class="log-item">+${MUTATIONS.find(x=>x.id===id)?.label||id}</div>`).join("");
+ if(pill)pill.textContent=s.phase+" / "+s.maxPhases;if(thought)thought.textContent=s.thought;
+ if(title)title.textContent=s.w.mutations.length?humanWorldTitle(w):"아직 게임이 아닙니다.";
+ if(desc)desc.textContent=s.w.mutations.length?"지금 보이는 구조도 임시입니다. 다음 행동에 따라 전혀 다른 시스템이 붙을 수 있습니다.":"점 하나만 있습니다. 무엇을 해야 하는지는 정해져 있지 않습니다.";
+}
+function humanWorldTitle(w){
+ const bits=[];if(w.control==="inertia")bits.push("관성 이동");if(w.space==="depth")bits.push("입체 공간");if(w.space==="worldmap")bits.push("확장 공간");if(w.systems.includes("collect"))bits.push("수집");if(w.systems.includes("resource"))bits.push("자원");if(w.systems.includes("upgrade"))bits.push("성장");if(w.systems.includes("dialogue"))bits.push("대화");if(w.systems.includes("construction"))bits.push("건설");if(w.systems.includes("projectile"))bits.push("발사");return bits.slice(0,3).join(" + ")||"형태가 생기는 중";
+}
+function accumulate(k,v){s.m[k]+=v;s.total[k]+=v}
+function update(dt){
+ const p=s.p,m=s.m,w=s.w,ox=p.x,oy=p.y;
+ if(s.ptr.down){
+  if(w.control==="direct"){p.x+=(s.ptr.x-p.x)*clamp(dt*.02,0,1);p.y+=(s.ptr.y-p.y)*clamp(dt*.02,0,1)}
+  else{p.vx+=(s.ptr.x-p.x)*.00075*dt;p.vy+=(s.ptr.y-p.y)*.00075*dt}
+ }
+ if(w.control==="inertia"){p.vx*=Math.pow(.992,dt/16);p.vy*=Math.pow(.992,dt/16);p.x+=p.vx;p.y+=p.vy}
+ if(p.x<.02||p.x>.98){p.vx*=-.7;p.x=clamp(p.x,.02,.98)}if(p.y<.03||p.y>.97){p.vy*=-.7;p.y=clamp(p.y,.03,.97)}
+ const d=Math.hypot(p.x-ox,p.y-oy),spd=d/Math.max(.001,dt/16.67);accumulate("distance",d);if(spd>.012)accumulate("fast",d*5);else if(d>.0004)accumulate("slow",d*2);else accumulate("idle",dt/1000);
+ if(p.x<.08||p.x>.92||p.y<.08||p.y>.92)accumulate("edge",dt/1000);
+ const ax=p.x-s.lastPos.x,ay=p.y-s.lastPos.y;if(Math.abs(ax)+Math.abs(ay)>.002&&s.trail.length>1){const q=s.trail[s.trail.length-1],r=s.trail[Math.max(0,s.trail.length-4)];const cross=Math.abs((q.x-r.x)*ay-(q.y-r.y)*ax);accumulate("curve",cross*10)}
+ s.lastPos={x:p.x,y:p.y};s.trail.push({x:p.x,y:p.y,t:performance.now()});while(s.trail.length&&performance.now()-s.trail[0].t>2400)s.trail.shift();
+ for(const e of s.entities){
+  if(e.type==="target"){const dx=e.x-p.x,dy=e.y-p.y,dd=Math.hypot(dx,dy)||1;e.x=clamp(e.x+dx/dd*.00035*dt,.05,.95);e.y=clamp(e.y+dy/dd*.00035*dt,.06,.94);if(dd<.065){accumulate("targetHits",1);accumulate("retries",1);e.x=Math.random()>.5?.12:.88;e.y=.12+Math.random()*.76}}
+  if(e.type==="companion"){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd>.09){e.x+=(p.x-e.x)*.018;e.y+=(p.y-e.y)*.018}else accumulate("proximity",dt/1000)}
+  if(e.type==="npc"){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<.12){accumulate("proximity",dt/1000);if(w.systems.includes("dialogue"))e.speech=["여기 더 있어도 돼.","저쪽은 아직 안 봤지?","이상하게 네가 오면 변하네."][Math.floor(performance.now()/1700)%3]}}
+  if(e.type==="collect"&&e.on&&Math.hypot(e.x-p.x,e.y-p.y)<.04){e.on=false;s.resources++;accumulate("collects",1)}
+  if(e.type==="hazard"&&p.x>e.x-e.w&&p.x<e.x+e.w&&p.y>e.y-e.h/2&&p.y<e.y+e.h/2){p.x=ox;p.y=oy;p.vx*=-.5;p.vy*=-.5;accumulate("retries",.2)}
+  if(e.type==="base"&&Math.hypot(e.x-p.x,e.y-p.y)<e.r&&s.resources>0){accumulate("returns",1);if(w.systems.includes("resource"))s.resources=0}
+ }
+ const dur=s.phase===0?6200:6800;
+ if(performance.now()-s.phaseStarted>dur){
+  s.phase++;
+  if(s.phase>=s.maxPhases){crystallize();return false}
+  const id=chooseMutation();s.m=freshMetrics();s.phaseStarted=performance.now();applyMutation(id);
+ }
+ return true;
+}
+function draw(){
+ const c=document.getElementById("cv");if(!c)return;const x=c.getContext("2d"),d=c._d||1,w=c.width,h=c.height,W=s.w;x.fillStyle="#080a0f";x.fillRect(0,0,w,h);
+ if(W.space==="depth"){const vanX=w*.5,vanY=h*.2;x.strokeStyle="rgba(255,255,255,.055)";for(let i=0;i<=10;i++){x.beginPath();x.moveTo(vanX,vanY);x.lineTo(w*i/10,h);x.stroke()}for(let j=1;j<8;j++){const y=vanY+(h-vanY)*(j/8);x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke()}}
+ else{x.strokeStyle="rgba(255,255,255,.032)";for(let i=1;i<11;i++){x.beginPath();x.moveTo(w*i/11,0);x.lineTo(w*i/11,h);x.stroke()}for(let i=1;i<8;i++){x.beginPath();x.moveTo(0,h*i/8);x.lineTo(w,h*i/8);x.stroke()}}
+ if(W.space==="worldmap"){x.fillStyle="rgba(90,120,190,.07)";for(let i=0;i<12;i++)x.fillRect(((i*83)%100)/100*w,((i*47)%100)/100*h,34*d,22*d)}
+ if(W.systems.includes("trail")&&s.trail.length>1){x.beginPath();s.trail.forEach((q,i)=>{const a=q.x*w,b=q.y*h;i?x.lineTo(a,b):x.moveTo(a,b)});x.strokeStyle="rgba(216,245,110,.22)";x.lineWidth=2*d;x.stroke()}
+ for(const e of s.entities){
+  if(e.type==="hazard"){x.fillStyle="rgba(255,82,110,.22)";x.fillRect((e.x-e.w)*w,(e.y-e.h/2)*h,e.w*2*w,e.h*h);continue}
+  if(e.type==="base"){x.beginPath();x.arc(e.x*w,e.y*h,e.r*Math.min(w,h),0,Math.PI*2);x.strokeStyle="rgba(216,245,110,.35)";x.lineWidth=2*d;x.stroke();continue}
+  if(e.type==="collect"&&!e.on)continue;
+  let col="#b7bfcc",r=.014;if(e.type==="target")col="#ff5d88";if(e.type==="companion")col="#a68cff";if(e.type==="collect"){col="#66b6ff";r=.009}if(e.type==="npc")col="#ffd16a";
+  dot(x,w,h,e.x,e.y,r,col,d);
+  if(e.type==="npc"&&W.systems.includes("dialogue")&&Math.hypot(e.x-s.p.x,e.y-s.p.y)<.12){x.font=(12*d)+"px sans-serif";x.fillStyle="rgba(240,242,246,.8)";x.fillText(e.speech||"...",e.x*w+12*d,e.y*h-12*d)}
+ }
+ drawPlayer(x,w,h,s.p,W.visualForm,d);
+ if(W.systems.includes("resource")){x.font=(12*d)+"px sans-serif";x.fillStyle="rgba(255,255,255,.65)";x.fillText("RESOURCE "+s.resources,18*d,h-20*d)}
+}
+function dot(x,w,h,px,py,r,col,d){x.beginPath();x.arc(px*w,py*h,r*Math.min(w,h),0,Math.PI*2);x.fillStyle=col;x.shadowBlur=16*d;x.shadowColor=col;x.fill();x.shadowBlur=0}
+function drawPlayer(x,w,h,p,form,d){
+ const px=p.x*w,py=p.y*h,col="#eaff78";x.save();x.translate(px,py);x.fillStyle=col;x.shadowBlur=22*d;x.shadowColor=col;
+ if(form==="dot"||form==="agent"){x.beginPath();x.arc(0,0,.018*Math.min(w,h),0,Math.PI*2);x.fill()}
+ else if(form==="ship"||form==="glider"){x.beginPath();x.moveTo(18*d,0);x.lineTo(-12*d,-10*d);x.lineTo(-7*d,0);x.lineTo(-12*d,10*d);x.closePath();x.fill()}
+ else if(form==="rover"||form==="builder"){x.fillRect(-15*d,-9*d,30*d,18*d);x.fillStyle="#8ea34d";x.fillRect(-12*d,9*d,7*d,5*d);x.fillRect(5*d,9*d,7*d,5*d)}
+ else{ x.beginPath();x.ellipse(0,0,16*d,11*d,0,0,Math.PI*2);x.fill();x.fillStyle="#0b0d10";x.beginPath();x.arc(5*d,-2*d,2*d,0,Math.PI*2);x.fill()}
+ x.restore();x.shadowBlur=0;
+}
+function loop(t){s._last=s._last||t;const dt=Math.min(32,t-s._last);s._last=t;if(update(dt)===false)return;draw();raf=requestAnimationFrame(loop)}
+
+function buildGameSpec(){
+ const w=s.w,T=s.total,systems=[...w.systems],entities=[...w.entities];
+ let goal="explore";
+ if(systems.includes("construction")&&systems.includes("resource"))goal="build";
+ else if(systems.includes("upgrade")&&systems.includes("collect"))goal="grow";
+ else if(systems.includes("projectile")&&entities.includes("target"))goal="hunt";
+ else if(entities.includes("companion"))goal="escort";
+ else if(systems.includes("collect")&&entities.includes("base"))goal="deliver";
+ else if(entities.includes("target"))goal="chase";
+ else if(systems.includes("collect"))goal="collect";
+ const noun={build:"FOUNDRY",grow:"DRIFTER",hunt:"SIGNAL",escort:"TWIN",deliver:"COURIER",chase:"TRACE",collect:"RELIC",explore:"EDGE"}[goal];
+ const prefix=w.space==="worldmap"?"WIDE":w.space==="depth"?"DEEP":w.control==="inertia"?"VECTOR":systems.includes("dialogue")?"ECHO":"NULL";
+ const title=prefix+" "+noun;
+ const verbs=[];
+ if(w.control==="inertia")verbs.push("관성 조작");else verbs.push("직접 이동");
+ if(entities.includes("target"))verbs.push(systems.includes("projectile")?"사냥":"추적");
+ if(systems.includes("collect"))verbs.push("수집");
+ if(entities.includes("base"))verbs.push("귀환");
+ if(systems.includes("upgrade"))verbs.push("성장");
+ if(systems.includes("construction"))verbs.push("건설");
+ if(entities.includes("companion"))verbs.push("동행");
+ if(systems.includes("dialogue"))verbs.push("대화");
+ const objective={
+  build:"공간을 돌아다니며 자원을 모아 거점에 돌아오고, 모은 자원으로 구조물을 늘려 간다.",
+  grow:"조각을 모아 거점으로 귀환하고, 성능을 올려 더 먼 영역까지 탐색한다.",
+  hunt:"움직이는 대상을 추적해 거리와 타이밍을 맞춰 공격하며 점수를 쌓는다.",
+  escort:"동행자를 잃지 않도록 속도와 거리를 조절하며 위험한 공간을 통과한다.",
+  deliver:"공간에서 자원을 모은 뒤 거점으로 돌아와 한 번에 더 많은 배송을 완성한다.",
+  chase:"도망가는 표식을 따라잡고, 반복할수록 더 빠르고 복잡한 경로를 공략한다.",
+  collect:"공간 곳곳에 생기는 조각을 찾아 수집하며 더 넓은 구역을 연다.",
+  explore:"경계를 따라 이동하며 보이지 않는 신호와 새로운 영역을 발견한다."
+ }[goal];
+ return{title,goal,verbs,objective,world:JSON.parse(JSON.stringify(w)),metrics:T};
+}
+function crystallize(){
+ cancelAnimationFrame(raf);const g=buildGameSpec();s.game=g;
+ root.innerHTML=`<section class="crystal"><div class="lock">✓ GAME DESIGN LOCKED</div><div class="eyebrow" style="margin-top:18px">FOUND FROM THIS SESSION</div><h2>${g.title}</h2><p style="font-size:17px;max-width:760px">${g.objective}</p><div class="spec-grid"><div class="spec"><b>핵심 행동</b><span>${g.verbs.join(" · ")}</span></div><div class="spec"><b>세계 구조</b><span>${g.world.space} / ${g.world.time} / ${g.world.control}</span></div><div class="spec"><b>이번 세션에서 생긴 시스템</b><span>${g.world.systems.join(" · ")||"minimal"}</span></div></div><div class="eyebrow" style="margin-top:30px">게임은 이미 확정됐습니다</div><h3 style="font-size:27px;margin:0 0 6px">이 게임의 아트 방향만 고르세요.</h3><p>아래 세 장은 서로 다른 게임이 아니라 <b style="color:#fff">같은 룰의 같은 게임</b>입니다.</p><div class="art-grid">
+ <button class="art-card" data-art="neon"><div class="preview neon"><span class="shape"></span><span class="sat"></span></div><div class="art-body"><h3>Neon Signal</h3><p>전자 신호와 발광체, 밤의 추상 공간.</p></div></button>
+ <button class="art-card" data-art="ink"><div class="preview ink"><span class="shape"></span><span class="sat"></span></div><div class="art-body"><h3>Ink Toybox</h3><p>종이와 잉크, 손으로 만든 기묘한 장난감 세계.</p></div></button>
+ <button class="art-card" data-art="machine"><div class="preview machine"><span class="shape"></span><span class="sat"></span></div><div class="art-body"><h3>Cold Machine</h3><p>금속 구조물과 계기판, 산업 기계의 세계.</p></div></button>
+ </div></section>`;
+ document.querySelectorAll(".art-card").forEach(b=>b.onclick=()=>finalize(b.dataset.art));
+}
+function finalize(art){
+ const g=s.game,pack=loadPack();const obj={schema_version:"0.3",game_id:uid(),created_at:new Date().toISOString(),title:g.title,goal:g.goal,verbs:g.verbs,objective:g.objective,world:g.world,metrics:g.metrics,art,progress:{score:0,best:0,visits:0}};pack.unshift(obj);savePack(pack);playGame(obj.game_id);
+}
+function palette(art){if(art==="ink")return{bg:"#d8cbb2",grid:"rgba(52,42,32,.08)",player:"#24211d",a:"#a44d3a",b:"#486b72",haz:"rgba(130,60,50,.22)",text:"#26231f"};if(art==="machine")return{bg:"#0f1519",grid:"rgba(200,230,240,.055)",player:"#d6e0e5",a:"#f2a45f",b:"#72a5bd",haz:"rgba(245,116,90,.18)",text:"#dce5e9"};return{bg:"#070812",grid:"rgba(130,105,255,.08)",player:"#eaff78",a:"#ff4db5",b:"#65b6ff",haz:"rgba(255,72,110,.2)",text:"#f7f8ff"}}
+function playGame(id){
+ cancelAnimationFrame(gameRaf);const pack=loadPack(),g=pack.find(x=>x.game_id===id);if(!g)return showPack();g.progress.visits=(g.progress.visits||0)+1;savePack(pack);
+ root.innerHTML=`<section class="play"><div class="play-stage" id="playStage"><canvas id="game"></canvas></div><aside class="play-side"><div class="eyebrow">NOW PLAYING</div><h3>${g.title}</h3><div class="objective">${g.objective}</div><div class="small" style="margin-top:20px">SCORE</div><div class="score" id="score">0</div><div class="small" id="best">BEST ${g.progress.best||0}</div><div class="stack" style="margin-top:18px">${g.verbs.map(v=>`<span class="chip on">${v}</span>`).join("")}</div><p class="small" style="margin-top:20px">마우스/손가락으로 직접 플레이하세요. 아트 방향은 룰에 영향을 주지 않습니다.</p><button class="ghost" id="packBack" style="margin-top:10px">내 게임팩</button></aside></section>`;
+ document.getElementById("packBack").onclick=showPack;
+ const c=document.getElementById("game"),st=document.getElementById("playStage");resizeCanvas(c,st,600);runFrozenGame(c,g,pack);window.onresize=()=>resizeCanvas(c,st,innerWidth<820?520:600);
+}
+function runFrozenGame(c,g,pack){
+ const P=palette(g.art),W=g.world,R={p:{x:.5,y:.55,vx:0,vy:0},ptr:{x:.5,y:.55,down:false},score:0,res:0,entities:[],trail:[],round:1};
+ const pos=e=>{const r=c.getBoundingClientRect(),q=e.touches?.[0]||e;return{x:clamp((q.clientX-r.left)/r.width,0,1),y:clamp((q.clientY-r.top)/r.height,0,1)}};
+ const dn=e=>{e.preventDefault();Object.assign(R.ptr,pos(e),{down:true})},mv=e=>{if(R.ptr.down){e.preventDefault();Object.assign(R.ptr,pos(e))}},up=()=>R.ptr.down=false;c.onpointerdown=dn;c.onpointermove=mv;window.onpointerup=up;c.ontouchstart=dn;c.ontouchmove=mv;window.ontouchend=up;
+ function spawn(){R.entities=[];if(W.entities.includes("target"))R.entities.push({type:"target",x:.8,y:.25});if(W.entities.includes("companion"))R.entities.push({type:"companion",x:.4,y:.6});if(W.entities.includes("npc"))R.entities.push({type:"npc",x:.72,y:.62});if(W.systems.includes("collect"))for(let i=0;i<10;i++)R.entities.push({type:"collect",x:.08+Math.random()*.84,y:.1+Math.random()*.8,on:true});if(W.entities.includes("hazards"))for(let i=0;i<6;i++)R.entities.push({type:"hazard",x:.14+i*.14,y:.2+Math.random()*.58,w:.025,h:.16});if(W.entities.includes("base"))R.entities.push({type:"base",x:.12,y:.84,r:.075})}
+ spawn();let last=performance.now(),shotCd=0;
+ c.onclick=e=>{if(W.systems.includes("projectile")&&shotCd<=0){const p=pos(e);R.entities.push({type:"shot",x:R.p.x,y:R.p.y,vx:(p.x-R.p.x)*.03,vy:(p.y-R.p.y)*.03});shotCd=300}}
+ function tick(now){const dt=Math.min(32,now-last);last=now;shotCd-=dt;const p=R.p,ox=p.x,oy=p.y;if(R.ptr.down){if(W.control==="direct"){p.x+=(R.ptr.x-p.x)*.22;p.y+=(R.ptr.y-p.y)*.22}else{p.vx+=(R.ptr.x-p.x)*.0007*dt;p.vy+=(R.ptr.y-p.y)*.0007*dt}}if(W.control==="inertia"){p.vx*=.985;p.vy*=.985;p.x+=p.vx;p.y+=p.vy}p.x=clamp(p.x,.02,.98);p.y=clamp(p.y,.03,.97);R.trail.push({x:p.x,y:p.y});if(R.trail.length>60)R.trail.shift();
+  for(const e of R.entities){if(e.type==="target"){const dx=e.x-p.x,dy=e.y-p.y,dd=Math.hypot(dx,dy)||1;e.x=clamp(e.x+dx/dd*.00038*dt,.04,.96);e.y=clamp(e.y+dy/dd*.00038*dt,.05,.95);if(dd<.06&&!W.systems.includes("projectile")){R.score+=10;e.x=Math.random()>.5?.1:.9;e.y=.1+Math.random()*.8}}
+   if(e.type==="companion"){e.x+=(p.x-e.x)*.02;e.y+=(p.y-e.y)*.02;const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd>.055&&dd<.18)R.score+=dt*.003}
+   if(e.type==="collect"&&e.on&&Math.hypot(e.x-p.x,e.y-p.y)<.04){e.on=false;R.res++;R.score+=3}
+   if(e.type==="base"&&Math.hypot(e.x-p.x,e.y-p.y)<e.r&&R.res>0){R.score+=R.res*(W.systems.includes("upgrade")?5:3);R.res=0;if(W.systems.includes("construction")){R.round++;spawn()}}
+   if(e.type==="hazard"&&p.x>e.x-e.w&&p.x<e.x+e.w&&p.y>e.y-e.h/2&&p.y<e.y+e.h/2){p.x=ox;p.y=oy;R.score=Math.max(0,R.score-1)}
+   if(e.type==="shot"){e.x+=e.vx;e.y+=e.vy;for(const t of R.entities)if(t.type==="target"&&Math.hypot(e.x-t.x,e.y-t.y)<.05){e.dead=true;R.score+=12;t.x=Math.random()>.5?.12:.88;t.y=.1+Math.random()*.8}}
+  }R.entities=R.entities.filter(e=>!e.dead&&e.x>-0.1&&e.x<1.1&&e.y>-0.1&&e.y<1.1);
+  drawFrozen(c,R,g,P);const n=Math.floor(R.score);document.getElementById("score").textContent=n;if(n>(g.progress.best||0)){g.progress.best=n;const i=pack.findIndex(x=>x.game_id===g.game_id);pack[i]=g;savePack(pack);document.getElementById("best").textContent="BEST "+n}gameRaf=requestAnimationFrame(tick)}
+ gameRaf=requestAnimationFrame(tick);
+}
+function drawFrozen(c,R,g,P){const x=c.getContext("2d"),d=c._d||1,w=c.width,h=c.height,W=g.world;x.fillStyle=P.bg;x.fillRect(0,0,w,h);x.strokeStyle=P.grid;for(let i=1;i<12;i++){x.beginPath();x.moveTo(w*i/12,0);x.lineTo(w*i/12,h);x.stroke()}for(let i=1;i<9;i++){x.beginPath();x.moveTo(0,h*i/9);x.lineTo(w,h*i/9);x.stroke()}
+ if(W.systems.includes("trail")){x.beginPath();R.trail.forEach((q,i)=>{i?x.lineTo(q.x*w,q.y*h):x.moveTo(q.x*w,q.y*h)});x.strokeStyle=P.grid;x.lineWidth=3*d;x.stroke()}
+ for(const e of R.entities){if(e.type==="hazard"){x.fillStyle=P.haz;x.fillRect((e.x-e.w)*w,(e.y-e.h/2)*h,e.w*2*w,e.h*h);continue}if(e.type==="base"){x.beginPath();x.arc(e.x*w,e.y*h,e.r*Math.min(w,h),0,Math.PI*2);x.strokeStyle=P.a;x.lineWidth=2*d;x.stroke();continue}if(e.type==="collect"&&!e.on)continue;let col=P.b,r=.011;if(e.type==="target")col=P.a;if(e.type==="companion")col="#a88cff";if(e.type==="npc")col="#f3c66b";if(e.type==="shot"){col=P.player||"#fff";r=.005}dot(x,w,h,e.x,e.y,r,col,d)}
+ drawPlayer(x,w,h,R.p,W.visualForm,d);x.font=(12*d)+"px sans-serif";x.fillStyle=P.text;x.fillText("RES "+R.res,16*d,h-18*d)}
+function showPack(){cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);const p=loadPack();root.innerHTML=`<section class="crystal"><div class="eyebrow">MY GAMEPACK</div><h2>내 게임팩</h2><p>각 게임은 하나의 템플릿을 고른 결과가 아니라, 그 세션에서 실제로 붙은 게임 문법의 조합입니다.</p>${p.length?`<div class="pack">${p.map(g=>`<button class="game-card" data-id="${g.game_id}"><div class="small">${new Date(g.created_at).toLocaleString("ko-KR")} · 방문 ${g.progress?.visits||0}회</div><h3>${g.title}</h3><div class="stack">${g.verbs.slice(0,5).map(v=>`<span class="chip on">${v}</span>`).join("")}</div><p>${g.objective}</p></button>`).join("")}</div>`:`<p style="margin-top:60px">아직 게임이 없습니다.</p>`}</section>`;document.querySelectorAll(".game-card").forEach(b=>b.onclick=()=>playGame(b.dataset.id))}
+home();
+</script></body></html>
