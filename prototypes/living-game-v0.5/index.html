@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Living Game v0.5 — Need Hypothesis Engine</title>
+<style>
+:root{--bg:#07090d;--panel:#10131a;--text:#f5f6f2;--muted:#8f96a6;--accent:#dcf66e;--line:rgba(255,255,255,.11);--danger:#ff657f}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow-x:hidden}.app{min-height:100vh;display:grid;place-items:center;padding:18px}.shell{width:min(1180px,100%);min-height:740px;border:1px solid var(--line);border-radius:28px;background:#090b10;overflow:hidden;box-shadow:0 35px 120px rgba(0,0,0,.5)}
+.top{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px}.brand{font-size:12px;font-weight:900;letter-spacing:.15em}.brand b{color:var(--accent)}button{font:inherit}.ghost{border:1px solid var(--line);background:transparent;color:#adb3bf;border-radius:999px;padding:9px 13px;cursor:pointer}
+main{padding:24px}.hero{max-width:800px;min-height:610px;margin:auto;display:flex;flex-direction:column;justify-content:center}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:13px}
+h1{font-size:clamp(44px,8vw,88px);line-height:.92;letter-spacing:-.06em;margin:0 0 22px}h2{font-size:clamp(30px,5vw,58px);line-height:1;letter-spacing:-.05em;margin:0 0 16px}h3{letter-spacing:-.02em}p{line-height:1.7;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:28px}.primary,.secondary{border-radius:18px;padding:20px 22px;text-align:left;cursor:pointer}.primary{border:0;background:var(--accent);color:#0d1009;font-weight:900}.secondary{border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);font-weight:800}.meta{font-size:12px;font-weight:500;opacity:.65;margin-top:7px}
+.status{margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:999px;width:max-content;font-size:11px;color:#9fa6b5}.status i{width:7px;height:7px;border-radius:50%;background:#777}.status.good i{background:var(--accent);box-shadow:0 0 14px var(--accent)}.status.bad{color:#ff9aab}.status.bad i{background:var(--danger)}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}.stage{position:relative;min-height:620px;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#080a0f;touch-action:none;user-select:none}.stage canvas{display:block;width:100%;height:620px}.hud{position:absolute;left:15px;right:15px;top:14px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.pill{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(5,7,10,.65);backdrop-filter:blur(8px);font-size:10px;color:#a8afbc}.live{color:var(--accent)}
+.side{min-height:620px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.018);padding:20px;display:flex;flex-direction:column}.side h3{font-size:23px;line-height:1.05;margin:2px 0 10px}.thought{padding:13px 14px;border:1px solid rgba(220,246,110,.15);border-radius:14px;background:rgba(220,246,110,.035);font-size:12px;line-height:1.55;color:#aeb5c2;margin:14px 0}.stack{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:10px;border-radius:999px;padding:6px 8px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);color:#a4abb9}.chip.on{color:var(--accent);border-color:rgba(220,246,110,.18);background:rgba(220,246,110,.04)}
+.history{margin-top:16px;display:grid;gap:8px;max-height:255px;overflow:auto}.history-item{padding:10px 11px;border-left:1px solid rgba(255,255,255,.12);font-size:11px;line-height:1.5;color:#858d9d}.history-item b{color:#c9ced8}.foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:#6f7787;line-height:1.55}.error{border:1px solid rgba(255,101,127,.25);background:rgba(255,101,127,.05);color:#ff9aaa;padding:13px;border-radius:14px;font-size:12px;line-height:1.55}
+.crystal{max-width:980px;margin:12px auto}.lock{display:inline-flex;padding:8px 10px;border-radius:999px;border:1px solid rgba(220,246,110,.25);background:rgba(220,246,110,.05);color:var(--accent);font-size:10px;font-weight:900}.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}.spec{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.02)}.spec b{display:block;margin-bottom:6px}.spec span{font-size:12px;color:#9299a8;line-height:1.5}
+.art-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}.art-card{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#0d1016;color:var(--text);cursor:pointer;text-align:left;transition:.18s}.art-card:hover{transform:translateY(-4px);border-color:rgba(220,246,110,.45)}.art-preview{height:210px;position:relative}.art-preview:before{content:"";position:absolute;inset:20% 23%;border-radius:45% 55% 50% 42%}.art-card:nth-child(1) .art-preview{background:linear-gradient(145deg,#080712,#1a124b,#071820)}.art-card:nth-child(1) .art-preview:before{background:#ebff75;box-shadow:0 0 45px #bfff5a}.art-card:nth-child(2) .art-preview{background:linear-gradient(145deg,#e7ddc9,#b99f80)}.art-card:nth-child(2) .art-preview:before{background:#28231d;box-shadow:12px 12px 0 rgba(80,55,40,.12)}.art-card:nth-child(3) .art-preview{background:linear-gradient(145deg,#11171c,#253139)}.art-card:nth-child(3) .art-preview:before{background:#d7e1e6;box-shadow:0 0 25px rgba(120,190,220,.35)}.art-body{padding:16px}.art-body h3{font-size:19px;margin:0 0 6px}.art-body p{font-size:12px;margin:0}
+.play{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}.play-stage{min-height:610px;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#080a0f}.play-stage canvas{display:block;width:100%;height:610px;touch-action:none}.play-side{border:1px solid var(--line);border-radius:24px;padding:20px;background:rgba(255,255,255,.02)}.score{font-size:48px;font-weight:900;letter-spacing:-.05em}.objective{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);font-size:12px;line-height:1.55;color:#a9b0bd}.small{font-size:11px;color:#747d8c;line-height:1.55}.pack{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}.game-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(255,255,255,.025);color:var(--text);cursor:pointer;text-align:left}.game-card h3{font-size:22px;margin:4px 0 8px}
+@media(max-width:840px){.app{padding:0}.shell{min-height:100vh;border:0;border-radius:0}.top{height:58px}main{padding:16px}.actions,.workspace,.specs,.art-grid,.play,.pack{grid-template-columns:1fr}.stage,.side{min-height:auto}.stage canvas{height:520px}.side{min-height:240px}.play-stage canvas{height:520px}.art-preview{height:150px}}
+</style>
+</head>
+<body><div class="app"><div class="shell"><div class="top"><div class="brand">LIVING <b>GAME</b> / v0.5</div><button class="ghost" id="homeBtn">처음으로</button></div><main id="root"></main></div></div>
+<script>
+const STORE="living_game_pack_v05";
+const root=document.getElementById("root");
+document.getElementById("homeBtn").onclick=home;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>crypto?.randomUUID?.()||("g-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+function loadPack(){try{return JSON.parse(localStorage.getItem(STORE)||"[]")}catch{return[]}}
+function savePack(v){localStorage.setItem(STORE,JSON.stringify(v))}
+function esc(v){return String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function makeSeed(){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]||Date.now()}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pick(arr,rng){return arr[Math.floor(rng()*arr.length)]}
+let S=null,raf=0,gameRaf=0;
+
+const NEED_DEFS={
+ mastery:{ko:"숙련",desc:"직접 조작을 익히고 점점 더 잘하고 싶다"},
+ growth:{ko:"성장",desc:"무언가를 키우거나 성능을 누적해서 좋아지게 만들고 싶다"},
+ discovery:{ko:"발견",desc:"모르는 공간·규칙·대상을 알아내고 싶다"},
+ ownership:{ko:"소유",desc:"모으고 보관하고 내 것으로 남기는 즐거움을 원한다"},
+ relationship:{ko:"관계",desc:"존재·캐릭터와 애착이나 상호작용을 만들고 싶다"},
+ optimization:{ko:"최적화",desc:"효율·동선·생산·수치를 더 좋게 만들고 싶다"},
+ competition:{ko:"경쟁",desc:"상대·기록·기준을 이기고 싶다"},
+ expression:{ko:"표현",desc:"배치·꾸미기·움직임을 내 방식으로 만들고 싶다"},
+ narrative:{ko:"서사",desc:"무슨 일이 벌어지는지, 다음 이야기가 무엇인지 알고 싶다"},
+ risk:{ko:"위험",desc:"실패 가능성과 긴장 속에서 선택하거나 버티고 싶다"},
+ calm:{ko:"편안한 반복",desc:"압박 없이 반복하며 안정적인 흐름을 즐기고 싶다"},
+ agency:{ko:"자유 선택",desc:"정해진 답보다 내 방식대로 움직이고 결정하고 싶다"}
+};
+const NEED_KEYS=Object.keys(NEED_DEFS);
+
+function freshHypotheses(){
+ const h={};
+ for(const k of NEED_KEYS)h[k]={alpha:1,beta:1,evidence:[],counter:[],tests:0};
+ return h;
+}
+function strength(k){const h=S.hypotheses[k];return h.alpha/(h.alpha+h.beta)}
+function evidenceMass(k){const h=S.hypotheses[k];return h.alpha+h.beta-2}
+function uncertainty(k){const p=strength(k),mass=evidenceMass(k);return (1-Math.abs(p-.5)*2)*(1/(1+mass*.25))}
+function topNeeds(n=4){return NEED_KEYS.map(k=>({k,p:strength(k),mass:evidenceMass(k)})).sort((a,b)=>b.p-a.p).slice(0,n)}
+
+function baseWorld(){return{
+ avatar:{form:"dot"},control:"direct_drag",space:"abstract_flat",time:"continuous",entities:[],systems:[],goal:null,
+ physics:{friction:.985,acceleration:1,bounce:.65},density:{collectibles:7,hazards:4},
+ relationship:{companion_follow:.025},economy:{resources:0,upgrade_level:0,structures:0},
+ feedback:{trail_strength:.25}
+}}
+function freshTelemetry(){return{
+ distance:0,fast_distance:0,slow_distance:0,idle_seconds:0,edge_seconds:0,taps:0,pointer_seconds:0,
+ direction_changes:0,target_contacts:0,collectibles_taken:0,companion_near_seconds:0,npc_near_seconds:0,
+ hazard_hits:0,base_returns:0,shots_fired:0,resources_spent:0,gate_hits:0
+}}
+
+function home(){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);
+ const n=loadPack().length;
+ root.innerHTML='<section class="hero">'+
+  '<div class="eyebrow">NEED HYPOTHESIS ENGINE</div>'+
+  '<h1>어떤 게임이 아니라<br>왜 놀고 싶은지부터.</h1>'+
+  '<p>점 하나에서 시작합니다. 시스템은 장르를 맞히지 않고, “숙련하고 싶은가 / 키우고 싶은가 / 발견하고 싶은가 / 관계를 만들고 싶은가…” 같은 <b style="color:#fff">오늘의 놀이 욕구 가설</b>을 세우고 계속 확인·반박합니다.</p>'+
+  '<div class="status good"><i></i> API 0회 · 서버 0회 · 브라우저 내부 추론</div>'+
+  '<div class="actions"><button class="primary" id="newBtn">새 게임<div class="meta">행동 → 가설 → 실험 → 가설 수정</div></button>'+
+  '<button class="secondary" id="packBtn">내 게임팩<div class="meta">'+n+'개의 게임</div></button></div></section>';
+ document.getElementById("newBtn").onclick=start;document.getElementById("packBtn").onclick=showPack;
+}
+
+function start(){
+ const seed=makeSeed();
+ S={
+  seed,rng:mulberry32(seed),started:performance.now(),phaseStarted:performance.now(),phase:0,nextPlanAt:performance.now()+8000,
+  planning:false,world:baseWorld(),hypotheses:freshHypotheses(),telemetry:freshTelemetry(),history:[],used:{},
+  lastExperiment:null,lastEngagement:.35,recentEngagement:[],p:{x:.5,y:.5,vx:0,vy:0},ptr:{x:.5,y:.5,down:false},
+  lastMove:{dx:0,dy:0},entities:[],trail:[],cargo:0,score:0,hp:3,crystallized:null
+ };
+ renderWorkspace();syncEntities();raf=requestAnimationFrame(loop);
+}
+
+function renderWorkspace(){
+ root.innerHTML='<section class="workspace"><div class="stage" id="stage"><canvas id="cv"></canvas>'+
+ '<div class="hud"><span class="pill live" id="livePill">행동을 관찰 중</span><span class="pill" id="phasePill">TEST 0</span></div></div>'+
+ '<aside class="side"><div class="eyebrow">CURRENT NEED HYPOTHESES</div><h3 id="worldTitle">아직 아무것도 확정하지 않았습니다.</h3>'+
+ '<p id="worldDesc">점 하나를 어떻게 다루는지 먼저 봅니다.</p><div class="thought" id="thought">첫 행동에서 가능한 설명들을 여러 개 유지합니다.</div>'+
+ '<div id="hypotheses"></div><div class="history" id="history"></div>'+
+ '<div class="foot">다음 실험은 가장 점수가 높은 기능을 붙이는 것이 아니라, <b>서로 경쟁하는 욕구 가설을 구분할 수 있는 상황</b>을 고릅니다.</div></aside></section>';
+ const c=document.getElementById("cv"),st=document.getElementById("stage");resizeCanvas(c,st,620);bindPointer(c);
+ window.onresize=()=>resizeCanvas(c,st,innerWidth<840?520:620);refreshSide();
+}
+function resizeCanvas(c,st,h){const d=Math.min(2,devicePixelRatio||1),r=st.getBoundingClientRect();c.width=Math.max(320,Math.floor(r.width*d));c.height=Math.floor(h*d);c._d=d}
+function pointerPos(c,e){const r=c.getBoundingClientRect(),q=e.touches?.[0]||e;return{x:clamp((q.clientX-r.left)/r.width,0,1),y:clamp((q.clientY-r.top)/r.height,0,1)}}
+function bindPointer(c){
+ const dn=e=>{e.preventDefault();Object.assign(S.ptr,pointerPos(c,e),{down:true});S.telemetry.taps++};
+ const mv=e=>{if(!S.ptr.down)return;e.preventDefault();Object.assign(S.ptr,pointerPos(c,e))};const up=()=>S.ptr.down=false;
+ c.onpointerdown=dn;c.onpointermove=mv;window.onpointerup=up;c.ontouchstart=dn;c.ontouchmove=mv;window.ontouchend=up;
+ c.onclick=e=>{if(S.world.systems.includes("projectile"))shoot(pointerPos(c,e))}
+}
+function refreshSide(){
+ if(!S)return;
+ const ph=document.getElementById("hypotheses"),hist=document.getElementById("history"),pill=document.getElementById("phasePill");
+ if(ph){
+  const top=topNeeds(5);
+  ph.innerHTML=top.map(x=>{
+   const def=NEED_DEFS[x.k],pct=Math.round(x.p*100),h=S.hypotheses[x.k];
+   const ev=h.evidence[h.evidence.length-1],co=h.counter[h.counter.length-1];
+   return '<div style="margin:11px 0 13px"><div style="display:flex;justify-content:space-between;font-size:11px"><b>'+def.ko+'</b><span>'+pct+'%</span></div>'+
+    '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:5px;margin:6px 0"><div style="width:'+pct+'%;height:100%;background:var(--accent);border-radius:5px"></div></div>'+
+    '<div class="small">'+esc(def.desc)+'</div>'+
+    (ev?'<div class="small" style="color:#a9c96a">+ '+esc(ev)+'</div>':'')+
+    (co?'<div class="small" style="color:#b37a86">− '+esc(co)+'</div>':'')+'</div>';
+  }).join("");
+ }
+ if(hist)hist.innerHTML=S.history.slice().reverse().map(h=>'<div class="history-item"><b>'+esc(h.label)+'</b><br>'+esc(h.question)+'<br><span>'+esc(h.result||"관찰 중")+'</span></div>').join("");
+ if(pill)pill.textContent="TEST "+S.phase;
+ const wt=document.getElementById("worldTitle"),wd=document.getElementById("worldDesc");
+ if(wt){const top=topNeeds(2);wt.textContent=top[0].mass>0.5?NEED_DEFS[top[0].k].ko+" / "+NEED_DEFS[top[1].k].ko+" 가설을 보고 있습니다.":"아직 아무것도 확정하지 않았습니다."}
+ if(wd)wd.textContent=describeWorld();
+}
+function describeWorld(){const w=S.world,a=[];if(w.avatar.form!=="dot")a.push(w.avatar.form);if(w.control!=="direct_drag")a.push(w.control);if(w.space!=="abstract_flat")a.push(w.space);if(w.systems.length)a.push(w.systems.slice(-2).join("+"));return a.length?"현재 임시 세계: "+a.join(" · "):"점 하나를 어떻게 다루는지 먼저 봅니다."}
+
+function signals(t,sec){
+ sec=Math.max(1,sec);
+ return{
+  engagement:clamp(t.pointer_seconds/sec*.45+t.distance*12*.25+(t.target_contacts+t.collectibles_taken+t.base_returns+t.gate_hits+t.shots_fired)*.05,0,1),
+  speed:clamp(t.fast_distance*20,0,1),
+  precision:clamp(t.direction_changes/35+t.target_contacts*.12+(1-clamp(t.hazard_hits/5,0,1))*.15,0,1),
+  explore:clamp(t.edge_seconds/sec*1.7+t.distance*7,0,1),
+  repeat:clamp(t.target_contacts*.16+t.base_returns*.24+t.gate_hits*.18+t.hazard_hits*.08,0,1),
+  collect:clamp(t.collectibles_taken/7,0,1),
+  proximity:clamp((t.companion_near_seconds+t.npc_near_seconds)/sec*1.7,0,1),
+  risk:clamp(t.hazard_hits*.16+t.fast_distance*8,0,1),
+  calm:clamp(t.slow_distance*10+t.idle_seconds/sec*.7,0,1),
+  agency:clamp(t.edge_seconds/sec+t.direction_changes/45+t.taps/12,0,1),
+  economy:clamp(t.resources_spent/8+t.base_returns*.2,0,1)
+ }
+}
+function weighted(sig,map){let n=0,d=0;for(const [k,w] of Object.entries(map)){n+=(sig[k]||0)*w;d+=Math.abs(w)}return d?clamp(n/d,0,1):.5}
+
+function exp(id,label,question,mutations,requires,probes,fun=.6){return{id,label,question,mutations,requires,probes,fun}}
+function experiments(){
+ const w=S.world;
+ return[
+  exp("precision_course","좁은 통과 구간","빠르게 움직이는 것보다 '잘 움직이는 것'을 좋아하는가?",
+   [{op:"set_control",value:"inertia"},{op:"set_space",value:"lanes"},{op:"add_entity",value:"hazard"}],
+   ()=>!S.used.precision_course,{mastery:{precision:.7,repeat:.3},risk:{risk:.6,speed:.4},competition:{repeat:.5,speed:.5}},.85),
+
+  exp("open_horizon","열린 경계","목표 없이도 새로운 공간을 찾아 나가고 싶은가?",
+   [{op:"set_space",value:"world_map"},{op:"add_entity",value:"gate"}],
+   ()=>!S.used.open_horizon,{discovery:{explore:.8,agency:.2},agency:{agency:.7,explore:.3},calm:{calm:.6,explore:.2}},.75),
+
+  exp("collect_field","흩어진 조각","발견보다 '내 것으로 모으는 것'에서 더 반응하는가?",
+   [{op:"add_entity",value:"collectible"},{op:"add_system",value:"collect"}],
+   ()=>!S.used.collect_field,{ownership:{collect:.8,repeat:.2},optimization:{collect:.5,engagement:.3},discovery:{explore:.5,collect:.3}},.8),
+
+  exp("home_loop","귀환 거점","모은 것을 들고 돌아오는 반복 루프를 즐기는가?",
+   [{op:"add_entity",value:"base"},{op:"add_system",value:"deliver"}],
+   ()=>w.systems.includes("collect")&&!S.used.home_loop,{ownership:{collect:.4,repeat:.5},optimization:{repeat:.7,economy:.3},growth:{repeat:.5,economy:.4}},.82),
+
+  exp("upgrade_feedback","성능 성장","보상이 다음 조작 성능을 바꾸면 반복 의욕이 커지는가?",
+   [{op:"add_entity",value:"resource_node"},{op:"add_system",value:"resource"},{op:"add_system",value:"upgrade"}],
+   ()=>w.entities.includes("base")&&!S.used.upgrade_feedback,{growth:{economy:.6,repeat:.4},optimization:{economy:.7,repeat:.3},mastery:{precision:.4,repeat:.4}},.86),
+
+  exp("quiet_companion","말 없는 동행자","목표가 아닌 존재에게 자발적으로 신경을 쓰는가?",
+   [{op:"add_entity",value:"companion"}],
+   ()=>!S.used.quiet_companion,{relationship:{proximity:.8,calm:.2},calm:{proximity:.3,calm:.7},agency:{agency:.4,proximity:.2}},.72),
+
+  exp("npc_thread","반응하는 인물","행동의 결과보다 '누가 왜 여기 있는지'에 머무는가?",
+   [{op:"add_entity",value:"npc"},{op:"add_system",value:"dialogue"}],
+   ()=>!S.used.npc_thread,{relationship:{proximity:.7,engagement:.3},narrative:{proximity:.6,calm:.3},discovery:{proximity:.25,explore:.35}},.78),
+
+  exp("moving_rival","도망가는 기준","자유 이동보다 상대/기록이 생길 때 반복이 늘어나는가?",
+   [{op:"add_entity",value:"target"},{op:"add_system",value:"chase"}],
+   ()=>!S.used.moving_rival,{competition:{repeat:.7,speed:.3},mastery:{precision:.45,repeat:.45},risk:{speed:.45,risk:.35}},.86),
+
+  exp("danger_zone","실패 가능한 구역","실패 가능성이 생겼을 때 오히려 더 몰입하는가?",
+   [{op:"add_entity",value:"hazard"},{op:"add_system",value:"survival"}],
+   ()=>!S.used.danger_zone,{risk:{risk:.65,repeat:.35},mastery:{precision:.55,repeat:.35},calm:{calm:.7,risk:.1}},.82),
+
+  exp("trail_canvas","움직임의 흔적","목표 달성보다 움직임 자체를 자기 방식으로 만드는가?",
+   [{op:"add_system",value:"trail"},{op:"set_control",value:"direct_drag"}],
+   ()=>!S.used.trail_canvas,{expression:{agency:.45,calm:.25,engagement:.3},agency:{agency:.65,engagement:.2},mastery:{precision:.35,engagement:.25}},.7),
+
+  exp("build_patch","세계에 남기는 변화","모은 자원을 '내가 만든 구조'로 바꾸는 데 반응하는가?",
+   [{op:"add_entity",value:"base"},{op:"add_entity",value:"resource_node"},{op:"add_system",value:"resource"},{op:"add_system",value:"build"},{op:"set_avatar_form",value:"builder"}],
+   ()=>S.phase>=3&&!S.used.build_patch,{expression:{economy:.35,agency:.3,repeat:.25},optimization:{economy:.6,repeat:.35},ownership:{economy:.35,repeat:.35}},.88),
+
+  exp("aim_test","거리에서 개입","접근하는 것보다 조준하고 직접 개입하는 조작을 원하는가?",
+   [{op:"add_entity",value:"projectile_target"},{op:"add_system",value:"projectile"},{op:"set_control",value:"aim"},{op:"set_avatar_form",value:"ship"}],
+   ()=>S.phase>=2&&!S.used.aim_test,{mastery:{precision:.55,repeat:.35},competition:{repeat:.5,engagement:.35},agency:{agency:.4,engagement:.3}},.8),
+
+  exp("slow_room","작은 안전 공간","목표나 위험 없이 가까운 공간에서 천천히 반복하는 흐름을 원하는가?",
+   [{op:"set_space",value:"top_down_room"},{op:"set_control",value:"click_move"}],
+   ()=>!S.used.slow_room,{calm:{calm:.7,engagement:.25},relationship:{calm:.3,proximity:.35},agency:{agency:.45,calm:.2}},.62)
+ ];
+}
+
+function chooseExperiment(){
+ const candidates=experiments().filter(e=>e.requires());
+ if(!candidates.length)return null;
+ const top=topNeeds(6);
+ const ranked=candidates.map(e=>{
+  let info=0,contrast=0;
+  const vals=[];
+  for(const n of top){
+   const rel=e.probes[n.k]?1:0;
+   if(rel){info+=uncertainty(n.k)*(0.6+n.p*.4);vals.push(n.p)}
+  }
+  if(vals.length>=2)contrast=Math.max(...vals)-Math.min(...vals);
+  const novelty=1-Math.min(.9,(S.used[e.id]||0)*.4);
+  const randomness=S.rng()*.35;
+  return{e,score:info*.9+contrast*.25+novelty*.5+e.fun*.4+randomness};
+ }).sort((a,b)=>b.score-a.score);
+ return ranked[0].e;
+}
+
+function evaluateExperiment(){
+ if(!S.lastExperiment)return;
+ const sec=(performance.now()-S.phaseStarted)/1000,sig=signals(S.telemetry,sec),eng=sig.engagement;
+ const ex=S.lastExperiment;
+ const resultBits=[];
+ for(const [need,map] of Object.entries(ex.probes)){
+  let support=weighted(sig,map);
+  support=clamp(support*.8+(eng-S.lastEngagement+.5)*.2,0,1);
+  const h=S.hypotheses[need],weight=.9+ex.fun*.5;
+  h.alpha+=support*weight;h.beta+=(1-support)*weight;h.tests++;
+  if(support>.62){
+   const msg=ex.label+"에서 관련 행동이 유지됨";
+   h.evidence.push(msg);if(h.evidence.length>3)h.evidence.shift();resultBits.push(NEED_DEFS[need].ko+" ↑");
+  }else if(support<.38){
+   const msg=ex.label+"에서 관련 행동이 약해짐";
+   h.counter.push(msg);if(h.counter.length>3)h.counter.shift();resultBits.push(NEED_DEFS[need].ko+" ↓");
+  }
+ }
+ S.lastEngagement=eng;S.recentEngagement.push(eng);if(S.recentEngagement.length>4)S.recentEngagement.shift();
+ const h=S.history[S.history.length-1];if(h)h.result=resultBits.length?resultBits.join(" · "):"뚜렷한 변화 없음";
+}
+
+function planNext(){
+ if(S.planning||S.crystallized)return;S.planning=true;
+ evaluateExperiment();
+ if(shouldCrystallize()){crystallize();S.planning=false;return}
+ const ex=chooseExperiment();if(!ex){crystallize();S.planning=false;return}
+ S.used[ex.id]=(S.used[ex.id]||0)+1;
+ const plan={id:ex.id,label:ex.label,question:ex.question,result:null,mutations:ex.mutations};
+ S.history.push(plan);S.lastExperiment=ex;
+ for(const m of ex.mutations)applyMutation(m);
+ S.phase++;S.telemetry=freshTelemetry();S.phaseStarted=performance.now();S.nextPlanAt=performance.now()+11500;
+ syncEntities();refreshSide();
+ const thought=document.getElementById("thought"),live=document.getElementById("livePill");
+ if(thought)thought.textContent=ex.question;if(live)live.textContent="가설을 구분하는 실험 중";
+ S.planning=false;
+}
+function shouldCrystallize(){
+ const elapsed=(performance.now()-S.started)/1000,top=topNeeds(3);
+ const strong=top[0].p>.68&&top[0].mass>2.1;
+ const second=top[1].p>.59&&top[1].mass>1.2;
+ const separation=top[0].p-top[2].p>.08;
+ if(elapsed>125||S.phase>=10)return true;
+ return elapsed>68&&S.phase>=6&&strong&&second&&separation;
+}
+
+function applyMutation(m){
+ const w=S.world,v=m.value;
+ if(m.op==="set_avatar_form")w.avatar.form=v;
+ else if(m.op==="set_control")w.control=v;
+ else if(m.op==="set_space")w.space=v;
+ else if(m.op==="add_entity"){if(!w.entities.includes(v))w.entities.push(v)}
+ else if(m.op==="add_system"){if(!w.systems.includes(v))w.systems.push(v)}
+ else if(m.op==="set_goal")w.goal=v;
+}
+function syncEntities(){
+ const old=S.entities,keep=t=>old.filter(e=>e.type===t),next=[],w=S.world;
+ for(const type of w.entities){
+  const existing=keep(type);if(existing.length){next.push(...existing);continue}
+  if(type==="target"||type==="projectile_target")next.push({type,x:.78,y:.28});
+  else if(type==="companion")next.push({type,x:.38,y:.58});
+  else if(type==="npc")next.push({type,x:.7,y:.62,speech:"..."});
+  else if(type==="base")next.push({type,x:.13,y:.82,r:.075});
+  else if(type==="gate")next.push({type,x:.8,y:.45,r:.06});
+  else if(type==="hazard")for(let i=0;i<5;i++)next.push({type,x:.16+i*.16,y:.2+Math.random()*.6,w:.032,h:.16});
+  else if(type==="collectible")for(let i=0;i<8;i++)next.push({type,x:.08+Math.random()*.84,y:.1+Math.random()*.8,on:true});
+  else if(type==="resource_node")for(let i=0;i<5;i++)next.push({type,x:.12+Math.random()*.76,y:.14+Math.random()*.72,on:true,respawn:0});
+ }
+ S.entities=next;
+}
+function shoot(pos){S.entities.push({type:"shot",x:S.p.x,y:S.p.y,vx:(pos.x-S.p.x)*.035,vy:(pos.y-S.p.y)*.035});S.telemetry.shots_fired++}
+function acc(k,v){S.telemetry[k]=(S.telemetry[k]||0)+v}
+
+function update(dt){
+ const w=S.world,p=S.p,ox=p.x,oy=p.y;
+ if(S.ptr.down)acc("pointer_seconds",dt/1000);
+ if(w.control==="direct_drag"&&S.ptr.down){p.x+=(S.ptr.x-p.x)*.22;p.y+=(S.ptr.y-p.y)*.22}
+ if(w.control==="inertia"&&S.ptr.down){p.vx+=(S.ptr.x-p.x)*.0007*dt;p.vy+=(S.ptr.y-p.y)*.0007*dt}
+ if(w.control==="steer"&&S.ptr.down){const dx=S.ptr.x-p.x,dy=S.ptr.y-p.y,l=Math.hypot(dx,dy)||1;p.vx+=dx/l*.0006*dt;p.vy+=dy/l*.0006*dt}
+ if(w.control==="click_move"){p.x+=(S.ptr.x-p.x)*.055;p.y+=(S.ptr.y-p.y)*.055}
+ if(w.control==="aim"&&S.ptr.down){p.x+=(S.ptr.x-p.x)*.08;p.y+=(S.ptr.y-p.y)*.08}
+ if(["inertia","steer"].includes(w.control)){p.vx*=w.physics.friction;p.vy*=w.physics.friction;p.x+=p.vx;p.y+=p.vy}
+ if(p.x<.02||p.x>.98){p.vx*=-.65;p.x=clamp(p.x,.02,.98)}if(p.y<.03||p.y>.97){p.vy*=-.65;p.y=clamp(p.y,.03,.97)}
+ const dx=p.x-ox,dy=p.y-oy,d=Math.hypot(dx,dy),spd=d/Math.max(.001,dt/16.67);
+ acc("distance",d);if(spd>.012)acc("fast_distance",d);else if(d>.0003)acc("slow_distance",d);else acc("idle_seconds",dt/1000);
+ if(p.x<.08||p.x>.92||p.y<.08||p.y>.92)acc("edge_seconds",dt/1000);
+ const prev=S.lastMove;if((prev.dx*dy-prev.dy*dx)**2>.00000002)acc("direction_changes",1);S.lastMove={dx,dy};
+ S.trail.push({x:p.x,y:p.y});if(S.trail.length>80)S.trail.shift();
+
+ for(const e of S.entities){
+  if(e.type==="target"||e.type==="projectile_target"){
+   const ex=e.x-p.x,ey=e.y-p.y,dd=Math.hypot(ex,ey)||1;
+   if(w.systems.includes("chase")){e.x=clamp(e.x+ex/dd*.00034*dt,.04,.96);e.y=clamp(e.y+ey/dd*.00034*dt,.05,.95)}
+   if(dd<.06&&e.type==="target"){acc("target_contacts",1);S.score+=10;e.x=Math.random()>.5?.1:.9;e.y=.1+Math.random()*.8}
+  }
+  if(e.type==="companion"){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd>.07){e.x+=(p.x-e.x)*.025;e.y+=(p.y-e.y)*.025}else acc("companion_near_seconds",dt/1000)}
+  if(e.type==="npc"){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<.13){acc("npc_near_seconds",dt/1000);if(w.systems.includes("dialogue"))e.speech=["왜 여기까지 왔어?","저쪽도 봤어?","그걸 계속 모으는구나."][Math.floor(performance.now()/1800)%3]}}
+  if((e.type==="collectible"||e.type==="resource_node")&&e.on&&Math.hypot(e.x-p.x,e.y-p.y)<.045){e.on=false;S.cargo++;S.score+=2;acc("collectibles_taken",1);if(e.type==="resource_node")e.respawn=performance.now()+4200}
+  if(e.type==="resource_node"&&!e.on&&performance.now()>e.respawn){e.on=true;e.x=.1+Math.random()*.8;e.y=.1+Math.random()*.8}
+  if(e.type==="base"&&Math.hypot(e.x-p.x,e.y-p.y)<e.r&&S.cargo>0){acc("base_returns",1);S.score+=S.cargo*4;w.economy.resources+=S.cargo;S.cargo=0;if(w.systems.includes("upgrade")&&w.economy.resources>=5){w.economy.resources-=5;w.physics.friction=.988;acc("resources_spent",5)}if(w.systems.includes("build")&&w.economy.resources>=4){w.economy.resources-=4;w.economy.structures++;acc("resources_spent",4)}}
+  if(e.type==="hazard"&&p.x>e.x-e.w&&p.x<e.x+e.w&&p.y>e.y-e.h/2&&p.y<e.y+e.h/2){p.x=ox;p.y=oy;p.vx*=-.4;p.vy*=-.4;acc("hazard_hits",1)}
+  if(e.type==="gate"&&Math.hypot(e.x-p.x,e.y-p.y)<e.r){acc("gate_hits",1);S.score+=5;e.x=.12+Math.random()*.76;e.y=.15+Math.random()*.7}
+  if(e.type==="shot"){e.x+=e.vx;e.y+=e.vy;for(const t of S.entities)if(["target","projectile_target","hazard"].includes(t.type)&&Math.hypot(e.x-t.x,e.y-t.y)<.05){e.dead=true;S.score+=10;acc("target_contacts",1);if(t.type==="hazard")t.dead=true;else{t.x=.1+Math.random()*.8;t.y=.1+Math.random()*.8}}}
+ }
+ S.entities=S.entities.filter(e=>!e.dead&&e.x>-0.15&&e.x<1.15&&e.y>-0.15&&e.y<1.15);
+ if(performance.now()>=S.nextPlanAt&&!S.planning&&!S.crystallized)planNext();
+}
+function loop(t){if(!S||S.crystallized)return;S._last=S._last||t;const dt=Math.min(33,t-S._last);S._last=t;update(dt);drawWorld(document.getElementById("cv"),S,S.world);raf=requestAnimationFrame(loop)}
+
+function drawWorld(c,state,w){
+ if(!c)return;const x=c.getContext("2d"),d=c._d||1,W=c.width,H=c.height;x.fillStyle="#080a0f";x.fillRect(0,0,W,H);drawSpace(x,W,H,w.space,d);
+ if(w.systems.includes("trail")){x.beginPath();state.trail.forEach((q,i)=>i?x.lineTo(q.x*W,q.y*H):x.moveTo(q.x*W,q.y*H));x.strokeStyle="rgba(220,246,110,.24)";x.lineWidth=2*d;x.stroke()}
+ for(const e of state.entities)drawEntity(x,W,H,e,d,w);drawAvatar(x,W,H,state.p,w.avatar.form,d);
+ x.font=(12*d)+"px sans-serif";x.fillStyle="rgba(255,255,255,.65)";x.fillText("CARGO "+state.cargo+"  SCORE "+Math.floor(state.score),16*d,H-18*d);
+}
+function drawSpace(x,W,H,space,d){
+ x.strokeStyle="rgba(255,255,255,.04)";x.lineWidth=d;
+ if(space==="pseudo_depth"){const vx=W*.5,vy=H*.2;for(let i=0;i<=10;i++){x.beginPath();x.moveTo(vx,vy);x.lineTo(W*i/10,H);x.stroke()}for(let j=1;j<8;j++){const y=vy+(H-vy)*j/8;x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke()}}
+ else if(space==="lanes"){for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,H*i/4);x.lineTo(W,H*i/4);x.stroke()}}
+ else if(space==="top_down_room"){x.strokeStyle="rgba(255,255,255,.12)";x.lineWidth=4*d;x.strokeRect(28*d,28*d,W-56*d,H-56*d)}
+ else if(space==="world_map"){for(let i=0;i<10;i++){x.beginPath();x.arc(((i*79)%100)/100*W,((i*43)%100)/100*H,18*d,0,Math.PI*2);x.stroke()}}
+ else{for(let i=1;i<11;i++){x.beginPath();x.moveTo(W*i/11,0);x.lineTo(W*i/11,H);x.stroke()}for(let i=1;i<8;i++){x.beginPath();x.moveTo(0,H*i/8);x.lineTo(W,H*i/8);x.stroke()}}
+}
+function drawEntity(x,W,H,e,d,w){
+ if((e.type==="collectible"||e.type==="resource_node")&&!e.on)return;
+ if(e.type==="hazard"){x.fillStyle="rgba(255,90,115,.22)";x.fillRect((e.x-e.w)*W,(e.y-e.h/2)*H,e.w*2*W,e.h*H);return}
+ if(e.type==="base"||e.type==="gate"){x.beginPath();x.arc(e.x*W,e.y*H,e.r*Math.min(W,H),0,Math.PI*2);x.strokeStyle=e.type==="base"?"#dcf66e":"#75baff";x.lineWidth=2*d;x.stroke();return}
+ let col="#a9b0bd",r=.013;if(e.type==="target"||e.type==="projectile_target")col="#ff5b88";if(e.type==="companion")col="#a98cff";if(e.type==="npc")col="#ffd06c";if(e.type==="collectible"||e.type==="resource_node"){col="#66b6ff";r=.009}if(e.type==="shot"){col="#fff";r=.005}
+ dot(x,W,H,e.x,e.y,r,col,d);if(e.type==="npc"&&w.systems.includes("dialogue")&&Math.hypot(e.x-S.p.x,e.y-S.p.y)<.13){x.fillStyle="rgba(255,255,255,.75)";x.font=(11*d)+"px sans-serif";x.fillText(e.speech||"...",e.x*W+12*d,e.y*H-10*d)}
+}
+function dot(x,W,H,px,py,r,col,d){x.beginPath();x.arc(px*W,py*H,r*Math.min(W,H),0,Math.PI*2);x.fillStyle=col;x.shadowBlur=16*d;x.shadowColor=col;x.fill();x.shadowBlur=0}
+function drawAvatar(x,W,H,p,form,d){
+ x.save();x.translate(p.x*W,p.y*H);x.fillStyle="#eaff78";x.shadowBlur=20*d;x.shadowColor="#c9ff58";
+ if(form==="ship"){x.beginPath();x.moveTo(18*d,0);x.lineTo(-12*d,-10*d);x.lineTo(-7*d,0);x.lineTo(-12*d,10*d);x.closePath();x.fill()}
+ else if(form==="builder"){x.fillRect(-15*d,-9*d,30*d,18*d);x.fillStyle="#7d8d45";x.fillRect(-11*d,9*d,7*d,5*d);x.fillRect(4*d,9*d,7*d,5*d)}
+ else{x.beginPath();x.arc(0,0,11*d,0,Math.PI*2);x.fill()}
+ x.restore();x.shadowBlur=0;
+}
+
+function buildConcept(){
+ const top=topNeeds(3),a=top[0].k,b=top[1].k,c=top[2].k,w=S.world;
+ const rolePool={
+  mastery:["야간 운송 파일럿","시험장 드라이버","기계 조작사"],
+  growth:["작은 작업장의 정비사","개조형 탐사자","장비 육성자"],
+  discovery:["금지 구역 조사원","미지 신호 탐사자","밤거리 수색자"],
+  ownership:["희귀품 회수원","수집 창고지기","유실물 관리인"],
+  relationship:["작은 동행자의 보호자","밤 근무 파트너","기묘한 주민들의 관리인"],
+  optimization:["자동화 작업장 운영자","배달망 설계자","작은 시설 관리자"],
+  competition:["비공식 기록 도전자","도심 시험 주자","라이벌 코스 참가자"],
+  expression:["작은 공간 설계자","움직임을 그리는 조종사","자기식 작업장 제작자"],
+  narrative:["야간 사건 기록원","사라진 사람을 쫓는 조사원","이상한 편지의 전달자"],
+  risk:["위험구역 회수원","폭풍 항로 조종사","붕괴 지역 구조원"],
+  calm:["작은 정거장 관리인","느린 수집 산책자","밤의 온실지기"],
+  agency:["자유 계약 해결사","무경로 탐사자","도시 샛길 배달원"]
+ };
+ const fantasy={
+  mastery:"직접 조작을 익힐수록 더 어려운 구간을 매끄럽게 통과한다",
+  growth:"모은 자원으로 장비와 능력이 눈에 띄게 성장한다",
+  discovery:"새로운 구역과 숨겨진 규칙을 하나씩 발견한다",
+  ownership:"찾은 것들이 실제 컬렉션과 거점에 남는다",
+  relationship:"반복해서 만나는 존재들이 행동을 기억하고 관계가 변한다",
+  optimization:"동선과 자원 흐름을 손봐 효율을 계속 끌어올린다",
+  competition:"기록과 라이벌을 상대로 계속 더 나은 결과를 노린다",
+  expression:"공간과 결과물을 자기 방식으로 바꿔 흔적을 남긴다",
+  narrative:"행동할수록 사건의 이유와 다음 이야기가 열린다",
+  risk:"더 큰 보상을 위해 위험한 선택을 감수한다",
+  calm:"압박 없이 반복하면서 작은 변화가 쌓이는 흐름을 즐긴다",
+  agency:"정해진 순서 없이 자기 방식으로 목표에 접근한다"
+ };
+ const role=pick(rolePool[a],S.rng);
+ const setting=w.space==="world_map"?"서로 연결된 여러 구역":w.space==="lanes"?"빠르게 바뀌는 경로망":w.space==="top_down_room"?"작지만 계속 변하는 거점":w.space==="pseudo_depth"?"깊이와 높낮이가 있는 구역":"하나씩 의미가 생기는 작은 세계";
+ const titleWords1={mastery:["NIGHT","VECTOR","SHIFT"],growth:["GARAGE","GROW","FORGE"],discovery:["UNKNOWN","HIDDEN","OUTER"],ownership:["CACHE","ARCHIVE","KEEP"],relationship:["TWIN","NEIGHBOR","HEART"],optimization:["GRID","FLOW","SYSTEM"],competition:["RIVAL","RECORD","RUN"],expression:["MAKER","TRACE","FORM"],narrative:["CASE","LETTER","STORY"],risk:["RED","LAST","DANGER"],calm:["SLOW","QUIET","LITTLE"],agency:["FREE","SIDE","OPEN"]}[a];
+ const titleWords2={mastery:["ROUTE","DRIVE","TRIAL"],growth:["WORKSHOP","MACHINE","HABITAT"],discovery:["SIGNAL","MAP","ZONE"],ownership:["RELIC","STORE","ROOM"],relationship:["COMPANION","STATION","HOUSE"],optimization:["NETWORK","YARD","LINE"],competition:["CIRCUIT","LEAGUE","TRACK"],expression:["STUDIO","GARDEN","FIELD"],narrative:["NIGHT","FILES","MYSTERY"],risk:["COURIER","SALVAGE","PASS"],calm:["KEEPER","GARDEN","STATION"],agency:["CITY","ROADS","ROAM"]}[b]||["GAME","WORLD","LOOP"];
+ const title=pick(titleWords1,S.rng)+" "+pick(titleWords2,S.rng);
+ return{
+  title,
+  one_line:role+"가 되어 "+setting+"에서 "+fantasy[a]+"면서 "+fantasy[b]+".",
+  role,setting,needs:[a,b,c],
+  core_loop:[fantasy[a],fantasy[b],fantasy[c]].join(" → "),
+  core_verbs:deriveVerbs(w,a,b),
+  player_goal:fantasy[a]+" 그리고 "+fantasy[b],
+  failure_or_pressure:NEED_DEFS.risk&&strength("risk")>.62?"위험을 감수한 선택은 더 큰 손실 가능성을 만든다":"실패보다 더 좋은 기록·상태를 만들지 못하는 것이 압박이다",
+  progression:strength("growth")>.58?"플레이할수록 장비·능력·거점이 실제로 성장한다":"숙련, 발견, 관계 기록이 세션을 넘어 남는다"
+ };
+}
+function deriveVerbs(w,a,b){
+ const v=[];if(["inertia","steer"].includes(w.control))v.push("조종");else v.push("이동");
+ if(w.systems.includes("collect"))v.push("수집");if(w.systems.includes("deliver"))v.push("운반");if(w.systems.includes("upgrade"))v.push("개조");if(w.systems.includes("build"))v.push("건설");if(w.systems.includes("dialogue"))v.push("대화");if(w.systems.includes("chase"))v.push("추적");if(w.systems.includes("projectile"))v.push("조준");if(w.entities.includes("companion"))v.push("동행");return [...new Set(v)].slice(0,5);
+}
+const ARTS=[
+ {name:"Neon Night",visual_brief:"깊은 밤과 네온 발광, 속도와 실루엣을 강하게 읽히게 하는 방향."},
+ {name:"Warm Miniature",visual_brief:"작은 모형 세계, 목재와 종이 질감, 소유·관계·공간의 흔적이 따뜻하게 남는 방향."},
+ {name:"Industrial Field",visual_brief:"금속 장비와 기능적인 구조물, 조작·성장·자원 흐름이 눈에 보이는 방향."},
+ {name:"Dream Habitat",visual_brief:"부드러운 유기체와 몽환적인 환경, 존재와 탐험의 감각을 강조하는 방향."},
+ {name:"Retro Handheld",visual_brief:"제한된 픽셀 표현과 또렷한 UI, 규칙과 반복 플레이가 즉각 읽히는 방향."}
+];
+function crystallize(){
+ evaluateExperiment();cancelAnimationFrame(raf);
+ const design=buildConcept(),pool=[...ARTS],arts=[];while(arts.length<3)arts.push(pool.splice(Math.floor(S.rng()*pool.length),1)[0]);
+ S.crystallized={game_design:design,art_directions:arts};
+ showCrystallization(S.crystallized);
+}
+function showCrystallization(plan){
+ const g=plan.game_design,top=g.needs.map(k=>NEED_DEFS[k].ko).join(" · ");
+ root.innerHTML='<section class="crystal"><div class="lock">✓ TODAY\'S PLAY NEEDS FOUND</div><div class="eyebrow" style="margin-top:18px">'+esc(top)+'</div>'+
+ '<h2>'+esc(g.title)+'</h2><p style="font-size:17px;max-width:760px">'+esc(g.one_line)+'</p>'+
+ '<div class="specs"><div class="spec"><b>오늘의 핵심 욕구</b><span>'+esc(top)+'</span></div><div class="spec"><b>핵심 루프</b><span>'+esc(g.core_loop)+'</span></div><div class="spec"><b>역할</b><span>'+esc(g.role)+'</span></div></div>'+
+ '<div class="eyebrow" style="margin-top:28px">게임은 하나로 확정됨</div><h3 style="font-size:27px;margin:0">아트 방향만 고르세요.</h3><p>아래는 같은 게임의 외형만 다른 세 가지입니다.</p>'+
+ '<div class="art-grid">'+plan.art_directions.map((a,i)=>'<button class="art-card" data-i="'+i+'"><div class="art-preview"></div><div class="art-body"><h3>'+esc(a.name)+'</h3><p>'+esc(a.visual_brief)+'</p></div></button>').join("")+'</div></section>';
+ document.querySelectorAll(".art-card").forEach(b=>b.onclick=()=>finalizeGame(Number(b.dataset.i)));
+}
+function finalizeGame(i){
+ const pack=loadPack(),g=S.crystallized.game_design,a=S.crystallized.art_directions[i];
+ const item={schema_version:"0.5",game_id:uid(),created_at:new Date().toISOString(),seed:S.seed,game_design:g,need_snapshot:Object.fromEntries(NEED_KEYS.map(k=>[k,{strength:strength(k),evidence:S.hypotheses[k].evidence,counter:S.hypotheses[k].counter}])),world:JSON.parse(JSON.stringify(S.world)),history:S.history,art_direction:a,progress:{best:0,visits:0}};
+ pack.unshift(item);savePack(pack);playGame(item.game_id);
+}
+function playGame(id){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);const pack=loadPack(),g=pack.find(x=>x.game_id===id);if(!g)return showPack();g.progress.visits++;savePack(pack);
+ const gd=g.game_design;root.innerHTML='<section class="play"><div class="play-stage" id="playStage"><canvas id="game"></canvas></div><aside class="play-side"><div class="eyebrow">NOW PLAYING</div><h3>'+esc(gd.title)+'</h3><div class="objective">'+esc(gd.one_line)+'<br><br><b>목표:</b> '+esc(gd.player_goal)+'</div><div class="small" style="margin-top:18px">SCORE</div><div class="score" id="score">0</div><div class="small" id="best">BEST '+(g.progress.best||0)+'</div><div class="stack" style="margin-top:18px">'+gd.core_verbs.map(v=>'<span class="chip on">'+esc(v)+'</span>').join("")+'</div><p class="small" style="margin-top:18px">아트: '+esc(g.art_direction.name)+'</p><button class="ghost" id="packBack" style="margin-top:8px">내 게임팩</button></aside></section>';
+ document.getElementById("packBack").onclick=showPack;runFrozen(document.getElementById("game"),document.getElementById("playStage"),g,pack);
+}
+function runFrozen(c,st,g,pack){
+ S={seed:g.seed,rng:mulberry32(g.seed),started:performance.now(),phaseStarted:performance.now(),phase:999,nextPlanAt:Infinity,planning:false,world:JSON.parse(JSON.stringify(g.world)),hypotheses:freshHypotheses(),telemetry:freshTelemetry(),history:[],used:{},lastExperiment:null,lastEngagement:.3,recentEngagement:[],p:{x:.5,y:.5,vx:0,vy:0},ptr:{x:.5,y:.5,down:false},lastMove:{dx:0,dy:0},entities:[],trail:[],cargo:0,score:0,hp:3,crystallized:{frozen:true}};
+ resizeCanvas(c,st,610);bindPointer(c);syncEntities();window.onresize=()=>resizeCanvas(c,st,innerWidth<840?520:610);
+ function tick(t){S._last=S._last||t;const dt=Math.min(33,t-S._last);S._last=t;const saveNext=S.nextPlanAt;S.nextPlanAt=Infinity;update(dt);S.nextPlanAt=saveNext;drawWorld(c,S,S.world);const n=Math.floor(S.score);document.getElementById("score").textContent=n;if(n>(g.progress.best||0)){g.progress.best=n;const idx=pack.findIndex(x=>x.game_id===g.game_id);pack[idx]=g;savePack(pack);document.getElementById("best").textContent="BEST "+n}gameRaf=requestAnimationFrame(tick)}
+ gameRaf=requestAnimationFrame(tick);
+}
+function showPack(){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);const p=loadPack();
+ root.innerHTML='<section class="crystal"><div class="eyebrow">MY GAMEPACK</div><h2>내 게임팩</h2><p>각 게임은 당시 추론된 놀이 욕구와 실제 실험 기록을 함께 보존합니다.</p>'+
+ (p.length?'<div class="pack">'+p.map(g=>'<button class="game-card" data-id="'+g.game_id+'"><div class="small">'+new Date(g.created_at).toLocaleString("ko-KR")+' · 방문 '+(g.progress?.visits||0)+'회</div><h3>'+esc(g.game_design.title)+'</h3><div class="stack">'+g.game_design.needs.map(k=>'<span class="chip on">'+esc(NEED_DEFS[k].ko)+'</span>').join("")+'</div><p>'+esc(g.game_design.one_line)+'</p></button>').join("")+'</div>':'<p style="margin-top:60px">아직 게임이 없습니다.</p>')+'</section>';
+ document.querySelectorAll(".game-card").forEach(b=>b.onclick=()=>playGame(b.dataset.id));
+}
+home();
+</script></body></html>
