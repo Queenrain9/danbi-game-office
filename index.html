@@ -1995,35 +1995,36 @@ function fidelityPendingCard(b){
     (tickets.length?'<div class="human-gate"><b>Open repair tickets · '+tickets.length+'</b><br>'+tickets.slice(0,6).map(x=>esc(x.requirement_id)+' · '+esc(x.verdict)+' · '+esc(x.title)).join("<br>")+'</div>':'')+'</div>';
 }
 function fidelityPage(){
-  const pending=buildJobs.filter(b=>b.status==="fidelity_pending" || b.status==="repair");
   const currentReviews=fidelityReviews.filter(r=>!isSupersededReview(r));
   const supersededReviews=fidelityReviews.filter(r=>isSupersededReview(r));
-  return genericHeader("Static Fidelity Gate","빌더의 자기평가를 믿지 않고 Wireframe + Implementation Contract + 실제 코드를 독립적으로 대조합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
+  return genericHeader("Static Fidelity Gate","완성된 Godot Build를 Wireframe + Implementation Contract + 실제 코드와 독립적으로 대조하고 검수 결과를 남깁니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
     '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Static Fidelity Gate Hourly</strong><span>independent verifier</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 50분</b></span><span>VERIFIED / PARTIAL / MISSING / CONFLICT / BROKEN</span><span>FAIL → Repair → Build Farm</span><span>ALL VERIFIED → PLAYTEST READY</span></div></div>'+
-    (pending.length?'<div class="section-head"><div><h2>검수 대기 / Repair</h2><p>PLAYTEST READY 이전의 실제 제작 후보</p></div></div><div class="cards">'+pending.map(fidelityPendingCard).join("")+'</div>':'')+
-    '<div class="section-head"><div><h2>Current Review History</h2><p>현재 Blueprint/Build에 유효한 독립 검수 결과</p></div></div><div class="cards">'+(currentReviews.map(fidelityReviewCard).join("") || '<div class="empty">현재 유효한 Fidelity Review 기록이 없습니다.</div>')+'</div>'+
+    '<div class="section-head"><div><h2>설계 검수 결과</h2><p>실제로 수행된 현재 Blueprint/Build의 독립 검수 결과만 표시합니다.</p></div></div><div class="cards">'+(currentReviews.map(fidelityReviewCard).join("") || '<div class="empty">아직 현재 Build에 대한 설계 검수 결과가 없습니다.<br>검수 대기 상태는 Build Farm에서 확인합니다.</div>')+'</div>'+
     (supersededReviews.length?'<div class="section-head"><div><h2>Superseded History</h2><p>reset 이전 이력 · 현재 승인/Repair 판단에 사용하지 않음</p></div></div><div class="cards">'+supersededReviews.map(fidelityReviewCard).join("")+'</div>':'');
 }
 
 function buildCard(p){
   const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"Implementation Complete"};
+  const status=String(p.status||"").toLowerCase();
+  const statusLabels={building:"빌드 중",repair:"수리 중",blocked:"작업 중단",fidelity_pending:"Godot 빌드 완료 · 설계 검수 대기"};
   const blockers=Array.isArray(p.blockers)?p.blockers:[];
   const historical=isHistoricalBuild(p);
   const softReset=String(p.build_summary||"").startsWith("SOFT_RESET:");
-  const kicker=historical?"HISTORICAL BUILD · DO NOT REUSE":"GODOT BUILD JOB";
-  const badge=softReset?"SUPERSEDED":p.status;
-  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+(historical?'amber':'blue')+'">'+esc(badge)+'</span></div>'+
+  const kicker=historical?"HISTORICAL BUILD · DO NOT REUSE":status==="fidelity_pending"?"GODOT BUILD":"GODOT BUILD JOB";
+  const badge=softReset?"SUPERSEDED":(statusLabels[status]||p.status);
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+(historical?'amber':status==="fidelity_pending"?'green':'blue')+'">'+esc(badge)+'</span></div>'+
   '<div class="meta"><span>'+esc(p.build_version||"-")+'</span><span>'+esc(labels[p.current_stage]||p.current_stage||"-")+'</span><span>Godot 4.x</span></div>'+
-  '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>Contract implementation</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
-  (softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>Current Work</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
+  '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>설계 요구사항 구현</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
+  (status==="fidelity_pending"?'<div class="human-gate" style="margin-top:12px"><b>Godot 빌드 완료</b><br>Build Farm 시공이 끝났습니다. 독립 설계 검수를 기다리고 있습니다.</div>':softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>현재 작업</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
   '<div class="meta"><span>'+esc(p.project_path||"-")+'</span>'+(!historical&&p.last_commit?'<span>'+esc(String(p.last_commit).slice(0,8))+'</span>':'')+'</div>'+
   (blockers.length&&!historical?'<div class="human-gate"><b>Blocker</b><br>'+blockers.map(x=>esc(typeof x==="string"?x:JSON.stringify(x))).join("<br>")+'</div>':'')+'</div>';
 }
 function buildPage(){
-  const activeBuilds=buildJobs.filter(b=>!isHistoricalBuild(b) && ["building","repair","blocked"].includes(String(b.status||"").toLowerCase()));
-  return genericHeader("Build Farm","Implementation Contract의 모든 requirement를 실제 Godot playable로 구현합니다. Builder는 스스로 VERIFIED 판정을 내리지 않습니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
-  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → Contract Intake</span><span>Implementation Complete → Static Fidelity Gate</span></div></div>'+
-  '<div class="cards">'+(activeBuilds.map(buildCard).join("") || '<div class="empty">현재 Build Farm에서 작업 중인 게임이 없습니다.<br>새 Blueprint가 승인되면 Build Farm이 가져옵니다.</div>')+'</div>';
+  const buildOutputs=buildJobs.filter(b=>!isHistoricalBuild(b) && ["building","repair","blocked","fidelity_pending"].includes(String(b.status||"").toLowerCase()));
+  return genericHeader("Build Farm","승인된 Implementation Blueprint를 실제 Godot playable로 만들고, 완성된 Build를 설계 검수 전까지 보관합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active build limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Blueprint → Godot Build</span><span>완료 → 설계 검수 대기</span><span>검수 FAIL → Repair</span></div></div>'+
+  '<div class="section-head"><div><h2>Godot Build</h2><p>현재 제작·수리 중인 Build와 설계 검수를 기다리는 완성 Build입니다.</p></div></div>'+
+  '<div class="cards">'+(buildOutputs.map(buildCard).join("") || '<div class="empty">현재 Build Farm에 Godot Build가 없습니다.<br>새 Blueprint가 승인되면 이곳에서 제작됩니다.</div>')+'</div>';
 }
 
 function reviewCard(p,compact=false){
