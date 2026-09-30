@@ -1915,17 +1915,42 @@ function showWireframePack(id,screenIndex=0,section="screens",variantIndex=0){
 }
 
 
+function implementationHumanState(p){
+  const status=String(p?.status||"").toLowerCase();
+  const blueprint=String(p?.blueprint_status||"").toLowerCase();
+  if(status==="blocked" || blueprint==="blocked") return {label:"진행에 문제 있음",tone:"red",next:"구현 설계실에서 문제 해결"};
+  if(status==="repair") return {label:"검수에서 문제 발견 · 수리 중",tone:"amber",next:"빌드 팜"};
+  if(status==="playtest_ready" || status==="qa_ready") return {label:"플레이테스트 가능",tone:"green",next:"플레이테스트실"};
+  if(status==="fidelity_pending") return {label:"Godot 구현 완료 · 설계 검수 기다리는 중",tone:"blue",next:"설계 검수실"};
+  if(blueprint==="pending_review") return {label:"설계도 작성 완료 · 검수 기다리는 중",tone:"amber",next:"설계 검수실"};
+  if(blueprint==="approved" && status==="ready") return {label:"구현 설계 완료 · 빌드 가능",tone:"green",next:"빌드 팜"};
+  if(status==="draft" || blueprint==="missing" || !blueprint) return {label:"구현 설계 작성 중",tone:"blue",next:"구현 설계 완료 대기"};
+  if(status==="ready") return {label:"구현 설계 완료 · 다음 단계 준비",tone:"green",next:"빌드 팜"};
+  return {label:"상태 확인 중",tone:"blue",next:"자동 파이프라인"};
+}
+function implementationGameBrief(p){
+  const sourceDesign=gameDesigns.find(x=>x.id===p.design_id) || gameDesigns.find(x=>x.idea_id===p.idea_id) || null;
+  const sourceIdea=promotedIdeas.find(x=>x.id===p.idea_id) || null;
+  return p.one_line || sourceDesign?.one_line || sourceIdea?.one_line || "원본 게임 설명을 불러오는 중입니다.";
+}
 function implementationContractCard(p){
   const counts=p.category_counts||{};
   const cats=Object.entries(counts).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
-  return '<div class="game-card"><div class="card-top"><div><div class="kicker">IMPLEMENTATION CONTRACT</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge blue">'+esc(p.status)+'</span></div>'+
+  const human=implementationHumanState(p);
+  const brief=implementationGameBrief(p);
+  const raw=[p.status?("system: "+p.status):"",p.blueprint_status?("blueprint: "+p.blueprint_status):""].filter(Boolean).join(" · ");
+  return '<div class="game-card">'+
+    '<div class="card-top"><div><div class="kicker">IMPLEMENTATION CONTRACT</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+human.tone+'">'+esc(human.label)+'</span></div>'+
+    '<div class="card-desc" style="margin-top:8px">'+esc(brief)+'</div>'+
+    '<div class="human-gate" style="margin-top:12px"><b>'+esc(human.label)+'</b><br><span style="color:#a9bdd4">다음 단계 → '+esc(human.next)+'</span></div>'+
     '<div class="meta"><span>'+esc(p.version||"v0.1")+'</span><span>'+Number(p.requirement_count||0)+' requirements</span></div>'+
-    '<div class="detail-box" style="margin-top:12px"><h3>Atomic Checklist</h3><p>'+cats.map(([k,v])=>esc(k)+' '+Number(v)).join(' · ')+'</p></div>'+
-    '<div class="card-desc">Builder는 각 requirement에 IMPLEMENTED 증거만 남깁니다. VERIFIED 판정은 설계 검수실만 할 수 있습니다.</div></div>';
+    (cats.length?'<div class="detail-box" style="margin-top:12px"><h3>설계 요구사항</h3><p>'+cats.map(([k,v])=>esc(k)+' '+Number(v)).join(' · ')+'</p></div>':'')+
+    (raw?'<div style="margin-top:12px;font-size:10px;color:#5f7794">'+esc(raw)+'</div>':'')+
+  '</div>';
 }
 function implementationPage(){
   return genericHeader("Implementation Contract","Wireframe Pack의 component / interaction / state / transition / rule을 1:1 시공 체크리스트로 컴파일합니다.",'<button class="btn" onclick="loadImplementationContracts(true)">↻ 새로고침</button>')+
-    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Implementation Contract Hourly</strong><span>translation only</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 35분</b></span><span>Wireframe → Atomic Requirements</span><span>기획 변경 금지</span></div></div>'+
+    '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Implementation Contract Hourly</strong><span>translation only</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 35분</b></span><span>Wireframe → Atomic Requirements</span><span>기획 변경 금지</span></div><div style="margin-top:12px;font-size:11px;color:#7f95af">Builder는 구현 증거를 남기고, 최종 VERIFIED 판정은 설계 검수실에서 합니다.</div></div>'+
     '<div class="cards">'+(implementationContracts.map(implementationContractCard).join("") || '<div class="empty">아직 Implementation Contract가 없습니다.<br>35분 예약 작업이 Wireframe Pack을 시공 계약으로 변환합니다.</div>')+'</div>';
 }
 
