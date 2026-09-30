@@ -116,6 +116,25 @@
 .idea-detail-score > div { background:rgba(0,0,0,.12); border-radius:10px; padding:9px; }
 .idea-detail-score b { display:block; font-size:14px; }
 .idea-detail-score span { font-size:9px; color:#6e86a3; }
+.idea-auto-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 16px;margin:0 0 12px;border-radius:15px;background:linear-gradient(135deg,#10233d,#0b182a);border:1px solid rgba(116,167,255,.16)}
+.idea-auto-copy{display:flex;align-items:center;gap:11px;min-width:0}
+.idea-auto-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(116,167,255,.10);color:#9fc3ff;font-size:16px;flex:0 0 auto}
+.idea-auto-copy strong{display:block;font-size:12px;color:#e8f1fc}
+.idea-auto-copy span{display:block;margin-top:3px;font-size:9px;color:#6f88a6}
+.idea-queue-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto;gap:8px;align-items:center;margin-bottom:10px}
+.idea-search{width:100%;height:38px;padding:0 12px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:#091625;color:#e7f0fb;outline:none;font-size:11px}
+.idea-search:focus{border-color:rgba(116,167,255,.35);box-shadow:0 0 0 3px rgba(116,167,255,.06)}
+.idea-filter-select{height:38px;min-width:130px;padding:0 10px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:#091625;color:#b9c9dc;font-size:10px;outline:none}
+.idea-queue-tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.idea-queue-tab{border:1px solid rgba(255,255,255,.06);background:#0a1727;color:#7189a5;padding:7px 10px;border-radius:999px;font-size:10px;font-weight:700}
+.idea-queue-tab.active{background:#173050;color:#eef6ff;border-color:rgba(116,167,255,.18)}
+.idea-queue-count{margin-left:auto;color:#667f9c;font-size:9px}
+.idea-queue-badge{display:inline-flex;align-items:center;padding:4px 7px;border-radius:999px;border:1px solid rgba(243,200,106,.22);background:rgba(243,200,106,.07);color:#f3c86a;font-size:9px;font-weight:700}
+.idea-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.045)}
+.idea-card-footer .idea-card-hint{margin:0}
+.idea-priority-action{font-size:9px!important;padding:6px 8px!important;white-space:nowrap}
+@media(max-width:800px){.idea-auto-banner{align-items:flex-start;flex-direction:column}.idea-queue-toolbar{grid-template-columns:1fr 1fr}.idea-queue-toolbar .idea-search{grid-column:1/-1}.idea-filter-select{min-width:0;width:100%}}
+
 .design-cards { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); align-items:stretch; gap:10px; }
 .design-card { min-height:210px; padding:14px; display:flex; flex-direction:column; }
 .design-card .card-desc { min-height:0; margin:9px 0 10px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
@@ -404,6 +423,10 @@ let pipelinePollTimer = null;
 let promotedIdeas = [];
 let ideaPairwiseVotes = [];
 let ideaLabMode = localStorage.getItem("danbiIdeaLabMode") || "all";
+let ideaQueueFilter = localStorage.getItem("danbiIdeaQueueFilter") || "all";
+let ideaGenreFilter = localStorage.getItem("danbiIdeaGenreFilter") || "all";
+let ideaSortMode = localStorage.getItem("danbiIdeaSortMode") || "queue";
+let ideaSearchQuery = "";
 let gameDesigns = [];
 let wireframePacks = [];
 let implementationContracts = [];
@@ -953,21 +976,20 @@ function ideaCard(p){
   const promotedAt=p.source_run_at||p.created_at;
   const when=promotedAt ? new Date(promotedAt).toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}) : "-";
   const priority=!!p.human_priority;
-  const bucket=ideaBucketLabel(p.curation_bucket);
   return `<div class="game-card idea-card ${priority?"priority":""}" id="idea-${esc(p.id)}" onclick="showIdeaDetail('${p.id}')">
     <div class="card-top">
       <div>
-        <div class="kicker">${priority?"★ 우선 · ":""}입고 ${esc(when)}</div>
+        <div class="kicker">입고 ${esc(when)}</div>
         <div class="card-title">${esc(p.title)}</div>
       </div>
-      <div class="idea-card-top-actions">
-        ${bucket?`<span class="idea-bucket ${esc(p.curation_bucket)}">${bucket}</span>`:""}
-        <button class="idea-star ${priority?"on":""}" title="${priority?"우선 설계 해제":"Game Design 우선 설계"}" onclick="event.stopPropagation();setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★":"☆"}</button>
-      </div>
+      ${priority?'<span class="idea-queue-badge">★ 우선 대기</span>':""}
     </div>
     <div class="card-desc">${esc(p.one_line)}</div>
     <div class="meta"><span>${esc(p.genre)}</span><span>${esc(p.platform)}</span></div>
-    <div class="idea-card-hint">클릭해서 플레이 방식 · 심사 근거 보기</div>
+    <div class="idea-card-footer">
+      <div class="idea-card-hint">클릭해서 플레이 방식 · 심사 근거 보기</div>
+      <button class="btn ${priority?"good":"ghost"} idea-priority-action" onclick="event.stopPropagation();setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"우선 해제":"+ 우선 대기열"}</button>
+    </div>
   </div>`;
 }
 
@@ -994,33 +1016,133 @@ function showIdeaDetail(id){
     ${p.next_test?`<div class="human-gate" style="margin-top:12px"><b>다음 검증 포인트</b><br>${esc(p.next_test)}</div>`:""}
     <div class="card-actions" style="justify-content:flex-end">
       <button class="btn" onclick="closeModal()">닫기</button>
-      <button class="btn ${priority?"good":"primary"}" onclick="setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★ 우선순위 해제":"☆ Game Design 우선"}</button>
+      <button class="btn ${priority?"good":"primary"}" onclick="setIdeaPriority('${p.id}',${priority?"false":"true"})">${priority?"★ 우선 대기열 해제":"+ 우선 대기열로 올리기"}</button>
     </div>
   `);
 }
 
+function ideaRunUnavailable(){
+  modal(`
+    <div class="modal-head">
+      <div><div class="kicker">IDEA LAB AUTOMATION</div><h2>지금 생성하기</h2></div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+    <div class="detail-box">
+      <h3>아직 사이트 직접 실행은 연결 전이에요.</h3>
+      <p>현재 아이디어 생성은 ChatGPT 예약 작업에서 실행합니다. 나중에 API/실행 연결을 붙이면 이 버튼에서 같은 작업을 바로 시작할 수 있게 할 예정입니다.</p>
+    </div>
+    <div class="card-actions" style="justify-content:flex-end"><button class="btn primary" onclick="closeModal()">확인</button></div>
+  `);
+}
+
+function setIdeaQueueFilter(value){
+  ideaQueueFilter=["all","priority","regular"].includes(value)?value:"all";
+  localStorage.setItem("danbiIdeaQueueFilter",ideaQueueFilter);
+  render();
+}
+
+function setIdeaGenreFilter(value){
+  ideaGenreFilter=value||"all";
+  localStorage.setItem("danbiIdeaGenreFilter",ideaGenreFilter);
+  render();
+}
+
+function setIdeaSortMode(value){
+  ideaSortMode=["queue","latest","oldest","title"].includes(value)?value:"queue";
+  localStorage.setItem("danbiIdeaSortMode",ideaSortMode);
+  render();
+}
+
+function ideaPendingPool(ps){
+  return [...ps].filter(p=>!p.status || p.status==="idea_lab");
+}
+
+function ideaSearchText(p){
+  const reasons=Array.isArray(p.why_promoted)?p.why_promoted:[];
+  return [p.title,p.one_line,p.core_action,p.genre,p.platform,p.next_test,...reasons].filter(Boolean).join(" ").toLocaleLowerCase("ko-KR");
+}
+
+function filteredIdeaQueue(ps){
+  let out=ideaPendingPool(ps);
+  if(ideaQueueFilter==="priority") out=out.filter(p=>!!p.human_priority);
+  if(ideaQueueFilter==="regular") out=out.filter(p=>!p.human_priority);
+  if(ideaGenreFilter!=="all") out=out.filter(p=>(p.genre||"")===ideaGenreFilter);
+  const tokens=(ideaSearchQuery||"").trim().toLocaleLowerCase("ko-KR").split(/\s+/).filter(Boolean);
+  if(tokens.length) out=out.filter(p=>{
+    const hay=ideaSearchText(p);
+    return tokens.every(t=>hay.includes(t));
+  });
+  out.sort((a,b)=>{
+    if(ideaSortMode==="latest") return new Date(b.created_at||0)-new Date(a.created_at||0);
+    if(ideaSortMode==="oldest") return new Date(a.created_at||0)-new Date(b.created_at||0);
+    if(ideaSortMode==="title") return String(a.title||"").localeCompare(String(b.title||""),"ko");
+    const pa=a.human_priority?1:0, pb=b.human_priority?1:0;
+    if(pa!==pb) return pb-pa;
+    if(pa&&pb){
+      const aa=new Date(a.human_priority_at||a.created_at||0), bb=new Date(b.human_priority_at||b.created_at||0);
+      return aa-bb;
+    }
+    return new Date(a.created_at||0)-new Date(b.created_at||0);
+  });
+  return out;
+}
+
+function ideaQueueGrid(ps){
+  return `<div class="cards idea-cards">${ps.map(ideaCard).join("") || '<div class="empty">조건에 맞는 대기 아이디어가 없습니다. 검색어나 필터를 바꿔보세요.</div>'}</div>`;
+}
+
+function updateIdeaQueueSearch(value){
+  ideaSearchQuery=value||"";
+  const visible=filteredIdeaQueue(promotedIdeas);
+  const grid=document.getElementById("ideaQueueResults");
+  const count=document.getElementById("ideaQueueCount");
+  if(grid) grid.innerHTML=ideaQueueGrid(visible);
+  if(count) count.textContent=`${visible.length}개 표시`;
+}
+
 function ideaModeHeader(ps){
-  const priorityCount=ps.filter(x=>x.human_priority).length;
+  const pending=ideaPendingPool(ps);
+  const priorityCount=pending.filter(x=>x.human_priority).length;
   return genericHeader(
     "Idea Lab",
-    ideaLabMode==="all" ? `후보 ${ps.length}개 · 전체 보관함` : `후보 ${ps.length}개 · 빠르게 줄이고 서로 비교하기`,
-    `<div style="display:flex;gap:8px;align-items:center">
-      <div class="idea-mode-switch">
-        <button class="${ideaLabMode==="all"?"active":""}" onclick="setIdeaLabMode('all')">전체 보기</button>
-        <button class="${ideaLabMode==="curate"?"active":""}" onclick="setIdeaLabMode('curate')">대표 선별</button>
+    `현재 작업 대기 후보 ${pending.length}개 · Game Design으로 넘어가면 이 목록에서 빠집니다.`,
+    `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
+  ) + `
+    <div class="idea-auto-banner">
+      <div class="idea-auto-copy">
+        <div class="idea-auto-icon">✦</div>
+        <div><strong>아이디어 후보 생성 · 1시간 주기</strong><span>자동 생성 작업은 ChatGPT 예약 작업에서 관리됩니다. 우선 대기 ${priorityCount}개.</span></div>
       </div>
-      <button class="btn" onclick="Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false)]).then(()=>toast('Idea Lab 새로고침'))">↻</button>
-    </div>`
-  ) + `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-2px 0 12px;color:#7087a3;font-size:10px"><span>★ Game Design 우선 ${priorityCount}개</span><span>선별 결과는 클라우드에 저장됩니다.</span></div>`;
+      <button class="btn primary" onclick="ideaRunUnavailable()">지금 생성하기</button>
+    </div>`;
 }
 
 function ideasAllView(ps){
-  const sorted=[...ps].sort((a,b)=>{
-    const pa=a.human_priority?1:0,pb=b.human_priority?1:0;
-    if(pa!==pb) return pb-pa;
-    return new Date(b.created_at||0)-new Date(a.created_at||0);
-  });
-  return `<div class="cards idea-cards">${sorted.map(ideaCard).join("") || '<div class="empty">아직 Idea Lab 후보가 없습니다.</div>'}</div>`;
+  const pending=ideaPendingPool(ps);
+  const genres=[...new Set(pending.map(p=>p.genre).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"ko"));
+  if(ideaGenreFilter!=="all" && !genres.includes(ideaGenreFilter)) ideaGenreFilter="all";
+  const visible=filteredIdeaQueue(pending);
+  return `
+    <div class="idea-queue-toolbar">
+      <input class="idea-search" type="search" value="${esc(ideaSearchQuery)}" placeholder="아이디어 검색 · 괴물, 추리, 전략, 퍼즐, 조작 방식..." oninput="updateIdeaQueueSearch(this.value)">
+      <select class="idea-filter-select" onchange="setIdeaGenreFilter(this.value)">
+        <option value="all">모든 장르</option>
+        ${genres.map(g=>`<option value="${esc(g)}" ${ideaGenreFilter===g?"selected":""}>${esc(g)}</option>`).join("")}
+      </select>
+      <select class="idea-filter-select" onchange="setIdeaSortMode(this.value)">
+        <option value="queue" ${ideaSortMode==="queue"?"selected":""}>실제 처리 순서</option>
+        <option value="latest" ${ideaSortMode==="latest"?"selected":""}>최신 입고순</option>
+        <option value="oldest" ${ideaSortMode==="oldest"?"selected":""}>오래된 입고순</option>
+        <option value="title" ${ideaSortMode==="title"?"selected":""}>이름순</option>
+      </select>
+    </div>
+    <div class="idea-queue-tabs">
+      <button class="idea-queue-tab ${ideaQueueFilter==="all"?"active":""}" onclick="setIdeaQueueFilter('all')">전체 대기</button>
+      <button class="idea-queue-tab ${ideaQueueFilter==="priority"?"active":""}" onclick="setIdeaQueueFilter('priority')">★ 우선 대기열</button>
+      <button class="idea-queue-tab ${ideaQueueFilter==="regular"?"active":""}" onclick="setIdeaQueueFilter('regular')">일반 대기</button>
+      <span class="idea-queue-count" id="ideaQueueCount">${visible.length}개 표시</span>
+    </div>
+    <div id="ideaQueueResults">${ideaQueueGrid(visible)}</div>`;
 }
 
 function ideasCurationView(ps){
@@ -1090,8 +1212,8 @@ function ideasCurationView(ps){
 }
 
 function ideasPage(){
-  const ps=[...promotedIdeas];
-  return ideaModeHeader(ps) + (ideaLabMode==="curate" ? ideasCurationView(ps) : ideasAllView(ps));
+  const ps=ideaPendingPool(promotedIdeas);
+  return ideaModeHeader(ps) + ideasAllView(ps);
 }
 
 function designCard(p){
