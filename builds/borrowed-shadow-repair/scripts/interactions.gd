@@ -115,9 +115,14 @@ func on_shadow_workbench_01_item() -> void:
 func on_shadow_workbench_02_item() -> void:
     var game=root_game()
     if game: game.rotate_piece(15.0)
-func on_shadow_workbench_03_n_15() -> void:
+func rotate_left_pressed() -> void:
     var game=root_game()
-    if game: game.rotate_piece(-15.0 if get_viewport().gui_get_focus_owner() and get_viewport().gui_get_focus_owner().name == "rotate_left" else 15.0)
+    if game: game.rotate_piece(-15.0)
+func rotate_right_pressed() -> void:
+    var game=root_game()
+    if game: game.rotate_piece(15.0)
+func on_shadow_workbench_03_n_15() -> void:
+    rotate_right_pressed()
 func on_shadow_workbench_04_snap() -> void:
     var game=root_game()
     if game:
