@@ -57,7 +57,7 @@ def _component_types(names, godot_type, default_pattern='absolute_control_v1', e
 
 
 _component_types('button', 'Button', 'button_tap_v1', ('explicit_script_v1',))
-_component_types('hold_button hold_control toggle', 'Button', 'explicit_script_v1', ('button_tap_v1',))
+_component_types('hold_button hold_control toggle', 'Button', 'explicit_script_v1', ('button_tap_v1', 'adapter_host_v1'))
 _component_types(
     'label status counter metric grade headline large_number stat timer rating '
     'result_stamp legend text report cue',
@@ -78,7 +78,7 @@ _component_types(
     'canvas card_list cards chip chip_group chips cue_strip list list_buttons grid grid_buttons timeline '
     'metric_grid tags tray part_tray tool_tray horizontal_strip stack resource route_cards '
     'goal_overlays reach_overlay world',
-    'Control', 'absolute_control_v1', ('explicit_script_v1',)
+    'Control', 'absolute_control_v1', ('explicit_script_v1', 'adapter_host_v1')
 )
 _component_types(
     'arc_control crank cuttable drag_handle drag_tool draggable draggable_entities '
@@ -199,13 +199,13 @@ def compile_interaction_adapters(interaction):
     for key in ('axis','cancel','min_distance_px','max_duration_ms','hold_ms','movement_tolerance_px','tolerance_px','min_coverage','min_value','max_value'):
         if key in sem:
             params[key] = sem[key]
-    plan = [{'adapter_id': adapter_id, 'script_path': INTERACTION_ADAPTERS[adapter_id]['script_path'], 'params': params}]
+    plan = [{'adapter_id': adapter_id, 'script_path': INTERACTION_ADAPTERS[adapter_id]['script_path'], 'target_component_id': sem.get('target_component_id'), 'params': params}]
     completion = sem.get('completion')
     if isinstance(completion, dict) and str(completion.get('kind') or '').lower() == 'snap':
         snap_params = {k: completion[k] for k in ('tolerance_px','rotation_tolerance_deg') if k in completion}
         if 'tolerance_px' not in snap_params:
             return {'adapter_bindings': [], 'fallback_reason': 'snap_requires_tolerance_px'}
-        plan.append({'adapter_id': 'snap_v1', 'script_path': INTERACTION_ADAPTERS['snap_v1']['script_path'], 'params': snap_params})
+        plan.append({'adapter_id': 'snap_v1', 'script_path': INTERACTION_ADAPTERS['snap_v1']['script_path'], 'target_component_id': sem.get('target_component_id'), 'snap_target_component_id': completion.get('target_component_id'), 'params': snap_params})
     return {'adapter_bindings': plan, 'fallback_reason': None}
 
 
@@ -533,6 +533,13 @@ def validate(b, project=None, claims=None, commit=None):
         adapters = v.get('adapter_bindings', [])
         fallback_reason = v.get('fallback_reason')
         if sem:
+            if sem.get('target_component_id') and sem.get('target_component_id') != primary_component.get('component_id'):
+                error('SEMANTIC_TARGET', primary_path, 'interaction_semantics.target_component_id must match the bound primary component')
+            completion = sem.get('completion')
+            if isinstance(completion, dict) and completion.get('target_component_id'):
+                related_ids = {nodes.get(p,{}).get('component_id') for p in target_paths}
+                if completion.get('target_component_id') not in related_ids:
+                    error('SEMANTIC_TARGET', primary_path, 'completion target_component_id must resolve through target_node/related_nodes')
             plan = compile_interaction_adapters(src)
             expected_adapters = plan.get('adapter_bindings', [])
             if plan.get('fallback_reason'):
@@ -550,6 +557,9 @@ def validate(b, project=None, claims=None, commit=None):
                         continue
                     if a.get('script_path') != spec['script_path']:
                         error('ADAPTER_PATH', primary_path, 'Adapter script path differs from canonical runtime path')
+                    for target_key in ('target_component_id','snap_target_component_id'):
+                        if expected.get(target_key) != a.get(target_key):
+                            error('ADAPTER_TARGET', primary_path, 'Adapter '+target_key+' differs from Wireframe semantics')
                     params = a.get('params') if isinstance(a.get('params'), dict) else {}
                     for key in spec.get('required_params', []):
                         if key not in params:
