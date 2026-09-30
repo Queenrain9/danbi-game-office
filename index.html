@@ -121,6 +121,13 @@
 .idea-auto-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(116,167,255,.10);color:#9fc3ff;font-size:16px;flex:0 0 auto}
 .idea-auto-copy strong{display:block;font-size:12px;color:#e8f1fc}
 .idea-auto-copy span{display:block;margin-top:3px;font-size:9px;color:#6f88a6}
+.idea-queue-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:8px 10px;border:1px solid rgba(255,255,255,.055);background:#0a1727;border-radius:11px}
+.idea-queue-status-left{display:flex;align-items:center;gap:7px;min-width:0;color:#7f96b1;font-size:10px}
+.idea-queue-status-left strong{color:#dce8f6;font-size:10px;font-weight:750}
+.idea-queue-status-actions{display:flex;gap:6px;align-items:center;flex:0 0 auto}
+.idea-queue-status .btn{padding:7px 9px;font-size:9px}
+@media(max-width:620px){.idea-queue-status{align-items:flex-start}.idea-queue-status-left{flex-wrap:wrap}}
+
 .idea-queue-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto;gap:8px;align-items:center;margin-bottom:10px}
 .idea-search{width:100%;height:38px;padding:0 12px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:#091625;color:#e7f0fb;outline:none;font-size:11px}
 .idea-search:focus{border-color:rgba(116,167,255,.35);box-shadow:0 0 0 3px rgba(116,167,255,.06)}
@@ -798,7 +805,7 @@ function titleInfo(){
   const map={
     dashboard:["대표 대시보드","확정된 실제 제작 데이터만 표시합니다."],
     planning:["기획본부 대시보드","Idea Lab → Game Design → Pre-production의 실제 현재 상태를 한눈에 봅니다."],
-    ideas:["아이디어 연구소","GPT 내부 생성·비평·프로듀서 심사를 통과한 후보만 도착합니다."],
+    ideas:["아이디어 연구소",""],
     design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
     wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
     implementation:["구현 설계실","Wireframe Pack을 1:1 원자 단위 Implementation Contract로 변환합니다."],
@@ -1103,18 +1110,18 @@ function updateIdeaQueueSearch(value){
 function ideaModeHeader(ps){
   const pending=ideaPendingPool(ps);
   const priorityCount=pending.filter(x=>x.human_priority).length;
-  return genericHeader(
-    "Idea Lab",
-    `현재 작업 대기 후보 ${pending.length}개 · Game Design으로 넘어가면 이 목록에서 빠집니다.`,
-    `<button class="btn" onclick="loadPromotedIdeas(true)">↻ 새로고침</button>`
-  ) + `
-    <div class="idea-auto-banner">
-      <div class="idea-auto-copy">
-        <div class="idea-auto-icon">✦</div>
-        <div><strong>아이디어 후보 생성 · 1시간 주기</strong><span>자동 생성 작업은 ChatGPT 예약 작업에서 관리됩니다. 우선 대기 ${priorityCount}개.</span></div>
-      </div>
-      <button class="btn primary" onclick="ideaRunUnavailable()">지금 생성하기</button>
-    </div>`;
+  return `<div class="idea-queue-status">
+    <div class="idea-queue-status-left">
+      <strong>대기 ${pending.length}</strong>
+      <span>·</span>
+      <span>매시간 자동 생성</span>
+      ${priorityCount?`<span>· ★ 우선 ${priorityCount}</span>`:""}
+    </div>
+    <div class="idea-queue-status-actions">
+      <button class="btn ghost" onclick="ideaRunUnavailable()">지금 생성</button>
+      <button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>
+    </div>
+  </div>`;
 }
 
 function ideasAllView(ps){
@@ -1693,7 +1700,7 @@ function settingsPage(){
 function render(){
   if(!["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","directed","visual","archive","activity","settings"].includes(current)) current="dashboard";
   navRender();
-  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; document.getElementById("pageSubtitle").textContent=s;
+  const [t,s]=titleInfo(); document.getElementById("pageTitle").textContent=t; const sub=document.getElementById("pageSubtitle"); sub.textContent=s; sub.style.display=s?"":"none";
   const pages={dashboard,planning:planningDashboard,ideas:ideasPage,design:designPage,wireframe:wirePage,implementation:implementationPage,build:buildPage,fidelity:fidelityPage,review:reviewPage,directed:directedPage,visual:visualPage,archive:archivePage,activity:activityPage,settings:settingsPage};
   document.getElementById("content").innerHTML = pages[current]();
 }
