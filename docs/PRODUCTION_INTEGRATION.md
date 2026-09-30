@@ -4,6 +4,49 @@ The existing Compiler, Build Farm and Static Fidelity Gate scheduled prompts use
 
 The Compiler automation was paused before this integration and remains paused. The Builder and Gate schedules remain enabled. No existing game was reclassified or promoted.
 
+
+## Scheduled pipeline run ledger
+
+Every scheduled production job that reads this document must record its execution independently from artifact creation. This lets the CEO dashboard distinguish "no work this hour" from "the automation did not run".
+
+Canonical job names:
+- `implementation_contract`
+- `build_farm`
+- `fidelity_gate`
+
+At the very start of a scheduled run, before lease acquisition or candidate selection:
+
+```sql
+select public.danbi_start_pipeline_run(
+  '<job_name>',
+  null,
+  jsonb_build_object('source','chat_automation')
+) as run_id;
+```
+
+Keep the returned `run_id` for the entire execution. A crash or interrupted run intentionally leaves a `running` row so the dashboard can detect a stale execution.
+
+Before every normal return, including "no candidate" and lease-unavailable exits, finish the same run:
+
+```sql
+select public.danbi_finish_pipeline_run(
+  '<run_id>',
+  '<success|noop|blocked|failed>',
+  <produced_count>,
+  '<short summary>',
+  <error_summary_or_null>,
+  null
+);
+```
+
+Status meaning:
+- `success`: durable pipeline progress was committed, even if the game remains in the same high-level stage.
+- `noop`: the automation executed normally but had no eligible work, or a lease was unavailable and no state changed.
+- `blocked`: a real semantic/source/permission/storage blocker prevented the selected work from advancing.
+- `failed`: an unexpected execution/tool failure prevented a normal completion.
+- Never create fake output just to make `produced_count > 0`.
+- The run ledger is operational telemetry, not production evidence and not a substitute for existing build/evidence/fidelity records.
+
 ## Canonical reference size
 
 Wireframe geometry is stored as screen percentages, so construction still needs one deterministic pixel canvas for Godot offsets and project settings.
