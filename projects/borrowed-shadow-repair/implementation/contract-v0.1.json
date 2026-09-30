@@ -1,0 +1,1688 @@
+{
+  "id": "bb27ce5f-06f3-49c7-8493-f6092fb4f83c",
+  "title": "Borrowed Shadow Repair",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "29b950ca-2b83-45cc-8a8b-e18d13d84f4b",
+  "version": "v0.1",
+  "design_id": "c81b3420-2ff8-40a9-bf89-9e0a5d051dc6",
+  "created_at": "2026-09-29T15:33:46.829677+00:00",
+  "updated_at": "2026-09-30T15:28:53.835297+00:00",
+  "requirements": [
+    {
+      "id": "ACC:01",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[1]",
+      "requirement": {
+        "criterion": "7개 화면/오버레이가 정의된 분기대로 이동한다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:02",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[2]",
+      "requirement": {
+        "criterion": "조각은 drag되고 충돌 시 마지막 유효 위치로 복귀한다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:03",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[3]",
+      "requirement": {
+        "criterion": "선택 조각은 two-finger 또는 ±15° 버튼으로 회전한다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:04",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[4]",
+      "requirement": {
+        "criterion": "18px/12° 허용치에서만 ghost snap과 실제 snap이 발생한다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:05",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[5]",
+      "requirement": {
+        "criterion": "정렬되지 않은 seam은 trace를 시작할 수 없다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:06",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[6]",
+      "requirement": {
+        "criterion": "trace가 20px corridor를 벗어나면 취소된다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:07",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[7]",
+      "requirement": {
+        "criterion": "필수 seam 완료 전 Pose Test가 비활성이다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:08",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[8]",
+      "requirement": {
+        "criterion": "0.6초 hold 완료 후에만 Test가 실행된다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:09",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[9]",
+      "requirement": {
+        "criterion": "첫 실패만 Rework로 돌아가며 두 번째 Test 후 Result가 확정된다"
+      },
+      "verification": [
+        "Independently verify this observable criterion against actual implementation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:implementation_order",
+      "category": "architecture",
+      "source_ref": "developer_handoff.implementation_order",
+      "requirement": {
+        "implementation_order": [
+          "flow/state machine",
+          "piece drag",
+          "rotation",
+          "snap",
+          "stitch trace",
+          "pose test",
+          "rework",
+          "result"
+        ]
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:persistence",
+      "category": "architecture",
+      "source_ref": "developer_handoff.persistence",
+      "requirement": {
+        "persistence": "completed contract/unlock only"
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:required_data",
+      "category": "architecture",
+      "source_ref": "developer_handoff.required_data",
+      "requirement": {
+        "required_data": [
+          "ContractData",
+          "PieceData",
+          "AnchorGraph",
+          "SeamGraph",
+          "TestPose"
+        ]
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:reusable",
+      "category": "architecture",
+      "source_ref": "developer_handoff.reusable",
+      "requirement": {
+        "reusable": [
+          "ShadowPiece",
+          "AnchorNode",
+          "SeamPath",
+          "HoldButton",
+          "ResultPanel"
+        ]
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:scene_hierarchy",
+      "category": "architecture",
+      "source_ref": "developer_handoff.scene_hierarchy",
+      "requirement": {
+        "scene_hierarchy": [
+          "AppRoot",
+          "ContractController",
+          "WorkbenchScene",
+          "GestureLayer",
+          "HUDLayer",
+          "ModalLayer"
+        ]
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:state_owner",
+      "category": "architecture",
+      "source_ref": "developer_handoff.state_owner",
+      "requirement": {
+        "state_owner": "ContractSessionState"
+      },
+      "verification": [
+        "Implement this handoff contract as functional code/data",
+        "Named units must carry real responsibility rather than be placeholders"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:customer_intake:begin",
+      "category": "component",
+      "source_ref": "screens.customer_intake.components.begin",
+      "requirement": {
+        "box": {
+          "h": 8,
+          "w": 60,
+          "x": 20,
+          "y": 86
+        },
+        "type": "button",
+        "label": "수선 시작",
+        "screen": "customer_intake",
+        "component": "begin",
+        "state_binding": "diagnosed"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:customer_intake:customer",
+      "category": "component",
+      "source_ref": "screens.customer_intake.components.customer",
+      "requirement": {
+        "box": {
+          "h": 44,
+          "w": 64,
+          "x": 18,
+          "y": 8
+        },
+        "type": "object",
+        "label": "손님+어긋난 그림자",
+        "screen": "customer_intake",
+        "component": "customer",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:customer_intake:symptom_targets",
+      "category": "component",
+      "source_ref": "screens.customer_intake.components.symptom_targets",
+      "requirement": {
+        "box": {
+          "h": 14,
+          "w": 76,
+          "x": 12,
+          "y": 63
+        },
+        "type": "hotspots",
+        "label": "증상 포인트",
+        "screen": "customer_intake",
+        "component": "symptom_targets",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_workshop:client_btn",
+      "category": "component",
+      "source_ref": "screens.night_workshop.components.client_btn",
+      "requirement": {
+        "box": {
+          "h": 9,
+          "w": 64,
+          "x": 18,
+          "y": 83
+        },
+        "type": "button",
+        "label": "다음 손님 받기",
+        "screen": "night_workshop",
+        "component": "client_btn",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_workshop:progress",
+      "category": "component",
+      "source_ref": "screens.night_workshop.components.progress",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 20,
+          "x": 70,
+          "y": 7
+        },
+        "type": "status",
+        "label": "의뢰 1/5",
+        "screen": "night_workshop",
+        "component": "progress",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:pose_test:hold_test",
+      "category": "component",
+      "source_ref": "screens.pose_test.components.hold_test",
+      "requirement": {
+        "box": {
+          "h": 9,
+          "w": 64,
+          "x": 18,
+          "y": 81
+        },
+        "type": "hold_button",
+        "label": "0.6초 눌러 테스트",
+        "screen": "pose_test",
+        "component": "hold_test",
+        "state_binding": "enabled"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:pose_test:pose_pair",
+      "category": "component",
+      "source_ref": "screens.pose_test.components.pose_pair",
+      "requirement": {
+        "box": {
+          "h": 53,
+          "w": 70,
+          "x": 15,
+          "y": 12
+        },
+        "type": "animation",
+        "label": "몸 + 그림자",
+        "screen": "pose_test",
+        "component": "pose_pair",
+        "state_binding": "idle|testing|pass|fail"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:result:behavior",
+      "category": "component",
+      "source_ref": "screens.result.components.behavior",
+      "requirement": {
+        "box": {
+          "h": 32,
+          "w": 76,
+          "x": 12,
+          "y": 33
+        },
+        "type": "comparison",
+        "label": "복구 전/후",
+        "screen": "result",
+        "component": "behavior",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:result:continue",
+      "category": "component",
+      "source_ref": "screens.result.components.continue",
+      "requirement": {
+        "box": {
+          "h": 9,
+          "w": 60,
+          "x": 20,
+          "y": 80
+        },
+        "type": "button",
+        "label": "다음 의뢰",
+        "screen": "result",
+        "component": "continue",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:result:grade",
+      "category": "component",
+      "source_ref": "screens.result.components.grade",
+      "requirement": {
+        "box": {
+          "h": 13,
+          "w": 40,
+          "x": 30,
+          "y": 10
+        },
+        "type": "status",
+        "label": "등급",
+        "screen": "result",
+        "component": "grade",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:rework_overlay:error_anchor",
+      "category": "component",
+      "source_ref": "screens.rework_overlay.components.error_anchor",
+      "requirement": {
+        "box": {
+          "h": 20,
+          "w": 60,
+          "x": 20,
+          "y": 30
+        },
+        "type": "preview",
+        "label": "오류 위치 미리보기",
+        "screen": "rework_overlay",
+        "component": "error_anchor",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:rework_overlay:rework_btn",
+      "category": "component",
+      "source_ref": "screens.rework_overlay.components.rework_btn",
+      "requirement": {
+        "box": {
+          "h": 9,
+          "w": 60,
+          "x": 20,
+          "y": 57
+        },
+        "type": "button",
+        "label": "1회 재수선",
+        "screen": "rework_overlay",
+        "component": "rework_btn",
+        "state_binding": "rework_available"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shadow_workbench:piece_tray",
+      "category": "component",
+      "source_ref": "screens.shadow_workbench.components.piece_tray",
+      "requirement": {
+        "box": {
+          "h": 8,
+          "w": 84,
+          "x": 8,
+          "y": 78
+        },
+        "type": "tray",
+        "label": "조각 트레이",
+        "screen": "shadow_workbench",
+        "component": "piece_tray",
+        "state_binding": ""
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shadow_workbench:rotate_left",
+      "category": "component",
+      "source_ref": "screens.shadow_workbench.components.rotate_left",
+      "requirement": {
+        "box": {
+          "h": 7,
+          "w": 18,
+          "x": 8,
+          "y": 90
+        },
+        "type": "button",
+        "label": "-15°",
+        "screen": "shadow_workbench",
+        "component": "rotate_left",
+        "state_binding": "piece_selected"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shadow_workbench:rotate_right",
+      "category": "component",
+      "source_ref": "screens.shadow_workbench.components.rotate_right",
+      "requirement": {
+        "box": {
+          "h": 7,
+          "w": 18,
+          "x": 28,
+          "y": 90
+        },
+        "type": "button",
+        "label": "+15°",
+        "screen": "shadow_workbench",
+        "component": "rotate_right",
+        "state_binding": "piece_selected"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shadow_workbench:silhouette",
+      "category": "component",
+      "source_ref": "screens.shadow_workbench.components.silhouette",
+      "requirement": {
+        "box": {
+          "h": 50,
+          "w": 80,
+          "x": 10,
+          "y": 18
+        },
+        "type": "canvas",
+        "label": "Base Silhouette",
+        "screen": "shadow_workbench",
+        "component": "silhouette",
+        "state_binding": "repair"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shadow_workbench:stitch_btn",
+      "category": "component",
+      "source_ref": "screens.shadow_workbench.components.stitch_btn",
+      "requirement": {
+        "box": {
+          "h": 7,
+          "w": 34,
+          "x": 58,
+          "y": 90
+        },
+        "type": "button",
+        "label": "봉합 모드",
+        "screen": "shadow_workbench",
+        "component": "stitch_btn",
+        "state_binding": "required_snaps_done"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:stitch_mode:seam_canvas",
+      "category": "component",
+      "source_ref": "screens.stitch_mode.components.seam_canvas",
+      "requirement": {
+        "box": {
+          "h": 58,
+          "w": 82,
+          "x": 9,
+          "y": 17
+        },
+        "type": "canvas",
+        "label": "정렬된 그림자",
+        "screen": "stitch_mode",
+        "component": "seam_canvas",
+        "state_binding": "stitch"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:stitch_mode:test_btn",
+      "category": "component",
+      "source_ref": "screens.stitch_mode.components.test_btn",
+      "requirement": {
+        "box": {
+          "h": 8,
+          "w": 60,
+          "x": 20,
+          "y": 87
+        },
+        "type": "button",
+        "label": "Pose Test",
+        "screen": "stitch_mode",
+        "component": "test_btn",
+        "state_binding": "all_required_locked"
+      },
+      "verification": [
+        "Create the exact component with the specified normalized box",
+        "Preserve type, label and state binding",
+        "Do not replace specified geometry with unconstrained auto-layout"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CNT:mvp_scope",
+      "category": "content",
+      "source_ref": "mvp_scope",
+      "requirement": {
+        "mvp_scope": "세로 모바일 5개 의뢰, 조각 drag, 15° 회전, ghost snap, seam trace, Test hold, 1회 Rework, 결과 등급. 규칙 모듈은 기본 anchor·회전 잠금·봉합 순서."
+      },
+      "verification": [
+        "Implement every MVP feature and quantity"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CNT:screen_inventory",
+      "category": "content",
+      "source_ref": "screen_inventory",
+      "requirement": {
+        "screen_inventory": [
+          "Night Workshop — 의뢰 시작",
+          "Customer Intake — 증상/목표",
+          "Shadow Workbench — 배치·회전",
+          "Stitch Mode — 봉합",
+          "Pose Test — 동기화 테스트",
+          "Rework Overlay — 오류 수정",
+          "Result — 등급/행동 변화"
+        ]
+      },
+      "verification": [
+        "Every listed screen must exist and be reachable with its stated purpose"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:loading",
+      "category": "global_state",
+      "source_ref": "global_states.loading",
+      "requirement": {
+        "id": "loading",
+        "rule": "의뢰 데이터 준비 중 입력 차단"
+      },
+      "verification": [
+        "Enforce this rule across all affected screens"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:pause",
+      "category": "global_state",
+      "source_ref": "global_states.pause",
+      "requirement": {
+        "id": "pause",
+        "rule": "조각 위치와 seam 상태 보존"
+      },
+      "verification": [
+        "Enforce this rule across all affected screens"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:rework_used",
+      "category": "global_state",
+      "source_ref": "global_states.rework_used",
+      "requirement": {
+        "id": "rework_used",
+        "rule": "의뢰당 1회만 true 전환"
+      },
+      "verification": [
+        "Enforce this rule across all affected screens"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:01",
+      "category": "input_map",
+      "source_ref": "input_map[1]",
+      "requirement": {
+        "use": "symptom/buttons/15° rotate",
+        "input": "tap",
+        "priority": 2
+      },
+      "verification": [
+        "Implement exact modality/use",
+        "Respect numeric gesture priority and deterministic conflict handling"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:02",
+      "category": "input_map",
+      "source_ref": "input_map[2]",
+      "requirement": {
+        "use": "shadow piece",
+        "input": "single-finger drag",
+        "priority": 4
+      },
+      "verification": [
+        "Implement exact modality/use",
+        "Respect numeric gesture priority and deterministic conflict handling"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:03",
+      "category": "input_map",
+      "source_ref": "input_map[3]",
+      "requirement": {
+        "use": "selected piece rotation",
+        "input": "two-finger twist",
+        "priority": 5
+      },
+      "verification": [
+        "Implement exact modality/use",
+        "Respect numeric gesture priority and deterministic conflict handling"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:04",
+      "category": "input_map",
+      "source_ref": "input_map[4]",
+      "requirement": {
+        "use": "seam path",
+        "input": "trace",
+        "priority": 5
+      },
+      "verification": [
+        "Implement exact modality/use",
+        "Respect numeric gesture priority and deterministic conflict handling"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:05",
+      "category": "input_map",
+      "source_ref": "input_map[5]",
+      "requirement": {
+        "use": "pose test",
+        "input": "hold 0.6s",
+        "priority": 5
+      },
+      "verification": [
+        "Implement exact modality/use",
+        "Respect numeric gesture priority and deterministic conflict handling"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INT:customer_intake:01",
+      "category": "interaction",
+      "source_ref": "screens.customer_intake.interactions[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "수선 목표 고정",
+        "screen": "customer_intake",
+        "target": "symptom target",
+        "feedback": "problem pulse",
+        "precondition": "observing",
+        "state_change": "diagnosed",
+        "invalid_cancel": "비증상 영역은 무반응"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:night_workshop:01",
+      "category": "interaction",
+      "source_ref": "screens.night_workshop.interactions[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "손님 로드",
+        "screen": "night_workshop",
+        "target": "client_btn",
+        "feedback": "fade",
+        "precondition": "ready",
+        "state_change": "Intake",
+        "invalid_cancel": "중복 tap 무시"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:pose_test:01",
+      "category": "interaction",
+      "source_ref": "screens.pose_test.interactions[1]",
+      "requirement": {
+        "input": "hold 0.6s",
+        "action": "테스트 실행",
+        "screen": "pose_test",
+        "target": "hold_test",
+        "feedback": "radial fill then pose animation",
+        "precondition": "required seams complete",
+        "state_change": "active",
+        "invalid_cancel": "release<0.6s resets"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:result:01",
+      "category": "interaction",
+      "source_ref": "screens.result.interactions[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "다음 의뢰",
+        "screen": "result",
+        "target": "continue",
+        "feedback": "success/neutral haptic",
+        "precondition": "result shown",
+        "state_change": "ready",
+        "invalid_cancel": "연타 무시"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:rework_overlay:01",
+      "category": "interaction",
+      "source_ref": "screens.rework_overlay.interactions[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "오류 anchor 강조 상태로 작업대 복귀",
+        "screen": "rework_overlay",
+        "target": "rework_btn",
+        "feedback": "warning haptic",
+        "precondition": "rework_used=false",
+        "state_change": "consumed",
+        "invalid_cancel": "이미 사용했으면 disabled"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shadow_workbench:01",
+      "category": "interaction",
+      "source_ref": "screens.shadow_workbench.interactions[1]",
+      "requirement": {
+        "input": "drag",
+        "action": "조각 이동",
+        "screen": "shadow_workbench",
+        "target": "shadow_piece",
+        "feedback": "ghost follows",
+        "precondition": "piece available",
+        "state_change": "dragging",
+        "invalid_cancel": "충돌 시 원위치 bounce"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shadow_workbench:02",
+      "category": "interaction",
+      "source_ref": "screens.shadow_workbench.interactions[2]",
+      "requirement": {
+        "input": "two-finger twist",
+        "action": "연속 회전",
+        "screen": "shadow_workbench",
+        "target": "selected piece",
+        "feedback": "angle tick",
+        "precondition": "selected",
+        "state_change": "selected",
+        "invalid_cancel": "gesture cancel keeps last valid angle"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shadow_workbench:03",
+      "category": "interaction",
+      "source_ref": "screens.shadow_workbench.interactions[3]",
+      "requirement": {
+        "input": "tap",
+        "action": "15° 회전",
+        "screen": "shadow_workbench",
+        "target": "rotate buttons",
+        "feedback": "tick + light haptic",
+        "precondition": "selected",
+        "state_change": "selected",
+        "invalid_cancel": "미선택 disabled"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shadow_workbench:04",
+      "category": "interaction",
+      "source_ref": "screens.shadow_workbench.interactions[4]",
+      "requirement": {
+        "input": "release",
+        "action": "snap",
+        "screen": "shadow_workbench",
+        "target": "anchor",
+        "feedback": "ghost bright + magnetic click",
+        "precondition": "within 18px/12deg",
+        "state_change": "snapped",
+        "invalid_cancel": "잘못된 anchor는 snap 없음"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:stitch_mode:01",
+      "category": "interaction",
+      "source_ref": "screens.stitch_mode.interactions[1]",
+      "requirement": {
+        "input": "trace",
+        "action": "20px corridor를 따라 봉합",
+        "screen": "stitch_mode",
+        "target": "available seam",
+        "feedback": "seam closes",
+        "precondition": "aligned",
+        "state_change": "tracing",
+        "invalid_cancel": "20px 이탈 시 취소·error"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:stitch_mode:02",
+      "category": "interaction",
+      "source_ref": "screens.stitch_mode.interactions[2]",
+      "requirement": {
+        "input": "release",
+        "action": "seam 잠금",
+        "screen": "stitch_mode",
+        "target": "seam end",
+        "feedback": "medium haptic",
+        "precondition": "trace valid",
+        "state_change": "locked",
+        "invalid_cancel": "불완전 trace reset"
+      },
+      "verification": [
+        "Use the exact gesture and target",
+        "Enforce precondition and state change",
+        "Implement feedback and invalid/cancel behavior without shortcut substitution"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "RUL:failure",
+      "category": "rule",
+      "source_ref": "game_rules.failure",
+      "requirement": {
+        "failure": "진행 차단 대신 낮은 등급과 잔여 이상 행동"
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:grades",
+      "category": "rule",
+      "source_ref": "game_rules.grades",
+      "requirement": {
+        "grades": {
+          "A": 80,
+          "B": 65,
+          "C": 0,
+          "S": 95
+        }
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:pieces",
+      "category": "rule",
+      "source_ref": "game_rules.pieces",
+      "requirement": {
+        "pieces": "초반 2~3, 후반 4~6"
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:rework_limit",
+      "category": "rule",
+      "source_ref": "game_rules.rework_limit",
+      "requirement": {
+        "rework_limit": 1
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:score",
+      "category": "rule",
+      "source_ref": "game_rules.score",
+      "requirement": {
+        "score": {
+          "rework": -10,
+          "stitch": 30,
+          "alignment": 50,
+          "diagnosis": 20
+        }
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:snap",
+      "category": "rule",
+      "source_ref": "game_rules.snap",
+      "requirement": {
+        "snap": {
+          "position_px": 18,
+          "rotation_deg": 12
+        }
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:stitch_trace_deviation_px",
+      "category": "rule",
+      "source_ref": "game_rules.stitch_trace_deviation_px",
+      "requirement": {
+        "stitch_trace_deviation_px": 20
+      },
+      "verification": [
+        "Implement every branch and numeric value exactly",
+        "Derive outcome from actual gameplay state/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:customer_intake:diagnosed",
+      "category": "state",
+      "source_ref": "screens.customer_intake.states.diagnosed",
+      "requirement": {
+        "state": "diagnosed",
+        "screen": "customer_intake",
+        "purpose": "증상을 관찰하고 수선 목표를 고정"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:customer_intake:observing",
+      "category": "state",
+      "source_ref": "screens.customer_intake.states.observing",
+      "requirement": {
+        "state": "observing",
+        "screen": "customer_intake",
+        "purpose": "증상을 관찰하고 수선 목표를 고정"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:night_workshop:ready",
+      "category": "state",
+      "source_ref": "screens.night_workshop.states.ready",
+      "requirement": {
+        "state": "ready",
+        "screen": "night_workshop",
+        "purpose": "의뢰 시작과 현재 진행 확인"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pose_test:active",
+      "category": "state",
+      "source_ref": "screens.pose_test.states.active",
+      "requirement": {
+        "state": "active",
+        "screen": "pose_test",
+        "purpose": "몸과 그림자의 동기화를 0.6초 hold로 검증"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pose_test:fail",
+      "category": "state",
+      "source_ref": "screens.pose_test.states.fail",
+      "requirement": {
+        "state": "fail",
+        "screen": "pose_test",
+        "purpose": "몸과 그림자의 동기화를 0.6초 hold로 검증"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pose_test:holding",
+      "category": "state",
+      "source_ref": "screens.pose_test.states.holding",
+      "requirement": {
+        "state": "holding",
+        "screen": "pose_test",
+        "purpose": "몸과 그림자의 동기화를 0.6초 hold로 검증"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pose_test:idle",
+      "category": "state",
+      "source_ref": "screens.pose_test.states.idle",
+      "requirement": {
+        "state": "idle",
+        "screen": "pose_test",
+        "purpose": "몸과 그림자의 동기화를 0.6초 hold로 검증"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pose_test:pass",
+      "category": "state",
+      "source_ref": "screens.pose_test.states.pass",
+      "requirement": {
+        "state": "pass",
+        "screen": "pose_test",
+        "purpose": "몸과 그림자의 동기화를 0.6초 hold로 검증"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:result:result",
+      "category": "state",
+      "source_ref": "screens.result.states.result",
+      "requirement": {
+        "state": "result",
+        "screen": "result",
+        "purpose": "등급과 손님의 행동 변화 확인"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:rework_overlay:consumed",
+      "category": "state",
+      "source_ref": "screens.rework_overlay.states.consumed",
+      "requirement": {
+        "state": "consumed",
+        "screen": "rework_overlay",
+        "purpose": "첫 실패의 오류 anchor를 알려주고 1회 수정으로 복귀"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:rework_overlay:shown",
+      "category": "state",
+      "source_ref": "screens.rework_overlay.states.shown",
+      "requirement": {
+        "state": "shown",
+        "screen": "rework_overlay",
+        "purpose": "첫 실패의 오류 anchor를 알려주고 1회 수정으로 복귀"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:collision",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.collision",
+      "requirement": {
+        "state": "collision",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:dragging",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.dragging",
+      "requirement": {
+        "state": "dragging",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:idle",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.idle",
+      "requirement": {
+        "state": "idle",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:selected",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.selected",
+      "requirement": {
+        "state": "selected",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:snap_candidate",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.snap_candidate",
+      "requirement": {
+        "state": "snap_candidate",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shadow_workbench:snapped",
+      "category": "state",
+      "source_ref": "screens.shadow_workbench.states.snapped",
+      "requirement": {
+        "state": "snapped",
+        "screen": "shadow_workbench",
+        "purpose": "그림자 조각을 drag/rotate하여 anchor에 정렬"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:stitch_mode:available",
+      "category": "state",
+      "source_ref": "screens.stitch_mode.states.available",
+      "requirement": {
+        "state": "available",
+        "screen": "stitch_mode",
+        "purpose": "정렬된 경계를 손가락으로 따라 봉합"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:stitch_mode:error",
+      "category": "state",
+      "source_ref": "screens.stitch_mode.states.error",
+      "requirement": {
+        "state": "error",
+        "screen": "stitch_mode",
+        "purpose": "정렬된 경계를 손가락으로 따라 봉합"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:stitch_mode:locked",
+      "category": "state",
+      "source_ref": "screens.stitch_mode.states.locked",
+      "requirement": {
+        "state": "locked",
+        "screen": "stitch_mode",
+        "purpose": "정렬된 경계를 손가락으로 따라 봉합"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:stitch_mode:tracing",
+      "category": "state",
+      "source_ref": "screens.stitch_mode.states.tracing",
+      "requirement": {
+        "state": "tracing",
+        "screen": "stitch_mode",
+        "purpose": "정렬된 경계를 손가락으로 따라 봉합"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:stitch_mode:unavailable",
+      "category": "state",
+      "source_ref": "screens.stitch_mode.states.unavailable",
+      "requirement": {
+        "state": "unavailable",
+        "screen": "stitch_mode",
+        "purpose": "정렬된 경계를 손가락으로 따라 봉합"
+      },
+      "verification": [
+        "Represent this state explicitly",
+        "Make entry, allowed input and exit observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:customer_intake:01",
+      "category": "transition",
+      "source_ref": "screens.customer_intake.transitions[1]",
+      "requirement": {
+        "to": "shadow_workbench",
+        "from": "customer_intake",
+        "trigger": "tap begin",
+        "animation": "short fade",
+        "condition": "diagnosed"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:night_workshop:01",
+      "category": "transition",
+      "source_ref": "screens.night_workshop.transitions[1]",
+      "requirement": {
+        "to": "customer_intake",
+        "from": "ready",
+        "trigger": "tap client_btn",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:pose_test:01",
+      "category": "transition",
+      "source_ref": "screens.pose_test.transitions[1]",
+      "requirement": {
+        "to": "result",
+        "from": "pose_test",
+        "trigger": "test pass",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:pose_test:02",
+      "category": "transition",
+      "source_ref": "screens.pose_test.transitions[2]",
+      "requirement": {
+        "to": "rework_overlay",
+        "from": "pose_test",
+        "trigger": "first test fail",
+        "animation": "short fade",
+        "condition": "rework_used=false"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:pose_test:03",
+      "category": "transition",
+      "source_ref": "screens.pose_test.transitions[3]",
+      "requirement": {
+        "to": "result",
+        "from": "pose_test",
+        "trigger": "second test complete",
+        "animation": "short fade",
+        "condition": "rework_used=true"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:result:01",
+      "category": "transition",
+      "source_ref": "screens.result.transitions[1]",
+      "requirement": {
+        "to": "night_workshop",
+        "from": "result",
+        "trigger": "tap continue",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:rework_overlay:01",
+      "category": "transition",
+      "source_ref": "screens.rework_overlay.transitions[1]",
+      "requirement": {
+        "to": "shadow_workbench",
+        "from": "rework_overlay",
+        "trigger": "tap rework_btn",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:shadow_workbench:01",
+      "category": "transition",
+      "source_ref": "screens.shadow_workbench.transitions[1]",
+      "requirement": {
+        "to": "stitch_mode",
+        "from": "shadow_workbench",
+        "trigger": "tap stitch_btn",
+        "animation": "short fade",
+        "condition": "required snaps complete"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:stitch_mode:01",
+      "category": "transition",
+      "source_ref": "screens.stitch_mode.transitions[1]",
+      "requirement": {
+        "to": "pose_test",
+        "from": "stitch_mode",
+        "trigger": "tap test_btn",
+        "animation": "short fade",
+        "condition": "all required seams locked"
+      },
+      "verification": [
+        "Preserve from/to/trigger/condition exactly",
+        "Blocked conditions must not transition",
+        "Implement specified animation"
+      ],
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": "2026-09-29T15:33:46.829677+00:00",
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "category_counts": {
+    "rule": 7,
+    "state": 22,
+    "content": 2,
+    "component": 19,
+    "input_map": 5,
+    "acceptance": 9,
+    "transition": 9,
+    "interaction": 11,
+    "architecture": 6,
+    "global_state": 3
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T04:49:53.97739+00:00",
+    "artifact_blob": "53674ec78ce991edd8371cb3afb5e2fb2139dddb",
+    "evidence_path": "production/contracts/bb27ce5f-06f3-49c7-8493-f6092fb4f83c/blueprint-review-162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b.json",
+    "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+    "source_checked": "true",
+    "artifact_commit": "fd989d593006c0a5a30fdb6ea6a3322c2db62aa3",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Implementation Contract v0.1 — Borrowed Shadow Repair\n\nRecompiled from current Game Design + Interaction Wireframe Pack after SOFT_RESET. Stable requirement IDs preserved from reset ID map. Runtime-dependent verification remains manual_playtest.",
+  "requirement_count": 93,
+  "wireframe_pack_id": "5cf372d5-5252-4f53-ab1f-2bf273202168"
+}

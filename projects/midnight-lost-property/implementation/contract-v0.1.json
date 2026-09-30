@@ -1,0 +1,1803 @@
+{
+  "id": "f556078a-f98d-4509-b08a-26509a651d78",
+  "title": "Midnight Lost Property",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "84d59494-178a-40af-9b76-d6af8592895c",
+  "version": "v0.1",
+  "design_id": "cd44b43d-0022-45e5-9cad-7028ab8da75a",
+  "created_at": "2026-09-29T15:34:24.973197+00:00",
+  "updated_at": "2026-09-30T17:22:59.275966+00:00",
+  "requirements": [
+    {
+      "id": "ACC:1",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/0",
+      "requirement": "8개 화면이 정의된 흐름대로 이동한다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:2",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/1",
+      "requirement": "Inspection에서 drag/pinch/hotspot이 충돌 없이 동작한다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/1"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:3",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/2",
+      "requirement": "질문 예산이 3→0으로 감소하고 0에서 추가 질문이 차단된다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/2"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:4",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/3",
+      "requirement": "단서 카드를 long-press drag하여 두 비교 슬롯에 배치할 수 있다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/3"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:5",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/4",
+      "requirement": "단서 2개 미만이면 Decision 확정이 불가능하다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/4"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:6",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/5",
+      "requirement": "RETURN/HOLD/REPORT 선택 뒤 confirm swipe 완료 시 판정이 잠긴다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/5"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ACC:7",
+      "category": "acceptance",
+      "source_ref": "/source/pack/acceptance_criteria/6",
+      "requirement": "세 번째 Outcome 뒤 Shift Summary로 이동한다",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/acceptance_criteria/6"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "ARC:implementation_order",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/implementation_order",
+      "requirement": [
+        "navigation/state machine",
+        "inspection gestures",
+        "evidence tray",
+        "interview budget",
+        "compare drag-drop",
+        "decision lock",
+        "outcome/summary"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/implementation_order"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:persistence",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/persistence",
+      "requirement": "shift progress only",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/persistence"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:required_data",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/required_data",
+      "requirement": [
+        "CaseData",
+        "EvidenceData",
+        "VisitorData",
+        "DecisionRule"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/required_data"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:reusable",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/reusable",
+      "requirement": [
+        "EvidenceCard",
+        "PrimaryButton",
+        "StatusChip",
+        "DragDropSlot",
+        "ConfirmRail"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/reusable"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:scene_hierarchy",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/scene_hierarchy",
+      "requirement": [
+        "AppRoot",
+        "ShiftController",
+        "CaseSceneRouter",
+        "HUDLayer",
+        "ModalLayer"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/scene_hierarchy"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:state_owner",
+      "category": "architecture",
+      "source_ref": "/source/pack/developer_handoff/state_owner",
+      "requirement": "CaseSessionState",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/developer_handoff/state_owner"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:case_intake:case_meta",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/0",
+      "requirement": {
+        "id": "case_meta",
+        "box": {
+          "h": 11,
+          "w": 82,
+          "x": 9,
+          "y": 8
+        },
+        "type": "panel",
+        "label": "발견 장소 / 시간",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:case_intake:inspect_btn",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/2",
+      "requirement": {
+        "id": "inspect_btn",
+        "box": {
+          "h": 9,
+          "w": 64,
+          "x": 18,
+          "y": 78
+        },
+        "type": "button",
+        "label": "조사 시작",
+        "state_binding": "intake"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:case_intake:item_preview",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/1",
+      "requirement": {
+        "id": "item_preview",
+        "box": {
+          "h": 36,
+          "w": 64,
+          "x": 18,
+          "y": 28
+        },
+        "type": "object",
+        "label": "분실물",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:decision_confirm:confirm_rail",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/4",
+      "requirement": {
+        "id": "confirm_rail",
+        "box": {
+          "h": 10,
+          "w": 76,
+          "x": 12,
+          "y": 75
+        },
+        "type": "slider",
+        "label": "밀어서 확정",
+        "state_binding": "disabled|armed"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/components/4"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:decision_confirm:evidence_summary",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/0",
+      "requirement": {
+        "id": "evidence_summary",
+        "box": {
+          "h": 25,
+          "w": 82,
+          "x": 9,
+          "y": 8
+        },
+        "type": "panel",
+        "label": "근거 요약",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:decision_confirm:hold",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/2",
+      "requirement": {
+        "id": "hold",
+        "box": {
+          "h": 15,
+          "w": 26,
+          "x": 37,
+          "y": 43
+        },
+        "type": "button",
+        "label": "HOLD",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:decision_confirm:report",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/3",
+      "requirement": {
+        "id": "report",
+        "box": {
+          "h": 15,
+          "w": 26,
+          "x": 66,
+          "y": 43
+        },
+        "type": "button",
+        "label": "REPORT",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/components/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:decision_confirm:return",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/1",
+      "requirement": {
+        "id": "return",
+        "box": {
+          "h": 15,
+          "w": 26,
+          "x": 8,
+          "y": 43
+        },
+        "type": "button",
+        "label": "RETURN",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:evidence_review:decision_btn",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/4",
+      "requirement": {
+        "id": "decision_btn",
+        "box": {
+          "h": 7,
+          "w": 60,
+          "x": 20,
+          "y": 89
+        },
+        "type": "button",
+        "label": "판정하기",
+        "state_binding": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/components/4"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:evidence_review:evidence_cards",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/3",
+      "requirement": {
+        "id": "evidence_cards",
+        "box": {
+          "h": 18,
+          "w": 84,
+          "x": 8,
+          "y": 65
+        },
+        "type": "tray",
+        "label": "단서 카드",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/components/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:evidence_review:relation",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/2",
+      "requirement": {
+        "id": "relation",
+        "box": {
+          "h": 8,
+          "w": 56,
+          "x": 22,
+          "y": 47
+        },
+        "type": "status",
+        "label": "관계 결과",
+        "state_binding": "none|match|conflict"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:evidence_review:slot_a",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/0",
+      "requirement": {
+        "id": "slot_a",
+        "box": {
+          "h": 20,
+          "w": 32,
+          "x": 12,
+          "y": 23
+        },
+        "type": "dropzone",
+        "label": "비교 A",
+        "state_binding": "empty|filled"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:evidence_review:slot_b",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/1",
+      "requirement": {
+        "id": "slot_b",
+        "box": {
+          "h": 20,
+          "w": 32,
+          "x": 56,
+          "y": 23
+        },
+        "type": "dropzone",
+        "label": "비교 B",
+        "state_binding": "empty|filled"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection_desk:clue_tray",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/1",
+      "requirement": {
+        "id": "clue_tray",
+        "box": {
+          "h": 9,
+          "w": 86,
+          "x": 7,
+          "y": 75
+        },
+        "type": "tray",
+        "label": "단서 트레이",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection_desk:interview_btn",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/2",
+      "requirement": {
+        "id": "interview_btn",
+        "box": {
+          "h": 7,
+          "w": 40,
+          "x": 54,
+          "y": 89
+        },
+        "type": "button",
+        "label": "방문객 질문",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection_desk:object",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/0",
+      "requirement": {
+        "id": "object",
+        "box": {
+          "h": 45,
+          "w": 76,
+          "x": 12,
+          "y": 19
+        },
+        "type": "manipulable",
+        "label": "Lost Item",
+        "state_binding": "idle|rotating|zoomed"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection_desk:review_btn",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/3",
+      "requirement": {
+        "id": "review_btn",
+        "box": {
+          "h": 7,
+          "w": 40,
+          "x": 7,
+          "y": 89
+        },
+        "type": "button",
+        "label": "단서 대조",
+        "state_binding": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/components/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_desk:case_counter",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/1",
+      "requirement": {
+        "id": "case_counter",
+        "box": {
+          "h": 6,
+          "w": 20,
+          "x": 70,
+          "y": 7
+        },
+        "type": "status",
+        "label": "0 / 3 cases",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_desk:shift_title",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/0",
+      "requirement": {
+        "id": "shift_title",
+        "box": {
+          "h": 6,
+          "w": 55,
+          "x": 10,
+          "y": 7
+        },
+        "type": "label",
+        "label": "MIDNIGHT SHIFT",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_desk:start_shift",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/2",
+      "requirement": {
+        "id": "start_shift",
+        "box": {
+          "h": 9,
+          "w": 64,
+          "x": 18,
+          "y": 83
+        },
+        "type": "button",
+        "label": "근무 시작",
+        "state_binding": "ready"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:outcome:continue",
+      "category": "component",
+      "source_ref": "/source/pack/screens/6/components/3",
+      "requirement": {
+        "id": "continue",
+        "box": {
+          "h": 8,
+          "w": 60,
+          "x": 20,
+          "y": 84
+        },
+        "type": "button",
+        "label": "계속",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/components/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:outcome:reason",
+      "category": "component",
+      "source_ref": "/source/pack/screens/6/components/1",
+      "requirement": {
+        "id": "reason",
+        "box": {
+          "h": 28,
+          "w": 80,
+          "x": 10,
+          "y": 24
+        },
+        "type": "panel",
+        "label": "왜 맞았나/틀렸나",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:outcome:result_stamp",
+      "category": "component",
+      "source_ref": "/source/pack/screens/6/components/0",
+      "requirement": {
+        "id": "result_stamp",
+        "box": {
+          "h": 12,
+          "w": 50,
+          "x": 25,
+          "y": 9
+        },
+        "type": "status",
+        "label": "판정 결과",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:outcome:score",
+      "category": "component",
+      "source_ref": "/source/pack/screens/6/components/2",
+      "requirement": {
+        "id": "score",
+        "box": {
+          "h": 12,
+          "w": 64,
+          "x": 18,
+          "y": 61
+        },
+        "type": "status",
+        "label": "점수 변화",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:case_rows",
+      "category": "component",
+      "source_ref": "/source/pack/screens/7/components/1",
+      "requirement": {
+        "id": "case_rows",
+        "box": {
+          "h": 36,
+          "w": 80,
+          "x": 10,
+          "y": 34
+        },
+        "type": "list",
+        "label": "사건 3개 요약",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:finish",
+      "category": "component",
+      "source_ref": "/source/pack/screens/7/components/2",
+      "requirement": {
+        "id": "finish",
+        "box": {
+          "h": 8,
+          "w": 60,
+          "x": 20,
+          "y": 83
+        },
+        "type": "button",
+        "label": "근무 종료",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:grade",
+      "category": "component",
+      "source_ref": "/source/pack/screens/7/components/0",
+      "requirement": {
+        "id": "grade",
+        "box": {
+          "h": 15,
+          "w": 44,
+          "x": 28,
+          "y": 10
+        },
+        "type": "status",
+        "label": "근무 등급",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:visitor_interview:back_inspect",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/3",
+      "requirement": {
+        "id": "back_inspect",
+        "box": {
+          "h": 6,
+          "w": 40,
+          "x": 7,
+          "y": 91
+        },
+        "type": "button",
+        "label": "물건 다시 보기",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/components/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:visitor_interview:budget",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/1",
+      "requirement": {
+        "id": "budget",
+        "box": {
+          "h": 6,
+          "w": 20,
+          "x": 72,
+          "y": 5
+        },
+        "type": "status",
+        "label": "질문 3/3",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/components/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:visitor_interview:question_cards",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/2",
+      "requirement": {
+        "id": "question_cards",
+        "box": {
+          "h": 20,
+          "w": 82,
+          "x": 9,
+          "y": 65
+        },
+        "type": "list",
+        "label": "질문 카드",
+        "state_binding": "budget>0"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/components/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:visitor_interview:review_btn",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/4",
+      "requirement": {
+        "id": "review_btn",
+        "box": {
+          "h": 6,
+          "w": 40,
+          "x": 53,
+          "y": 91
+        },
+        "type": "button",
+        "label": "단서 대조",
+        "state_binding": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/components/4"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:visitor_interview:visitor",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/0",
+      "requirement": {
+        "id": "visitor",
+        "box": {
+          "h": 27,
+          "w": 50,
+          "x": 25,
+          "y": 8
+        },
+        "type": "portrait",
+        "label": "방문객",
+        "state_binding": ""
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/components/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CNT:mvp_scope",
+      "category": "content",
+      "source_ref": "/source/design/mvp_scope",
+      "requirement": "세로 모바일 1개 밤, 완성 사건 5개, 물건 회전/확대/hotspot, 질문 예산, 단서 카드 비교, RETURN/HOLD/REPORT, Outcome, Shift Summary.",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/mvp_scope"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "CNT:screen_inventory",
+      "category": "content",
+      "source_ref": "/source/design/screen_inventory",
+      "requirement": [
+        "Night Desk — 근무 시작",
+        "Case Intake — 발견 정보",
+        "Inspection Desk — 물건 조사",
+        "Visitor Interview — 제한 질문",
+        "Evidence Review — 단서 대조",
+        "Decision Confirm — 조치 확인",
+        "Outcome — 결과",
+        "Shift Summary — 3사건 요약"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/screen_inventory"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:decision_locked",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/2",
+      "requirement": {
+        "id": "decision_locked",
+        "rule": "판정 후 back/수정 금지"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/global_states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:loading",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/0",
+      "requirement": {
+        "id": "loading",
+        "rule": "사건 데이터 준비 중 입력 차단"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/global_states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:pause",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/1",
+      "requirement": {
+        "id": "pause",
+        "rule": "현재 사건 상태 보존"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/global_states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:1",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/0",
+      "requirement": {
+        "use": "hotspot/questions/choices/buttons",
+        "input": "tap",
+        "priority": 3
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/input_map/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INP:2",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/1",
+      "requirement": {
+        "use": "evidence cards",
+        "input": "long-press drag",
+        "priority": 4
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/input_map/1"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INP:3",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/2",
+      "requirement": {
+        "use": "object rotation",
+        "input": "drag",
+        "priority": 2
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/input_map/2"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INP:4",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/3",
+      "requirement": {
+        "use": "object zoom",
+        "input": "pinch",
+        "priority": 5
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/input_map/3"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INP:5",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/4",
+      "requirement": {
+        "use": "irreversible decision",
+        "input": "horizontal confirm swipe",
+        "priority": 5
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/input_map/4"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:case_intake:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/0",
+      "requirement": {
+        "action": "Inspection 진입",
+        "target": "inspect_btn",
+        "trigger": "tap",
+        "feedback": "fade + light haptic",
+        "precondition": "case loaded",
+        "state_change": "Inspection",
+        "invalid_input": "로딩 중 입력 차단"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:decision_confirm:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/0",
+      "requirement": {
+        "action": "조치 선택",
+        "target": "decision buttons",
+        "trigger": "tap",
+        "feedback": "selected outline",
+        "precondition": "clues>=2",
+        "state_change": "selected",
+        "invalid_input": "근거 부족이면 Review 안내"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:decision_confirm:2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/1",
+      "requirement": {
+        "action": "판정 잠금",
+        "target": "confirm_rail",
+        "trigger": "horizontal swipe",
+        "feedback": "stamp + rigid haptic",
+        "precondition": "decision selected",
+        "state_change": "locked",
+        "invalid_input": "중간 release면 rail reset"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/interactions/1"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:evidence_review:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/0",
+      "requirement": {
+        "action": "슬롯에 배치",
+        "target": "evidence_card",
+        "trigger": "long-press drag",
+        "feedback": "slot highlight",
+        "precondition": "card available",
+        "state_change": "one_slot|comparing",
+        "invalid_input": "중복 카드면 원위치"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:evidence_review:2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/1",
+      "requirement": {
+        "action": "관계 계산/기록",
+        "target": "slot",
+        "trigger": "drop",
+        "feedback": "line + medium haptic",
+        "precondition": "two unique clues",
+        "state_change": "relation_recorded",
+        "invalid_input": "부적합 drop bounce"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/interactions/1"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection_desk:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/0",
+      "requirement": {
+        "action": "물건 회전",
+        "target": "object",
+        "trigger": "drag",
+        "feedback": "surface moves",
+        "precondition": "Inspection",
+        "state_change": "rotating",
+        "invalid_input": "viewport 밖 drag는 clamp"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection_desk:2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/1",
+      "requirement": {
+        "action": "확대/축소",
+        "target": "object",
+        "trigger": "pinch",
+        "feedback": "scale feedback",
+        "precondition": "Inspection",
+        "state_change": "zoomed",
+        "invalid_input": "min/max clamp"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/interactions/1"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection_desk:3",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/2",
+      "requirement": {
+        "action": "단서 카드 생성",
+        "target": "hotspot",
+        "trigger": "tap",
+        "feedback": "ring + card pop + light haptic",
+        "precondition": "hotspot active",
+        "state_change": "hotspot_revealed",
+        "invalid_input": "비 hotspot은 약한 경계 반응"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/interactions/2"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:night_desk:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/0",
+      "requirement": {
+        "action": "첫 사건 로드",
+        "target": "start_shift",
+        "trigger": "tap",
+        "feedback": "button depress + light haptic",
+        "precondition": "ready",
+        "state_change": "Intake",
+        "invalid_input": "중복 tap 무시"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:outcome:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/6/interactions/0",
+      "requirement": {
+        "action": "다음 사건 또는 요약",
+        "target": "continue",
+        "trigger": "tap",
+        "feedback": "success/neutral haptic",
+        "precondition": "outcome shown",
+        "state_change": "complete",
+        "invalid_input": "연타 무시"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shift_summary:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/7/interactions/0",
+      "requirement": {
+        "action": "Night Desk 복귀",
+        "target": "finish",
+        "trigger": "tap",
+        "feedback": "fade",
+        "precondition": "summary",
+        "state_change": "ready",
+        "invalid_input": "none"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:visitor_interview:1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/0",
+      "requirement": {
+        "action": "질문 소비·응답 단서 생성",
+        "target": "question_card",
+        "trigger": "tap",
+        "feedback": "핵심 구절 강조",
+        "precondition": "budget>0",
+        "state_change": "answering",
+        "invalid_input": "budget=0이면 잠금 사유 표시"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/interactions/0"
+      },
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "RUL:clues",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/clues",
+      "requirement": "3~5, 결정 최소 2",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/clues"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:decisions",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/decisions",
+      "requirement": [
+        "RETURN",
+        "HOLD",
+        "REPORT"
+      ],
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/decisions"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:grades",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/grades",
+      "requirement": {
+        "A": 280,
+        "B": 220,
+        "C": 0,
+        "S": 330
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/grades"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:principle",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/principle",
+      "requirement": "소유주 맞히기가 아니라 증거 수준에 맞는 조치를 고른다.",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/principle"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:questions",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/questions",
+      "requirement": "기본 3회",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/questions"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:score",
+      "category": "rule",
+      "source_ref": "/source/design/game_rules/score",
+      "requirement": {
+        "correct": 100,
+        "false_report": -25,
+        "reckless_return": -40,
+        "supported_reason": 30,
+        "unnecessary_question": -5
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/design/game_rules/score"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:case_intake:intake",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/0",
+      "requirement": "intake",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:decision_confirm:blocked",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/4",
+      "requirement": "blocked",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/states/4"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:decision_confirm:confirming",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/2",
+      "requirement": "confirming",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:decision_confirm:locked",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/3",
+      "requirement": "locked",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/states/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:decision_confirm:selected",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/1",
+      "requirement": "selected",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:decision_confirm:unselected",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/0",
+      "requirement": "unselected",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:evidence_review:comparing",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/2",
+      "requirement": "comparing",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:evidence_review:empty",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/0",
+      "requirement": "empty",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:evidence_review:one_slot",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/1",
+      "requirement": "one_slot",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:evidence_review:relation_recorded",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/3",
+      "requirement": "relation_recorded",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/states/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection_desk:hotspot_revealed",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/3",
+      "requirement": "hotspot_revealed",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/states/3"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection_desk:idle",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/0",
+      "requirement": "idle",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection_desk:rotating",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/1",
+      "requirement": "rotating",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection_desk:zoomed",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/2",
+      "requirement": "zoomed",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:night_desk:ready",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/0",
+      "requirement": "ready",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:outcome:complete",
+      "category": "state",
+      "source_ref": "/source/pack/screens/6/states/2",
+      "requirement": "complete",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:outcome:correct",
+      "category": "state",
+      "source_ref": "/source/pack/screens/6/states/0",
+      "requirement": "correct",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:outcome:incorrect",
+      "category": "state",
+      "source_ref": "/source/pack/screens/6/states/1",
+      "requirement": "incorrect",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shift_summary:summary",
+      "category": "state",
+      "source_ref": "/source/pack/screens/7/states/0",
+      "requirement": "summary",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:visitor_interview:answering",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/1",
+      "requirement": "answering",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/states/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:visitor_interview:budget_empty",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/2",
+      "requirement": "budget_empty",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/states/2"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:visitor_interview:question_ready",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/0",
+      "requirement": "question_ready",
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/states/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:case_intake:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/0",
+      "requirement": {
+        "to": "inspection",
+        "from": "intake",
+        "trigger": "tap inspect_btn",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/1/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:decision_confirm:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/0",
+      "requirement": {
+        "to": "outcome",
+        "from": "decision_confirm",
+        "trigger": "confirm complete",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/5/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:evidence_review:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/0",
+      "requirement": {
+        "to": "decision_confirm",
+        "from": "evidence_review",
+        "trigger": "tap decision_btn",
+        "animation": "short fade",
+        "condition": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/4/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:inspection_desk:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/0",
+      "requirement": {
+        "to": "visitor_interview",
+        "from": "inspection",
+        "trigger": "tap interview_btn",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:inspection_desk:2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/1",
+      "requirement": {
+        "to": "evidence_review",
+        "from": "inspection",
+        "trigger": "tap review_btn",
+        "animation": "short fade",
+        "condition": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/2/transitions/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:night_desk:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/0/transitions/0",
+      "requirement": {
+        "to": "case_intake",
+        "from": "ready",
+        "trigger": "tap start_shift",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/0/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:outcome:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/6/transitions/0",
+      "requirement": {
+        "to": "case_intake",
+        "from": "outcome",
+        "trigger": "tap continue",
+        "animation": "short fade",
+        "condition": "case_index<3"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:outcome:2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/6/transitions/1",
+      "requirement": {
+        "to": "shift_summary",
+        "from": "outcome",
+        "trigger": "tap continue",
+        "animation": "short fade",
+        "condition": "case_index=3"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/6/transitions/1"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:shift_summary:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/7/transitions/0",
+      "requirement": {
+        "to": "night_desk",
+        "from": "shift_summary",
+        "trigger": "tap finish",
+        "animation": "short fade",
+        "condition": "always"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/7/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:visitor_interview:1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/0",
+      "requirement": {
+        "to": "inspection",
+        "from": "visitor_interview",
+        "trigger": "tap back_inspect",
+        "animation": "short fade",
+        "condition": "return_count<1"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/transitions/0"
+      },
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:visitor_interview:2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/1",
+      "requirement": {
+        "to": "evidence_review",
+        "from": "visitor_interview",
+        "trigger": "tap review_btn",
+        "animation": "short fade",
+        "condition": "clues>=2"
+      },
+      "verification": {
+        "condition": "implementation preserves source obligation",
+        "source_ref": "/source/pack/screens/3/transitions/1"
+      },
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": "2026-09-29T15:34:24.973197+00:00",
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "category_counts": {
+    "rule": 6,
+    "state": 22,
+    "content": 2,
+    "component": 32,
+    "input_map": 5,
+    "acceptance": 7,
+    "transition": 11,
+    "interaction": 12,
+    "architecture": 6,
+    "global_state": 3
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T06:56:22.943593+00:00",
+    "artifact_blob": "b30b95e3cad10f453125371fa3e920455f9c9680",
+    "evidence_path": "production/contracts/f556078a-f98d-4509-b08a-26509a651d78/blueprint-review-da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0.json",
+    "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+    "source_checked": "true",
+    "artifact_commit": "00fac90366b8f409af947a4fd2239d546af66a50",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Midnight Lost Property — Implementation Contract v1.1\n\nAtomic requirements compiled from the current Game Design and Wireframe Pack.\n\n## ACC:1\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/0`\n- Verification mode: `manual_playtest`\n\n```json\n\"8개 화면이 정의된 흐름대로 이동한다\"\n```\n\n## ACC:2\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/1`\n- Verification mode: `manual_playtest`\n\n```json\n\"Inspection에서 drag/pinch/hotspot이 충돌 없이 동작한다\"\n```\n\n## ACC:3\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/2`\n- Verification mode: `manual_playtest`\n\n```json\n\"질문 예산이 3→0으로 감소하고 0에서 추가 질문이 차단된다\"\n```\n\n## ACC:4\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/3`\n- Verification mode: `manual_playtest`\n\n```json\n\"단서 카드를 long-press drag하여 두 비교 슬롯에 배치할 수 있다\"\n```\n\n## ACC:5\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/4`\n- Verification mode: `manual_playtest`\n\n```json\n\"단서 2개 미만이면 Decision 확정이 불가능하다\"\n```\n\n## ACC:6\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/5`\n- Verification mode: `manual_playtest`\n\n```json\n\"RETURN/HOLD/REPORT 선택 뒤 confirm swipe 완료 시 판정이 잠긴다\"\n```\n\n## ACC:7\n- Category: acceptance\n- Source: `/source/pack/acceptance_criteria/6`\n- Verification mode: `manual_playtest`\n\n```json\n\"세 번째 Outcome 뒤 Shift Summary로 이동한다\"\n```\n\n## ARC:implementation_order\n- Category: architecture\n- Source: `/source/pack/developer_handoff/implementation_order`\n- Verification mode: `static`\n\n```json\n[\n  \"navigation/state machine\",\n  \"inspection gestures\",\n  \"evidence tray\",\n  \"interview budget\",\n  \"compare drag-drop\",\n  \"decision lock\",\n  \"outcome/summary\"\n]\n```\n\n## ARC:persistence\n- Category: architecture\n- Source: `/source/pack/developer_handoff/persistence`\n- Verification mode: `static`\n\n```json\n\"shift progress only\"\n```\n\n## ARC:required_data\n- Category: architecture\n- Source: `/source/pack/developer_handoff/required_data`\n- Verification mode: `static`\n\n```json\n[\n  \"CaseData\",\n  \"EvidenceData\",\n  \"VisitorData\",\n  \"DecisionRule\"\n]\n```\n\n## ARC:reusable\n- Category: architecture\n- Source: `/source/pack/developer_handoff/reusable`\n- Verification mode: `static`\n\n```json\n[\n  \"EvidenceCard\",\n  \"PrimaryButton\",\n  \"StatusChip\",\n  \"DragDropSlot\",\n  \"ConfirmRail\"\n]\n```\n\n## ARC:scene_hierarchy\n- Category: architecture\n- Source: `/source/pack/developer_handoff/scene_hierarchy`\n- Verification mode: `static`\n\n```json\n[\n  \"AppRoot\",\n  \"ShiftController\",\n  \"CaseSceneRouter\",\n  \"HUDLayer\",\n  \"ModalLayer\"\n]\n```\n\n## ARC:state_owner\n- Category: architecture\n- Source: `/source/pack/developer_handoff/state_owner`\n- Verification mode: `static`\n\n```json\n\"CaseSessionState\"\n```\n\n## CMP:case_intake:case_meta\n- Category: component\n- Source: `/source/pack/screens/1/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"case_meta\",\n  \"box\": {\n    \"h\": 11,\n    \"w\": 82,\n    \"x\": 9,\n    \"y\": 8\n  },\n  \"type\": \"panel\",\n  \"label\": \"발견 장소 / 시간\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:case_intake:inspect_btn\n- Category: component\n- Source: `/source/pack/screens/1/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"inspect_btn\",\n  \"box\": {\n    \"h\": 9,\n    \"w\": 64,\n    \"x\": 18,\n    \"y\": 78\n  },\n  \"type\": \"button\",\n  \"label\": \"조사 시작\",\n  \"state_binding\": \"intake\"\n}\n```\n\n## CMP:case_intake:item_preview\n- Category: component\n- Source: `/source/pack/screens/1/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"item_preview\",\n  \"box\": {\n    \"h\": 36,\n    \"w\": 64,\n    \"x\": 18,\n    \"y\": 28\n  },\n  \"type\": \"object\",\n  \"label\": \"분실물\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:decision_confirm:confirm_rail\n- Category: component\n- Source: `/source/pack/screens/5/components/4`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"confirm_rail\",\n  \"box\": {\n    \"h\": 10,\n    \"w\": 76,\n    \"x\": 12,\n    \"y\": 75\n  },\n  \"type\": \"slider\",\n  \"label\": \"밀어서 확정\",\n  \"state_binding\": \"disabled|armed\"\n}\n```\n\n## CMP:decision_confirm:evidence_summary\n- Category: component\n- Source: `/source/pack/screens/5/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"evidence_summary\",\n  \"box\": {\n    \"h\": 25,\n    \"w\": 82,\n    \"x\": 9,\n    \"y\": 8\n  },\n  \"type\": \"panel\",\n  \"label\": \"근거 요약\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:decision_confirm:hold\n- Category: component\n- Source: `/source/pack/screens/5/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"hold\",\n  \"box\": {\n    \"h\": 15,\n    \"w\": 26,\n    \"x\": 37,\n    \"y\": 43\n  },\n  \"type\": \"button\",\n  \"label\": \"HOLD\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:decision_confirm:report\n- Category: component\n- Source: `/source/pack/screens/5/components/3`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"report\",\n  \"box\": {\n    \"h\": 15,\n    \"w\": 26,\n    \"x\": 66,\n    \"y\": 43\n  },\n  \"type\": \"button\",\n  \"label\": \"REPORT\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:decision_confirm:return\n- Category: component\n- Source: `/source/pack/screens/5/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"return\",\n  \"box\": {\n    \"h\": 15,\n    \"w\": 26,\n    \"x\": 8,\n    \"y\": 43\n  },\n  \"type\": \"button\",\n  \"label\": \"RETURN\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:evidence_review:decision_btn\n- Category: component\n- Source: `/source/pack/screens/4/components/4`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"decision_btn\",\n  \"box\": {\n    \"h\": 7,\n    \"w\": 60,\n    \"x\": 20,\n    \"y\": 89\n  },\n  \"type\": \"button\",\n  \"label\": \"판정하기\",\n  \"state_binding\": \"clues>=2\"\n}\n```\n\n## CMP:evidence_review:evidence_cards\n- Category: component\n- Source: `/source/pack/screens/4/components/3`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"evidence_cards\",\n  \"box\": {\n    \"h\": 18,\n    \"w\": 84,\n    \"x\": 8,\n    \"y\": 65\n  },\n  \"type\": \"tray\",\n  \"label\": \"단서 카드\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:evidence_review:relation\n- Category: component\n- Source: `/source/pack/screens/4/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"relation\",\n  \"box\": {\n    \"h\": 8,\n    \"w\": 56,\n    \"x\": 22,\n    \"y\": 47\n  },\n  \"type\": \"status\",\n  \"label\": \"관계 결과\",\n  \"state_binding\": \"none|match|conflict\"\n}\n```\n\n## CMP:evidence_review:slot_a\n- Category: component\n- Source: `/source/pack/screens/4/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"slot_a\",\n  \"box\": {\n    \"h\": 20,\n    \"w\": 32,\n    \"x\": 12,\n    \"y\": 23\n  },\n  \"type\": \"dropzone\",\n  \"label\": \"비교 A\",\n  \"state_binding\": \"empty|filled\"\n}\n```\n\n## CMP:evidence_review:slot_b\n- Category: component\n- Source: `/source/pack/screens/4/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"slot_b\",\n  \"box\": {\n    \"h\": 20,\n    \"w\": 32,\n    \"x\": 56,\n    \"y\": 23\n  },\n  \"type\": \"dropzone\",\n  \"label\": \"비교 B\",\n  \"state_binding\": \"empty|filled\"\n}\n```\n\n## CMP:inspection_desk:clue_tray\n- Category: component\n- Source: `/source/pack/screens/2/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"clue_tray\",\n  \"box\": {\n    \"h\": 9,\n    \"w\": 86,\n    \"x\": 7,\n    \"y\": 75\n  },\n  \"type\": \"tray\",\n  \"label\": \"단서 트레이\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:inspection_desk:interview_btn\n- Category: component\n- Source: `/source/pack/screens/2/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"interview_btn\",\n  \"box\": {\n    \"h\": 7,\n    \"w\": 40,\n    \"x\": 54,\n    \"y\": 89\n  },\n  \"type\": \"button\",\n  \"label\": \"방문객 질문\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:inspection_desk:object\n- Category: component\n- Source: `/source/pack/screens/2/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"object\",\n  \"box\": {\n    \"h\": 45,\n    \"w\": 76,\n    \"x\": 12,\n    \"y\": 19\n  },\n  \"type\": \"manipulable\",\n  \"label\": \"Lost Item\",\n  \"state_binding\": \"idle|rotating|zoomed\"\n}\n```\n\n## CMP:inspection_desk:review_btn\n- Category: component\n- Source: `/source/pack/screens/2/components/3`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"review_btn\",\n  \"box\": {\n    \"h\": 7,\n    \"w\": 40,\n    \"x\": 7,\n    \"y\": 89\n  },\n  \"type\": \"button\",\n  \"label\": \"단서 대조\",\n  \"state_binding\": \"clues>=2\"\n}\n```\n\n## CMP:night_desk:case_counter\n- Category: component\n- Source: `/source/pack/screens/0/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"case_counter\",\n  \"box\": {\n    \"h\": 6,\n    \"w\": 20,\n    \"x\": 70,\n    \"y\": 7\n  },\n  \"type\": \"status\",\n  \"label\": \"0 / 3 cases\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:night_desk:shift_title\n- Category: component\n- Source: `/source/pack/screens/0/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"shift_title\",\n  \"box\": {\n    \"h\": 6,\n    \"w\": 55,\n    \"x\": 10,\n    \"y\": 7\n  },\n  \"type\": \"label\",\n  \"label\": \"MIDNIGHT SHIFT\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:night_desk:start_shift\n- Category: component\n- Source: `/source/pack/screens/0/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"start_shift\",\n  \"box\": {\n    \"h\": 9,\n    \"w\": 64,\n    \"x\": 18,\n    \"y\": 83\n  },\n  \"type\": \"button\",\n  \"label\": \"근무 시작\",\n  \"state_binding\": \"ready\"\n}\n```\n\n## CMP:outcome:continue\n- Category: component\n- Source: `/source/pack/screens/6/components/3`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"continue\",\n  \"box\": {\n    \"h\": 8,\n    \"w\": 60,\n    \"x\": 20,\n    \"y\": 84\n  },\n  \"type\": \"button\",\n  \"label\": \"계속\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:outcome:reason\n- Category: component\n- Source: `/source/pack/screens/6/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"reason\",\n  \"box\": {\n    \"h\": 28,\n    \"w\": 80,\n    \"x\": 10,\n    \"y\": 24\n  },\n  \"type\": \"panel\",\n  \"label\": \"왜 맞았나/틀렸나\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:outcome:result_stamp\n- Category: component\n- Source: `/source/pack/screens/6/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"result_stamp\",\n  \"box\": {\n    \"h\": 12,\n    \"w\": 50,\n    \"x\": 25,\n    \"y\": 9\n  },\n  \"type\": \"status\",\n  \"label\": \"판정 결과\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:outcome:score\n- Category: component\n- Source: `/source/pack/screens/6/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"score\",\n  \"box\": {\n    \"h\": 12,\n    \"w\": 64,\n    \"x\": 18,\n    \"y\": 61\n  },\n  \"type\": \"status\",\n  \"label\": \"점수 변화\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:shift_summary:case_rows\n- Category: component\n- Source: `/source/pack/screens/7/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"case_rows\",\n  \"box\": {\n    \"h\": 36,\n    \"w\": 80,\n    \"x\": 10,\n    \"y\": 34\n  },\n  \"type\": \"list\",\n  \"label\": \"사건 3개 요약\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:shift_summary:finish\n- Category: component\n- Source: `/source/pack/screens/7/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"finish\",\n  \"box\": {\n    \"h\": 8,\n    \"w\": 60,\n    \"x\": 20,\n    \"y\": 83\n  },\n  \"type\": \"button\",\n  \"label\": \"근무 종료\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:shift_summary:grade\n- Category: component\n- Source: `/source/pack/screens/7/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"grade\",\n  \"box\": {\n    \"h\": 15,\n    \"w\": 44,\n    \"x\": 28,\n    \"y\": 10\n  },\n  \"type\": \"status\",\n  \"label\": \"근무 등급\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:visitor_interview:back_inspect\n- Category: component\n- Source: `/source/pack/screens/3/components/3`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"back_inspect\",\n  \"box\": {\n    \"h\": 6,\n    \"w\": 40,\n    \"x\": 7,\n    \"y\": 91\n  },\n  \"type\": \"button\",\n  \"label\": \"물건 다시 보기\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:visitor_interview:budget\n- Category: component\n- Source: `/source/pack/screens/3/components/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"budget\",\n  \"box\": {\n    \"h\": 6,\n    \"w\": 20,\n    \"x\": 72,\n    \"y\": 5\n  },\n  \"type\": \"status\",\n  \"label\": \"질문 3/3\",\n  \"state_binding\": \"\"\n}\n```\n\n## CMP:visitor_interview:question_cards\n- Category: component\n- Source: `/source/pack/screens/3/components/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"question_cards\",\n  \"box\": {\n    \"h\": 20,\n    \"w\": 82,\n    \"x\": 9,\n    \"y\": 65\n  },\n  \"type\": \"list\",\n  \"label\": \"질문 카드\",\n  \"state_binding\": \"budget>0\"\n}\n```\n\n## CMP:visitor_interview:review_btn\n- Category: component\n- Source: `/source/pack/screens/3/components/4`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"review_btn\",\n  \"box\": {\n    \"h\": 6,\n    \"w\": 40,\n    \"x\": 53,\n    \"y\": 91\n  },\n  \"type\": \"button\",\n  \"label\": \"단서 대조\",\n  \"state_binding\": \"clues>=2\"\n}\n```\n\n## CMP:visitor_interview:visitor\n- Category: component\n- Source: `/source/pack/screens/3/components/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"visitor\",\n  \"box\": {\n    \"h\": 27,\n    \"w\": 50,\n    \"x\": 25,\n    \"y\": 8\n  },\n  \"type\": \"portrait\",\n  \"label\": \"방문객\",\n  \"state_binding\": \"\"\n}\n```\n\n## CNT:mvp_scope\n- Category: content\n- Source: `/source/design/mvp_scope`\n- Verification mode: `static`\n\n```json\n\"세로 모바일 1개 밤, 완성 사건 5개, 물건 회전/확대/hotspot, 질문 예산, 단서 카드 비교, RETURN/HOLD/REPORT, Outcome, Shift Summary.\"\n```\n\n## CNT:screen_inventory\n- Category: content\n- Source: `/source/design/screen_inventory`\n- Verification mode: `static`\n\n```json\n[\n  \"Night Desk — 근무 시작\",\n  \"Case Intake — 발견 정보\",\n  \"Inspection Desk — 물건 조사\",\n  \"Visitor Interview — 제한 질문\",\n  \"Evidence Review — 단서 대조\",\n  \"Decision Confirm — 조치 확인\",\n  \"Outcome — 결과\",\n  \"Shift Summary — 3사건 요약\"\n]\n```\n\n## GST:decision_locked\n- Category: global_state\n- Source: `/source/pack/global_states/2`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"decision_locked\",\n  \"rule\": \"판정 후 back/수정 금지\"\n}\n```\n\n## GST:loading\n- Category: global_state\n- Source: `/source/pack/global_states/0`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"loading\",\n  \"rule\": \"사건 데이터 준비 중 입력 차단\"\n}\n```\n\n## GST:pause\n- Category: global_state\n- Source: `/source/pack/global_states/1`\n- Verification mode: `static`\n\n```json\n{\n  \"id\": \"pause\",\n  \"rule\": \"현재 사건 상태 보존\"\n}\n```\n\n## INP:1\n- Category: input_map\n- Source: `/source/pack/input_map/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"use\": \"hotspot/questions/choices/buttons\",\n  \"input\": \"tap\",\n  \"priority\": 3\n}\n```\n\n## INP:2\n- Category: input_map\n- Source: `/source/pack/input_map/1`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"use\": \"evidence cards\",\n  \"input\": \"long-press drag\",\n  \"priority\": 4\n}\n```\n\n## INP:3\n- Category: input_map\n- Source: `/source/pack/input_map/2`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"use\": \"object rotation\",\n  \"input\": \"drag\",\n  \"priority\": 2\n}\n```\n\n## INP:4\n- Category: input_map\n- Source: `/source/pack/input_map/3`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"use\": \"object zoom\",\n  \"input\": \"pinch\",\n  \"priority\": 5\n}\n```\n\n## INP:5\n- Category: input_map\n- Source: `/source/pack/input_map/4`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"use\": \"irreversible decision\",\n  \"input\": \"horizontal confirm swipe\",\n  \"priority\": 5\n}\n```\n\n## INT:case_intake:1\n- Category: interaction\n- Source: `/source/pack/screens/1/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"Inspection 진입\",\n  \"target\": \"inspect_btn\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"fade + light haptic\",\n  \"precondition\": \"case loaded\",\n  \"state_change\": \"Inspection\",\n  \"invalid_input\": \"로딩 중 입력 차단\"\n}\n```\n\n## INT:decision_confirm:1\n- Category: interaction\n- Source: `/source/pack/screens/5/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"조치 선택\",\n  \"target\": \"decision buttons\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"selected outline\",\n  \"precondition\": \"clues>=2\",\n  \"state_change\": \"selected\",\n  \"invalid_input\": \"근거 부족이면 Review 안내\"\n}\n```\n\n## INT:decision_confirm:2\n- Category: interaction\n- Source: `/source/pack/screens/5/interactions/1`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"판정 잠금\",\n  \"target\": \"confirm_rail\",\n  \"trigger\": \"horizontal swipe\",\n  \"feedback\": \"stamp + rigid haptic\",\n  \"precondition\": \"decision selected\",\n  \"state_change\": \"locked\",\n  \"invalid_input\": \"중간 release면 rail reset\"\n}\n```\n\n## INT:evidence_review:1\n- Category: interaction\n- Source: `/source/pack/screens/4/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"슬롯에 배치\",\n  \"target\": \"evidence_card\",\n  \"trigger\": \"long-press drag\",\n  \"feedback\": \"slot highlight\",\n  \"precondition\": \"card available\",\n  \"state_change\": \"one_slot|comparing\",\n  \"invalid_input\": \"중복 카드면 원위치\"\n}\n```\n\n## INT:evidence_review:2\n- Category: interaction\n- Source: `/source/pack/screens/4/interactions/1`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"관계 계산/기록\",\n  \"target\": \"slot\",\n  \"trigger\": \"drop\",\n  \"feedback\": \"line + medium haptic\",\n  \"precondition\": \"two unique clues\",\n  \"state_change\": \"relation_recorded\",\n  \"invalid_input\": \"부적합 drop bounce\"\n}\n```\n\n## INT:inspection_desk:1\n- Category: interaction\n- Source: `/source/pack/screens/2/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"물건 회전\",\n  \"target\": \"object\",\n  \"trigger\": \"drag\",\n  \"feedback\": \"surface moves\",\n  \"precondition\": \"Inspection\",\n  \"state_change\": \"rotating\",\n  \"invalid_input\": \"viewport 밖 drag는 clamp\"\n}\n```\n\n## INT:inspection_desk:2\n- Category: interaction\n- Source: `/source/pack/screens/2/interactions/1`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"확대/축소\",\n  \"target\": \"object\",\n  \"trigger\": \"pinch\",\n  \"feedback\": \"scale feedback\",\n  \"precondition\": \"Inspection\",\n  \"state_change\": \"zoomed\",\n  \"invalid_input\": \"min/max clamp\"\n}\n```\n\n## INT:inspection_desk:3\n- Category: interaction\n- Source: `/source/pack/screens/2/interactions/2`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"단서 카드 생성\",\n  \"target\": \"hotspot\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"ring + card pop + light haptic\",\n  \"precondition\": \"hotspot active\",\n  \"state_change\": \"hotspot_revealed\",\n  \"invalid_input\": \"비 hotspot은 약한 경계 반응\"\n}\n```\n\n## INT:night_desk:1\n- Category: interaction\n- Source: `/source/pack/screens/0/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"첫 사건 로드\",\n  \"target\": \"start_shift\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"button depress + light haptic\",\n  \"precondition\": \"ready\",\n  \"state_change\": \"Intake\",\n  \"invalid_input\": \"중복 tap 무시\"\n}\n```\n\n## INT:outcome:1\n- Category: interaction\n- Source: `/source/pack/screens/6/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"다음 사건 또는 요약\",\n  \"target\": \"continue\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"success/neutral haptic\",\n  \"precondition\": \"outcome shown\",\n  \"state_change\": \"complete\",\n  \"invalid_input\": \"연타 무시\"\n}\n```\n\n## INT:shift_summary:1\n- Category: interaction\n- Source: `/source/pack/screens/7/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"Night Desk 복귀\",\n  \"target\": \"finish\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"fade\",\n  \"precondition\": \"summary\",\n  \"state_change\": \"ready\",\n  \"invalid_input\": \"none\"\n}\n```\n\n## INT:visitor_interview:1\n- Category: interaction\n- Source: `/source/pack/screens/3/interactions/0`\n- Verification mode: `manual_playtest`\n\n```json\n{\n  \"action\": \"질문 소비·응답 단서 생성\",\n  \"target\": \"question_card\",\n  \"trigger\": \"tap\",\n  \"feedback\": \"핵심 구절 강조\",\n  \"precondition\": \"budget>0\",\n  \"state_change\": \"answering\",\n  \"invalid_input\": \"budget=0이면 잠금 사유 표시\"\n}\n```\n\n## RUL:clues\n- Category: rule\n- Source: `/source/design/game_rules/clues`\n- Verification mode: `static`\n\n```json\n\"3~5, 결정 최소 2\"\n```\n\n## RUL:decisions\n- Category: rule\n- Source: `/source/design/game_rules/decisions`\n- Verification mode: `static`\n\n```json\n[\n  \"RETURN\",\n  \"HOLD\",\n  \"REPORT\"\n]\n```\n\n## RUL:grades\n- Category: rule\n- Source: `/source/design/game_rules/grades`\n- Verification mode: `static`\n\n```json\n{\n  \"A\": 280,\n  \"B\": 220,\n  \"C\": 0,\n  \"S\": 330\n}\n```\n\n## RUL:principle\n- Category: rule\n- Source: `/source/design/game_rules/principle`\n- Verification mode: `static`\n\n```json\n\"소유주 맞히기가 아니라 증거 수준에 맞는 조치를 고른다.\"\n```\n\n## RUL:questions\n- Category: rule\n- Source: `/source/design/game_rules/questions`\n- Verification mode: `static`\n\n```json\n\"기본 3회\"\n```\n\n## RUL:score\n- Category: rule\n- Source: `/source/design/game_rules/score`\n- Verification mode: `static`\n\n```json\n{\n  \"correct\": 100,\n  \"false_report\": -25,\n  \"reckless_return\": -40,\n  \"supported_reason\": 30,\n  \"unnecessary_question\": -5\n}\n```\n\n## STA:case_intake:intake\n- Category: state\n- Source: `/source/pack/screens/1/states/0`\n- Verification mode: `static`\n\n```json\n\"intake\"\n```\n\n## STA:decision_confirm:blocked\n- Category: state\n- Source: `/source/pack/screens/5/states/4`\n- Verification mode: `static`\n\n```json\n\"blocked\"\n```\n\n## STA:decision_confirm:confirming\n- Category: state\n- Source: `/source/pack/screens/5/states/2`\n- Verification mode: `static`\n\n```json\n\"confirming\"\n```\n\n## STA:decision_confirm:locked\n- Category: state\n- Source: `/source/pack/screens/5/states/3`\n- Verification mode: `static`\n\n```json\n\"locked\"\n```\n\n## STA:decision_confirm:selected\n- Category: state\n- Source: `/source/pack/screens/5/states/1`\n- Verification mode: `static`\n\n```json\n\"selected\"\n```\n\n## STA:decision_confirm:unselected\n- Category: state\n- Source: `/source/pack/screens/5/states/0`\n- Verification mode: `static`\n\n```json\n\"unselected\"\n```\n\n## STA:evidence_review:comparing\n- Category: state\n- Source: `/source/pack/screens/4/states/2`\n- Verification mode: `static`\n\n```json\n\"comparing\"\n```\n\n## STA:evidence_review:empty\n- Category: state\n- Source: `/source/pack/screens/4/states/0`\n- Verification mode: `static`\n\n```json\n\"empty\"\n```\n\n## STA:evidence_review:one_slot\n- Category: state\n- Source: `/source/pack/screens/4/states/1`\n- Verification mode: `static`\n\n```json\n\"one_slot\"\n```\n\n## STA:evidence_review:relation_recorded\n- Category: state\n- Source: `/source/pack/screens/4/states/3`\n- Verification mode: `static`\n\n```json\n\"relation_recorded\"\n```\n\n## STA:inspection_desk:hotspot_revealed\n- Category: state\n- Source: `/source/pack/screens/2/states/3`\n- Verification mode: `static`\n\n```json\n\"hotspot_revealed\"\n```\n\n## STA:inspection_desk:idle\n- Category: state\n- Source: `/source/pack/screens/2/states/0`\n- Verification mode: `static`\n\n```json\n\"idle\"\n```\n\n## STA:inspection_desk:rotating\n- Category: state\n- Source: `/source/pack/screens/2/states/1`\n- Verification mode: `static`\n\n```json\n\"rotating\"\n```\n\n## STA:inspection_desk:zoomed\n- Category: state\n- Source: `/source/pack/screens/2/states/2`\n- Verification mode: `static`\n\n```json\n\"zoomed\"\n```\n\n## STA:night_desk:ready\n- Category: state\n- Source: `/source/pack/screens/0/states/0`\n- Verification mode: `static`\n\n```json\n\"ready\"\n```\n\n## STA:outcome:complete\n- Category: state\n- Source: `/source/pack/screens/6/states/2`\n- Verification mode: `static`\n\n```json\n\"complete\"\n```\n\n## STA:outcome:correct\n- Category: state\n- Source: `/source/pack/screens/6/states/0`\n- Verification mode: `static`\n\n```json\n\"correct\"\n```\n\n## STA:outcome:incorrect\n- Category: state\n- Source: `/source/pack/screens/6/states/1`\n- Verification mode: `static`\n\n```json\n\"incorrect\"\n```\n\n## STA:shift_summary:summary\n- Category: state\n- Source: `/source/pack/screens/7/states/0`\n- Verification mode: `static`\n\n```json\n\"summary\"\n```\n\n## STA:visitor_interview:answering\n- Category: state\n- Source: `/source/pack/screens/3/states/1`\n- Verification mode: `static`\n\n```json\n\"answering\"\n```\n\n## STA:visitor_interview:budget_empty\n- Category: state\n- Source: `/source/pack/screens/3/states/2`\n- Verification mode: `static`\n\n```json\n\"budget_empty\"\n```\n\n## STA:visitor_interview:question_ready\n- Category: state\n- Source: `/source/pack/screens/3/states/0`\n- Verification mode: `static`\n\n```json\n\"question_ready\"\n```\n\n## TRN:case_intake:1\n- Category: transition\n- Source: `/source/pack/screens/1/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"inspection\",\n  \"from\": \"intake\",\n  \"trigger\": \"tap inspect_btn\",\n  \"animation\": \"short fade\",\n  \"condition\": \"always\"\n}\n```\n\n## TRN:decision_confirm:1\n- Category: transition\n- Source: `/source/pack/screens/5/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"outcome\",\n  \"from\": \"decision_confirm\",\n  \"trigger\": \"confirm complete\",\n  \"animation\": \"short fade\",\n  \"condition\": \"always\"\n}\n```\n\n## TRN:evidence_review:1\n- Category: transition\n- Source: `/source/pack/screens/4/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"decision_confirm\",\n  \"from\": \"evidence_review\",\n  \"trigger\": \"tap decision_btn\",\n  \"animation\": \"short fade\",\n  \"condition\": \"clues>=2\"\n}\n```\n\n## TRN:inspection_desk:1\n- Category: transition\n- Source: `/source/pack/screens/2/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"visitor_interview\",\n  \"from\": \"inspection\",\n  \"trigger\": \"tap interview_btn\",\n  \"animation\": \"short fade\",\n  \"condition\": \"always\"\n}\n```\n\n## TRN:inspection_desk:2\n- Category: transition\n- Source: `/source/pack/screens/2/transitions/1`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"evidence_review\",\n  \"from\": \"inspection\",\n  \"trigger\": \"tap review_btn\",\n  \"animation\": \"short fade\",\n  \"condition\": \"clues>=2\"\n}\n```\n\n## TRN:night_desk:1\n- Category: transition\n- Source: `/source/pack/screens/0/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"case_intake\",\n  \"from\": \"ready\",\n  \"trigger\": \"tap start_shift\",\n  \"animation\": \"short fade\",\n  \"condition\": \"always\"\n}\n```\n\n## TRN:outcome:1\n- Category: transition\n- Source: `/source/pack/screens/6/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"case_intake\",\n  \"from\": \"outcome\",\n  \"trigger\": \"tap continue\",\n  \"animation\": \"short fade\",\n  \"condition\": \"case_index<3\"\n}\n```\n\n## TRN:outcome:2\n- Category: transition\n- Source: `/source/pack/screens/6/transitions/1`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"shift_summary\",\n  \"from\": \"outcome\",\n  \"trigger\": \"tap continue\",\n  \"animation\": \"short fade\",\n  \"condition\": \"case_index=3\"\n}\n```\n\n## TRN:shift_summary:1\n- Category: transition\n- Source: `/source/pack/screens/7/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"night_desk\",\n  \"from\": \"shift_summary\",\n  \"trigger\": \"tap finish\",\n  \"animation\": \"short fade\",\n  \"condition\": \"always\"\n}\n```\n\n## TRN:visitor_interview:1\n- Category: transition\n- Source: `/source/pack/screens/3/transitions/0`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"inspection\",\n  \"from\": \"visitor_interview\",\n  \"trigger\": \"tap back_inspect\",\n  \"animation\": \"short fade\",\n  \"condition\": \"return_count<1\"\n}\n```\n\n## TRN:visitor_interview:2\n- Category: transition\n- Source: `/source/pack/screens/3/transitions/1`\n- Verification mode: `static`\n\n```json\n{\n  \"to\": \"evidence_review\",\n  \"from\": \"visitor_interview\",\n  \"trigger\": \"tap review_btn\",\n  \"animation\": \"short fade\",\n  \"condition\": \"clues>=2\"\n}\n```\n",
+  "requirement_count": 106,
+  "wireframe_pack_id": "9d510757-6ab2-4f80-96d8-adbcbbe542c3"
+}

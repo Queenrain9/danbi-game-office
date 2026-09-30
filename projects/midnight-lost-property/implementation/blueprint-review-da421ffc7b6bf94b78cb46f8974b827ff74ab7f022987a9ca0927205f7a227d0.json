@@ -1,0 +1,13 @@
+{
+  "role": "gate",
+  "reviewed_at": "2026-09-30T06:56:22.943593+00:00",
+  "artifact_blob": "b30b95e3cad10f453125371fa3e920455f9c9680",
+  "evidence_path": "production/contracts/f556078a-f98d-4509-b08a-26509a651d78/blueprint-review-da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0.json",
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "source_checked": "true",
+  "artifact_commit": "00fac90366b8f409af947a4fd2239d546af66a50",
+  "validator_passed": "true",
+  "verification_scope": "construction_blueprint_static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true
+}

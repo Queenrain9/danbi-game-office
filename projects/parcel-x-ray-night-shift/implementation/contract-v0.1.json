@@ -1,0 +1,1932 @@
+{
+  "id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+  "title": "Parcel X-Ray Night Shift",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "422762b7-fdb5-446a-a939-bbcd755cbdb2",
+  "version": "v0.1",
+  "design_id": "8336d50a-9b52-4295-9b7c-f648010b776f",
+  "created_at": "2026-09-29T14:38:46.165724+00:00",
+  "updated_at": "2026-09-30T17:03:18.79764+00:00",
+  "requirements": [
+    {
+      "id": "ACC:01",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[1]",
+      "requirement": {
+        "criterion": "7개 inventory 화면/overlay가 모두 이동 가능"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:02",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[2]",
+      "requirement": {
+        "criterion": "Inspection에서 rotate/scan/pin/classify가 서로 충돌 없이 작동"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:03",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[3]",
+      "requirement": {
+        "criterion": "유효 레인 밖 release는 table로 복귀"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:04",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[4]",
+      "requirement": {
+        "criterion": "Rule Manual은 background 입력을 차단"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:05",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[5]",
+      "requirement": {
+        "criterion": "valid lane release 후 result까지 gameplay 입력 잠금"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ACC:06",
+      "category": "acceptance",
+      "source_ref": "acceptance_criteria[6]",
+      "requirement": {
+        "criterion": "8개 처리 후 Summary로 이동"
+      },
+      "verification": [
+        "Independent Fidelity Gate must verify this criterion against actual repository code"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:required_data",
+      "category": "architecture",
+      "source_ref": "developer_handoff.required_data",
+      "requirement": {
+        "required_data": [
+          "ParcelCase",
+          "HazardRules",
+          "ShiftProgress"
+        ]
+      },
+      "verification": [
+        "Required data models are represented in actual code/data"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:reusable_components",
+      "category": "architecture",
+      "source_ref": "developer_handoff.reusable_components",
+      "requirement": {
+        "reusable_components": [
+          "ParcelView",
+          "ScanRail",
+          "EvidencePin",
+          "DropLane",
+          "RuleChip",
+          "ResultStamp"
+        ]
+      },
+      "verification": [
+        "Named reusable components exist as reusable implementation units or an explicitly equivalent structure"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:scene_hierarchy",
+      "category": "architecture",
+      "source_ref": "developer_handoff.scene_hierarchy",
+      "requirement": {
+        "scene_hierarchy": [
+          "AppRoot",
+          "ShiftController",
+          "CaseRouter",
+          "HUDLayer",
+          "OverlayLayer"
+        ]
+      },
+      "verification": [
+        "Required hierarchy is present and carries real responsibility, not empty placeholder nodes"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "ARC:state_ownership",
+      "category": "architecture",
+      "source_ref": "developer_handoff.state_ownership",
+      "requirement": {
+        "state_ownership": "ShiftController owns case index/score; Inspection owns transient gesture state"
+      },
+      "verification": [
+        "Actual code ownership matches this division of responsibility"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:classification_result:continue",
+      "category": "component",
+      "source_ref": "classification_result.continue",
+      "requirement": {
+        "box": {
+          "h": 9,
+          "w": 64,
+          "x": 18,
+          "y": 83
+        },
+        "type": "button",
+        "label": "NEXT PARCEL",
+        "screen": "classification_result",
+        "component": "continue",
+        "enabled_when": null,
+        "state_binding": "result",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:classification_result:evidence_replay",
+      "category": "component",
+      "source_ref": "classification_result.evidence_replay",
+      "requirement": {
+        "box": {
+          "h": 34,
+          "w": 80,
+          "x": 10,
+          "y": 31
+        },
+        "type": "preview",
+        "label": "Evidence Slice",
+        "screen": "classification_result",
+        "component": "evidence_replay",
+        "enabled_when": null,
+        "state_binding": "result",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:classification_result:reason",
+      "category": "component",
+      "source_ref": "classification_result.reason",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 80,
+          "x": 10,
+          "y": 68
+        },
+        "type": "text_card",
+        "label": "Why",
+        "screen": "classification_result",
+        "component": "reason",
+        "enabled_when": null,
+        "state_binding": "result",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:classification_result:score_delta",
+      "category": "component",
+      "source_ref": "classification_result.score_delta",
+      "requirement": {
+        "box": {
+          "h": 7,
+          "w": 32,
+          "x": 34,
+          "y": 20
+        },
+        "type": "status",
+        "label": "Score",
+        "screen": "classification_result",
+        "component": "score_delta",
+        "enabled_when": null,
+        "state_binding": "result",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:classification_result:stamp",
+      "category": "component",
+      "source_ref": "classification_result.stamp",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 60,
+          "x": 20,
+          "y": 8
+        },
+        "type": "result_stamp",
+        "label": "PASS / REPACK / ISOLATE",
+        "screen": "classification_result",
+        "component": "stamp",
+        "enabled_when": null,
+        "state_binding": "result",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:case_rule",
+      "category": "component",
+      "source_ref": "inspection.case_rule",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 56,
+          "x": 5,
+          "y": 5
+        },
+        "type": "chip",
+        "label": "Rule chip",
+        "screen": "inspection",
+        "component": "case_rule",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:isolate_lane",
+      "category": "component",
+      "source_ref": "inspection.isolate_lane",
+      "requirement": {
+        "box": {
+          "h": 13,
+          "w": 28,
+          "x": 67,
+          "y": 78
+        },
+        "type": "drop_target",
+        "label": "ISOLATE",
+        "screen": "inspection",
+        "component": "isolate_lane",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!input_lock"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:manual_btn",
+      "category": "component",
+      "source_ref": "inspection.manual_btn",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 8,
+          "x": 87,
+          "y": 5
+        },
+        "type": "button",
+        "label": "?",
+        "screen": "inspection",
+        "component": "manual_btn",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!input_lock"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:pass_lane",
+      "category": "component",
+      "source_ref": "inspection.pass_lane",
+      "requirement": {
+        "box": {
+          "h": 13,
+          "w": 28,
+          "x": 5,
+          "y": 78
+        },
+        "type": "drop_target",
+        "label": "PASS",
+        "screen": "inspection",
+        "component": "pass_lane",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!input_lock"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:pin_tray",
+      "category": "component",
+      "source_ref": "inspection.pin_tray",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 34,
+          "x": 8,
+          "y": 65
+        },
+        "type": "status",
+        "label": "Evidence Pins 0/4",
+        "screen": "inspection",
+        "component": "pin_tray",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:repack_lane",
+      "category": "component",
+      "source_ref": "inspection.repack_lane",
+      "requirement": {
+        "box": {
+          "h": 13,
+          "w": 28,
+          "x": 36,
+          "y": 78
+        },
+        "type": "drop_target",
+        "label": "REPACK",
+        "screen": "inspection",
+        "component": "repack_lane",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!input_lock"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:scan_count",
+      "category": "component",
+      "source_ref": "inspection.scan_count",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 20,
+          "x": 64,
+          "y": 5
+        },
+        "type": "status",
+        "label": "Scans 0/4",
+        "screen": "inspection",
+        "component": "scan_count",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:scan_plane",
+      "category": "component",
+      "source_ref": "inspection.scan_plane",
+      "requirement": {
+        "box": {
+          "h": 2,
+          "w": 64,
+          "x": 12,
+          "y": 36
+        },
+        "type": "indicator",
+        "label": "Slice Plane",
+        "screen": "inspection",
+        "component": "scan_plane",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:scan_rail",
+      "category": "component",
+      "source_ref": "inspection.scan_rail",
+      "requirement": {
+        "box": {
+          "h": 48,
+          "w": 10,
+          "x": 84,
+          "y": 15
+        },
+        "type": "slider",
+        "label": "Slice 0–100",
+        "screen": "inspection",
+        "component": "scan_rail",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!classifying"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:inspection:xray_box",
+      "category": "component",
+      "source_ref": "inspection.xray_box",
+      "requirement": {
+        "box": {
+          "h": 48,
+          "w": 72,
+          "x": 8,
+          "y": 15
+        },
+        "type": "interactive_object",
+        "label": "Parcel / X-ray",
+        "screen": "inspection",
+        "component": "xray_box",
+        "enabled_when": null,
+        "state_binding": "inspect",
+        "interaction_role": "!classifying"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_hub:shift_card",
+      "category": "component",
+      "source_ref": "night_hub.shift_card",
+      "requirement": {
+        "box": {
+          "h": 32,
+          "w": 84,
+          "x": 8,
+          "y": 22
+        },
+        "type": "card",
+        "label": "Night Shift 01",
+        "screen": "night_hub",
+        "component": "shift_card",
+        "enabled_when": null,
+        "state_binding": "hub",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:night_hub:start_shift",
+      "category": "component",
+      "source_ref": "night_hub.start_shift",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 64,
+          "x": 18,
+          "y": 68
+        },
+        "type": "button",
+        "label": "START SHIFT",
+        "screen": "night_hub",
+        "component": "start_shift",
+        "enabled_when": "shift_available",
+        "state_binding": "hub",
+        "interaction_role": "start"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:parcel_intake:begin_inspect",
+      "category": "component",
+      "source_ref": "parcel_intake.begin_inspect",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 64,
+          "x": 18,
+          "y": 76
+        },
+        "type": "button",
+        "label": "BEGIN INSPECT",
+        "screen": "parcel_intake",
+        "component": "begin_inspect",
+        "enabled_when": "case_loaded",
+        "state_binding": "intake",
+        "interaction_role": "start"
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:parcel_intake:case_counter",
+      "category": "component",
+      "source_ref": "parcel_intake.case_counter",
+      "requirement": {
+        "box": {
+          "h": 6,
+          "w": 22,
+          "x": 6,
+          "y": 5
+        },
+        "type": "status",
+        "label": "1 / 8",
+        "screen": "parcel_intake",
+        "component": "case_counter",
+        "enabled_when": null,
+        "state_binding": "intake",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:parcel_intake:label_card",
+      "category": "component",
+      "source_ref": "parcel_intake.label_card",
+      "requirement": {
+        "box": {
+          "h": 32,
+          "w": 84,
+          "x": 8,
+          "y": 18
+        },
+        "type": "card",
+        "label": "Parcel Label",
+        "screen": "parcel_intake",
+        "component": "label_card",
+        "enabled_when": null,
+        "state_binding": "intake",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:parcel_intake:rule_chips",
+      "category": "component",
+      "source_ref": "parcel_intake.rule_chips",
+      "requirement": {
+        "box": {
+          "h": 14,
+          "w": 84,
+          "x": 8,
+          "y": 54
+        },
+        "type": "chip_group",
+        "label": "Active Rules",
+        "screen": "parcel_intake",
+        "component": "rule_chips",
+        "enabled_when": null,
+        "state_binding": "intake",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:pause:pause_scrim",
+      "category": "component",
+      "source_ref": "pause.pause_scrim",
+      "requirement": {
+        "box": {
+          "h": 100,
+          "w": 100,
+          "x": 0,
+          "y": 0
+        },
+        "type": "overlay",
+        "label": "Paused",
+        "screen": "pause",
+        "component": "pause_scrim",
+        "enabled_when": null,
+        "state_binding": "paused",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:pause:quit",
+      "category": "component",
+      "source_ref": "pause.quit",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 60,
+          "x": 20,
+          "y": 54
+        },
+        "type": "button",
+        "label": "QUIT TO HUB",
+        "screen": "pause",
+        "component": "quit",
+        "enabled_when": null,
+        "state_binding": "paused",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:pause:resume",
+      "category": "component",
+      "source_ref": "pause.resume",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 60,
+          "x": 20,
+          "y": 40
+        },
+        "type": "button",
+        "label": "RESUME",
+        "screen": "pause",
+        "component": "resume",
+        "enabled_when": null,
+        "state_binding": "paused",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:rule_manual:close_rule",
+      "category": "component",
+      "source_ref": "rule_manual.close_rule",
+      "requirement": {
+        "box": {
+          "h": 7,
+          "w": 18,
+          "x": 70,
+          "y": 74
+        },
+        "type": "button",
+        "label": "CLOSE",
+        "screen": "rule_manual",
+        "component": "close_rule",
+        "enabled_when": null,
+        "state_binding": "rule_overlay",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:rule_manual:modal_scrim",
+      "category": "component",
+      "source_ref": "rule_manual.modal_scrim",
+      "requirement": {
+        "box": {
+          "h": 100,
+          "w": 100,
+          "x": 0,
+          "y": 0
+        },
+        "type": "overlay",
+        "label": "Scrim",
+        "screen": "rule_manual",
+        "component": "modal_scrim",
+        "enabled_when": null,
+        "state_binding": "rule_overlay",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:rule_manual:rule_panel",
+      "category": "component",
+      "source_ref": "rule_manual.rule_panel",
+      "requirement": {
+        "box": {
+          "h": 66,
+          "w": 84,
+          "x": 8,
+          "y": 16
+        },
+        "type": "modal",
+        "label": "Rules",
+        "screen": "rule_manual",
+        "component": "rule_panel",
+        "enabled_when": null,
+        "state_binding": "rule_overlay",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:accuracy",
+      "category": "component",
+      "source_ref": "shift_summary.accuracy",
+      "requirement": {
+        "box": {
+          "h": 12,
+          "w": 26,
+          "x": 8,
+          "y": 36
+        },
+        "type": "metric",
+        "label": "Accuracy",
+        "screen": "shift_summary",
+        "component": "accuracy",
+        "enabled_when": null,
+        "state_binding": "summary",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:critical",
+      "category": "component",
+      "source_ref": "shift_summary.critical",
+      "requirement": {
+        "box": {
+          "h": 12,
+          "w": 26,
+          "x": 37,
+          "y": 36
+        },
+        "type": "metric",
+        "label": "Critical Miss",
+        "screen": "shift_summary",
+        "component": "critical",
+        "enabled_when": null,
+        "state_binding": "summary",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:efficiency",
+      "category": "component",
+      "source_ref": "shift_summary.efficiency",
+      "requirement": {
+        "box": {
+          "h": 12,
+          "w": 26,
+          "x": 66,
+          "y": 36
+        },
+        "type": "metric",
+        "label": "Efficiency",
+        "screen": "shift_summary",
+        "component": "efficiency",
+        "enabled_when": null,
+        "state_binding": "summary",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:grade",
+      "category": "component",
+      "source_ref": "shift_summary.grade",
+      "requirement": {
+        "box": {
+          "h": 18,
+          "w": 30,
+          "x": 35,
+          "y": 10
+        },
+        "type": "grade",
+        "label": "GRADE",
+        "screen": "shift_summary",
+        "component": "grade",
+        "enabled_when": null,
+        "state_binding": "summary",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CMP:shift_summary:next",
+      "category": "component",
+      "source_ref": "shift_summary.next",
+      "requirement": {
+        "box": {
+          "h": 10,
+          "w": 64,
+          "x": 18,
+          "y": 80
+        },
+        "type": "button",
+        "label": "BACK TO HUB",
+        "screen": "shift_summary",
+        "component": "next",
+        "enabled_when": null,
+        "state_binding": "summary",
+        "interaction_role": null
+      },
+      "verification": [
+        "Component exists on the specified screen/overlay",
+        "Geometry and state binding match the Wireframe Pack",
+        "Enabled/disabled behavior matches source conditions"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "CNT:mvp_scope",
+      "category": "content",
+      "source_ref": "mvp_scope",
+      "requirement": {
+        "mvp_scope": "세로 모바일 greybox 1개 Shift. 고정 상자 10개 중 8개 출제, primitive 내부 물체 6종, 위험 규칙 3개, 상자 회전, slice scan, evidence pin, 3레인 분류, 결과 설명, Shift Summary까지 실제 플레이 가능하게 구현.",
+        "screen_inventory": [
+          "Night Hub / Shift Select",
+          "Parcel Intake",
+          "X-Ray Inspection Table",
+          "Classification Result",
+          "Shift Summary",
+          "Rule Manual Overlay",
+          "Pause"
+        ]
+      },
+      "verification": [
+        "All MVP content quantities and listed screens are present",
+        "No core scope item is silently omitted"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:input_lock",
+      "category": "global_state",
+      "source_ref": "global_state.input_lock",
+      "requirement": {
+        "id": "input_lock",
+        "rule": "valid classification release through result reveal"
+      },
+      "verification": [
+        "Global state rule is enforced across all affected screens"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "GST:paused",
+      "category": "global_state",
+      "source_ref": "global_state.paused",
+      "requirement": {
+        "id": "paused",
+        "rule": "freeze shift state"
+      },
+      "verification": [
+        "Global state rule is enforced across all affected screens"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:classify",
+      "category": "input_map",
+      "source_ref": "input_map.classify",
+      "requirement": {
+        "use": "classify",
+        "input": "drag-release",
+        "priority": 5
+      },
+      "verification": [
+        "Input priority matches source",
+        "Conflicting gestures are deterministically resolved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:pin",
+      "category": "input_map",
+      "source_ref": "input_map.pin",
+      "requirement": {
+        "use": "pin",
+        "input": "tap",
+        "priority": 2
+      },
+      "verification": [
+        "Input priority matches source",
+        "Conflicting gestures are deterministically resolved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:rotate",
+      "category": "input_map",
+      "source_ref": "input_map.rotate",
+      "requirement": {
+        "use": "rotate",
+        "input": "drag",
+        "priority": 3
+      },
+      "verification": [
+        "Input priority matches source",
+        "Conflicting gestures are deterministically resolved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INP:scan",
+      "category": "input_map",
+      "source_ref": "input_map.scan",
+      "requirement": {
+        "use": "scan",
+        "input": "rail swipe",
+        "priority": 4
+      },
+      "verification": [
+        "Input priority matches source",
+        "Conflicting gestures are deterministically resolved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "INT:classification_result:01",
+      "category": "interaction",
+      "source_ref": "classification_result.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "advance",
+        "screen": "classification_result",
+        "target": "continue",
+        "feedback": "press",
+        "precondition": "result shown",
+        "state_change": "next intake or summary",
+        "invalid_input": "none"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection:01",
+      "category": "interaction",
+      "source_ref": "inspection.interaction[1]",
+      "requirement": {
+        "input": "1-finger drag",
+        "action": "rotate yaw/pitch",
+        "screen": "inspection",
+        "target": "xray_box",
+        "feedback": "direct follow + friction audio",
+        "precondition": "start inside box; not scan rail; !classifying",
+        "state_change": "box_pose",
+        "invalid_input": "UI/rail start ignored"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection:02",
+      "category": "interaction",
+      "source_ref": "inspection.interaction[2]",
+      "requirement": {
+        "input": "vertical swipe",
+        "action": "map y to slice_depth",
+        "screen": "inspection",
+        "target": "scan_rail",
+        "feedback": "scan plane + hum",
+        "precondition": "gesture starts in rail; !classifying",
+        "state_change": "slice_depth 0..100",
+        "invalid_input": "disabled during box classification drag"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection:03",
+      "category": "interaction",
+      "source_ref": "inspection.interaction[3]",
+      "requirement": {
+        "input": "tap",
+        "action": "toggle evidence pin",
+        "screen": "inspection",
+        "target": "visible internal shape in xray_box",
+        "feedback": "ring + light haptic",
+        "precondition": "scan active; pins<4; no drag threshold crossed",
+        "state_change": "pins",
+        "invalid_input": "empty tap -> faint no-target pulse"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:inspection:04",
+      "category": "interaction",
+      "source_ref": "inspection.interaction[4]",
+      "requirement": {
+        "input": "drag-release",
+        "action": "classify parcel",
+        "screen": "inspection",
+        "target": "xray_box → pass_lane/repack_lane/isolate_lane",
+        "feedback": "lane outline + magnetic snap",
+        "precondition": "unclassified",
+        "state_change": "input_lock + result",
+        "invalid_input": "release outside lane -> spring to table"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:night_hub:01",
+      "category": "interaction",
+      "source_ref": "night_hub.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "load first parcel",
+        "screen": "night_hub",
+        "target": "start_shift",
+        "feedback": "button press + short fade",
+        "precondition": "shift_available",
+        "state_change": "intake",
+        "invalid_input": "disabled if no shift data"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:parcel_intake:01",
+      "category": "interaction",
+      "source_ref": "parcel_intake.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "enter inspection",
+        "screen": "parcel_intake",
+        "target": "begin_inspect",
+        "feedback": "button depress",
+        "precondition": "case_loaded",
+        "state_change": "inspect",
+        "invalid_input": "ignore while loading"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:pause:01",
+      "category": "interaction",
+      "source_ref": "pause.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "resume prior state",
+        "screen": "pause",
+        "target": "resume",
+        "feedback": "fade",
+        "precondition": null,
+        "state_change": "prior",
+        "invalid_input": "none"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:pause:02",
+      "category": "interaction",
+      "source_ref": "pause.interaction[2]",
+      "requirement": {
+        "input": "tap",
+        "action": "abandon shift",
+        "screen": "pause",
+        "target": "quit",
+        "feedback": "confirm then fade",
+        "precondition": null,
+        "state_change": "hub",
+        "invalid_input": "none"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:rule_manual:01",
+      "category": "interaction",
+      "source_ref": "rule_manual.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "dismiss",
+        "screen": "rule_manual",
+        "target": "close_rule",
+        "feedback": "fade",
+        "precondition": "overlay",
+        "state_change": "inspect",
+        "invalid_input": "background taps blocked"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "INT:shift_summary:01",
+      "category": "interaction",
+      "source_ref": "shift_summary.interaction[1]",
+      "requirement": {
+        "input": "tap",
+        "action": "return hub",
+        "screen": "shift_summary",
+        "target": "next",
+        "feedback": "press",
+        "precondition": "summary",
+        "state_change": "hub",
+        "invalid_input": "none"
+      },
+      "verification": [
+        "Use the exact input modality and target from the Wireframe Pack",
+        "Verify precondition, state change, immediate feedback and invalid/cancel path",
+        "Do not substitute buttons/text/counters for the specified spatial or gesture interaction"
+      ],
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "RUL:combo",
+      "category": "rule",
+      "source_ref": "game_rules.combo",
+      "requirement": {
+        "combo": "연속 3정답부터 +10 accuracy streak, 오답 시 리셋"
+      },
+      "verification": [
+        "Scoring logic exactly matches the rule"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:failure",
+      "category": "rule",
+      "source_ref": "game_rules.failure",
+      "requirement": {
+        "failure": "Shift 즉시 실패 없음. 위험 상자를 PASS하면 Critical Miss 기록; 2회 이상이면 Shift grade 최대 C."
+      },
+      "verification": [
+        "Failure/grade constraints exactly match the rule"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:hazard:01",
+      "category": "rule",
+      "source_ref": "game_rules.initial_rules[1]",
+      "requirement": {
+        "rule": "금속성 고밀도 물체가 완충재 없이 외벽 10% 이내면 REPACK"
+      },
+      "verification": [
+        "Hazard evaluation derives outcome from the described spatial/data relationship"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:hazard:02",
+      "category": "rule",
+      "source_ref": "game_rules.initial_rules[2]",
+      "requirement": {
+        "rule": "서로 다른 두 고밀도 물체가 케이블형 구조로 연결되고 전원 셀과 접촉하면 ISOLATE"
+      },
+      "verification": [
+        "Hazard evaluation derives outcome from the described spatial/data relationship"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:hazard:03",
+      "category": "rule",
+      "source_ref": "game_rules.initial_rules[3]",
+      "requirement": {
+        "rule": "위험 조건이 없으면 PASS"
+      },
+      "verification": [
+        "Hazard evaluation derives outcome from the described spatial/data relationship"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scan_budget",
+      "category": "rule",
+      "source_ref": "game_rules.scan_budget",
+      "requirement": {
+        "scan_budget": {
+          "penalty": "5회째부터 efficiency 점수 감소",
+          "hard_limit": null,
+          "soft_target": 4
+        }
+      },
+      "verification": [
+        "Scan count/efficiency penalty is implemented exactly, including 5th-use behavior"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:correct",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.correct",
+      "requirement": {
+        "correct": 100
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:critical_isolate",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.critical_isolate",
+      "requirement": {
+        "critical_isolate": 150
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:efficient_bonus",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.efficient_bonus",
+      "requirement": {
+        "efficient_bonus": "<=3 scan reversals +20"
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:false_pin",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.false_pin",
+      "requirement": {
+        "false_pin": -5
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:wrong_other",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.wrong_other",
+      "requirement": {
+        "wrong_other": -80
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "RUL:scoring:wrong_pass",
+      "category": "rule",
+      "source_ref": "game_rules.scoring.wrong_pass",
+      "requirement": {
+        "wrong_pass": -180
+      },
+      "verification": [
+        "Numeric scoring effect is implemented exactly"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:classification_result:result",
+      "category": "state",
+      "source_ref": "classification_result.state.result",
+      "requirement": {
+        "id": "result",
+        "ui": "stamp/reason",
+        "exit": "continue",
+        "enter": "decision lock",
+        "allowed_input": "continue"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection:classifying",
+      "category": "state",
+      "source_ref": "inspection.state.classifying",
+      "requirement": {
+        "id": "classifying",
+        "ui": "lane highlight",
+        "exit": "release/cancel",
+        "enter": "box drag enters lane zone",
+        "allowed_input": "drag/release"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:inspection:inspect",
+      "category": "state",
+      "source_ref": "inspection.state.inspect",
+      "requirement": {
+        "id": "inspect",
+        "ui": "all controls",
+        "exit": "valid lane release",
+        "enter": "begin",
+        "allowed_input": "rotate/scan/pin/box drag/manual"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:night_hub:hub",
+      "category": "state",
+      "source_ref": "night_hub.state.hub",
+      "requirement": {
+        "id": "hub",
+        "ui": "shift card visible",
+        "exit": "start_shift",
+        "enter": "app/start or summary exit",
+        "allowed_input": "shift select/start"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:parcel_intake:intake",
+      "category": "state",
+      "source_ref": "parcel_intake.state.intake",
+      "requirement": {
+        "id": "intake",
+        "ui": "label/rules",
+        "exit": "begin",
+        "enter": "parcel loaded",
+        "allowed_input": "label tap, begin"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:pause:paused",
+      "category": "state",
+      "source_ref": "pause.state.paused",
+      "requirement": {
+        "id": "paused",
+        "ui": "game frozen",
+        "exit": "resume/quit",
+        "enter": "pause action",
+        "allowed_input": "resume/quit"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:rule_manual:rule_overlay",
+      "category": "state",
+      "source_ref": "rule_manual.state.rule_overlay",
+      "requirement": {
+        "id": "rule_overlay",
+        "ui": "background blocked",
+        "exit": "close",
+        "enter": "manual tap",
+        "allowed_input": "close"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "STA:shift_summary:summary",
+      "category": "state",
+      "source_ref": "shift_summary.state.summary",
+      "requirement": {
+        "id": "summary",
+        "ui": "metrics",
+        "exit": "hub",
+        "enter": "8 results",
+        "allowed_input": "next"
+      },
+      "verification": [
+        "State entry/exit conditions exist",
+        "Allowed inputs match",
+        "Visible UI/state effect is observable"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "VAR:inspection:classifying",
+      "category": "state_variant",
+      "source_ref": "inspection.variant.classifying",
+      "requirement": {
+        "id": "classifying",
+        "name": "CLASSIFYING",
+        "notes": "lane drag priority > rotate > hotspot",
+        "condition": "parcel drag enters bottom 22%",
+        "component_overrides": {
+          "xray_box": {
+            "box": {
+              "h": 24,
+              "w": 54,
+              "x": 18,
+              "y": 60
+            },
+            "label": "Parcel · Dragging"
+          },
+          "pass_lane": {
+            "label": "PASS · target"
+          },
+          "repack_lane": {
+            "label": "REPACK · target"
+          },
+          "isolate_lane": {
+            "label": "ISOLATE · target"
+          }
+        }
+      },
+      "verification": [
+        "Variant condition is implemented",
+        "Component overrides/behavior are observable",
+        "Input priority notes are preserved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "VAR:inspection:input_locked",
+      "category": "state_variant",
+      "source_ref": "inspection.variant.input_locked",
+      "requirement": {
+        "id": "input_locked",
+        "name": "LOCKED",
+        "notes": "all gameplay input disabled until result",
+        "condition": "valid lane release",
+        "component_overrides": {
+          "xray_box": {
+            "label": "Decision locked"
+          }
+        }
+      },
+      "verification": [
+        "Variant condition is implemented",
+        "Component overrides/behavior are observable",
+        "Input priority notes are preserved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "VAR:inspection:rotating",
+      "category": "state_variant",
+      "source_ref": "inspection.variant.rotating",
+      "requirement": {
+        "id": "rotating",
+        "name": "ROTATING",
+        "notes": "scan rail remains visible; hotspot tap suppressed",
+        "condition": "box drag below classification zone",
+        "component_overrides": {
+          "xray_box": {
+            "label": "Parcel · Rotating"
+          }
+        }
+      },
+      "verification": [
+        "Variant condition is implemented",
+        "Component overrides/behavior are observable",
+        "Input priority notes are preserved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "VAR:inspection:scanning",
+      "category": "state_variant",
+      "source_ref": "inspection.variant.scanning",
+      "requirement": {
+        "id": "scanning",
+        "name": "SCANNING",
+        "notes": "box rotate suppressed only while rail pointer held",
+        "condition": "scan rail active",
+        "component_overrides": {
+          "scan_rail": {
+            "label": "Slice · Active"
+          },
+          "scan_plane": {
+            "label": "Active Slice"
+          }
+        }
+      },
+      "verification": [
+        "Variant condition is implemented",
+        "Component overrides/behavior are observable",
+        "Input priority notes are preserved"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:classification_result:01",
+      "category": "transition",
+      "source_ref": "classification_result.transition[1]",
+      "requirement": {
+        "to": "parcel_intake",
+        "from": "result",
+        "trigger": "continue",
+        "animation": "fade",
+        "condition": "cases_done<8"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:classification_result:02",
+      "category": "transition",
+      "source_ref": "classification_result.transition[2]",
+      "requirement": {
+        "to": "shift_summary",
+        "from": "result",
+        "trigger": "continue",
+        "animation": "fade",
+        "condition": "cases_done=8"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:inspection:01",
+      "category": "transition",
+      "source_ref": "inspection.transition[1]",
+      "requirement": {
+        "to": "classification_result",
+        "from": "inspect",
+        "trigger": "valid lane release",
+        "animation": "snap then stamp",
+        "condition": "parcel center inside lane"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:inspection:02",
+      "category": "transition",
+      "source_ref": "inspection.transition[2]",
+      "requirement": {
+        "to": "rule_manual",
+        "from": "inspect",
+        "trigger": "tap manual_btn",
+        "animation": "modal",
+        "condition": "!input_lock"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:night_hub:01",
+      "category": "transition",
+      "source_ref": "night_hub.transition[1]",
+      "requirement": {
+        "to": "parcel_intake",
+        "from": "hub",
+        "trigger": "tap start_shift",
+        "animation": "short fade",
+        "condition": "shift_available"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:parcel_intake:01",
+      "category": "transition",
+      "source_ref": "parcel_intake.transition[1]",
+      "requirement": {
+        "to": "inspection",
+        "from": "intake",
+        "trigger": "tap begin_inspect",
+        "animation": "table push-in",
+        "condition": "case_loaded"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:pause:01",
+      "category": "transition",
+      "source_ref": "pause.transition[1]",
+      "requirement": {
+        "to": "inspection",
+        "from": "paused",
+        "trigger": "resume",
+        "animation": "fade",
+        "condition": "prior gameplay"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:pause:02",
+      "category": "transition",
+      "source_ref": "pause.transition[2]",
+      "requirement": {
+        "to": "night_hub",
+        "from": "paused",
+        "trigger": "quit confirm",
+        "animation": "fade",
+        "condition": "always"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:rule_manual:01",
+      "category": "transition",
+      "source_ref": "rule_manual.transition[1]",
+      "requirement": {
+        "to": "inspection",
+        "from": "rule_overlay",
+        "trigger": "close",
+        "animation": "modal fade",
+        "condition": "always"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    },
+    {
+      "id": "TRN:shift_summary:01",
+      "category": "transition",
+      "source_ref": "shift_summary.transition[1]",
+      "requirement": {
+        "to": "night_hub",
+        "from": "summary",
+        "trigger": "tap next",
+        "animation": "fade",
+        "condition": "always"
+      },
+      "verification": [
+        "From/to target exists",
+        "Trigger and guard condition are enforced",
+        "No dead end is introduced"
+      ],
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": "2026-09-29T14:38:46.165724+00:00",
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "category_counts": {
+    "rule": 12,
+    "state": 8,
+    "content": 1,
+    "component": 32,
+    "input_map": 4,
+    "acceptance": 6,
+    "transition": 10,
+    "interaction": 11,
+    "architecture": 4,
+    "global_state": 2,
+    "state_variant": 4
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T06:55:58.932491+00:00",
+    "artifact_blob": "b5818a17cc5d4aaf52d5dc4b96927b82787f8712",
+    "evidence_path": "production/contracts/3956862d-8262-431f-ae6c-32ce57e99a07/blueprint-review-86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e.json",
+    "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+    "source_checked": "true",
+    "artifact_commit": "e825b8d4fbeaa4383e68db5cda0bdd0563426152",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Implementation Contract v0.1 — Parcel X-Ray Night Shift\n\nRecompiled from current Game Design + Interaction Wireframe Pack after SOFT_RESET. Stable requirement IDs preserved from reset ID map. Runtime-dependent verification remains manual_playtest.",
+  "requirement_count": 94,
+  "wireframe_pack_id": "e023e9c0-b1b7-4fc4-a0e7-996c7d95c099"
+}
