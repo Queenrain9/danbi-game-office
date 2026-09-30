@@ -1,0 +1,32 @@
+{
+  "contract_id": "bb27ce5f-06f3-49c7-8493-f6092fb4f83c",
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "reviewed_at": "2026-09-30T04:49:23Z",
+  "repository_ref": "main",
+  "canonical_adapter": {
+    "production_integration_blob": "2a96aa7c0daf8ab71445feca2f072556d8015d0d",
+    "construction_blob": "412fbcea7ae3ce0030252ee4eb84893148b4de38",
+    "production_blob": "b7dfcf38120fc601cbcbffb5486ba08f70445791"
+  },
+  "checks": {
+    "production_check_blueprint": {
+      "status": "passed",
+      "errors": []
+    },
+    "source_identity": true,
+    "canonical_hash": true,
+    "component_geometry_registry": true,
+    "reusable_screen_use_sites": true,
+    "interaction_semantics_and_targets": true,
+    "node_schema_and_ownership": true,
+    "state_variant_transition_rule_bindings": true,
+    "requirement_implementation_and_static_test_coverage": true,
+    "six_static_stages": true,
+    "runtime_tests_remain_manual_playtest": true
+  }
+}
