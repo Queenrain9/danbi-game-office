@@ -130,11 +130,11 @@ function phaseSignals(t,seconds){
   curiosity:clamp(t.edge_seconds/sec*1.5+t.direction_changes/28,0,1),
   interaction:clamp((t.target_contacts+t.collectibles_taken+t.base_returns+t.shots_fired)*.13+(t.companion_near_seconds+t.npc_near_seconds)/sec*.7,0,1),
   dwell:clamp(t.idle_seconds/sec*1.8,0,1),
-  persistence:clamp(t.hazard_hits*.18+t.target_contacts*.12+t.base_returns*.22+t.resources_spent*.04,0,1)
+  persistence:clamp(t.hazard_hits*.18+t.target_contacts*.12+t.base_returns*.22+t.resources_spent*.04,0,1),taps:clamp(t.taps/8,0,1)
  }
 }
 function engagement(sig){return clamp(sig.activity*.22+sig.interaction*.27+sig.curiosity*.15+sig.persistence*.15+sig.speed*.11+(1-Math.abs(.35-sig.dwell))*.10,0,1)}
-function dotProbe(sig,p){return (sig.activity*(p.activity||0)+sig.speed*(p.speed||0)+sig.curiosity*(p.curiosity||0)+sig.interaction*(p.interaction||0)+sig.dwell*(p.dwell||0)+sig.persistence*(p.persistence||0))/Math.max(1,Object.values(p).reduce((a,b)=>a+Math.abs(b),0))}
+function dotProbe(sig,p){return (sig.activity*(p.activity||0)+sig.speed*(p.speed||0)+sig.curiosity*(p.curiosity||0)+sig.interaction*(p.interaction||0)+sig.dwell*(p.dwell||0)+sig.persistence*(p.persistence||0)+sig.taps*(p.taps||0))/Math.max(1,Object.values(p).reduce((a,b)=>a+Math.abs(b),0))}
 function statMean(id){const s=S.stats[id];return s&&s.n?s.sum/s.n:0}
 function categoryMean(cat){const s=S.categoryStats[cat];return s&&s.n?s.sum/s.n:0}
 function bumpStat(map,key,r){if(!map[key])map[key]={n:0,sum:0};map[key].n++;map[key].sum+=r}
