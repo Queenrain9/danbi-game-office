@@ -1,16 +1,64 @@
 import importlib.util
 from pathlib import Path
 import unittest
-spec=importlib.util.spec_from_file_location("construction",Path(__file__).parents[1]/"tools/fidelity/construction.py")
+
+ROOT = Path(__file__).parents[1]
+spec=importlib.util.spec_from_file_location("construction",ROOT/"tools/fidelity/construction.py")
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+
 class InteractionAdapterTests(unittest.TestCase):
     def test_registry(self):
         self.assertEqual(set(m.INTERACTION_ADAPTERS),{"drag_v1","snap_v1","hold_v1","swipe_v1","trace_v1","pinch_v1"})
-    def test_drag_snap(self):
+
+    def test_registry_lifecycle_is_production_for_current_v1_set(self):
+        registry=m.load_adapter_registry()
+        self.assertEqual(registry["schema_version"],"interaction-runtime-registry-v1")
+        self.assertEqual(set(registry["adapters"]),set(m.INTERACTION_ADAPTERS))
+        for adapter_id,entry in registry["adapters"].items():
+            self.assertEqual(entry["adapter_id"],adapter_id)
+            self.assertEqual(entry["status"],"production")
+            self.assertRegex(entry["sha256"],r"^[0-9a-f]{64}$")
+            self.assertTrue(entry["class_name"].endswith("V1"))
+            self.assertIn("4.7.2",entry["validated_godot"])
+            self.assertTrue(entry["ci_run"])
+
+    def test_production_selector_excludes_candidate_and_deprecated(self):
+        fake={
+            "a_v1":{"adapter_id":"a_v1","semantic_kind":"drag","status":"deprecated"},
+            "a_v2":{"adapter_id":"a_v2","semantic_kind":"drag","status":"production"},
+            "a_v3":{"adapter_id":"a_v3","semantic_kind":"drag","status":"candidate"},
+        }
+        self.assertEqual(m.select_production_adapter("drag",fake)["adapter_id"],"a_v2")
+
+    def test_drag_snap_compilation_pins_immutable_adapter_metadata(self):
         src={"interaction_semantics":{"kind":"drag","target_component_id":"piece","cancel":"return_origin","completion":{"kind":"snap","target_component_id":"slot","tolerance_px":24}}}
-        plan=m.compile_interaction_adapters(src);self.assertIsNone(plan["fallback_reason"]);self.assertEqual([x["adapter_id"] for x in plan["adapter_bindings"]],["drag_v1","snap_v1"]);self.assertEqual(plan["adapter_bindings"][1]["params"]["tolerance_px"],24)
+        plan=m.compile_interaction_adapters(src)
+        self.assertIsNone(plan["fallback_reason"])
+        self.assertEqual([x["adapter_id"] for x in plan["adapter_bindings"]],["drag_v1","snap_v1"])
+        self.assertEqual(plan["adapter_bindings"][1]["params"]["tolerance_px"],24)
+        for binding in plan["adapter_bindings"]:
+            self.assertEqual(binding["adapter_status"],"production")
+            self.assertRegex(binding["adapter_sha256"],r"^[0-9a-f]{64}$")
+            self.assertTrue(binding["adapter_class_name"].startswith("Danbi"))
+
+    def test_hash_normalizes_crlf_to_git_lf_bytes(self):
+        lf=b"class_name Example\nextends RefCounted\n"
+        crlf=b"class_name Example\r\nextends RefCounted\r\n"
+        self.assertEqual(m.adapter_content_sha256(lf),m.adapter_content_sha256(crlf))
+
+    def test_production_registry_matches_canonical_files(self):
+        self.assertEqual(m.verify_adapter_registry(ROOT),[])
+
+    def test_blueprint_hash_includes_adapter_pin(self):
+        base={"source":{},"bindings":{"interactions":[{"adapter_bindings":[{"adapter_id":"drag_v1","adapter_sha256":"a"*64}]}]}}
+        changed={"source":{},"bindings":{"interactions":[{"adapter_bindings":[{"adapter_id":"drag_v1","adapter_sha256":"b"*64}]}]}}
+        self.assertNotEqual(m.seal(base)["blueprint_hash"],m.seal(changed)["blueprint_hash"])
+
     def test_unknown_fallback(self):
         self.assertTrue(m.compile_interaction_adapters({"interaction_semantics":{"kind":"shadow_morph"}})["fallback_reason"].startswith("unsupported_semantic_kind:"))
+
     def test_legacy(self):
         self.assertEqual(m.compile_interaction_adapters({"input":"drag"})["fallback_reason"],"legacy_unstructured_interaction")
-if __name__=="__main__":unittest.main()
+
+if __name__=="__main__":
+    unittest.main()
