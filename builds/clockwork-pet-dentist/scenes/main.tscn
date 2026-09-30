@@ -1,0 +1,183 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource path="res://scripts/main.gd" type="Script" id="1"]
+[node name="AppRoot" type="Control"]
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1")
+[node name="patient_select" type="Control" parent="."]
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="patient_cards" type="Button" parent="patient_select"]
+offset_left=43.2
+offset_top=153.6
+offset_right=496.8
+offset_bottom=672.0
+text="PATIENT 01\nClockwork Fox\nTap to select"
+[node name="open" type="Button" parent="patient_select"]
+offset_left=108.0
+offset_top=777.6
+offset_right=432.0
+offset_bottom=864.0
+text="OPEN CASE"
+[node name="patient_brief" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="symptoms" type="Panel" parent="patient_brief"]
+offset_left=54.0
+offset_top=172.8
+offset_right=486.0
+offset_bottom=614.4
+[node name="back" type="Button" parent="patient_brief"]
+offset_left=43.2
+offset_top=796.8
+offset_right=237.6
+offset_bottom=873.6
+text="BACK"
+[node name="start" type="Button" parent="patient_brief"]
+offset_left=302.4
+offset_top=796.8
+offset_right=496.8
+offset_bottom=873.6
+text="OPEN MOUTH"
+[node name="treatment" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="mouth_view" type="Control" parent="treatment"]
+offset_left=32.4
+offset_top=124.8
+offset_right=507.6
+offset_bottom=614.4
+[node name="gear_layer" type="Button" parent="treatment"]
+offset_left=108.0
+offset_top=211.2
+offset_right=432.0
+offset_bottom=528.0
+text="⚙  GEAR MECHANISM"
+[node name="retainers" type="Label" parent="treatment"]
+offset_left=54.0
+offset_top=144.0
+offset_right=486.0
+offset_bottom=201.6
+text="RETAINER"
+[node name="fault_meter" type="ProgressBar" parent="treatment"]
+offset_left=54.0
+offset_top=633.6
+offset_right=486.0
+offset_bottom=672.0
+[node name="tools" type="Button" parent="treatment"]
+offset_left=43.2
+offset_top=710.4
+offset_right=194.4
+offset_bottom=806.4
+text="TOOLS"
+[node name="parts" type="Button" parent="treatment"]
+offset_left=210.6
+offset_top=710.4
+offset_right=361.8
+offset_bottom=806.4
+text="PARTS"
+[node name="test" type="Button" parent="treatment"]
+offset_left=378.0
+offset_top=710.4
+offset_right=496.8
+offset_bottom=806.4
+text="HOLD TEST"
+[node name="pause" type="Button" parent="treatment"]
+offset_left=442.8
+offset_top=864.0
+offset_right=507.6
+offset_bottom=921.6
+text="Ⅱ"
+[node name="part_bench" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="part" type="Button" parent="part_bench"]
+offset_left=108.0
+offset_top=211.2
+offset_right=432.0
+offset_bottom=480.0
+text="REPLACEMENT GEAR"
+[node name="grinder" type="Panel" parent="part_bench"]
+offset_left=54.0
+offset_top=537.6
+offset_right=270.0
+offset_bottom=691.2
+[node name="gauge" type="ProgressBar" parent="part_bench"]
+offset_left=302.4
+offset_top=576.0
+offset_right=486.0
+offset_bottom=624.0
+value=100.0
+[node name="discard" type="Button" parent="part_bench"]
+offset_left=54.0
+offset_top=748.8
+offset_right=237.6
+offset_bottom=825.6
+text="DISCARD"
+[node name="return" type="Button" parent="part_bench"]
+offset_left=302.4
+offset_top=748.8
+offset_right=486.0
+offset_bottom=825.6
+text="RETURN"
+[node name="pause" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="resume" type="Button" parent="pause"]
+offset_left=108.0
+offset_top=374.4
+offset_right=432.0
+offset_bottom=460.8
+text="RESUME"
+[node name="quit" type="Button" parent="pause"]
+offset_left=108.0
+offset_top=508.8
+offset_right=432.0
+offset_bottom=595.2
+text="QUIT"
+[node name="treatment_result" type="Control" parent="."]
+visible=false
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="stars" type="Label" parent="treatment_result"]
+offset_left=135.0
+offset_top=115.2
+offset_right=405.0
+offset_bottom=211.2
+text="★★★"
+[node name="report" type="Panel" parent="treatment_result"]
+offset_left=54.0
+offset_top=268.8
+offset_right=486.0
+offset_bottom=672.0
+[node name="retry" type="Button" parent="treatment_result"]
+offset_left=43.2
+offset_top=796.8
+offset_right=253.8
+offset_bottom=873.6
+text="RETRY"
+[node name="next" type="Button" parent="treatment_result"]
+offset_left=286.2
+offset_top=796.8
+offset_right=496.8
+offset_bottom=873.6
+text="NEXT"
+[connection signal="pressed" from="patient_select/patient_cards" to="." method="action_patient_select_0"]
+[connection signal="pressed" from="patient_select/open" to="." method="action_patient_select_1"]
+[connection signal="pressed" from="patient_brief/start" to="." method="action_patient_brief_0"]
+[connection signal="pressed" from="part_bench/return" to="." method="action_part_bench_1"]
+[connection signal="pressed" from="treatment/pause" to="." method="pause_game"]
+[connection signal="pressed" from="pause/resume" to="." method="action_pause_0"]
+[connection signal="pressed" from="treatment_result/retry" to="." method="action_treatment_result_0"]
+[connection signal="pressed" from="treatment_result/next" to="." method="action_treatment_result_1"]
