@@ -5,6 +5,28 @@ The existing Compiler, Build Farm and Static Fidelity Gate scheduled prompts use
 The Compiler automation was paused before this integration and remains paused. The Builder and Gate schedules remain enabled. No existing game was reclassified or promoted.
 
 
+## Per-game GitHub project archive
+
+Every production game has a durable GitHub project root under `projects/<slug>/`. The detailed convention is in `docs/PROJECT_ARCHIVE_CONVENTION.md`.
+
+Supabase remains the operational database for live queue selection, status transitions, UUID identity, Blueprint hashes and run bookkeeping. GitHub is the durable, human-browsable project archive. A completed artifact should not survive only as a database row.
+
+Expected stage archive paths:
+
+- `projects/<slug>/game-design/`
+- `projects/<slug>/wireframe/`
+- `projects/<slug>/implementation/`
+- `projects/<slug>/build/`
+- `projects/<slug>/fidelity/`
+- `projects/<slug>/playtest/`
+- `projects/<slug>/visual/`
+
+The active Build Farm construction path remains `builds/<slug>/` for compatibility. Do not move or rename it during an active pipeline. When a final game commit is fixed, archive an exact mirror under `projects/<slug>/build/godot/` without replacing `job.last_commit`; evidence-only archive commits are not game commits.
+
+The Project Archive Reconciler is allowed to backfill or refresh missing archive mirrors after the production stage completes. Archive repair must never rewrite Game Design/Wireframe meaning, Contract requirements, approved Blueprint content, build identity, evidence identity or review verdicts. A GitHub/archive outage is operational, not a semantic game blocker.
+
+Before introducing any new stage-specific GitHub location, prefer the per-game project tree above rather than creating another top-level archive silo.
+
 ## Scheduled pipeline run ledger
 
 Every scheduled production job that reads this document must record its execution independently from artifact creation. This lets the CEO dashboard distinguish "no work this hour" from "the automation did not run".
