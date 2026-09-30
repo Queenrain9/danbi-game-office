@@ -148,6 +148,23 @@ The Compiler also records Design↔Wireframe differences in `design_wireframe_no
 
 Operational GitHub/Supabase/network/tool/storage failures remain run-ledger failures and must not be converted into semantic game blockers.
 
+## Large Blueprint safe write
+
+Large Fidelity Blueprints must not be embedded into one giant raw SQL statement. For new or resumed unapproved Contracts, the Compiler uses the chunked staging path when the Blueprint is large or after any direct serialization/write failure.
+
+Protocol:
+
+1. Serialize the sealed Blueprint once as compact UTF-8 JSON. Its embedded `blueprint_hash` is the canonical SHA-256 of the Blueprint without the `blueprint_hash` field.
+2. Generate one fresh `write_id` and call `danbi_blueprint_write_begin(contract_id, write_id)`.
+3. Split the UTF-8 JSON by text segments small enough that each independently base64-encoded part is <= 65536 characters. 24 KB text segments are the recommended default.
+4. Base64-encode each segment independently and upload sequential `part_no` values with `danbi_blueprint_write_part(...)`.
+5. Verify count/order using `danbi_blueprint_write_status(...)`.
+6. Call `danbi_blueprint_write_finalize(contract_id, write_id, expected_parts, blueprint_hash)`.
+
+Finalize reassembles and parses JSON inside Postgres, verifies canonical hash, Contract/Wireframe identity, frozen source coverage/report and discrepancy notes, writes the Contract row, lets the Blueprint guard create matching history, and requires `danbi_compiler_checkpoint(...).complete=true` in the same transaction. If any invariant fails the Contract row is not advanced.
+
+Serialization/network/tool failure during staging is operational failure. Preserve the already-durable Contract requirements/source coverage and resume the same `blueprint_status='missing'` Contract later. Do not convert it to a semantic blocker.
+
 ## Compiler → independent Blueprint review
 
 Export **current full DB rows** for Contract, Wireframe Pack and Game Design to JSON. The Blueprint must keep `schema_version: fidelity-v1`, a frozen `source` with `pack`, `design`, and `requirements`, identical `screens` and `requirements`, plus `hash_algorithm: sha256-canonical-json-v1`. Add `bindings.scene_path`, `reference_size`, `coordinate_space: screen_percent`, `stretch_mode: canvas_items`, explicit `nodes`, `components`, `connections`, `interactions`, `implementations` (one or more `res://` file/node or symbol references per requirement), `reusable_components`, and `tests` with deterministic `checks` and `stage`. Use `construction_pattern` on each node; `registry` lists supported patterns. Every stage needs a static test, every requirement needs static implementation coverage, and executable behavior has a separate manual test. Use zero-based RFC6901 JSON pointers for `bindings.sources`.
