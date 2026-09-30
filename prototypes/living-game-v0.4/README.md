@@ -1,60 +1,98 @@
-# Living Game v0.4 — Real AI Planner
+# Living Game v0.4 — Zero-cost Local Adaptive Planner
 
-v0.1~v0.3에서 반복된 문제를 끊기 위해 만든 버전.
+이 버전은 OpenAI API / Supabase Planner 호출을 제거하고 브라우저 안에서만 동작한다.
 
-## v0.4에서 제거한 것
+## 핵심 구조
 
-- 미리 정한 완성 게임 후보
-- 장르 점수로 결과를 고르는 로직
-- buildGameSpec() 같은 결과 매핑 함수
-- AI처럼 보이는 로컬 규칙의 가짜 추론
-- Planner 실패 시 임의 게임 생성
+`행동 관찰 → 세계 변화 실험 → 실제 반응 평가 → 실험 보상 업데이트 → 다음 변화 선택 → 게임 결정`
 
-## 실제 흐름
+장르를 미리 점수화하거나 완성 게임 템플릿 중 하나를 고르지 않는다.
 
-1. 화면에는 점 하나만 존재.
-2. 브라우저는 실제 행동 telemetry를 기록.
-3. 일정 시간이 지나면 현재 world model + telemetry + 이전 AI 판단을 Supabase Edge Function에 전달.
-4. Edge Function의 실제 LLM Planner가 다음 세계 변경을 JSON으로 결정.
-5. 브라우저의 Universal Runtime은 허용된 mutation만 실행.
-6. 이 과정을 반복.
-7. AI가 충분히 하나의 게임이 되었다고 판단하면 정확히 하나의 Game Design을 crystallize.
-8. 사용자는 그 게임의 Art Direction 3안 중 하나만 선택.
-9. 현재 world model을 그대로 고정하여 즉시 플레이.
-10. Game Pack에 저장.
+Local Planner는 현재 world model과 최근 행동 telemetry를 바탕으로 여러 mutation 후보를 만들고,
+다음 기준을 함께 본다.
 
-## AI Planner endpoint
+- 최근 행동과의 관련성
+- 아직 시험하지 않은 변화인지
+- 같은 계열 변화가 이전에 반응을 얻었는지
+- 현재 세계와 실제로 연결 가능한지
+- 탐색 노이즈 / 세션 seed
 
-Supabase Edge Function:
+선택한 mutation 뒤에는 실제 플레이 반응을 측정해 reward를 계산하고,
+그 mutation과 category의 평균 보상을 업데이트한다.
 
-`living-game-planner`
+즉 완전한 LLM은 아니지만 단순한 `빠르게 움직임 → 레이싱 +1` 규칙도 아니다.
 
-이 함수는 `OPENAI_API_KEY`가 Supabase Edge Function Secrets에 있을 때만 실제 AI 호출을 한다.
-키가 없으면 HTTP 503 `ai_planner_not_connected`를 반환하며 프론트는 가짜 추론으로 대체하지 않는다.
+## 비용
 
-현재 모델 기본값은 `gpt-5.6-luna`. `LIVING_GAME_MODEL` secret으로 변경 가능.
+- OpenAI API 호출: 0
+- Supabase 호출: 0
+- 서버 저장: 0
+- 실행 위치: 브라우저
+- 게임팩 저장: localStorage
 
-## Runtime mutation contract
+## 현재 mutation 문법
 
-- set_avatar_form
-- set_control
-- set_space
-- add_entity / remove_entity
-- add_system / remove_system
-- set_goal
-- set_time
-- change_physics
-- change_density
-- change_relationship
-- change_economy
-- change_feedback
+### Control
+- direct_drag
+- inertia
+- steer
+- click_move
+- aim
 
-AI가 임의 JavaScript/GDScript를 쓰는 구조가 아니라 선언형 변경만 요청한다.
+### Space
+- abstract_flat
+- top_down_room
+- pseudo_depth
+- lanes
+- world_map
 
-## 다음 단계
+### Entity
+- target
+- collectible
+- companion
+- npc
+- base
+- hazard
+- resource_node
+- projectile_target
 
-- Art Direction 3안의 실제 이미지 생성
-- telemetry의 장기 Player Model 연동
-- Game Pack 서버 저장
-- 재방문 게임만 Deepening Factory로 보내기
-- Godot Runtime에 동일 mutation contract 구현
+### System
+- trail
+- chase
+- collect
+- escort
+- deliver
+- resource
+- upgrade
+- build
+- dialogue
+- projectile
+- survival
+- trade
+
+### Identity
+- dot
+- rover
+- ship
+- creature
+- runner
+- builder
+- courier
+
+## Crystallization
+
+약 60초 이후부터 현재 세계가 충분히 연결되어 있고 최근 실험 반응이 유지되면 게임으로 굳힌다.
+너무 오래 실험만 하지 않도록 약 115초 / 9 phase에서 hard stop이 있다.
+
+게임이 확정된 뒤 사용자에게 고르게 하는 것은 동일 게임의 Art Direction 3안뿐이다.
+선택 뒤에는 그때의 world model을 그대로 고정해 즉시 플레이한다.
+
+## 다음에 볼 것
+
+1. 점이 충분히 빨리 다른 존재/세계로 바뀌는가
+2. 세션마다 실제로 다른 mutation 경로가 나오는가
+3. 변화를 넣은 뒤 사용자의 행동이 달라지는 것이 체감되는가
+4. 최종 게임이 처음 점 게임의 변형이 아니라 하나의 게임처럼 느껴지는가
+5. Local Planner가 반복되는 안전한 조합으로 수렴하지 않는가
+
+v0.4의 목표는 "최종 생성 품질"보다 이 adaptive loop 자체가 성립하는지 검증하는 것이다.
