@@ -980,7 +980,7 @@ function titleInfo(){
     ideas:["아이디어 연구소",""],
     design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
     wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
-    implementation:["구현 설계실","Wireframe Pack을 1:1 원자 단위 Implementation Contract로 변환합니다."],
+    implementation:["구현 설계실","Wireframe을 구현 설계도로 컴파일하고, 독립 검수를 통과한 설계만 Build Farm으로 넘깁니다."],
     build:["빌드 팜","Implementation Contract를 실제 Godot playable로 구현합니다."],
     fidelity:["설계 검수실","Wireframe + Contract와 실제 코드를 독립적으로 대조하고 실패하면 Build Farm으로 반송합니다."],
     review:["플레이테스트실","여기서부터 단비가 게임을 직접 만지고 KEEP / MAYBE / KILL을 결정합니다."],
@@ -1919,7 +1919,8 @@ function showWireframePack(id,screenIndex=0,section="screens",variantIndex=0){
 function implementationHumanState(p){
   const status=String(p?.status||"").toLowerCase();
   const blueprint=String(p?.blueprint_status||"").toLowerCase();
-  if(status==="blocked" || blueprint==="blocked") return {key:"issue",label:"설계 문제 있음",tone:"red",next:"구현 설계 문제 확인"};
+  if(blueprint==="blocked") return {key:"issue",label:"설계 수정 필요",tone:"red",next:"수정 후 다시 설계도 검수"};
+  if(status==="blocked") return {key:"issue",label:"설계 문제 확인",tone:"red",next:"구현 설계 상태 확인"};
   if(blueprint==="pending_review") return {key:"review",label:"설계도 검수 대기",tone:"amber",next:"독립 설계도 검수"};
   if(blueprint==="approved" && status==="ready") return {key:"ready",label:"빌드 가능",tone:"green",next:"Build Farm"};
   if(status==="draft" || blueprint==="missing" || !blueprint) return {key:"design",label:"설계 중",tone:"blue",next:"구현 설계도 작성 완료"};
@@ -1942,6 +1943,7 @@ function implementationContractCard(p){
     '<div class="card-top"><div><div class="kicker">IMPLEMENTATION BLUEPRINT</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+human.tone+'">'+esc(human.label)+'</span></div>'+
     '<div class="card-desc" style="margin-top:8px">'+esc(brief)+'</div>'+
     '<div class="human-gate" style="margin-top:12px"><b>'+esc(human.label)+'</b><br><span style="color:#a9bdd4">다음 → '+esc(human.next)+'</span></div>'+
+    (human.key==="issue" && Array.isArray(p.blueprint_issues) && p.blueprint_issues.length ? '<div class="detail-box" style="margin-top:12px"><h3>검수에서 발견된 문제 · '+p.blueprint_issues.length+'개</h3><p>'+p.blueprint_issues.slice(0,3).map(x=>esc(typeof x==="string"?x:(x?.message||x?.issue||x?.kind||"수정 필요"))).join(" · ")+'</p></div>' : '')+
     '<div class="meta"><span>'+esc(p.version||"v0.1")+'</span><span>'+Number(p.requirement_count||0)+' requirements</span></div>'+
     (cats.length?'<div class="detail-box" style="margin-top:12px"><h3>설계 요구사항</h3><p>'+cats.map(([k,v])=>esc(k)+' '+Number(v)).join(' · ')+'</p></div>':'')+
     (raw?'<div style="margin-top:12px;font-size:10px;color:#5f7794">'+esc(raw)+'</div>':'')+
@@ -1971,19 +1973,23 @@ function implementationPage(){
   const review=currentContracts.filter(p=>implementationGroup(p)==="review");
   const ready=currentContracts.filter(p=>implementationGroup(p)==="ready");
   const issue=currentContracts.filter(p=>implementationGroup(p)==="issue");
-  return genericHeader("구현 설계실","Wireframe Pack을 Godot 시공용 구현 설계도로 컴파일하고, 독립 검수 승인을 거쳐 Build Farm으로 넘깁니다.",'<button class="btn" onclick="Promise.all([loadImplementationContracts(false),loadBuildJobs(false),loadGameDesigns(false)]).then(()=>toast(\'구현 설계실 새로고침\'))">↻ 새로고침</button>')+
+  const designStrip=design.length
+    ? '<div class="panel" style="margin-bottom:14px;padding:12px 16px"><div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><b style="font-size:12px;color:#dceaff">설계 중 · '+design.length+'개</b><div style="font-size:10px;color:#6f86a2;margin-top:3px">'+design.map(p=>esc(p.title)).join(" · ")+'</div></div><span class="badge blue">자동 처리 중</span></div></div>'
+    : '';
+  return genericHeader("구현 설계실","구현 설계도가 작성되면 독립 검수를 받고, 통과한 설계만 Build Farm으로 넘어갑니다.",'<button class="btn" onclick="Promise.all([loadImplementationContracts(false),loadBuildJobs(false),loadGameDesigns(false)]).then(()=>toast(\'구현 설계실 새로고침\'))">↻ 새로고침</button>')+
     '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>구현 설계 흐름</strong><span>Blueprint lifecycle</span></div>'+
       '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:11px;color:#91a5bd">'+
         '<span class="badge blue">설계 중 '+design.length+'</span><span>→</span>'+
         '<span class="badge amber">설계도 검수 대기 '+review.length+'</span><span>→</span>'+
         '<span class="badge green">빌드 가능 '+ready.length+'</span>'+
+        (issue.length?'<span style="margin-left:6px">↺</span><span class="badge red">설계 수정 필요 '+issue.length+'</span>':'')+
       '</div>'+
-      '<div style="margin-top:12px;font-size:11px;color:#7f95af">Blueprint 작성이 끝나도 바로 Build Farm으로 가지 않습니다. 독립 설계도 검수를 통과한 게임만 “빌드 가능”으로 이동합니다.</div>'+
+      '<div style="margin-top:12px;font-size:11px;color:#7f95af">설계도 검수에서 실패한 게임은 Build Farm으로 가지 않고 이 방의 “설계 수정 필요”로 돌아옵니다. 수정 후 다시 검수 대기 상태가 됩니다.</div>'+
     '</div>'+
-    (issue.length?implementationStatusSection("확인 필요","구현 설계 또는 Blueprint 검수에서 문제가 확인된 항목입니다.","red",issue,"확인 필요한 항목이 없습니다."):"")+
-    implementationStatusSection("설계 중","Wireframe을 atomic requirements와 Fidelity Blueprint로 변환하고 있는 게임입니다.","blue",design,"현재 설계 중인 게임이 없습니다.")+
-    implementationStatusSection("설계도 검수 대기","Blueprint 작성은 끝났고, 원본 Game Design / Wireframe과 독립 대조 검수를 기다리는 게임입니다.","amber",review,"현재 설계도 검수를 기다리는 게임이 없습니다.")+
-    implementationStatusSection("빌드 가능","독립 Blueprint 검수를 통과해 Build Farm이 가져갈 수 있는 게임입니다.","green",ready,"현재 Build Farm으로 넘길 준비가 끝난 게임이 없습니다.");
+    designStrip+
+    implementationStatusSection("설계도 검수 대기","Blueprint 작성이 끝나 원본 Game Design / Wireframe과 독립 대조 검수를 기다리는 게임입니다.","amber",review,"현재 설계도 검수를 기다리는 게임이 없습니다.")+
+    (issue.length?implementationStatusSection("설계 수정 필요","설계도 검수에서 실패해 구현 설계실로 돌아온 게임입니다. 문제를 수정한 뒤 다시 검수를 받습니다.","red",issue,""):"")+
+    implementationStatusSection("빌드 가능","독립 설계도 검수를 통과해 Build Farm이 가져갈 수 있는 게임입니다.","green",ready,"현재 Build Farm으로 넘길 준비가 끝난 게임이 없습니다.");
 }
 
 function isSupersededReview(r){
