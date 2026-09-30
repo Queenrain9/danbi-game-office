@@ -41,8 +41,8 @@ STUDIO_REFERENCE_SIZES = {
 
 # Wireframe component types are semantic, not Godot class names. The Compiler
 # must use this registry instead of inventing a mapping per game. A component
-# that receives a non-Button gesture keeps its canonical Godot type and is
-# promoted to explicit_script_v1.
+# that receives a non-Button gesture keeps its canonical Godot type. Structured
+# standard semantics use adapter_host_v1; legacy/special mechanics may use explicit_script_v1.
 SOURCE_COMPONENT_TYPES = {}
 
 
@@ -691,6 +691,32 @@ def validate_project(b, project, refs, error):
             try: rn,_,_=parse_scene(read(ref['file']))
             except (KeyError,ValueError): rn={}
             if ref['node_path'] not in rn: error('NODE_PATH',ref['node_path'],'Implementation node missing from referenced scene')
+    # Standard interaction adapters are immutable library copies. In a repository
+    # checkout, compare the game-local res:// copy with the canonical production source.
+    repo_root=project.resolve()
+    while repo_root.parent!=repo_root and not (repo_root/'.git').exists():
+        repo_root=repo_root.parent
+    seen_adapters=set()
+    for interaction in bindings.get('interactions',[]):
+        for adapter in interaction.get('adapter_bindings',[]) if isinstance(interaction.get('adapter_bindings'),list) else []:
+            aid=adapter.get('adapter_id')
+            if not aid or aid in seen_adapters: continue
+            seen_adapters.add(aid)
+            spec=INTERACTION_ADAPTERS.get(aid)
+            if not spec:
+                error('ADAPTER_MAPPING',aid,'Unknown interaction adapter in project validation')
+                continue
+            try:
+                local=(project/resource_path(adapter.get('script_path'))).resolve()
+                canonical=(repo_root/spec['source_path']).resolve()
+                if not canonical.is_file():
+                    error('ADAPTER_SOURCE',aid,'Canonical interaction runtime source missing from repository checkout')
+                elif not local.is_file():
+                    error('ADAPTER_COPY',adapter.get('script_path'),'Game-local interaction adapter copy is missing')
+                elif local.read_bytes()!=canonical.read_bytes():
+                    error('ADAPTER_COPY',adapter.get('script_path'),'Game-local interaction adapter differs from canonical runtime source')
+            except (ValueError,OSError) as exc:
+                error('ADAPTER_COPY',adapter.get('script_path'),str(exc))
     for t in bindings.get('tests',[]):
         if not is_static(t): continue
         for check in t.get('checks',[]):
