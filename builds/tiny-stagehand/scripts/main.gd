@@ -261,3 +261,10 @@ func _event_pos(event:InputEvent)->Vector2:
  if event is InputEventScreenTouch or event is InputEventScreenDrag:return event.position
  if event is InputEventMouseButton or event is InputEventMouseMotion:return event.position
  return Vector2.ZERO
+
+# Fidelity-v1 static scene signal bridges for the legacy rebaseline.
+func bp_action_lobby_select()->void:
+ open_briefing(0)
+
+func bp_action_result_retry()->void:
+ open_briefing(selected)

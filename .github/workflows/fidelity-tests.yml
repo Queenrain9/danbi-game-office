@@ -54,3 +54,7 @@ jobs:
         run: godot --headless --path production/godot/interaction_runtime --script res://headless_tests.gd
       - name: Run Borrowed Shadow compatibility probe
         run: godot --headless --path production/godot/interaction_runtime --script res://borrowed_shadow_probe.gd
+
+      - name: Tiny Stagehand fidelity-v1 bridge
+        run: |
+          python tools/fidelity/construction.py validate --blueprint builds/tiny-stagehand/docs/fidelity-blueprint.json --project builds/tiny-stagehand --commit "$(git rev-parse HEAD)"
