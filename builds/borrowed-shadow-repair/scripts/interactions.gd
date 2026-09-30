@@ -7,6 +7,7 @@ var hold_adapter = HoldV1.new()
 
 var pressed := false
 var hold_elapsed := 0.0
+var hold_pointer := Vector2.ZERO
 var last_angle := 0.0
 var touches:Dictionary={}
 var twist_start_angle:=0.0
@@ -26,7 +27,7 @@ func _process(delta: float) -> void:
     if name == "hold_test" and pressed:
         hold_elapsed += delta
         queue_redraw()
-        var held=hold_adapter.update(Time.get_ticks_msec(),Vector2.ZERO)
+        var held=hold_adapter.update(Time.get_ticks_msec(),hold_pointer)
         if held.get("completed",false):
             pressed=false
             var game=root_game()
@@ -50,10 +51,12 @@ func _gui_input(event: InputEvent) -> void:
             pressed=event.pressed
             if pressed:
                 hold_elapsed=0.0
-                hold_adapter.begin(Time.get_ticks_msec(),event.position)
+                hold_pointer=event.position
+                hold_adapter.begin(Time.get_ticks_msec(),hold_pointer)
                 game.set_state("holding")
             else:
-                var released=hold_adapter.release(Time.get_ticks_msec(),Vector2.ZERO)
+                hold_pointer=event.position
+                var released=hold_adapter.release(Time.get_ticks_msec(),hold_pointer)
                 if not released.get("completed",false):game.set_state("idle")
         if touches.size()==2:
             var pts=touches.values(); twist_start_angle=(pts[1]-pts[0]).angle(); twist_piece_angle=game.piece_angles[game.selected_piece] if game.selected_piece>=0 else 0.0
@@ -65,7 +68,8 @@ func _gui_input(event: InputEvent) -> void:
             var moved=drag_adapter.update(event.index,global_pointer)
             game.update_piece_drag(moved.get("position",global_pointer))
         elif name=="hold_test" and pressed:
-            var held=hold_adapter.update(Time.get_ticks_msec(),event.position)
+            hold_pointer=event.position
+            var held=hold_adapter.update(Time.get_ticks_msec(),hold_pointer)
             if held.get("phase","")=="cancel":
                 pressed=false
                 game.set_state("idle")
@@ -98,14 +102,23 @@ func _gui_input(event: InputEvent) -> void:
             accept_event()
         elif event is InputEventMouseMotion and pressed:
             game.update_trace(event.position, size); queue_redraw(); accept_event()
+    elif name == "hold_test" and event is InputEventMouseMotion and pressed:
+        hold_pointer=event.position
+        var held=hold_adapter.update(Time.get_ticks_msec(),hold_pointer)
+        if held.get("phase","")=="cancel":
+            pressed=false
+            game.set_state("idle")
+        accept_event()
     elif name == "hold_test" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
         pressed=event.pressed
         hold_elapsed=0.0 if pressed else hold_elapsed
         if pressed:
-            hold_adapter.begin(Time.get_ticks_msec(),Vector2.ZERO)
+            hold_pointer=event.position
+            hold_adapter.begin(Time.get_ticks_msec(),hold_pointer)
             game.set_state("holding")
         else:
-            var released=hold_adapter.release(Time.get_ticks_msec(),event.position)
+            hold_pointer=event.position
+            var released=hold_adapter.release(Time.get_ticks_msec(),hold_pointer)
             if not released.get("completed",false):game.set_state("idle")
         queue_redraw();accept_event()
 
