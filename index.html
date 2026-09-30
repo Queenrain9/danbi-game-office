@@ -372,6 +372,127 @@
 @media(max-width:1100px){.planning-action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planning-pipeline{grid-template-columns:1fr}.planning-next-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.planning-action-grid{grid-template-columns:1fr}.planning-output-list{grid-template-columns:1fr}}
 
+
+/* CEO dashboard v2 — cross-department control room */
+.ceo-shell{display:grid;gap:18px}
+.ceo-status{display:grid;grid-template-columns:190px minmax(0,1fr);padding:0;border:1px solid rgba(255,255,255,.07);background:linear-gradient(145deg,#10233a,#0b1b2e);border-radius:18px;overflow:hidden}
+.ceo-status-summary{display:flex;align-items:center;gap:12px;padding:20px 18px;background:rgba(51,82,115,.22);border-right:1px solid rgba(255,255,255,.06)}
+.ceo-lamp{width:13px;height:13px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px rgba(85,214,168,.08),0 0 18px rgba(85,214,168,.34);flex:none}
+.ceo-lamp.warn{background:var(--amber);box-shadow:0 0 0 5px rgba(243,200,106,.08),0 0 18px rgba(243,200,106,.32)}
+.ceo-status-summary strong{display:block;font-size:14px}
+.ceo-status-summary span{display:block;color:#7890aa;font-size:10px;line-height:1.5;margin-top:3px}
+.ceo-dept-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px 8px}
+.ceo-dept{min-width:0;padding:8px 16px;border-right:1px solid rgba(255,255,255,.045)}
+.ceo-dept:nth-child(3n){border-right:0}
+.ceo-dept:nth-child(n+4){border-top:1px solid rgba(255,255,255,.035)}
+.ceo-dept-head{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:730;color:#dce8f8}
+.ceo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+.ceo-dot.warn{background:var(--amber)}
+.ceo-dept-meta{font-size:9px;color:#67809e;margin-top:6px;line-height:1.45}
+.ceo-dept-meta.warn{color:#e7bb5f}
+.ceo-top-grid{display:grid;grid-template-columns:minmax(330px,.82fr) minmax(0,1.18fr);gap:18px}
+.ceo-panel{border:1px solid rgba(255,255,255,.065);background:rgba(13,26,44,.94);border-radius:18px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.ceo-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.ceo-panel-head h2{margin:0;font-size:16px;letter-spacing:-.025em}
+.ceo-panel-head span{font-size:9px;color:#5f7998;line-height:1.45;text-align:right}
+.ceo-inbox{display:grid;gap:8px}
+.ceo-inbox-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:11px;align-items:center;padding:11px 12px;background:#091728;border:1px solid rgba(255,255,255,.05);border-radius:12px}
+.ceo-inbox-row.attn{border-color:rgba(243,200,106,.30);background:linear-gradient(90deg,rgba(94,70,23,.14),#091728 46%)}
+.ceo-inbox-num{font-size:23px;font-weight:820;letter-spacing:-.05em;color:#7e9bbb;text-align:center}
+.ceo-inbox-row.attn .ceo-inbox-num{color:var(--amber)}
+.ceo-inbox-copy b{display:block;font-size:11px;color:#e2ecf8}
+.ceo-inbox-copy span{display:block;font-size:9px;color:#7188a4;line-height:1.45;margin-top:3px}
+.ceo-inbox-row .btn{padding:7px 9px;font-size:9px}
+.ceo-empty-ok{display:grid;place-items:center;text-align:center;min-height:120px;border:1px solid rgba(85,214,168,.15);background:rgba(85,214,168,.035);border-radius:13px;color:#8de4c7;font-size:14px;font-weight:750}
+.ceo-watch{margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.055)}
+.ceo-watch-title{font-size:9px;color:#607a98;margin-bottom:8px}
+.ceo-watch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 2px;font-size:9px}
+.ceo-watch-row span:first-child{color:#7b97b4}
+.ceo-watch-row b{font-size:10px;color:#cbd8e8;text-align:right}
+.ceo-ship-empty-label{font-size:9px;color:#637e9e;margin-bottom:3px}
+.ceo-ship-title{font-size:21px;font-weight:820;letter-spacing:-.04em;margin:0 0 4px}
+.ceo-ship-sub{font-size:9px;color:#66819e;margin-bottom:14px}
+.ceo-timeline{position:relative;padding-left:22px;margin-top:5px}
+.ceo-timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:#24405f}
+.ceo-step{position:relative;padding:0 0 13px 0}
+.ceo-step:last-child{padding-bottom:0}
+.ceo-step:before{content:"";position:absolute;left:-21px;top:1px;width:13px;height:13px;border-radius:50%;background:#18314e;border:2px solid #55789f}
+.ceo-step.done:before{background:#16473f;border-color:#55d6a8}
+.ceo-step.fail:before{background:#4a2430;border-color:#ff7d8e}
+.ceo-step.now:before{background:#1d4578;border-color:#74a7ff;box-shadow:0 0 0 5px rgba(116,167,255,.10)}
+.ceo-step.future:before{background:#0b1829;border-color:#294764;border-style:dashed}
+.ceo-step b{display:block;font-size:11px;color:#dfe9f7}
+.ceo-step span{display:block;margin-top:3px;font-size:9px;color:#6d86a2;line-height:1.45}
+.ceo-step-time{float:right;color:#527394!important;font-variant-numeric:tabular-nums}
+.ceo-issue-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.ceo-issue-chip{font-size:8px;color:#9fb0c4;border:1px solid rgba(255,255,255,.06);background:#091624;padding:3px 6px;border-radius:999px}
+.ceo-next-builds{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.055)}
+.ceo-next-builds>span{font-size:9px;color:#587390}
+.ceo-next-build{font-size:8px;color:#c5d4e7;background:#091728;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:5px 7px}
+.ceo-ready-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.ceo-ready-card{padding:15px;border-radius:14px;border:1px solid rgba(85,214,168,.19);background:linear-gradient(145deg,rgba(24,62,57,.32),#0a1829)}
+.ceo-ready-card h3{margin:5px 0 4px;font-size:16px}
+.ceo-ready-card p{margin:0 0 12px;color:#7891aa;font-size:9px;line-height:1.5}
+.ceo-line-wrap{overflow:hidden}
+.ceo-line-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}
+.ceo-stage{position:relative;min-width:0;padding:12px 10px 11px;border:1px solid rgba(255,255,255,.055);background:#091728;border-radius:12px}
+.ceo-stage:not(:last-child):after{content:"›";position:absolute;right:-7px;top:43%;z-index:2;color:#4a6684;font-size:14px}
+.ceo-stage.bottleneck{border-color:rgba(255,125,142,.48);background:linear-gradient(160deg,rgba(105,37,54,.26),#0a1728)}
+.ceo-stage.ready{border-color:rgba(85,214,168,.22)}
+.ceo-stage-group{font-size:7px;color:#496887;text-transform:uppercase;letter-spacing:.08em}
+.ceo-stage-name{font-size:10px;color:#d9e6f4;font-weight:720;line-height:1.35;margin-top:4px;min-height:27px}
+.ceo-stage-count{font-size:25px;font-weight:820;letter-spacing:-.055em;margin-top:5px}
+.ceo-stage.bottleneck .ceo-stage-count{color:#ff7d8e}
+.ceo-stage.ready .ceo-stage-count{color:#55d6a8}
+.ceo-stage-note{font-size:8px;color:#617b98;margin-top:4px;line-height:1.35}
+.ceo-stage-bar{height:4px;background:#11263d;border-radius:999px;overflow:hidden;margin-top:9px}
+.ceo-stage-bar i{display:block;height:100%;background:#5c8dd5;border-radius:inherit}
+.ceo-stage.bottleneck .ceo-stage-bar i{background:#ff7d8e}
+.ceo-stage.ready .ceo-stage-bar i{background:#55d6a8}
+.ceo-bottleneck-note{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(255,125,142,.055);color:#e98b9a;font-size:9px;line-height:1.45}
+.ceo-growth-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.ceo-kpi{padding:13px 12px;border:1px solid rgba(255,255,255,.05);background:#091728;border-radius:12px;min-width:0}
+.ceo-kpi-label{font-size:9px;color:#718aa7;line-height:1.3}
+.ceo-kpi-value{font-size:22px;font-weight:820;letter-spacing:-.05em;margin:7px 0 3px}
+.ceo-kpi-sub{font-size:8px;color:#5a7593;line-height:1.4}
+.ceo-secondary{margin-top:10px;font-size:8px;color:#506b88;text-align:right}
+.ceo-events{display:grid}
+.ceo-event{display:grid;grid-template-columns:80px 54px minmax(0,1fr);gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:10px}
+.ceo-event:last-child{border-bottom:0}
+.ceo-event-time{color:#557390;font-variant-numeric:tabular-nums}
+.ceo-event-kind{justify-self:start;font-size:8px;font-weight:760;border-radius:999px;padding:4px 7px;background:#102440;color:#8eb6ef}
+.ceo-event-kind.fail{background:rgba(141,47,64,.20);color:#ff92a0}
+.ceo-event-kind.good{background:rgba(31,112,87,.20);color:#6de0b8}
+.ceo-event-kind.repair{background:rgba(105,78,29,.19);color:#f1c66b}
+.ceo-event-copy{color:#cbd8e8;line-height:1.4}
+.ceo-data-note{font-size:8px;line-height:1.6;color:#506b88;padding:0 2px}
+.ceo-data-note b{color:#6f8dab}
+@media(max-width:1180px){
+  .ceo-dept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ceo-dept:nth-child(3n){border-right:1px solid rgba(255,255,255,.045)}
+  .ceo-dept:nth-child(2n){border-right:0}
+  .ceo-dept:nth-child(n+3){border-top:1px solid rgba(255,255,255,.035)}
+  .ceo-growth-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ceo-line-grid{gap:5px}
+  .ceo-stage{padding:10px 7px}
+}
+@media(max-width:900px){
+  .ceo-status{grid-template-columns:1fr}
+  .ceo-status-summary{border-right:0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .ceo-top-grid{grid-template-columns:1fr}
+  .ceo-growth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .ceo-dept-grid{grid-template-columns:1fr}
+  .ceo-dept,.ceo-dept:nth-child(2n),.ceo-dept:nth-child(3n){border-right:0;border-top:1px solid rgba(255,255,255,.035)}
+  .ceo-dept:first-child{border-top:0}
+  .ceo-line-wrap{overflow-x:auto;padding-bottom:5px}
+  .ceo-line-grid{display:flex;min-width:max-content}
+  .ceo-stage{width:118px;flex:0 0 118px}
+  .ceo-growth-grid{grid-template-columns:1fr}
+  .ceo-event{grid-template-columns:64px 48px minmax(0,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -749,7 +870,7 @@ async function loadRepairTickets(showToast=false){
     if(!res.ok) throw new Error("HTTP "+res.status);
     const payload=await res.json();
     repairTickets=Array.isArray(payload.repairs)?payload.repairs:[];
-    if(current==="fidelity" || current==="build") render();
+    if(current==="fidelity" || current==="build" || current==="dashboard") render();
     if(showToast) toast("Repair Ticket 새로고침 · "+repairTickets.filter(x=>x.status==="open").length+"개 open");
   }catch(err){
     console.error("Repair ticket load failed",err);
@@ -829,7 +950,7 @@ function count(stage){
 }
 function titleInfo(){
   const map={
-    dashboard:["대표 대시보드","확정된 실제 제작 데이터만 표시합니다."],
+    dashboard:["대표 대시보드","공장이 잘 돌고 있나 · 내가 결정할 것 · 무엇이 나왔나"],
     planning:["기획본부 대시보드","Idea Lab → Game Design → Pre-production의 실제 현재 상태를 한눈에 봅니다."],
     ideas:["아이디어 연구소",""],
     design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
@@ -856,46 +977,322 @@ function metricData(){
   ];
 }
 
+
+function ceoAge(raw){
+  if(!raw) return "기록 없음";
+  const t=new Date(raw).getTime();
+  if(!Number.isFinite(t)) return "기록 없음";
+  const ms=Math.max(0,Date.now()-t);
+  const m=Math.floor(ms/60000);
+  if(m<60) return Math.max(1,m)+"분 전";
+  const h=Math.floor(m/60);
+  if(h<24) return h+"시간 전";
+  return Math.floor(h/24)+"일 전";
+}
+function ceoClock(raw){
+  if(!raw) return "";
+  const d=new Date(raw);
+  if(Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function ceoLatest(items,fields){
+  let best=null;
+  (Array.isArray(items)?items:[]).forEach(x=>{
+    for(const f of fields){
+      if(!x || !x[f]) continue;
+      const t=new Date(x[f]).getTime();
+      if(Number.isFinite(t) && (!best || t>best.t)) best={t,raw:x[f],item:x};
+      break;
+    }
+  });
+  return best;
+}
+function ceoCurrentBuilds(){
+  return buildJobs.filter(b=>!isHistoricalBuild(b) && !!b.contract_id);
+}
+function ceoCurrentReviews(){
+  const ids=new Set(ceoCurrentBuilds().map(b=>b.id));
+  return fidelityReviews.filter(r=>!isSupersededReview(r) && ids.has(r.build_job_id));
+}
+function ceoPlaytestReady(){
+  return ceoCurrentBuilds().filter(b=>b.status==="playtest_ready" || b.status==="qa_ready");
+}
+function ceoWip(){
+  const contracts=implementationContracts.filter(c=>c.status!=="archived");
+  const builds=ceoCurrentBuilds();
+  const buildContractIds=new Set(builds.map(b=>b.contract_id).filter(Boolean));
+  const contractWireIds=new Set(contracts.map(c=>c.wireframe_pack_id).filter(Boolean));
+  const pendingWire=wireframePacks.filter(w=>w.status==="wireframe" && !contractWireIds.has(w.id));
+  const review=contracts.filter(c=>c.blueprint_status==="pending_review" || c.blueprint_status==="blocked");
+  const buildWaiting=contracts.filter(c=>c.status==="ready" && c.blueprint_status==="approved" && !buildContractIds.has(c.id));
+  const building=builds.filter(b=>["queued","building","repair","blocked"].includes(b.status));
+  const gate=builds.filter(b=>b.status==="fidelity_pending" || b.fidelity_status==="reviewing" || b.fidelity_status==="pending");
+  const ready=ceoPlaytestReady();
+  return {
+    idea:promotedIdeas.filter(x=>x.status==="idea_lab").length,
+    design:gameDesigns.filter(x=>x.status==="design").length,
+    wire:pendingWire.length,
+    review:review.length,
+    buildWaiting:buildWaiting.length,
+    building:building.length,
+    gate:gate.length,
+    ready:ready.length,
+    pendingWire,reviewContracts:review,buildWaitingContracts:buildWaiting,buildingBuilds:building,gateBuilds:gate,readyBuilds:ready
+  };
+}
+function ceoHumanBlockers(){
+  const rows=[];
+  ceoCurrentBuilds().forEach(b=>{
+    const blockers=Array.isArray(b.blockers)?b.blockers:[];
+    blockers.forEach(x=>{
+      if(x && typeof x==="object" && (x.requires_human===true || x.human_required===true || x.owner==="human" || x.blocker_type==="human_decision")){
+        rows.push({title:b.title,blocker:x});
+      }
+    });
+  });
+  return rows;
+}
+function ceoStatusDepartments(){
+  const currentBuilds=ceoCurrentBuilds();
+  const currentReviews=ceoCurrentReviews();
+  const defs=[
+    ["아이디어 연구소",promotedIdeas,["source_run_at","created_at"]],
+    ["게임 디자인실",gameDesigns,["source_run_at","created_at"]],
+    ["프리프로덕션",wireframePacks,["source_run_at","created_at"]],
+    ["구현 설계실",implementationContracts,["source_run_at","updated_at","created_at"]],
+    ["빌드 팜",currentBuilds,["source_run_at","updated_at","created_at"]],
+    ["설계 검수실",currentReviews,["source_run_at","completed_at","created_at"]]
+  ];
+  return defs.map(([name,items,fields])=>{
+    const last=ceoLatest(items,fields);
+    const stale=last ? Date.now()-last.t > 2.5*60*60*1000 : true;
+    return {name,last,stale};
+  });
+}
+function ceoWatchRows(w){
+  const fixed=repairTickets.filter(x=>x.status==="fixed").length;
+  const open=repairTickets.filter(x=>x.status==="open").length;
+  const rows=[
+    ["설계도 자동 검토",w.review+"건"],
+    ["Gate 재검수 대기",w.gate+"건"],
+    ["빌드 대기 설계도",w.buildWaiting+"건"],
+    ["미해결 수리 항목",open+"건"+(fixed?" · "+fixed+"건 수리 완료":"")]
+  ];
+  return rows;
+}
+function ceoInbox(w){
+  const unclassified=promotedIdeas.filter(x=>x.status==="idea_lab" && !x.curation_bucket);
+  const ready=ceoPlaytestReady();
+  const priority=[
+    ...promotedIdeas.filter(x=>x.status==="idea_lab" && x.human_priority),
+    ...gameDesigns.filter(x=>x.status==="design" && x.human_priority)
+  ];
+  const blockers=ceoHumanBlockers();
+  const rows=[
+    {n:unclassified.length,title:"아이디어 분류",sub:unclassified.length?unclassified.slice(0,3).map(x=>x.title).join(", ")+(unclassified.length>3?" 외 "+(unclassified.length-3)+"개":""):"분류할 후보가 없습니다.",go:"ideas",button:"분류하기"},
+    {n:ready.length,title:"플레이테스트",sub:ready.length?ready.slice(0,2).map(x=>x.title).join(", "):"PLAYTEST READY 게임이 도착하면 여기서 직접 판단합니다.",go:"review",button:"플레이테스트실"},
+    {n:priority.length,title:"우선 처리 지정",sub:priority.length?priority.slice(0,2).map(x=>x.title).join(", "):"대표가 따로 순서를 바꿀 항목이 없습니다.",go:"planning",button:"기획본부"},
+    {n:blockers.length,title:"사람 판단 차단",sub:blockers.length?blockers.slice(0,2).map(x=>x.title).join(", "):"현재 사람 결정이 필요한 blocker가 없습니다.",go:"build",button:"제작본부"}
+  ];
+  const decisionCount=unclassified.length+ready.length+priority.length+blockers.length;
+  return '<div class="ceo-panel-head"><h2>대표 결재함</h2><span>대표만 할 수 있는 결정</span></div>'+
+    (decisionCount===0?'<div class="ceo-empty-ok">결재할 것 없음 ✓</div>':
+      '<div class="ceo-inbox">'+rows.map(r=>
+        '<div class="ceo-inbox-row '+(r.n?"attn":"")+'">'+
+          '<div class="ceo-inbox-num">'+r.n+'</div>'+
+          '<div class="ceo-inbox-copy"><b>'+esc(r.title)+'</b><span>'+esc(r.sub)+'</span></div>'+
+          '<button class="btn '+(r.n?"":"ghost")+'" onclick="go(\''+r.go+'\')">'+esc(r.button)+'</button>'+
+        '</div>').join("")+'</div>')+
+    '<div class="ceo-watch"><div class="ceo-watch-title">지켜보기 · 자동 처리 중</div>'+
+      ceoWatchRows(w).map(r=>'<div class="ceo-watch-row"><span>자동 · '+esc(r[0])+'</span><b>'+esc(r[1])+'</b></div>').join("")+
+    '</div>';
+}
+function ceoReviewForBuild(buildId){
+  return ceoCurrentReviews().filter(r=>r.build_job_id===buildId).sort((a,b)=>Number(a.review_round||0)-Number(b.review_round||0));
+}
+function ceoRepairStats(buildId){
+  const rows=repairTickets.filter(x=>x.build_job_id===buildId);
+  return {
+    fixed:rows.filter(x=>x.status==="fixed").length,
+    open:rows.filter(x=>x.status==="open").length,
+    waived:rows.filter(x=>x.status==="waived").length,
+    latest:ceoLatest(rows,["updated_at","created_at"])
+  };
+}
+function ceoClosestCandidate(w){
+  if(w.gateBuilds.length) return w.gateBuilds[0];
+  if(w.buildingBuilds.length) return w.buildingBuilds[0];
+  if(w.buildWaitingContracts.length) return w.buildWaitingContracts[0];
+  if(w.reviewContracts.length) return w.reviewContracts[0];
+  if(w.pendingWire.length) return w.pendingWire[0];
+  return null;
+}
+function ceoIssueChips(r){
+  if(!r) return "";
+  const chips=[
+    ["검증",Number(r.verified_count||0)],
+    ["부분",Number(r.partial_count||0)],
+    ["누락",Number(r.missing_count||0)],
+    ["충돌",Number(r.conflict_count||0)],
+    ["고장",Number(r.broken_count||0)]
+  ];
+  return '<div class="ceo-issue-chips">'+chips.map(x=>'<span class="ceo-issue-chip">'+x[0]+' '+x[1]+'</span>').join("")+'</div>';
+}
+function ceoShipping(w){
+  const ready=ceoPlaytestReady();
+  if(ready.length){
+    return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY '+ready.length+'</span></div>'+
+      '<div class="ceo-ready-grid">'+ready.slice(0,4).map(b=>
+        '<div class="ceo-ready-card"><div class="kicker">PLAYTEST READY</div><h3>'+esc(b.title)+'</h3><p>사람 플레이테스트를 시작할 준비가 된 실제 빌드입니다.</p><button class="btn good" onclick="go(\'review\')">▶ 플레이테스트실</button></div>'
+      ).join("")+'</div>';
+  }
+
+  const candidate=ceoClosestCandidate(w);
+  if(!candidate){
+    return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY 0</span></div><div class="empty">아직 출하 후보가 없습니다.</div>';
+  }
+
+  const isBuild=!!candidate.contract_id && !!candidate.current_stage;
+  const contract=isBuild ? implementationContracts.find(c=>c.id===candidate.contract_id) : (candidate.requirement_count!==undefined?candidate:null);
+  const title=candidate.title||contract?.title||"출하 후보";
+  const reviews=isBuild?ceoReviewForBuild(candidate.id):[];
+  const firstFail=reviews.find(r=>r.verdict==="fail");
+  const repairs=isBuild?ceoRepairStats(candidate.id):{fixed:0,open:0,latest:null};
+  const currentStage=isBuild && (candidate.status==="fidelity_pending" || candidate.fidelity_status==="pending") ? "Gate 재검수 대기" :
+    isBuild && ["queued","building","repair","blocked"].includes(candidate.status) ? "빌드 진행 중" :
+    contract && contract.blueprint_status==="approved" ? "빌드 대기" :
+    contract && (contract.blueprint_status==="pending_review" || contract.blueprint_status==="blocked") ? "설계도 검토 대기" : "구현 설계 대기";
+
+  let steps='';
+  if(contract){
+    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 · 구현 설계 완료</b><span>요구사항 '+Number(contract.requirement_count||0)+'</span></div>';
+  }else{
+    steps+='<div class="ceo-step done"><b>기획 · 와이어프레임 완료</b><span>자동 제작 라인을 통과 중</span></div>';
+  }
+  if(isBuild){
+    steps+='<div class="ceo-step done"><b>첫 빌드 완료</b><span class="ceo-step-time">'+esc(ceoClock(candidate.created_at))+'</span><span>Godot 프로젝트 시공 완료</span></div>';
+  }
+  if(firstFail){
+    const issueTotal=Number(firstFail.partial_count||0)+Number(firstFail.missing_count||0)+Number(firstFail.conflict_count||0)+Number(firstFail.broken_count||0);
+    steps+='<div class="ceo-step fail"><b>Gate '+Number(firstFail.review_round||1)+'차 불합격</b><span class="ceo-step-time">'+esc(ceoClock(firstFail.completed_at||firstFail.created_at))+'</span><span>요구사항 대조에서 '+issueTotal+'개 결함 판정</span>'+ceoIssueChips(firstFail)+'</div>';
+  }
+  if(repairs.fixed){
+    steps+='<div class="ceo-step done"><b>수리 '+repairs.fixed+'건 완료</b><span class="ceo-step-time">'+esc(ceoClock(repairs.latest?.raw))+'</span><span>'+(repairs.open?'미해결 '+repairs.open+'건 남음':'미해결 수리 항목 없음')+'</span></div>';
+  }
+  steps+='<div class="ceo-step now"><b>'+esc(currentStage)+'</b><span>현재 자동 파이프라인 상태</span></div>';
+  steps+='<div class="ceo-step future"><b>PLAYTEST READY → 진열대</b><span>통과 후 대표가 직접 플레이테스트</span></div>';
+
+  const next=w.buildWaitingContracts.filter(c=>c.title!==title).slice(0,4);
+  return '<div class="ceo-panel-head"><h2>출하 진열대</h2><span>PLAYTEST READY 0</span></div>'+
+    '<div class="ceo-ship-empty-label">첫 출하에 가장 가까운 게임</div>'+
+    '<div class="ceo-ship-title">'+esc(title)+'</div>'+
+    '<div class="ceo-ship-sub">'+esc(currentStage)+'</div>'+
+    '<div class="ceo-timeline">'+steps+'</div>'+
+    (next.length?'<div class="ceo-next-builds"><span>다음 빌드 대기</span>'+next.map(c=>'<span class="ceo-next-build">'+esc(c.title)+' · '+Number(c.requirement_count||0)+'</span>').join("")+'</div>':'');
+}
+function ceoGrowth(){
+  const reviews=ceoCurrentReviews();
+  const first=reviews.filter(r=>Number(r.review_round||1)===1);
+  const firstPass=first.length ? Math.round(first.filter(r=>r.verdict==="pass").length/first.length*100)+"%" : "—";
+
+  const byBuild={};
+  reviews.forEach(r=>{
+    const k=r.build_job_id||"";
+    if(!k) return;
+    if(!byBuild[k]) byBuild[k]=0;
+    if(r.verdict==="fail") byBuild[k]+=1;
+  });
+  const rounds=Object.values(byBuild);
+  const avgRounds=rounds.length ? (rounds.reduce((a,b)=>a+b,0)/rounds.length).toFixed(1).replace(".0","")+"회" : "—";
+  const reqs=implementationContracts.map(c=>Number(c.requirement_count||0)).filter(n=>n>0);
+  const avgReq=reqs.length?Math.round(reqs.reduce((a,b)=>a+b,0)/reqs.length):null;
+  const kpis=[
+    ["아이디어 → PLAYTEST READY","—","첫 실제 출하부터 측정"],
+    ["첫 Gate 통과율",firstPass,first.length?first.length+"개 1차 Gate 기준":"측정 가능한 Gate 없음"],
+    ["평균 수리 라운드",avgRounds,rounds.length+"개 현재 빌드 기준"],
+    ["공용 부품 사용률","—","Interaction Library 계측 연결 후"],
+    ["Fallback 비율","—","fallback_reason 계측 연결 후"]
+  ];
+  return '<div class="ceo-panel-head"><h2>공장 성장</h2><span>반복할수록 빨라지고, 조립 중심이 되어 가는가</span></div>'+
+    '<div class="ceo-growth-grid">'+kpis.map(k=>'<div class="ceo-kpi"><div class="ceo-kpi-label">'+esc(k[0])+'</div><div class="ceo-kpi-value">'+esc(k[1])+'</div><div class="ceo-kpi-sub">'+esc(k[2])+'</div></div>').join("")+'</div>'+
+    '<div class="ceo-secondary">보조 지표 · 게임당 요구사항 '+(avgReq===null?"—":avgReq+" 평균")+'</div>';
+}
+function ceoMajorEvents(){
+  const events=[];
+  const builds=ceoCurrentBuilds();
+  const buildMap=new Map(builds.map(b=>[b.id,b]));
+
+  ceoPlaytestReady().forEach(b=>events.push({raw:b.updated_at||b.source_run_at||b.created_at,kind:"출하",cls:"good",copy:b.title+" · PLAYTEST READY"}));
+  ceoCurrentReviews().forEach(r=>{
+    const b=buildMap.get(r.build_job_id);
+    if(!b) return;
+    events.push({
+      raw:r.completed_at||r.source_run_at||r.created_at,
+      kind:r.verdict==="pass"?"통과":"불합격",
+      cls:r.verdict==="pass"?"good":"fail",
+      copy:b.title+" · Gate "+Number(r.review_round||1)+"차"+(r.verdict==="fail"?" · 부분 "+Number(r.partial_count||0)+" · 누락 "+Number(r.missing_count||0)+" · 충돌 "+Number(r.conflict_count||0)+" · 고장 "+Number(r.broken_count||0):"")
+    });
+  });
+  builds.forEach(b=>{
+    const rs=ceoRepairStats(b.id);
+    if(rs.fixed && rs.open===0) events.push({raw:rs.latest?.raw,kind:"수리",cls:"repair",copy:b.title+" · 수리 "+rs.fixed+"건 완료 → 재검수 가능"});
+    if(b.created_at) events.push({raw:b.created_at,kind:"빌드",cls:"",copy:b.title+" · 첫 빌드 생성"});
+  });
+  implementationContracts.filter(c=>c.blueprint_status==="approved" && c.status==="ready").forEach(c=>{
+    events.push({raw:c.updated_at||c.source_run_at||c.created_at,kind:"승인",cls:"good",copy:"설계도 승인 · "+c.title});
+  });
+
+  const rows=events.filter(e=>e.raw).sort((a,b)=>new Date(b.raw)-new Date(a.raw)).slice(0,5);
+  return '<div class="ceo-panel-head"><h2>주요 사건</h2><span>승인 · 불합격 · 수리 · 출하만</span></div>'+
+    (rows.length?'<div class="ceo-events">'+rows.map(e=>
+      '<div class="ceo-event"><div class="ceo-event-time">'+esc(ceoClock(e.raw))+'</div><div class="ceo-event-kind '+esc(e.cls)+'">'+esc(e.kind)+'</div><div class="ceo-event-copy">'+esc(e.copy)+'</div></div>'
+    ).join("")+'</div>':'<div class="empty">아직 주요 사건이 없습니다.</div>');
+}
 function dashboard(){
-  return `
-  <section class="hero">
-    <div class="hero-main">
-      <div class="eyebrow">DANBI GAME OFFICE</div>
-      <h1>회사 전체 파이프라인은<br>지금 재구성 중입니다.</h1>
-      <p>아직 확정하지 않은 단계는 메인 대시보드에서 임의로 채우지 않습니다. 현재는 Supabase와 예약 작업에서 실제로 들어오는 기획본부·빌드팜 데이터만 표시합니다.</p>
-      <div class="hero-actions">
-        <button class="btn primary" onclick="go('planning')">기획본부 둘러보기</button>
-        <button class="btn ghost" onclick="go('build')">빌드 팜 보기</button>
-      </div>
-    </div>
-    <div class="hero-side">
-      <div class="eyebrow">Dashboard policy</div>
-      <div class="hero-side-title">실제 데이터만 표시</div>
-      <div class="gate-note"><b style="color:#d8e6fb">No demo data</b><br>가짜 프로젝트, 샘플 진행률, 임의의 제작 활동은 메인 대시보드에 표시하지 않습니다.</div>
-      <div class="human-gate">전체 회사 대시보드는 나머지 파이프라인 구조가 확정된 뒤 다시 설계합니다.</div>
-    </div>
-  </section>
+  const w=ceoWip();
+  const depts=ceoStatusDepartments();
+  const staleCount=depts.filter(d=>d.stale).length;
+  const stages=[
+    ["기획","아이디어 연구",w.idea,"분류 대기"],
+    ["기획","와이어프레임 대기",w.design,"게임 설계 완료"],
+    ["제작","구현 설계 대기",w.wire,"계약 없는 Pack"],
+    ["제작","설계도 검토",w.review,"pending_review"],
+    ["제작","빌드 대기",w.buildWaiting,"승인된 설계도"],
+    ["제작","빌드 중",w.building,"Builder 작업"],
+    ["검수","설계 검수 (Gate)",w.gate,"재검수 포함"],
+    ["출하","PLAYTEST READY",w.ready,"대표 플레이"]
+  ];
+  const max=Math.max(1,...stages.map(s=>s[2]));
+  const bottleneckIndex=stages.reduce((best,s,i)=>s[2]>stages[best][2]?i:best,0);
 
-  <div class="stats">${metricData().map(([l,n,d])=>`<div class="stat"><div class="n">${n}</div><div class="label">${l}</div><div class="delta">${d}</div></div>`).join("")}</div>
+  return '<div class="ceo-shell">'+
+    '<section class="ceo-status">'+
+      '<div class="ceo-status-summary"><span class="ceo-lamp '+(staleCount?"warn":"")+'"></span><div><strong>'+(staleCount?"산출물 흐름 · 주의 "+staleCount+"곳":"최근 산출물 흐름 정상")+'</strong><span>실행 heartbeat 미연결 · 가동 여부가 아니라 마지막 산출물 기준</span></div></div>'+
+      '<div class="ceo-dept-grid">'+depts.map(d=>
+        '<div class="ceo-dept"><div class="ceo-dept-head"><span class="ceo-dot '+(d.stale?"warn":"")+'"></span>'+esc(d.name)+'</div><div class="ceo-dept-meta '+(d.stale?"warn":"")+'">'+(d.last?('마지막 산출물 '+esc(ceoAge(d.last.raw))):'산출물 기록 없음')+(d.stale?' · 실행 여부 미확인':'')+'</div></div>'
+      ).join("")+'</div>'+
+    '</section>'+
 
-  <div class="dashboard-grid" style="margin-top:18px">
-    <div class="panel">
-      <div class="panel-title"><strong>AI 기획본부</strong><span>실제 자동화 데이터</span></div>
-      <div class="detail-box">
-        <h3>현재 연결된 앞단</h3>
-        <p>Idea Lab <b>${promotedIdeas.length}</b> · Game Design <b>${gameDesigns.length}</b> · Pre-production <b>${wireframePacks.length}</b></p>
-      </div>
-      <div class="card-actions"><button class="btn primary" onclick="go('planning')">기획본부 대시보드 열기</button></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title"><strong>AI 제작본부</strong><span>현재 확정 범위</span></div>
-      <div class="detail-box">
-        <h3>3단계 제작 라인</h3>
-        <p>Implementation Contract <b>${implementationContracts.length}</b> · Build Job <b>${buildJobs.filter(b=>!isHistoricalBuild(b)).length}</b> · Fidelity Review <b>${fidelityReviews.filter(r=>!isSupersededReview(r)).length}</b></p>
-      </div>
-      <div class="card-actions"><button class="btn" onclick="go('implementation')">구현 설계실</button><button class="btn" onclick="go('build')">빌드 팜</button><button class="btn" onclick="go('fidelity')">설계 검수실</button></div>
-    </div>
-  </div>`;
+    '<div class="ceo-top-grid">'+
+      '<section class="ceo-panel">'+ceoInbox(w)+'</section>'+
+      '<section class="ceo-panel">'+ceoShipping(w)+'</section>'+
+    '</div>'+
+
+    '<section class="ceo-panel ceo-line-wrap">'+
+      '<div class="ceo-panel-head"><h2>생산 라인</h2><span>현재 상태별 대기 · 누적 생산량 아님</span></div>'+
+      '<div class="ceo-line-grid">'+stages.map((s,i)=>
+        '<div class="ceo-stage '+(i===bottleneckIndex&&s[2]?"bottleneck ":"")+(i===7?"ready":"")+'">'+
+          '<div class="ceo-stage-group">'+esc(s[0])+'</div><div class="ceo-stage-name">'+esc(s[1])+'</div><div class="ceo-stage-count">'+s[2]+'</div><div class="ceo-stage-note">'+esc(s[3])+'</div>'+
+          '<div class="ceo-stage-bar"><i style="width:'+Math.round(s[2]/max*100)+'%"></i></div>'+
+        '</div>'
+      ).join("")+'</div>'+
+      (w.wire?'<div class="ceo-bottleneck-note">● <b>적체:</b>&nbsp; 구현 설계 앞에 와이어프레임 '+w.wire+'개가 대기 중입니다. 한 회차 처리량과 다음 공정 속도를 함께 봐야 합니다.</div>':'')+
+    '</section>'+
+
+    '<section class="ceo-panel">'+ceoGrowth()+'</section>'+
+    '<section class="ceo-panel">'+ceoMajorEvents()+'</section>'+
+    '<div class="ceo-data-note"><b>데이터</b> · Supabase의 실제 Idea / Design / Wireframe / Contract / Build / Fidelity / Repair 데이터만 사용합니다. archived·soft-reset 이력과 계약 이전 legacy build는 현재 생산 라인에서 제외합니다.<br><b>상태 한계</b> · 예약 작업 heartbeat가 아직 없어 상단은 “작업 실행 성공”이 아니라 “마지막 산출물 신선도”만 표시합니다. 공용 부품 사용률·fallback 비율도 계측이 연결되기 전까지 — 로 표시합니다.</div>'+
+  '</div>';
 }
 
 
