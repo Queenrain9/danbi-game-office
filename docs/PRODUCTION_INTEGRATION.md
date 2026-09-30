@@ -14,38 +14,63 @@ Canonical job names:
 - `build_farm`
 - `fidelity_gate`
 
-At the very start of a scheduled run, before lease acquisition or candidate selection:
+The canonical default is **explicit DML**, not a SELECT-wrapped write-side-effect RPC. This avoids scheduled-run security checks mistaking operational writes hidden inside SELECT for read-only work.
+
+At the very start of a scheduled run, before lease acquisition or candidate selection, insert a `running` ledger row and keep the returned id for the entire execution:
 
 ```sql
-select public.danbi_start_pipeline_run(
+insert into public.danbi_pipeline_runs(
+  job_name, run_key, status, started_at, finished_at,
+  produced_count, summary, error_summary, metadata, updated_at
+)
+values(
   '<job_name>',
   null,
-  jsonb_build_object('source','chat_automation')
-) as run_id;
+  'running',
+  now(),
+  null,
+  0,
+  null,
+  null,
+  jsonb_build_object('source','chat_automation'),
+  now()
+)
+returning id;
 ```
 
-Keep the returned `run_id` for the entire execution. A crash or interrupted run intentionally leaves a `running` row so the dashboard can detect a stale execution.
+Use the returned id as `run_id`. For Build Farm, the same execution identity should also make the production lease owner unique, for example:
 
-Before every normal return, including "no candidate" and lease-unavailable exits, finish the same run:
+`build-farm-hourly:<run_id>`
+
+If the ledger insert itself is unavailable because of an operational/tool/security failure, do **not** mark the game or Blueprint blocked. Generate one fresh execution UUID for that run, keep it fixed for the lifetime of the run, and use it anywhere a per-execution owner is required. Continue only when doing so does not weaken source or lease safety.
+
+A crash or forced interruption may intentionally leave a `running` row so the dashboard can detect stale execution state.
+
+Before every normal return, including "no candidate", lease-unavailable exits, PARTIAL completion, and handled failures, update the same ledger row explicitly:
 
 ```sql
-select public.danbi_finish_pipeline_run(
-  '<run_id>',
-  '<success|noop|blocked|failed>',
-  <produced_count>,
-  '<short summary>',
-  <error_summary_or_null>,
-  null
-);
+update public.danbi_pipeline_runs
+set
+  status='<success|noop|blocked|failed>',
+  finished_at=now(),
+  produced_count=<actual durable game count>,
+  summary='<short summary>',
+  error_summary=<error_summary_or_null>,
+  updated_at=now()
+where id='<run_id>';
 ```
 
 Status meaning:
-- `success`: durable pipeline progress was committed, even if the game remains in the same high-level stage.
-- `noop`: the automation executed normally but had no eligible work, or a lease was unavailable and no state changed.
-- `blocked`: a real semantic/source/permission/storage blocker prevented the selected work from advancing.
-- `failed`: an unexpected execution/tool failure prevented a normal completion.
-- Never create fake output just to make `produced_count > 0`.
-- The run ledger is operational telemetry, not production evidence and not a substitute for existing build/evidence/fidelity records.
+- `success`: durable pipeline progress was committed. This also covers a PARTIAL run when durable progress exists; put the checkpoint / `resume_from` and operational issue in `summary`.
+- `noop`: the automation executed normally but had no eligible work, or another valid production lease was busy and no durable state changed.
+- `blocked`: a real semantic/source integrity blocker in the selected work prevented advancement.
+- `failed`: an operational/tool/network/permission/storage failure prevented advancement and no durable pipeline progress was committed.
+
+Do not use operational failures such as transient GitHub/Supabase/tool/permission/storage errors to mark the game itself blocked. Preserve the game checkpoint and report the operational failure in the run ledger instead.
+
+Never create fake output just to make `produced_count > 0`. The run ledger is operational telemetry, not production evidence and not a substitute for existing build/evidence/fidelity records.
+
+The legacy helpers `danbi_start_pipeline_run(...)` and `danbi_finish_pipeline_run(...)` may still exist in the database, but scheduled production prompts should prefer the explicit INSERT/UPDATE path above unless a future canonical revision explicitly changes this policy.
 
 ## Canonical reference size
 
