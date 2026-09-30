@@ -2021,11 +2021,9 @@ function buildCard(p){
 }
 function buildPage(){
   const activeBuilds=buildJobs.filter(b=>!isHistoricalBuild(b) && ["building","repair","blocked"].includes(String(b.status||"").toLowerCase()));
-  const historicalBuilds=buildJobs.filter(b=>isHistoricalBuild(b));
   return genericHeader("Build Farm","Implementation Contract의 모든 requirement를 실제 Godot playable로 구현합니다. Builder는 스스로 VERIFIED 판정을 내리지 않습니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
   '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Repair → Active → Contract Intake</span><span>Implementation Complete → Static Fidelity Gate</span></div></div>'+
-  '<div class="cards">'+(activeBuilds.map(buildCard).join("") || '<div class="empty">현재 Build Farm에서 작업 중인 게임이 없습니다.<br>새 Blueprint가 승인되면 Build Farm이 가져옵니다.</div>')+'</div>'+
-  (historicalBuilds.length?'<div class="section-head"><div><h2>Historical / Superseded Builds</h2><p>이력 보존 전용 · 새 Blueprint 구현에 재사용하지 않음</p></div></div><div class="cards">'+historicalBuilds.map(buildCard).join("")+'</div>':'');
+  '<div class="cards">'+(activeBuilds.map(buildCard).join("") || '<div class="empty">현재 Build Farm에서 작업 중인 게임이 없습니다.<br>새 Blueprint가 승인되면 Build Farm이 가져옵니다.</div>')+'</div>';
 }
 
 function reviewCard(p,compact=false){
