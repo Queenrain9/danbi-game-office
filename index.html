@@ -661,7 +661,7 @@ async function setDesignPriority(id, priority){
 
 async function loadGameDesigns(showToast=false){
   try{
-    const res=await fetch(CLOUD_URL+"?view=designs&limit=50",{
+    const res=await fetch(CLOUD_URL+"?view=designs&limit=50&all=1",{
       method:"GET",
       headers:publicHeaders(),
       cache:"no-store"
@@ -956,7 +956,7 @@ function planningDashboard(){
   const designPriority=designQueue.filter(x=>x.human_priority);
   const unclassified=ideaQueue.filter(x=>!x.curation_bucket);
   const attracted=ideaQueue.filter(x=>x.curation_bucket==="attract");
-  const unarchived=gameDesigns.filter(x=>!x.archive_commit);
+  const unarchived=gameDesigns.filter(x=>x.status==="design"&&!x.archive_commit);
 
   const oldestIdea=planningPriorityOrder(ideaQueue).find(x=>!x.human_priority)||ideaQueue[0];
   const oldestDesign=planningPriorityOrder(designQueue).find(x=>!x.human_priority)||designQueue[0];
@@ -1322,7 +1322,7 @@ function openDesignArchive(id){
 }
 
 function designPage(){
-  const ps=[...gameDesigns].sort((a,b)=>{
+  const ps=gameDesigns.filter(x=>x.status==="design").sort((a,b)=>{
     const pa=a.human_priority?1:0,pb=b.human_priority?1:0;
     if(pa!==pb) return pb-pa;
     if(pa&&pb){
@@ -1413,12 +1413,14 @@ function wireCard(p){
   const screens=Array.isArray(p.screens)?p.screens:[];
   const principles=Array.isArray(p.interaction_principles)?p.interaction_principles:[];
   const screenCount=p.screen_count||screens.length||0;
+  const sourceDesign=gameDesigns.find(x=>x.id===p.design_id) || gameDesigns.find(x=>x.idea_id===p.idea_id) || null;
+  const gameBrief=sourceDesign?.one_line || "원본 Game Design 요약을 불러오는 중입니다.";
   return `<div class="game-card">
     <div class="card-top">
       <div><div class="kicker">PACK RECEIVED · ${esc(when)}</div><div class="card-title">${esc(p.title)}</div></div>
       <span class="badge green">${esc(p.version||"v0.1")}</span>
     </div>
-    <div class="card-desc">Game Design Spec을 구현 가능한 화면·상태·인터랙션 구조로 번역한 개발용 Pack.</div>
+    <div class="card-desc">${esc(gameBrief)}</div>
     <div class="wf-card-stats">
       <div><b>${screenCount}</b><span>SCREENS</span></div>
       <div><b>${p.state_count||0}</b><span>STATES</span></div>
@@ -1431,7 +1433,10 @@ function wireCard(p){
       ${p.core_screen?`<span>Core · ${esc(p.core_screen)}</span>`:""}
     </div>
     ${principles.length?`<div class="human-gate"><b>Interaction Principle</b><br>${esc(principles[0])}</div>`:""}
-    <div class="card-actions"><button class="btn primary" onclick="showWireframePack('${p.id}',0)">Wireframe Pack 열기</button></div>
+    <div class="card-actions">
+      <button class="btn primary" onclick="showWireframePack('${p.id}',0)">Wireframe Pack 열기</button>
+      ${sourceDesign?`<button class="btn ghost" onclick="showDesignSpec('${sourceDesign.id}')">원본 Game Design</button>`:""}
+    </div>
   </div>`;
 }
 
