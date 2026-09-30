@@ -222,7 +222,11 @@ func show_pause()->void:
  if view!=View.LIVE or overlay:return
  paused=true; _modal("PAUSED","Timeline and controls are frozen.",[["RESUME",close_modal],["QUIT",quit_to_lobby]])
 
-func quit_to_lobby()->void:\n close_modal()\n show_lobby()\n\nfunc show_help()->void:
+func quit_to_lobby()->void:
+ close_modal()
+ show_lobby()
+
+func show_help()->void:
  if overlay:return
  var was_live=view==View.LIVE
  if was_live: paused=true
