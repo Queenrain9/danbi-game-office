@@ -218,6 +218,7 @@
     .badge.green { color:#8de4c7; border-color:rgba(85,214,168,.22); background:rgba(85,214,168,.08); }
     .badge.amber { color:#f3c86a; border-color:rgba(243,200,106,.22); background:rgba(243,200,106,.07); }
     .badge.blue { color:#9bc0ff; border-color:rgba(116,167,255,.24); background:rgba(116,167,255,.08); }
+    .badge.red { color:#ff9f9f; border-color:rgba(255,118,118,.24); background:rgba(255,118,118,.08); }
     .badge.purple { color:#d0baff; border-color:rgba(188,156,255,.24); background:rgba(188,156,255,.08); }
     .meta { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
     .meta span { font-size:10px; color:#7188a5; background:rgba(0,0,0,.16); border-radius:7px; padding:4px 6px; }
@@ -816,7 +817,7 @@ async function loadGameDesigns(showToast=false){
     }
     const payload=await res.json();
     gameDesigns=Array.isArray(payload.designs)?payload.designs:[];
-    if(current==="design" || current==="dashboard") render();
+    if(current==="design" || current==="dashboard" || current==="wireframe" || current==="implementation") render();
     if(showToast) toast(`Game Design 새로고침 · ${gameDesigns.length}개`);
   }catch(err){
     console.error("Game Design load failed",err);
