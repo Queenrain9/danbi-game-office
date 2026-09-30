@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "3eb410a4-b4f2-4d21-b1de-557abb3787f6",
+  "contract_id": "bb27ce5f-06f3-49c7-8493-f6092fb4f83c",
+  "design_id": "c81b3420-2ff8-40a9-bf89-9e0a5d051dc6",
+  "title": "Borrowed Shadow Repair",
+  "slug": "borrowed-shadow-repair",
+  "canonical_project_path": "builds/borrowed-shadow-repair",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "e4c9eb7f0574d3c0cc38e73e45da94574a3cbcf4",
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/borrowed-shadow-repair/build/godot",
+  "archived_file_count": 12,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}

@@ -1,0 +1,22 @@
+{
+  "role": "builder",
+  "kind": "static",
+  "status": "passed",
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "commit": "e4c9eb7f0574d3c0cc38e73e45da94574a3cbcf4",
+  "verification_scope": "static",
+  "checks": [
+    "project/main scene present",
+    "blueprint source/hash aligned",
+    "93/93 implementation claims",
+    "spatial drag and independent piece transforms",
+    "18px/12deg anchor snap",
+    "20px trace cancel plus endpoint completion",
+    "hotspot geometry hit-test",
+    "touch twist and +/-15 rotation",
+    "persistent contract data",
+    "short fade transitions",
+    "full 5-order loop"
+  ],
+  "runtime_qa": "not performed"
+}

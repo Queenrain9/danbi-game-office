@@ -1,0 +1,535 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/component_host.gd" id="1"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="2"]
+
+[node name="AppRoot" type="Control"]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="briefing" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="cue_help" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="live" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="lobby" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="pause" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="result" type="Control" parent="."]
+layout_mode = 1
+anchor_left = 0
+anchor_top = 0
+anchor_right = 1
+anchor_bottom = 1
+offset_left = 0
+offset_top = 0
+offset_right = 0
+offset_bottom = 0
+mouse_filter = 2
+visible = false
+
+[node name="cue_types" type="Panel" parent="briefing"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 403.2
+offset_right = 496.8
+offset_bottom = 614.4
+mouse_filter = 2
+
+[node name="goal" type="Panel" parent="briefing"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 192
+offset_right = 496.8
+offset_bottom = 364.8
+mouse_filter = 2
+
+[node name="scene_title" type="Panel" parent="briefing"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 76.8
+offset_right = 496.8
+offset_bottom = 153.6
+mouse_filter = 2
+
+[node name="start" type="Button" parent="briefing"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 97.2
+offset_top = 748.8
+offset_right = 442.8
+offset_bottom = 844.8
+mouse_filter = 0
+
+[node name="close" type="Button" parent="cue_help"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 367.2
+offset_top = 691.2
+offset_right = 475.2
+offset_bottom = 758.4
+mouse_filter = 0
+
+[node name="help_panel" type="Panel" parent="cue_help"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 153.6
+offset_right = 496.8
+offset_bottom = 768
+mouse_filter = 2
+
+[node name="scrim" type="ColorRect" parent="cue_help"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 0
+offset_top = 0
+offset_right = 540
+offset_bottom = 960
+mouse_filter = 0
+
+[node name="actor" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 232.2
+offset_top = 249.6
+offset_right = 307.8
+offset_bottom = 364.8
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="continuity" type="ProgressBar" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 21.6
+offset_top = 38.4
+offset_right = 183.6
+offset_bottom = 96
+mouse_filter = 2
+
+[node name="cue_future" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 259.2
+offset_top = 758.4
+offset_right = 518.4
+offset_bottom = 873.6
+mouse_filter = 2
+
+[node name="cue_next" type="Label" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 140.4
+offset_top = 758.4
+offset_right = 248.4
+offset_bottom = 873.6
+mouse_filter = 2
+
+[node name="cue_now" type="Label" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 21.6
+offset_top = 758.4
+offset_right = 129.6
+offset_bottom = 873.6
+mouse_filter = 2
+
+[node name="curtain_rope" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 226.8
+offset_top = 470.4
+offset_right = 291.6
+offset_bottom = 700.8
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="help" type="Button" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 421.2
+offset_top = 691.2
+offset_right = 518.4
+offset_bottom = 739.2
+mouse_filter = 0
+
+[node name="light_a" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 470.4
+offset_right = 108
+offset_bottom = 700.8
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="light_b" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 129.6
+offset_top = 470.4
+offset_right = 194.4
+offset_bottom = 700.8
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="pause_btn" type="Button" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 475.2
+offset_top = 38.4
+offset_right = 518.4
+offset_bottom = 96
+mouse_filter = 0
+
+[node name="prop_1" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 324
+offset_top = 499.2
+offset_right = 378
+offset_bottom = 595.2
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="prop_2" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 388.8
+offset_top = 499.2
+offset_right = 442.8
+offset_bottom = 595.2
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="prop_3" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 453.6
+offset_top = 499.2
+offset_right = 507.6
+offset_bottom = 595.2
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="prop_mark" type="Control" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 351
+offset_top = 297.6
+offset_right = 426.6
+offset_bottom = 374.4
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="stage_preview" type="TextureRect" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 21.6
+offset_top = 115.2
+offset_right = 518.4
+offset_bottom = 422.4
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="time" type="Label" parent="live"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 226.8
+offset_top = 38.4
+offset_right = 313.2
+offset_bottom = 96
+mouse_filter = 2
+
+[node name="grade" type="Label" parent="lobby"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 54
+offset_top = 566.4
+offset_right = 216
+offset_bottom = 633.6
+mouse_filter = 2
+
+[node name="scene_card" type="Panel" parent="lobby"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 172.8
+offset_right = 496.8
+offset_bottom = 537.6
+mouse_filter = 2
+
+[node name="select" type="Button" parent="lobby"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 97.2
+offset_top = 729.6
+offset_right = 442.8
+offset_bottom = 825.6
+mouse_filter = 0
+
+[node name="quit" type="Button" parent="pause"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 108
+offset_top = 518.4
+offset_right = 432
+offset_bottom = 614.4
+mouse_filter = 0
+
+[node name="resume" type="Button" parent="pause"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 108
+offset_top = 384
+offset_right = 432
+offset_bottom = 480
+mouse_filter = 0
+
+[node name="scrim" type="ColorRect" parent="pause"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 0
+offset_top = 0
+offset_right = 540
+offset_bottom = 960
+mouse_filter = 0
+
+[node name="accuracy" type="Label" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 199.8
+offset_top = 268.8
+offset_right = 340.2
+offset_bottom = 364.8
+mouse_filter = 2
+
+[node name="continuity_final" type="Label" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 268.8
+offset_right = 183.6
+offset_bottom = 364.8
+mouse_filter = 2
+
+[node name="grade" type="Label" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 189
+offset_top = 76.8
+offset_right = 351
+offset_bottom = 230.4
+mouse_filter = 2
+
+[node name="next" type="Button" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 291.6
+offset_top = 748.8
+offset_right = 496.8
+offset_bottom = 844.8
+mouse_filter = 0
+
+[node name="retry" type="Button" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 748.8
+offset_right = 248.4
+offset_bottom = 844.8
+mouse_filter = 0
+
+[node name="timeline" type="Control" parent="result"]
+layout_mode = 0
+anchor_left = 0
+anchor_top = 0
+anchor_right = 0
+anchor_bottom = 0
+offset_left = 43.2
+offset_top = 412.8
+offset_right = 496.8
+offset_bottom = 643.2
+mouse_filter = 2
+
+[connection signal="pressed" from="lobby/select" to="." method="bp_action_lobby_select"]
+[connection signal="pressed" from="briefing/start" to="." method="start_countdown"]
+[connection signal="pressed" from="live/help" to="." method="show_help"]
+[connection signal="pressed" from="pause/resume" to="." method="close_modal"]
+[connection signal="pressed" from="result/retry" to="." method="bp_action_result_retry"]
+[connection signal="pressed" from="result/next" to="." method="show_lobby"]
+[connection signal="pressed" from="cue_help/close" to="." method="close_modal"]
+[connection signal="pressed" from="live/pause_btn" to="." method="show_pause"]
+[connection signal="pressed" from="pause/quit" to="." method="quit_to_lobby"]

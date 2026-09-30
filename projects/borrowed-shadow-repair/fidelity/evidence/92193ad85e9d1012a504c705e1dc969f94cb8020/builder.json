@@ -1,0 +1,423 @@
+{
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "status": "passed",
+  "errors": [],
+  "manual_test_ids": [
+    "MANUAL:INT:customer_intake:01",
+    "MANUAL:INT:night_workshop:01",
+    "MANUAL:INT:pose_test:01",
+    "MANUAL:INT:result:01",
+    "MANUAL:INT:rework_overlay:01",
+    "MANUAL:INT:shadow_workbench:01",
+    "MANUAL:INT:shadow_workbench:02",
+    "MANUAL:INT:shadow_workbench:03",
+    "MANUAL:INT:shadow_workbench:04",
+    "MANUAL:INT:stitch_mode:01",
+    "MANUAL:INT:stitch_mode:02"
+  ],
+  "blueprint_hash": "162d83a58894315ed3e29fabb49cdd533500829567e7174040c481901a396a1b",
+  "commit": "92193ad85e9d1012a504c705e1dc969f94cb8020",
+  "results": [
+    {
+      "test_id": "STATIC:ACC:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:02",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:03",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:04",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:05",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:06",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:07",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:08",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:09",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:implementation_order",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:persistence",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:required_data",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:reusable",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:scene_hierarchy",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:state_owner",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:customer_intake:begin",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:customer_intake:customer",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:customer_intake:symptom_targets",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:night_workshop:client_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:night_workshop:progress",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:pose_test:hold_test",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:pose_test:pose_pair",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:result:behavior",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:result:continue",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:result:grade",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:rework_overlay:error_anchor",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:rework_overlay:rework_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shadow_workbench:piece_tray",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shadow_workbench:rotate_left",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shadow_workbench:rotate_right",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shadow_workbench:silhouette",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shadow_workbench:stitch_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:stitch_mode:seam_canvas",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:stitch_mode:test_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CNT:mvp_scope",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CNT:screen_inventory",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:loading",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:pause",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:rework_used",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:02",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:03",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:04",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:05",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:customer_intake:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:night_workshop:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:pose_test:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:result:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:rework_overlay:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:shadow_workbench:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:shadow_workbench:02",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:shadow_workbench:03",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:shadow_workbench:04",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:stitch_mode:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:stitch_mode:02",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:failure",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:grades",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:pieces",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:rework_limit",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:score",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:snap",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:stitch_trace_deviation_px",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:customer_intake:diagnosed",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:customer_intake:observing",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:night_workshop:ready",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:pose_test:active",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:pose_test:fail",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:pose_test:holding",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:pose_test:idle",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:pose_test:pass",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:result:result",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:rework_overlay:consumed",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:rework_overlay:shown",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:collision",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:dragging",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:idle",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:selected",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:snap_candidate",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shadow_workbench:snapped",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:stitch_mode:available",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:stitch_mode:error",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:stitch_mode:locked",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:stitch_mode:tracing",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:stitch_mode:unavailable",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:customer_intake:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:night_workshop:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:pose_test:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:pose_test:02",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:pose_test:03",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:result:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:rework_overlay:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:shadow_workbench:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:stitch_mode:01",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:skeleton",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:geometry",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:state",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:input",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:presentation",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:integration",
+      "status": "passed"
+    }
+  ],
+  "limitation": "Structural checks only; independent code/source review must verify game-specific semantics. Not runtime QA.",
+  "promotion_eligible": true,
+  "independent_semantic_review_required": true
+}

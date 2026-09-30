@@ -1,0 +1,19 @@
+{
+  "role": "builder",
+  "kind": "static",
+  "status": "passed",
+  "verification_scope": "static",
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "commit": "987a6c1095fbf9047702ea242a080c68ba003deb",
+  "adapter_bindings": "legacy approved blueprint: none",
+  "checks": [
+    "540x960 canonical viewport",
+    "canonical scene path and required nodes",
+    "reference pixel geometry",
+    "explicit rotate/scan/pin/classification gesture paths",
+    "button signal connections",
+    "94/94 implementation claims",
+    "start-to-eight-case-summary-to-hub flow"
+  ],
+  "runtime_qa": "not executed; manual playtest required"
+}

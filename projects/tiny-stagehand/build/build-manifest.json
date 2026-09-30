@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "43480741-d32b-4f45-937f-88d6396af8e2",
+  "contract_id": "fe893c5d-386c-490c-952d-556ffccfe6f1",
+  "design_id": "0798b6f0-7f9b-4fb9-966c-6f5db6f002b2",
+  "title": "Tiny Stagehand",
+  "slug": "tiny-stagehand",
+  "canonical_project_path": "builds/tiny-stagehand",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "d60fcd9b0b14ef1046760afcb3987eee2ca43692",
+  "blueprint_hash": "504a2c8f4ec38b9919866be08c1c4d14d26e76b375e0f61cc47e28e8f4e4ce2e",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/tiny-stagehand/build/godot",
+  "archived_file_count": 10,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}

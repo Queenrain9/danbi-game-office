@@ -1,0 +1,284 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource path="res://scripts/app_root.gd" type="Script" id="1"]
+[ext_resource path="res://scripts/interactions.gd" type="Script" id="2"]
+
+[node name="AppRoot" type="Control"]
+layout_mode=3
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1")
+[node name="Screens" type="Control" parent="."]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="night_hub" type="Control" parent="Screens"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="shift_card" type="Panel" parent="Screens/night_hub"]
+offset_left=43.2
+offset_top=211.2
+offset_right=496.8
+offset_bottom=518.4
+[node name="start_shift" type="Button" parent="Screens/night_hub"]
+offset_left=97.2
+offset_top=652.8
+offset_right=442.8
+offset_bottom=748.8
+text="START SHIFT"
+[node name="parcel_intake" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="case_counter" type="Label" parent="Screens/parcel_intake"]
+offset_left=32.4
+offset_top=48.0
+offset_right=151.2
+offset_bottom=105.6
+text="1 / 8"
+[node name="label_card" type="Panel" parent="Screens/parcel_intake"]
+offset_left=43.2
+offset_top=172.8
+offset_right=496.8
+offset_bottom=480.0
+[node name="rule_chips" type="Control" parent="Screens/parcel_intake"]
+offset_left=43.2
+offset_top=518.4
+offset_right=496.8
+offset_bottom=652.8
+[node name="RuleChip" type="Control" parent="Screens/parcel_intake/rule_chips"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="begin_inspect" type="Button" parent="Screens/parcel_intake"]
+offset_left=97.2
+offset_top=729.6
+offset_right=442.8
+offset_bottom=825.6
+text="BEGIN INSPECT"
+[node name="inspection" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="case_rule" type="Control" parent="Screens/inspection"]
+offset_left=27.0
+offset_top=48.0
+offset_right=329.4
+offset_bottom=105.6
+[node name="RuleChip" type="Control" parent="Screens/inspection/case_rule"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="scan_count" type="Label" parent="Screens/inspection"]
+offset_left=345.6
+offset_top=48.0
+offset_right=453.6
+offset_bottom=105.6
+text="Scans 0/4"
+[node name="manual_btn" type="Button" parent="Screens/inspection"]
+offset_left=469.8
+offset_top=48.0
+offset_right=513.0
+offset_bottom=105.6
+text="?"
+[node name="xray_box" type="Control" parent="Screens/inspection"]
+offset_left=43.2
+offset_top=144.0
+offset_right=432.0
+offset_bottom=604.8
+mouse_filter=1
+[node name="ParcelView" type="Control" parent="Screens/inspection/xray_box"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="scan_plane" type="Control" parent="Screens/inspection"]
+offset_left=64.8
+offset_top=345.6
+offset_right=410.4
+offset_bottom=364.8
+[node name="scan_rail" type="Control" parent="Screens/inspection"]
+offset_left=453.6
+offset_top=144.0
+offset_right=507.6
+offset_bottom=604.8
+[node name="ScanRail" type="Control" parent="Screens/inspection/scan_rail"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="pin_tray" type="Label" parent="Screens/inspection"]
+offset_left=43.2
+offset_top=624.0
+offset_right=226.8
+offset_bottom=681.6
+text="Evidence Pins 0/4"
+[node name="EvidencePin" type="Control" parent="Screens/inspection/pin_tray"]
+[node name="pass_lane" type="Control" parent="Screens/inspection"]
+offset_left=27.0
+offset_top=748.8
+offset_right=178.2
+offset_bottom=873.6
+[node name="DropLane" type="Control" parent="Screens/inspection/pass_lane"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="repack_lane" type="Control" parent="Screens/inspection"]
+offset_left=194.4
+offset_top=748.8
+offset_right=345.6
+offset_bottom=873.6
+[node name="DropLane" type="Control" parent="Screens/inspection/repack_lane"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="isolate_lane" type="Control" parent="Screens/inspection"]
+offset_left=361.8
+offset_top=748.8
+offset_right=513.0
+offset_bottom=873.6
+[node name="DropLane" type="Control" parent="Screens/inspection/isolate_lane"]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="classification_result" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="stamp" type="Label" parent="Screens/classification_result"]
+offset_left=108.0
+offset_top=76.8
+offset_right=432.0
+offset_bottom=172.8
+[node name="ResultStamp" type="Control" parent="Screens/classification_result/stamp"]
+[node name="score_delta" type="Label" parent="Screens/classification_result"]
+offset_left=183.6
+offset_top=192.0
+offset_right=356.4
+offset_bottom=259.2
+[node name="evidence_replay" type="TextureRect" parent="Screens/classification_result"]
+offset_left=54.0
+offset_top=297.6
+offset_right=486.0
+offset_bottom=624.0
+[node name="reason" type="Panel" parent="Screens/classification_result"]
+offset_left=54.0
+offset_top=652.8
+offset_right=486.0
+offset_bottom=748.8
+[node name="continue" type="Button" parent="Screens/classification_result"]
+offset_left=97.2
+offset_top=796.8
+offset_right=442.8
+offset_bottom=883.2
+text="NEXT PARCEL"
+[node name="shift_summary" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="grade" type="Label" parent="Screens/shift_summary"]
+offset_left=189.0
+offset_top=96.0
+offset_right=351.0
+offset_bottom=268.8
+[node name="accuracy" type="Label" parent="Screens/shift_summary"]
+offset_left=43.2
+offset_top=345.6
+offset_right=183.6
+offset_bottom=460.8
+[node name="critical" type="Label" parent="Screens/shift_summary"]
+offset_left=199.8
+offset_top=345.6
+offset_right=340.2
+offset_bottom=460.8
+[node name="efficiency" type="Label" parent="Screens/shift_summary"]
+offset_left=356.4
+offset_top=345.6
+offset_right=496.8
+offset_bottom=460.8
+[node name="next" type="Button" parent="Screens/shift_summary"]
+offset_left=97.2
+offset_top=768.0
+offset_right=442.8
+offset_bottom=864.0
+text="BACK TO HUB"
+[node name="rule_manual" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="modal_scrim" type="ColorRect" parent="Screens/rule_manual"]
+offset_right=540.0
+offset_bottom=960.0
+color=Color(0,0,0,0.75)
+mouse_filter=0
+[node name="rule_panel" type="Panel" parent="Screens/rule_manual"]
+offset_left=43.2
+offset_top=153.6
+offset_right=496.8
+offset_bottom=787.2
+[node name="close_rule" type="Button" parent="Screens/rule_manual"]
+offset_left=378.0
+offset_top=710.4
+offset_right=475.2
+offset_bottom=777.6
+text="CLOSE"
+[node name="pause" type="Control" parent="Screens"]
+visible=false
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+[node name="pause_scrim" type="ColorRect" parent="Screens/pause"]
+offset_right=540.0
+offset_bottom=960.0
+color=Color(0,0,0,0.8)
+[node name="resume" type="Button" parent="Screens/pause"]
+offset_left=108.0
+offset_top=384.0
+offset_right=432.0
+offset_bottom=480.0
+text="RESUME"
+[node name="quit" type="Button" parent="Screens/pause"]
+offset_left=108.0
+offset_top=518.4
+offset_right=432.0
+offset_bottom=614.4
+text="QUIT TO HUB"
+[node name="InteractionController" type="Control" parent="."]
+layout_mode=1
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+mouse_filter=2
+script=ExtResource("2")
+[node name="ReusableComponents" type="Control" parent="."]
+[node name="ShiftController" type="Control" parent="."]
+[node name="CaseRouter" type="Control" parent="."]
+[node name="HUDLayer" type="Control" parent="."]
+[node name="OverlayLayer" type="Control" parent="."]
+[connection signal="pressed" from="Screens/night_hub/start_shift" to="InteractionController" method="on_night_hub_01_load_first_parcel"]
+[connection signal="pressed" from="Screens/parcel_intake/begin_inspect" to="InteractionController" method="on_parcel_intake_01_enter_inspection"]
+[connection signal="pressed" from="Screens/classification_result/continue" to="InteractionController" method="on_classification_result_01_advance"]
+[connection signal="pressed" from="Screens/shift_summary/next" to="InteractionController" method="on_shift_summary_01_return_hub"]
+[connection signal="pressed" from="Screens/rule_manual/close_rule" to="InteractionController" method="on_rule_manual_01_dismiss"]
+[connection signal="pressed" from="Screens/pause/resume" to="InteractionController" method="on_pause_01_resume_prior_state"]
+[connection signal="pressed" from="Screens/pause/quit" to="InteractionController" method="on_pause_02_abandon_shift"]

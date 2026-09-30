@@ -1,0 +1,21 @@
+{
+  "schema_version": "project-build-archive-v1",
+  "build_job_id": "9cf75474-c24f-48e2-a91c-74de92df5946",
+  "contract_id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+  "design_id": "8336d50a-9b52-4295-9b7c-f648010b776f",
+  "title": "Parcel X-Ray Night Shift",
+  "slug": "parcel-x-ray-night-shift",
+  "canonical_project_path": "builds/parcel-x-ray-night-shift",
+  "repository": "Queenrain9/danbi-game-office",
+  "branch": "main",
+  "final_game_commit": "987a6c1095fbf9047702ea242a080c68ba003deb",
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "build_status": "fidelity_pending",
+  "fidelity_status": "pending",
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "archived_snapshot_path": "projects/parcel-x-ray-night-shift/build/godot",
+  "archived_file_count": 22,
+  "note": "Archive mirror only. Canonical Build Farm path and final commit identity are unchanged."
+}
