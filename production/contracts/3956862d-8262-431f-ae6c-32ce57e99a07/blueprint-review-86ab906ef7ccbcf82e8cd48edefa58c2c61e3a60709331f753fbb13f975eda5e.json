@@ -1,0 +1,47 @@
+{
+  "contract_id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "reviewed_at": "2026-09-30T06:52:55Z",
+  "checks": {
+    "official_cli": {
+      "status": "passed",
+      "errors": 0
+    },
+    "canonical_hash": true,
+    "current_db_source_equal": true,
+    "requirements_equal": true,
+    "screens_equal": true,
+    "component_coverage": true,
+    "interaction_semantics": true,
+    "state_transition_coverage": true,
+    "rule_value_preservation": true,
+    "implementation_test_coverage": true,
+    "six_stage_static_coverage": true,
+    "reusable_use_sites": true
+  },
+  "semantic_review": {
+    "core_loop_preserved": true,
+    "player_verbs_preserved": true,
+    "success_failure_preserved": true,
+    "scoring_budget_preserved": true,
+    "content_semantics_preserved": true,
+    "decision_trace_resolves": true,
+    "allowed_downstream_autonomy": [
+      "wireframe_layout",
+      "wireframe_feedback",
+      "blueprint_construction"
+    ],
+    "notes": [
+      "Eight-case shift is consistent with the Game Design's 10-case content pool and eight-case round structure.",
+      "Scan target 4 remains a soft efficiency target; no hard cap was introduced.",
+      "Added active-screen guards are construction safety and do not change gameplay meaning."
+    ]
+  },
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "issues": []
+}
+
