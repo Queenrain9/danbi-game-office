@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Living Game — Diagnostic Prototype v0.1</title>
+<style>
+:root{
+  --bg:#080a0f;--panel:rgba(18,21,30,.84);--line:rgba(255,255,255,.12);
+  --text:#f4f2ec;--muted:#a9adba;--accent:#d7f06b;--clarity:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+body{min-height:100vh;overflow-x:hidden}
+.world{position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(circle at 18% 32%,rgba(99,90,255,.20),transparent 28%),
+  radial-gradient(circle at 78% 66%,rgba(211,239,96,.10),transparent 24%),
+  linear-gradient(150deg,#090b12,#121724 55%,#07090d);
+  filter:blur(calc((1 - var(--clarity))*18px)) saturate(calc(.55 + var(--clarity)*.55));
+  transform:scale(calc(1.08 - var(--clarity)*.08));transition:filter .8s,transform .8s}
+.world:after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.06) 50%,transparent 50.3%),
+  linear-gradient(0deg,transparent 49.7%,rgba(255,255,255,.04) 50%,transparent 50.3%);
+  background-size:90px 90px;opacity:calc(.08 + var(--clarity)*.28)}
+.noise{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E")}
+.app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+.shell{width:min(980px,100%);min-height:680px;border:1px solid var(--line);border-radius:28px;background:rgba(8,10,15,.68);backdrop-filter:blur(18px);box-shadow:0 30px 100px rgba(0,0,0,.45);overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.brand{font-weight:800;letter-spacing:.08em;font-size:13px}.brand span{color:var(--accent)}
+.ghost{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:9px 13px;cursor:pointer}
+main{padding:38px}
+.hero{min-height:520px;display:flex;flex-direction:column;justify-content:center;max-width:720px;margin:auto}
+.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(38px,7vw,78px);line-height:.96;margin:0 0 20px;letter-spacing:-.055em}
+h2{font-size:clamp(28px,4vw,48px);line-height:1.04;margin:0 0 16px;letter-spacing:-.04em}
+p{line-height:1.7;color:var(--muted)}
+.actions{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:32px}
+button{font:inherit}
+.primary,.secondary,.option,.candidate,.game-card,.game-action{cursor:pointer;transition:.18s ease}
+.primary{border:0;border-radius:18px;padding:22px 24px;background:var(--accent);color:#11140c;font-weight:900;text-align:left;font-size:17px}
+.primary:hover{transform:translateY(-2px)}
+.secondary{border:1px solid var(--line);border-radius:18px;padding:22px 24px;background:rgba(255,255,255,.035);color:var(--text);font-weight:800;text-align:left}
+.meta{font-size:12px;color:#777f90;margin-top:7px;font-weight:500}
+.progress{display:flex;gap:5px;margin:12px 0 28px}.progress i{height:3px;flex:1;border-radius:8px;background:rgba(255,255,255,.09)}.progress i.on{background:var(--accent)}
+.scene{max-width:760px;margin:16px auto 0}
+.scene-copy{min-height:190px;padding:26px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015))}
+.scene-title{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:#81889b;margin-bottom:12px}
+.scene-text{font-size:clamp(24px,3.5vw,40px);line-height:1.16;letter-spacing:-.03em;white-space:pre-line}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:16px}
+.option{min-height:120px;border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(10,12,18,.82);color:var(--text);text-align:left}
+.option:hover{border-color:rgba(215,240,107,.6);transform:translateY(-2px)}
+.option b{display:block;font-size:17px;margin-bottom:8px}.option small{color:var(--muted);line-height:1.45}
+.inference{font-size:12px;color:#71788a;margin-top:14px;min-height:20px}
+.candidates{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.candidate{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:rgba(11,13,19,.88);padding:0;color:var(--text);text-align:left}
+.candidate:hover{transform:translateY(-4px);border-color:rgba(215,240,107,.55)}
+.art{height:180px;background:
+ radial-gradient(circle at 70% 28%,rgba(215,240,107,.26),transparent 25%),
+ radial-gradient(circle at 25% 76%,rgba(102,92,255,.3),transparent 30%),
+ linear-gradient(155deg,#181c2b,#0d1018)}
+.candidate:nth-child(2) .art{filter:hue-rotate(65deg)}.candidate:nth-child(3) .art{filter:hue-rotate(145deg)}
+.card-body{padding:18px}.card-body h3{font-size:22px;margin:0 0 8px}.tag{display:inline-block;font-size:11px;padding:6px 8px;border-radius:999px;background:rgba(215,240,107,.12);color:var(--accent);margin:0 5px 6px 0}
+.explain{margin-top:28px;padding:16px 18px;border-left:2px solid var(--accent);background:rgba(255,255,255,.025);font-size:13px;color:#9298a9;line-height:1.6}
+.pack-head{display:flex;justify-content:space-between;align-items:end;gap:16px}.games{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}
+.game-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(255,255,255,.025);color:var(--text);text-align:left}
+.game-card:hover{border-color:rgba(215,240,107,.5)}.game-card h3{margin:4px 0 8px;font-size:22px}.game-card .time{font-size:11px;color:#72798a}
+.play-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-top:22px}.play-panel{border:1px solid var(--line);border-radius:22px;padding:22px;background:rgba(255,255,255,.025)}
+.game-actions{display:grid;gap:9px;margin-top:18px}.game-action{border:1px solid var(--line);border-radius:14px;padding:15px;background:rgba(255,255,255,.035);color:var(--text);text-align:left}.game-action:hover{border-color:var(--accent)}
+.log{font-size:13px;color:#8d94a5;line-height:1.7;min-height:170px;white-space:pre-line}.stats{display:flex;gap:18px;margin-top:10px}.stat b{display:block;font-size:24px}.stat small{color:#777f90}
+.empty{margin:70px 0;text-align:center;color:#777f90}
+.share{margin-top:14px;width:100%;border:1px solid var(--line);border-radius:14px;padding:13px;background:transparent;color:var(--text);cursor:pointer}
+@media(max-width:720px){.app{padding:0}.shell{border-radius:0;min-height:100vh;border:0}.top{padding:18px}main{padding:24px}.actions,.candidates,.games,.play-grid{grid-template-columns:1fr}.options{grid-template-columns:1fr}.option{min-height:auto}.hero{min-height:calc(100vh - 130px)}.art{height:140px}}
+</style>
+</head>
+<body>
+<div class="world"></div><div class="noise"></div>
+<div class="app"><div class="shell">
+  <div class="top"><div class="brand">LIVING <span>GAME</span> / v0.1</div><button class="ghost" id="homeBtn">처음으로</button></div>
+  <main id="root"></main>
+</div></div>
+<script>
+const AXES=["pace","competition","relationship","mystery","progression","management","exploration","expression","pressure","mastery"];
+const AXIS_KO={pace:"속도감",competition:"경쟁",relationship:"캐릭터 관계",mystery:"추리",progression:"성장",management:"운영",exploration:"탐험",expression:"자기표현",pressure:"긴장감",mastery:"숙련"};
+const emptyScores=()=>Object.fromEntries(AXES.map(k=>[k,0]));
+
+const probes=[
+ {title:"플랫폼 0",text:"아직 목적지가 없는 역.\n세 가지가 동시에 당신의 시선을 잡는다.",options:[
+  {label:"멀어지는 불빛을 쫓는다",sub:"생각보다 몸이 먼저 움직인다.",d:{pace:3,exploration:2,pressure:1}},
+  {label:"낯선 사람에게 말을 건다",sub:"그가 왜 여기 있는지가 궁금하다.",d:{relationship:3,mystery:1,expression:1}},
+  {label:"잠긴 보관함을 살핀다",sub:"열 수 있을 것 같은데.",d:{mystery:3,mastery:2,exploration:1}}]},
+ {title:"첫 번째 갈림길",text:"통로 끝에서 경보가 울린다.\n누군가는 뛰고, 누군가는 멈춰 서 있다.",options:[
+  {label:"가장 먼저 도착해 본다",sub:"무슨 일인지는 가서 보면 된다.",d:{pace:3,competition:2,pressure:2}},
+  {label:"뒤처진 사람을 데려간다",sub:"혼자 가는 것보다 같이 가는 편.",d:{relationship:3,progression:1,pressure:-1}},
+  {label:"경보 장치를 해석한다",sub:"왜 울렸는지부터 알고 싶다.",d:{mystery:3,mastery:2,pace:-1}}]},
+ {title:"빈 작업실",text:"주인 없는 작업실.\n완성되지 않은 것들이 그대로 남아 있다.",options:[
+  {label:"망가진 기계를 고친다",sub:"작동하게 만들고 싶다.",d:{mastery:3,progression:2,management:1}},
+  {label:"선반을 내 방식으로 정리한다",sub:"여긴 더 잘 굴러갈 수 있다.",d:{management:3,expression:2,progression:1}},
+  {label:"주인의 기록부터 읽는다",sub:"이 방에는 이야기가 남아 있다.",d:{mystery:2,relationship:2,exploration:2}}]},
+ {title:"누군가의 도전",text:"처음 보는 사람이 당신을 가로막는다.\n“한 번 붙어볼래?”",options:[
+  {label:"바로 받아준다",sub:"룰은 하면서 익힌다.",d:{competition:3,pace:2,pressure:2}},
+  {label:"무엇을 걸 건지 묻는다",sub:"이기면 달라지는 게 있어야 한다.",d:{competition:1,progression:3,management:1}},
+  {label:"왜 나를 골랐는지 묻는다",sub:"저 사람 쪽이 더 궁금하다.",d:{relationship:3,mystery:2}}]},
+ {title:"지도에 없는 문",text:"벽에 없던 문이 생겼다.\n열어도 되는지는 아무도 알려주지 않는다.",options:[
+  {label:"연다",sub:"모르는 곳이면 더 좋다.",d:{exploration:3,pressure:2,pace:1}},
+  {label:"표식을 남기고 주변부터 본다",sub:"돌아올 길은 확보한다.",d:{mastery:2,mystery:2,management:1}},
+  {label:"다른 사람을 불러 같이 연다",sub:"혼자 볼 이유는 없다.",d:{relationship:2,exploration:2,expression:1}}]},
+ {title:"작은 소유물",text:"바닥에 낡은 물건 하나가 떨어져 있다.\n가치는 없어 보이는데 이상하게 손이 간다.",options:[
+  {label:"주워서 손본다",sub:"쓸모가 생길 때까지.",d:{progression:3,mastery:2,management:1}},
+  {label:"누구 물건인지 찾아본다",sub:"물건보다 사람이 먼저 떠오른다.",d:{relationship:2,mystery:3}},
+  {label:"내 식으로 바꿔 버린다",sub:"원래 모습일 필요는 없다.",d:{expression:3,progression:2}}]},
+ {title:"압박",text:"시간이 줄어든다.\n지금 하나만 끝낼 수 있다.",options:[
+  {label:"가장 어려운 걸 고른다",sub:"실패해도 제대로 해보고 싶다.",d:{mastery:3,pressure:3,competition:1}},
+  {label:"가장 큰 보상이 있는 걸 고른다",sub:"결과가 남아야 한다.",d:{progression:3,management:2,pressure:1}},
+  {label:"가장 궁금한 걸 고른다",sub:"결말을 못 보면 더 찝찝하다.",d:{mystery:3,exploration:2,pressure:-1}}]},
+ {title:"마지막 신호",text:"역 전체가 거의 선명해졌다.\n떠나기 전에 한 가지를 더 할 수 있다.",options:[
+  {label:"기록을 깨러 간다",sub:"내가 어디까지 되는지 확인한다.",d:{competition:3,mastery:3,pace:2}},
+  {label:"여기에 내 공간을 만든다",sub:"다음에 왔을 때 더 좋아져 있으면 좋겠다.",d:{progression:3,management:2,expression:2}},
+  {label:"아까 만난 사람을 다시 찾는다",sub:"그 사람 이야기가 아직 안 끝났다.",d:{relationship:3,mystery:1,progression:1}}]}
+];
+
+const templates=[
+ {id:"midnight-circuit",title:"MIDNIGHT CIRCUIT",genres:["레이싱","육성","라이벌 관계"],synopsis:"밤의 도시를 달리고, 낡은 머신을 키우고, 계속 마주치는 라이벌들과 관계를 만든다.",weights:{pace:3,competition:3,progression:2,relationship:1,mastery:2},actions:["야간 레이스에 참가한다","차고에서 머신을 손본다","라이벌을 찾아간다"]},
+ {id:"lost-found-03",title:"LOST & FOUND 03",genres:["추리","수집","관계"],synopsis:"막차 뒤에 남겨진 물건의 주인을 추리한다. 막혀도 다른 사건으로 넘어갈 수 있다.",weights:{mystery:3,relationship:2,exploration:2,progression:1},actions:["새 분실물을 조사한다","역 안을 돌아본다","단골 승객과 이야기한다"]},
+ {id:"night-market",title:"NIGHT MARKET OPERATOR",genres:["경영","수집","성장"],synopsis:"밤에만 열리는 작은 시장을 운영한다. 손님과 물건이 쌓일수록 시장의 성격도 달라진다.",weights:{management:3,progression:3,relationship:1,mastery:1},actions:["오늘의 가게 배치를 바꾼다","희귀 물건을 매입한다","단골 주문을 처리한다"]},
+ {id:"witch-mailroom",title:"WITCH MAILROOM",genres:["운영","미스터리","캐릭터"],synopsis:"도착지가 적혀 있지 않은 마법 우편을 분류하며 편지 속 사람들의 사연을 이어 붙인다.",weights:{management:2,mystery:3,relationship:2,mastery:1},actions:["수상한 편지를 분류한다","발신 흔적을 추적한다","배달부와 대화한다"]},
+ {id:"creature-rooftop",title:"ROOFTOP KEEPER",genres:["육성","수집","꾸미기"],synopsis:"도시 옥상에서 이상한 생물을 키우고 공간을 바꾼다. 떠났다가 돌아오면 흔적이 남아 있다.",weights:{progression:3,relationship:2,expression:3,management:1},actions:["생물을 돌본다","옥상을 꾸민다","새 흔적을 조사한다"]},
+ {id:"hollow-signal",title:"HOLLOW SIGNAL",genres:["탐험","미스터리","긴장"],synopsis:"신호가 끊긴 지역을 탐사한다. 깊이 들어갈수록 규칙을 스스로 알아내야 한다.",weights:{exploration:3,mystery:3,pressure:2,mastery:2},actions:["신호원 쪽으로 이동한다","장비를 조정한다","발견한 규칙을 시험한다"]},
+ {id:"backstreet-band",title:"BACKSTREET BAND",genres:["관계","성장","자기표현"],synopsis:"작은 합주실에서 시작해 멤버들과 호흡을 맞추고 자기 색깔의 공연을 만들어 간다.",weights:{relationship:3,progression:2,expression:3,mastery:1},actions:["합주한다","멤버와 이야기한다","다음 공연을 편곡한다"]},
+ {id:"last-courier",title:"LAST COURIER",genres:["속도","탐험","성장"],synopsis:"도시가 잠들기 전 마지막 배송들을 처리한다. 빠른 길과 이상한 샛길 사이에서 선택한다.",weights:{pace:3,exploration:3,progression:2,pressure:1},actions:["위험한 지름길로 간다","새 배송을 받는다","탈것을 업그레이드한다"]}
+];
+
+let state={screen:"home",probe:0,scores:emptyScores(),evidence:[],probeStartedAt:Date.now(),candidates:[],activeGame:null};
+const root=document.getElementById("root");
+document.getElementById("homeBtn").onclick=()=>showHome();
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function pack(){try{return JSON.parse(localStorage.getItem("living_game_pack")||"[]")}catch{return[]}}
+function savePack(v){localStorage.setItem("living_game_pack",JSON.stringify(v))}
+function uid(){return crypto?.randomUUID?.()||("g-"+Date.now()+"-"+Math.random().toString(36).slice(2))}
+function setClarity(n){document.documentElement.style.setProperty("--clarity",String(Math.max(0,Math.min(1,n))))}
+function formatDate(ts){return new Intl.DateTimeFormat("ko-KR",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(ts))}
+function topAxes(scores,n=3){return Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,n)}
+function normalize(scores){const max=Math.max(1,...Object.values(scores));return Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,Math.round((v/max)*100)/100]))}
+
+function showHome(){
+ state.screen="home";setClarity(.12);
+ const games=pack();
+ root.innerHTML=`<section class="hero">
+   <div class="eyebrow">오늘 무엇을 하고 싶은지 아직 몰라도 됩니다</div>
+   <h1>새 게임을<br>발견하세요.</h1>
+   <p>여기서 하는 행동만 보고 지금 당신이 하고 싶은 게임을 좁혀 갑니다. 설문은 없습니다.</p>
+   <div class="actions">
+    <button class="primary" id="newGame">새 게임<div class="meta">플레이하면서 오늘의 게임 찾기</div></button>
+    <button class="secondary" id="gamePack">내 게임팩<div class="meta">${games.length ? games.length+"개의 게임" : "아직 비어 있음"}</div></button>
+   </div>
+ </section>`;
+ document.getElementById("newGame").onclick=startDiagnostic;
+ document.getElementById("gamePack").onclick=showPack;
+}
+
+function startDiagnostic(){
+ state={screen:"diagnostic",probe:0,scores:emptyScores(),evidence:[],probeStartedAt:Date.now(),candidates:[],activeGame:null};
+ setClarity(.18);renderProbe();
+}
+function renderProbe(){
+ const p=probes[state.probe];setClarity(.18+(state.probe/probes.length)*.7);state.probeStartedAt=Date.now();
+ root.innerHTML=`<section class="scene">
+   <div class="eyebrow">이미 게임은 시작되었습니다</div>
+   <div class="progress">${probes.map((_,i)=>`<i class="${i<=state.probe?"on":""}"></i>`).join("")}</div>
+   <div class="scene-copy"><div class="scene-title">${esc(p.title)}</div><div class="scene-text">${esc(p.text)}</div></div>
+   <div class="options">${p.options.map((o,i)=>`<button class="option" data-i="${i}"><b>${esc(o.label)}</b><small>${esc(o.sub)}</small></button>`).join("")}</div>
+   <div class="inference">당신이 여기서 보여준 행동만 사용합니다.</div>
+ </section>`;
+ [...document.querySelectorAll(".option")].forEach(b=>b.onclick=()=>chooseOption(Number(b.dataset.i)));
+}
+function chooseOption(i){
+ const p=probes[state.probe],o=p.options[i],latency=Date.now()-state.probeStartedAt;
+ for(const [k,v] of Object.entries(o.d)) state.scores[k]=(state.scores[k]||0)+v;
+ if(latency<2200) state.scores.pace+=.35;
+ if(latency>6500) state.scores.mystery+=.2;
+ state.evidence.push({probe:state.probe,choice:i,label:o.label,latency_ms:latency});
+ state.probe++;
+ if(state.probe>=probes.length) revealCandidates(); else renderProbe();
+}
+function scoreTemplate(t){
+ let s=0;for(const [k,w] of Object.entries(t.weights))s+=(state.scores[k]||0)*w;return s;
+}
+function revealCandidates(){
+ state.screen="candidates";setClarity(1);
+ state.candidates=[...templates].map(t=>({...t,fit:scoreTemplate(t)})).sort((a,b)=>b.fit-a.fit).slice(0,3);
+ const tops=topAxes(state.scores,4).map(([k])=>AXIS_KO[k]).join(" · ");
+ root.innerHTML=`<section>
+   <div class="eyebrow">진단 종료 / GAME CANDIDATES</div>
+   <h2>님아, 오늘 이런 게임<br>하고 싶은 거 맞죠?</h2>
+   <p>지금까지의 선택에서는 <b style="color:#f4f2ec">${esc(tops)}</b> 쪽 신호가 강했습니다. 그래서 이 세 개를 만들었습니다.</p>
+   <div class="candidates">${state.candidates.map((c,i)=>`<button class="candidate" data-i="${i}">
+      <div class="art"></div><div class="card-body"><div class="eyebrow">OPTION 0${i+1}</div><h3>${esc(c.title)}</h3>
+      <div>${c.genres.map(g=>`<span class="tag">${esc(g)}</span>`).join("")}</div><p>${esc(c.synopsis)}</p></div>
+   </button>`).join("")}</div>
+   <div class="explain">이 결과는 검색 기록이나 다른 앱이 아니라 <b>방금 이 화면에서 한 행동</b>만으로 만들었습니다. 하나를 고르면 그 순간 하나의 게임으로 굳어지고 내 게임팩에 저장됩니다.</div>
+ </section>`;
+ [...document.querySelectorAll(".candidate")].forEach(b=>b.onclick=()=>materialize(Number(b.dataset.i)));
+}
+function materialize(i){
+ const c=state.candidates[i];
+ const genome={
+  schema_version:"0.1",game_id:uid(),template_id:c.id,title:c.title,created_at:new Date().toISOString(),
+  origin:"self",genres:c.genres,synopsis:c.synopsis,need_vector:normalize(state.scores),
+  diagnostic_evidence:state.evidence,kernels:Object.entries(c.weights).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,w])=>({id:k,weight:w})),
+  world_seed:Math.floor(Math.random()*1e9),actions:c.actions,progress:{level:1,xp:0,visits:1,actions:0},event_log:["게임이 만들어졌습니다."]
+ };
+ const games=pack();games.unshift(genome);savePack(games);openGame(genome.game_id);
+}
+function showPack(){
+ state.screen="pack";setClarity(.7);const games=pack();
+ root.innerHTML=`<section><div class="pack-head"><div><div class="eyebrow">MY GAMEPACK</div><h2>내 게임팩</h2><p>당신이 플레이해서 만들어진 게임들입니다.</p></div></div>
+ ${games.length?`<div class="games">${games.map(g=>`<button class="game-card" data-id="${esc(g.game_id)}"><div class="time">${esc(formatDate(g.created_at))} · 방문 ${g.progress?.visits||1}회</div><h3>${esc(g.title)}</h3><div>${(g.genres||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div><p>${esc(g.synopsis||"")}</p></button>`).join("")}</div>`:`<div class="empty">아직 만들어진 게임이 없습니다.<br>새 게임을 눌러 첫 게임을 만나보세요.</div>`}
+ </section>`;
+ [...document.querySelectorAll(".game-card")].forEach(b=>b.onclick=()=>openGame(b.dataset.id));
+}
+function updateGame(g){
+ const games=pack(),i=games.findIndex(x=>x.game_id===g.game_id);if(i>=0){games[i]=g;savePack(games)}
+}
+function openGame(id){
+ let games=pack(),g=games.find(x=>x.game_id===id);if(!g)return showPack();
+ if(state.activeGame!==id){g.progress=g.progress||{level:1,xp:0,visits:0,actions:0};g.progress.visits=(g.progress.visits||0)+1;updateGame(g)}
+ state.activeGame=id;state.screen="play";setClarity(1);renderGame(g);
+}
+function renderGame(g){
+ const need=topAxes(g.need_vector||{},3).map(([k,v])=>AXIS_KO[k]+" "+Math.round(v*100)+"%").join(" · ");
+ root.innerHTML=`<section><div class="eyebrow">NOW PLAYING / GAMEPACK</div><h2>${esc(g.title)}</h2><p>${esc(g.synopsis)}</p>
+  <div>${(g.genres||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div>
+  <div class="play-grid">
+   <div class="play-panel"><div class="scene-title">현재 플레이</div><div class="game-actions">${(g.actions||[]).map((a,i)=>`<button class="game-action" data-a="${i}">${esc(a)}</button>`).join("")}</div>
+    <div class="stats"><div class="stat"><b>${g.progress?.level||1}</b><small>LEVEL</small></div><div class="stat"><b>${g.progress?.xp||0}</b><small>XP</small></div><div class="stat"><b>${g.progress?.visits||1}</b><small>VISITS</small></div></div>
+   </div>
+   <div class="play-panel"><div class="scene-title">이 게임의 기억</div><div class="log">${esc((g.event_log||[]).slice(-7).reverse().join("\n"))}</div>
+    <button class="share" id="shareBtn">이 게임을 친구에게 선물하기</button>
+   </div>
+  </div>
+  <div class="explain">이 게임이 다시 선택될수록 <b>재방문 신호</b>가 쌓입니다. 실제 제품에서는 이 신호가 일정 수준을 넘으면 Deepening Factory가 더 많은 콘텐츠와 시스템을 붙입니다.<br><span style="opacity:.7">초기 추론: ${esc(need)}</span></div>
+ </section>`;
+ [...document.querySelectorAll(".game-action")].forEach(b=>b.onclick=()=>playAction(g,Number(b.dataset.a)));
+ document.getElementById("shareBtn").onclick=()=>shareGame(g);
+}
+function playAction(g,i){
+ const a=g.actions[i];g.progress.actions=(g.progress.actions||0)+1;g.progress.xp=(g.progress.xp||0)+10;
+ if(g.progress.xp>=g.progress.level*40){g.progress.xp=0;g.progress.level++;g.event_log.push("게임이 한 단계 깊어졌습니다.")}
+ const snippets=["작은 변화가 세계에 남았습니다.","새로운 가능성이 열렸습니다.","누군가 이 선택을 기억합니다.","다음 방문에 이어질 흔적이 생겼습니다."];
+ g.event_log.push("• "+a+" — "+snippets[(g.progress.actions+g.world_seed)%snippets.length]);updateGame(g);renderGame(g);
+}
+function b64url(obj){return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replaceAll("+","-").replaceAll("/","_").replaceAll("=","")}
+function fromB64url(s){s=s.replaceAll("-","+").replaceAll("_","/");while(s.length%4)s+="=";return JSON.parse(decodeURIComponent(escape(atob(s))))}
+async function shareGame(g){
+ const gift={...g,origin:"gift",diagnostic_evidence:undefined};const url=location.origin+location.pathname+"#share="+b64url(gift);
+ try{await navigator.clipboard.writeText(url);alert("선물 링크를 복사했습니다.");}catch{prompt("이 링크를 복사하세요.",url)}
+}
+function importGift(g){
+ const clone={...g,game_id:uid(),created_at:new Date().toISOString(),origin:"gift",progress:{level:g.progress?.level||1,xp:0,visits:0,actions:0},event_log:["친구에게서 이 게임을 선물받았습니다."]};
+ const games=pack();games.unshift(clone);savePack(games);history.replaceState(null,"",location.pathname);openGame(clone.game_id);
+}
+function handleShare(){
+ if(!location.hash.startsWith("#share="))return false;
+ try{
+  const g=fromB64url(location.hash.slice(7));setClarity(1);
+  root.innerHTML=`<section class="hero"><div class="eyebrow">A GAME WAS SENT TO YOU</div><h2>${esc(g.title)}</h2><p>${esc(g.synopsis||"")}</p><div>${(g.genres||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div><div class="actions"><button class="primary" id="acceptGift">내 게임팩에 넣고 플레이</button><button class="secondary" id="skipGift">돌아가기</button></div></section>`;
+  document.getElementById("acceptGift").onclick=()=>importGift(g);document.getElementById("skipGift").onclick=()=>{history.replaceState(null,"",location.pathname);showHome()};return true;
+ }catch(e){history.replaceState(null,"",location.pathname);return false}
+}
+if(!handleShare())showHome();
+</script>
+</body>
+</html>
