@@ -159,12 +159,20 @@ func _build_pieces() -> void:
 func show_screen(screen_id: String, state_id: String) -> void:
     if input_locked or paused: return
     input_locked=true
-    var tween:=create_tween(); tween.tween_interval(0.08); tween.tween_callback(_finish_screen_change.bind(screen_id,state_id))
+    var old:Control=$Screens.get_node_or_null(current_screen)
+    var tween:=create_tween()
+    if old and old.visible: tween.tween_property(old,"modulate:a",0.0,0.08)
+    tween.tween_callback(_finish_screen_change.bind(screen_id,state_id))
 
 func _finish_screen_change(screen_id:String,state_id:String)->void:
     current_screen=screen_id; current_state=state_id
     for child in $Screens.get_children(): child.visible=child.name==screen_id
-    input_locked=false; _refresh_components()
+    var fresh:Control=$Screens.get_node(screen_id); fresh.modulate.a=0.0
+    var tween:=create_tween(); tween.tween_property(fresh,"modulate:a",1.0,0.08); tween.tween_callback(_unlock_input)
+    _refresh_components()
+
+func _unlock_input()->void:
+    input_locked=false
 
 func set_state(state_id: String) -> void:
     current_state = state_id
@@ -215,7 +223,7 @@ func end_piece_drag(global_position:Vector2) -> void:
     var p:=piece_nodes[selected_piece]; p.global_position=global_position-p.size*.5
     var anchor:=_anchor_for(selected_piece); var angle_error:=absf(piece_angles[selected_piece]-_anchor_angle(selected_piece))
     if p.global_position.distance_to(anchor)<=SNAP_POSITION_PX and angle_error<=SNAP_ROTATION_DEG:
-        p.global_position=anchor; p.rotation_degrees=_anchor_angle(selected_piece); piece_snapped[selected_piece]=true; snapped_pieces=piece_snapped.count(true); set_state("snapped")
+        p.global_position=anchor; p.rotation_degrees=_anchor_angle(selected_piece); piece_snapped[selected_piece]=true; snapped_pieces=piece_snapped.count(true); Input.vibrate_handheld(18); set_state("snapped")
         if snapped_pieces==required_pieces: score+=50
     else:
         p.global_position=last_valid_position; p.rotation_degrees=last_valid_angle; set_state("collision")
@@ -232,6 +240,7 @@ func rotate_piece(delta_degrees:float)->void:
     if current_screen!="shadow_workbench" or selected_piece<0 or piece_snapped[selected_piece]:return
     piece_angles[selected_piece]=snappedf(piece_angles[selected_piece]+delta_degrees,15.0)
     piece_nodes[selected_piece].rotation_degrees=piece_angles[selected_piece]
+    Input.vibrate_handheld(8)
     last_valid_angle=piece_angles[selected_piece]
     set_state("selected")
 
@@ -255,6 +264,7 @@ func end_trace() -> void:
     seam_locked = trace_started and trace_reached_end and not trace_error
     if seam_locked:
         score += 30
+        Input.vibrate_handheld(28)
         set_state("locked")
     else:
         set_state("error")
@@ -296,6 +306,7 @@ func transition_pose_test_03() -> void:
 func transition_rework_overlay_01() -> void:
     if not rework_used:
         rework_used = true
+        set_state("consumed")
         seam_locked = false
         snapped_pieces = maxi(required_pieces - 1, 0)
         show_screen("shadow_workbench", "selected")
