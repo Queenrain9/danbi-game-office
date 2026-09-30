@@ -125,6 +125,29 @@ python tools/fidelity/production.py check-blueprint --blueprint sealed.json --co
 
 Re-read DB source before writing. An approved hash is immutable: recompile and independently reapprove any source or binding change. Legacy hashes have an unknown canonical format in this tool; never rewrite an approved Blueprint in place.
 
+## Blueprint review return path
+
+Independent Blueprint review is a loop inside the Implementation room lifecycle, not a terminal queue in the Fidelity room.
+
+Lifecycle:
+
+`draft/missing → pending_review → approved/ready → Build Farm`
+
+If review fails:
+
+`pending_review → blocked/draft → Compiler repair → pending_review`
+
+The Gate must call `danbi_reject_blueprint(contract_id, blueprint_hash, token, issues, review)` for a real Blueprint FAIL. That preserves the same Contract, stores the machine-readable `blueprint_issues` and independent review, and returns the item to the Implementation room as **설계 수정 필요**. A failed Blueprint must not remain indefinitely in `pending_review`.
+
+The Compiler then receives the same Contract as `resume_blocked`, reads the review issues, repairs only the Blueprint construction/trace/coverage defects allowed by the existing source, reseals with a new Blueprint hash when content changed, clears the issue set, and submits it again as `pending_review`. It must never create a replacement Contract merely because independent review failed.
+
+Compiler candidate priority is:
+1. `resume_missing`
+2. `resume_blocked`
+3. `new`
+
+This prevents rejected design work from being starved indefinitely by a continuing stream of new Wireframes while still allowing an interrupted partially-created Contract to complete first.
+
 ## Builder → final commit → static evidence
 
 Clone or materialize the repository, review the approved Blueprint, and construct an exact candidate scene:
@@ -168,14 +191,14 @@ Implementation Contract + Fidelity Blueprint compilation is one atomic game-leve
 
 A Contract row with `status='draft'` and `blueprint_status='missing'` is a resumable checkpoint, not a failed artifact. The next Compiler run must recover it before creating another new Contract. The database helpers are:
 
-- `danbi_next_compiler_candidate()` — returns `resume_missing` first, then a new Wireframe, and only considers true blocked work after the normal queue can keep moving.
+- `danbi_next_compiler_candidate()` — returns `resume_missing` first, then `resume_blocked` review repairs, then a new Wireframe.
 - `danbi_compiler_checkpoint(contract_id)` — reports complete only when the Blueprint, 64-character hash, empty issue set, `pending_review|approved` status, and matching `danbi_blueprint_history` row all exist.
 
 Within one scheduled run, game A must reach a complete checkpoint before game B is touched. A raw Contract INSERT is never a successful Compiler completion.
 
 Large Contract/Blueprint payloads must be passed as structured JSON or safely encoded/escaped before JSONB conversion. Do not construct megabyte-scale raw SQL JSON literals from free text. Transport/serialization failures such as an unescaped newline are retryable local failures; they must not become semantic blockers or cause the Compiler to skip to the next game.
 
-A genuine `blueprint_status='blocked'` item does not starve the rest of production. Its issue record remains available for repair while new eligible Wireframes may continue through the Compiler.
+A `blueprint_status='blocked'` item is a returned Blueprint review repair. It is retried before new Wireframes so review failures do not accumulate indefinitely. If the issue is truly upstream and cannot be repaired at the Blueprint layer, keep it blocked with explicit issues rather than silently skipping it.
 
 
 ## Interaction Runtime Library v1
