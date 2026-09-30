@@ -38,14 +38,37 @@ func _gui_input(event: InputEvent) -> void:
     if event is InputEventScreenTouch:
         if event.pressed: touches[event.index]=event.position
         else: touches.erase(event.index)
-        if name=="piece_tray" and event.pressed and touches.size()==1: game.begin_piece_drag(_piece_index_at(event.position))
-        elif name=="piece_tray" and not event.pressed and touches.size()==0: game.end_piece_drag(event.position+global_position)
+        if name=="piece_tray" and event.pressed and touches.size()==1:
+            var global_pointer=event.position+global_position
+            drag_adapter.begin(event.index,global_pointer,global_pointer)
+            game.begin_piece_drag(_piece_index_at(event.position))
+        elif name=="piece_tray" and not event.pressed and touches.size()==0:
+            var global_pointer=event.position+global_position
+            var released=drag_adapter.release(event.index,global_pointer)
+            game.end_piece_drag(released.get("position",global_pointer))
+        elif name=="hold_test":
+            pressed=event.pressed
+            if pressed:
+                hold_elapsed=0.0
+                hold_adapter.begin(Time.get_ticks_msec(),event.position)
+                game.set_state("holding")
+            else:
+                var released=hold_adapter.release(Time.get_ticks_msec(),Vector2.ZERO)
+                if not released.get("completed",false):game.set_state("idle")
         if touches.size()==2:
             var pts=touches.values(); twist_start_angle=(pts[1]-pts[0]).angle(); twist_piece_angle=game.piece_angles[game.selected_piece] if game.selected_piece>=0 else 0.0
         accept_event(); return
     if event is InputEventScreenDrag:
         if touches.has(event.index): touches[event.index]=event.position
-        if name=="piece_tray" and touches.size()==1: game.update_piece_drag(event.position+global_position)
+        if name=="piece_tray" and touches.size()==1:
+            var global_pointer=event.position+global_position
+            var moved=drag_adapter.update(event.index,global_pointer)
+            game.update_piece_drag(moved.get("position",global_pointer))
+        elif name=="hold_test" and pressed:
+            var held=hold_adapter.update(Time.get_ticks_msec(),event.position)
+            if held.get("phase","")=="cancel":
+                pressed=false
+                game.set_state("idle")
         elif name=="piece_tray" and touches.size()==2 and game.selected_piece>=0:
             var pts=touches.values(); var delta=rad_to_deg((pts[1]-pts[0]).angle()-twist_start_angle); game.piece_angles[game.selected_piece]=twist_piece_angle+delta; game.piece_nodes[game.selected_piece].rotation_degrees=game.piece_angles[game.selected_piece]
         accept_event(); return
@@ -79,7 +102,7 @@ func _gui_input(event: InputEvent) -> void:
         pressed=event.pressed
         hold_elapsed=0.0 if pressed else hold_elapsed
         if pressed:
-            hold_adapter.begin(Time.get_ticks_msec(),event.position)
+            hold_adapter.begin(Time.get_ticks_msec(),Vector2.ZERO)
             game.set_state("holding")
         else:
             var released=hold_adapter.release(Time.get_ticks_msec(),event.position)
