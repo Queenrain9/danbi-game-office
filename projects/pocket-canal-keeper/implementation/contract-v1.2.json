@@ -1,0 +1,4085 @@
+{
+  "id": "b27929ee-4ad3-4381-8b09-2760ee458ea3",
+  "title": "Pocket Canal Keeper",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "ae75ee43-2f25-40f6-9c27-a43030891f4e",
+  "version": "v1.2",
+  "design_id": "69cfd48e-f740-49c9-9f33-9171b44501b2",
+  "created_at": "2026-09-30T08:42:51.907922+00:00",
+  "updated_at": "2026-09-30T20:20:22.186925+00:00",
+  "requirements": [
+    {
+      "id": "REQ-SCREEN-STAGE_SELECT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/0",
+      "requirement": {
+        "value": {
+          "id": "stage_select",
+          "name": "Stage Select",
+          "order": 1,
+          "layout": {
+            "regions": [
+              {
+                "h": 10,
+                "w": 88,
+                "x": 6,
+                "y": 5,
+                "id": "header",
+                "role": "status",
+                "label": "progress"
+              },
+              {
+                "h": 72,
+                "w": 88,
+                "x": 6,
+                "y": 18,
+                "id": "grid",
+                "role": "selection",
+                "label": "stages"
+              }
+            ]
+          },
+          "states": [
+            "ready",
+            "locked"
+          ],
+          "purpose": "select unlocked stage and view stars",
+          "feedback": [
+            "stars visible per completed stage"
+          ],
+          "components": [
+            {
+              "id": "stage_cards",
+              "box": {
+                "h": 66,
+                "w": 84,
+                "x": 8,
+                "y": 20
+              },
+              "type": "grid",
+              "label": "Stage cards",
+              "state_binding": "unlocks/stars",
+              "interaction_role": "tap stage"
+            },
+            {
+              "id": "progress",
+              "box": {
+                "h": 7,
+                "w": 84,
+                "x": 8,
+                "y": 6
+              },
+              "type": "status",
+              "label": "Progress",
+              "state_binding": "unlocked_stage"
+            }
+          ],
+          "edge_cases": [
+            "stage1 always unlocked"
+          ],
+          "transitions": [
+            {
+              "to": "stage_brief",
+              "from": "stage_select",
+              "trigger": "unlocked stage tap",
+              "animation": "push",
+              "condition": "unlocked"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "select stage",
+              "target": "stage_cards",
+              "feedback": "press",
+              "precondition": "unlocked",
+              "state_change": "selected_stage",
+              "invalid_input": "lock pulse"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "locked_stage",
+              "name": "Locked Stage",
+              "notes": "locked tap pulses",
+              "condition": "stage > unlocked",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {}
+            }
+          ],
+          "implementation_notes": [
+            "six data stages"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/0"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_SELECT-STAGE_CARDS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/0",
+      "requirement": {
+        "value": {
+          "id": "stage_cards",
+          "box": {
+            "h": 66,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "grid",
+          "label": "Stage cards",
+          "state_binding": "unlocks/stars",
+          "interaction_role": "tap stage"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_SELECT-PROGRESS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/1",
+      "requirement": {
+        "value": {
+          "id": "progress",
+          "box": {
+            "h": 7,
+            "w": 84,
+            "x": 8,
+            "y": 6
+          },
+          "type": "status",
+          "label": "Progress",
+          "state_binding": "unlocked_stage"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-STAGE_SELECT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "select stage",
+          "target": "stage_cards",
+          "feedback": "press",
+          "precondition": "unlocked",
+          "state_change": "selected_stage",
+          "invalid_input": "lock pulse"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-STAGE_SELECT-READY",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/0",
+      "requirement": {
+        "value": "ready",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-STAGE_SELECT-LOCKED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/1",
+      "requirement": {
+        "value": "locked",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-STAGE_SELECT-LOCKED_STAGE",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/0/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "locked_stage",
+          "name": "Locked Stage",
+          "notes": "locked tap pulses",
+          "condition": "stage > unlocked",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_SELECT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/0/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "stage_brief",
+          "from": "stage_select",
+          "trigger": "unlocked stage tap",
+          "animation": "push",
+          "condition": "unlocked"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-STAGE_BRIEF",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/1",
+      "requirement": {
+        "value": {
+          "id": "stage_brief",
+          "name": "Stage Brief",
+          "order": 2,
+          "layout": {
+            "regions": [
+              {
+                "h": 48,
+                "w": 86,
+                "x": 7,
+                "y": 12,
+                "id": "preview",
+                "role": "preview",
+                "label": "canal preview"
+              },
+              {
+                "h": 18,
+                "w": 86,
+                "x": 7,
+                "y": 63,
+                "id": "rules",
+                "role": "rules",
+                "label": "boats/constraints"
+              },
+              {
+                "h": 11,
+                "w": 86,
+                "x": 7,
+                "y": 84,
+                "id": "actions",
+                "role": "navigation",
+                "label": "actions"
+              }
+            ]
+          },
+          "states": [
+            "brief"
+          ],
+          "purpose": "preview canal, boats and special constraints",
+          "feedback": [
+            "manifest exposes trait icons"
+          ],
+          "components": [
+            {
+              "id": "map_preview",
+              "box": {
+                "h": 44,
+                "w": 82,
+                "x": 9,
+                "y": 14
+              },
+              "type": "map",
+              "label": "Map preview",
+              "state_binding": "stage.graph"
+            },
+            {
+              "id": "boat_manifest",
+              "box": {
+                "h": 16,
+                "w": 48,
+                "x": 9,
+                "y": 64
+              },
+              "type": "list",
+              "label": "Boat manifest",
+              "state_binding": "boats"
+            },
+            {
+              "id": "constraints",
+              "box": {
+                "h": 16,
+                "w": 31,
+                "x": 60,
+                "y": 64
+              },
+              "type": "chips",
+              "label": "Constraints",
+              "state_binding": "stage.rules"
+            },
+            {
+              "id": "start",
+              "box": {
+                "h": 8,
+                "w": 39,
+                "x": 52,
+                "y": 85
+              },
+              "type": "button",
+              "label": "Start",
+              "state_binding": "loaded"
+            },
+            {
+              "id": "back",
+              "box": {
+                "h": 8,
+                "w": 25,
+                "x": 9,
+                "y": 85
+              },
+              "type": "button",
+              "label": "Back",
+              "state_binding": "loaded"
+            }
+          ],
+          "edge_cases": [
+            "invalid graph blocks start"
+          ],
+          "transitions": [
+            {
+              "to": "canal_board",
+              "from": "stage_brief",
+              "trigger": "start",
+              "animation": "fade",
+              "condition": "loaded"
+            },
+            {
+              "to": "stage_select",
+              "from": "stage_brief",
+              "trigger": "back",
+              "animation": "pop",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "initialize stage",
+              "target": "start",
+              "feedback": "press",
+              "precondition": "loaded",
+              "state_change": "running",
+              "invalid_input": "disabled until loaded"
+            },
+            {
+              "input": "tap",
+              "action": "return select",
+              "target": "back",
+              "feedback": "press",
+              "precondition": "true",
+              "state_change": "none",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": [
+            "read-only preview"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/1"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_BRIEF-MAP_PREVIEW",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/0",
+      "requirement": {
+        "value": {
+          "id": "map_preview",
+          "box": {
+            "h": 44,
+            "w": 82,
+            "x": 9,
+            "y": 14
+          },
+          "type": "map",
+          "label": "Map preview",
+          "state_binding": "stage.graph"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_BRIEF-BOAT_MANIFEST",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/1",
+      "requirement": {
+        "value": {
+          "id": "boat_manifest",
+          "box": {
+            "h": 16,
+            "w": 48,
+            "x": 9,
+            "y": 64
+          },
+          "type": "list",
+          "label": "Boat manifest",
+          "state_binding": "boats"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_BRIEF-CONSTRAINTS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/2",
+      "requirement": {
+        "value": {
+          "id": "constraints",
+          "box": {
+            "h": 16,
+            "w": 31,
+            "x": 60,
+            "y": 64
+          },
+          "type": "chips",
+          "label": "Constraints",
+          "state_binding": "stage.rules"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_BRIEF-START",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/3",
+      "requirement": {
+        "value": {
+          "id": "start",
+          "box": {
+            "h": 8,
+            "w": 39,
+            "x": 52,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "loaded"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_BRIEF-BACK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/4",
+      "requirement": {
+        "value": {
+          "id": "back",
+          "box": {
+            "h": 8,
+            "w": 25,
+            "x": 9,
+            "y": 85
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "loaded"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-STAGE_BRIEF-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "initialize stage",
+          "target": "start",
+          "feedback": "press",
+          "precondition": "loaded",
+          "state_change": "running",
+          "invalid_input": "disabled until loaded"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-STAGE_BRIEF-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "return select",
+          "target": "back",
+          "feedback": "press",
+          "precondition": "true",
+          "state_change": "none",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-STAGE_BRIEF-BRIEF",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/0",
+      "requirement": {
+        "value": "brief",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_BRIEF-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "canal_board",
+          "from": "stage_brief",
+          "trigger": "start",
+          "animation": "fade",
+          "condition": "loaded"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_BRIEF-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "stage_select",
+          "from": "stage_brief",
+          "trigger": "back",
+          "animation": "pop",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-CANAL_BOARD",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/2",
+      "requirement": {
+        "value": {
+          "id": "canal_board",
+          "name": "Canal Board",
+          "order": 3,
+          "layout": {
+            "regions": [
+              {
+                "h": 10,
+                "w": 92,
+                "x": 4,
+                "y": 4,
+                "id": "hud",
+                "role": "status",
+                "label": "stage status"
+              },
+              {
+                "h": 66,
+                "w": 92,
+                "x": 4,
+                "y": 16,
+                "id": "board",
+                "role": "simulation",
+                "label": "canal graph"
+              },
+              {
+                "h": 12,
+                "w": 92,
+                "x": 4,
+                "y": 84,
+                "id": "device_tray",
+                "role": "status",
+                "label": "selected device/status"
+              }
+            ]
+          },
+          "states": [
+            "running",
+            "device_busy",
+            "warning",
+            "paused",
+            "success_pending",
+            "failure_pending"
+          ],
+          "purpose": "core traffic control",
+          "feedback": [
+            "protected occupancy visible",
+            "waiting intent arrows visible",
+            "device state must be readable without opening menus"
+          ],
+          "components": [
+            {
+              "id": "safety_meter",
+              "box": {
+                "h": 7,
+                "w": 22,
+                "x": 6,
+                "y": 5
+              },
+              "type": "meter",
+              "label": "Safety strikes",
+              "state_binding": "strikes/3"
+            },
+            {
+              "id": "ops_counter",
+              "box": {
+                "h": 7,
+                "w": 20,
+                "x": 31,
+                "y": 5
+              },
+              "type": "counter",
+              "label": "Operations",
+              "state_binding": "operations/par"
+            },
+            {
+              "id": "pause",
+              "box": {
+                "h": 7,
+                "w": 10,
+                "x": 84,
+                "y": 5
+              },
+              "type": "button",
+              "label": "Pause",
+              "state_binding": "running/busy"
+            },
+            {
+              "id": "canal_graph",
+              "box": {
+                "h": 62,
+                "w": 88,
+                "x": 6,
+                "y": 18
+              },
+              "type": "world_view",
+              "label": "Canal graph",
+              "state_binding": "segments/occupancy/routes",
+              "interaction_role": "result feedback"
+            },
+            {
+              "id": "gate_lever",
+              "box": {
+                "h": 20,
+                "w": 18,
+                "x": 10,
+                "y": 54
+              },
+              "type": "arc_control",
+              "label": "Sluice lever",
+              "enabled_when": "gate idle && interlock safe",
+              "state_binding": "gate_state",
+              "interaction_role": "arc drag"
+            },
+            {
+              "id": "bridge_wheel",
+              "box": {
+                "h": 19,
+                "w": 19,
+                "x": 70,
+                "y": 26
+              },
+              "type": "rotary",
+              "label": "Bridge wheel",
+              "enabled_when": "crossing empty",
+              "state_binding": "bridge_state",
+              "interaction_role": "circular drag"
+            },
+            {
+              "id": "lock_control",
+              "box": {
+                "h": 21,
+                "w": 16,
+                "x": 72,
+                "y": 56
+              },
+              "type": "vertical_slider",
+              "label": "Lock level control",
+              "enabled_when": "safe door sequence",
+              "state_binding": "lock_level",
+              "interaction_role": "vertical drag"
+            },
+            {
+              "id": "signal_buoy",
+              "box": {
+                "h": 14,
+                "w": 14,
+                "x": 35,
+                "y": 30
+              },
+              "type": "toggle",
+              "label": "Traffic signal",
+              "enabled_when": "signal available",
+              "state_binding": "signal hold/go",
+              "interaction_role": "tap"
+            },
+            {
+              "id": "boat_layer",
+              "box": {
+                "h": 56,
+                "w": 84,
+                "x": 8,
+                "y": 20
+              },
+              "type": "interactive_layer",
+              "label": "Boats",
+              "state_binding": "boat positions/traits",
+              "interaction_role": "tap inspect"
+            },
+            {
+              "id": "device_status",
+              "box": {
+                "h": 7,
+                "w": 86,
+                "x": 7,
+                "y": 86
+              },
+              "type": "status",
+              "label": "Device status",
+              "state_binding": "selected/busy/warning"
+            }
+          ],
+          "edge_cases": [
+            "unsafe same-segment entry produces strike before visual overlap",
+            "45s boat timeout fails stage",
+            "device pointer owns gesture until release",
+            "second touch ignored"
+          ],
+          "transitions": [
+            {
+              "to": "boat_inspect_popover",
+              "from": "canal_board",
+              "trigger": "boat tap",
+              "animation": "popover",
+              "condition": "boat exists"
+            },
+            {
+              "to": "pause_overlay",
+              "from": "canal_board",
+              "trigger": "pause",
+              "animation": "overlay",
+              "condition": "running or device_busy"
+            },
+            {
+              "to": "stage_result",
+              "from": "canal_board",
+              "trigger": "all delivered or fail",
+              "animation": "result sheet",
+              "condition": "terminal"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "arc_drag",
+              "action": "snap closed/half/open",
+              "target": "gate_lever",
+              "feedback": "gate/water arrows + clunk/tick",
+              "precondition": "idle && safe",
+              "state_change": "gate state; operations+1",
+              "invalid_input": "shake/no commit"
+            },
+            {
+              "input": "circular_drag",
+              "action": "toggle road/water orientation",
+              "target": "bridge_wheel",
+              "feedback": "gear rotation/path update",
+              "precondition": "crossing empty",
+              "state_change": "bridge busy then new state; operations+1",
+              "invalid_input": "red crossing outline/no commit"
+            },
+            {
+              "input": "vertical_drag",
+              "action": "equalize to nearest legal low/high",
+              "target": "lock_control",
+              "feedback": "water/gauge/boat height",
+              "precondition": "safe door sequence",
+              "state_change": "device_busy then level; operations+1",
+              "invalid_input": "warning/no commit"
+            },
+            {
+              "input": "tap",
+              "action": "toggle hold/go",
+              "target": "signal_buoy",
+              "feedback": "buoy/intent arrow",
+              "precondition": "available",
+              "state_change": "queue permission; operations+1",
+              "invalid_input": "locked pulse"
+            },
+            {
+              "input": "tap",
+              "action": "select boat",
+              "target": "boat_layer",
+              "feedback": "route highlight/popover",
+              "precondition": "running or device_busy",
+              "state_change": "inspect selection only",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "busy_variant",
+              "name": "Device Busy",
+              "notes": "busy device locked; independent devices remain live",
+              "condition": "device animation/equalizing",
+              "components": [
+                {
+                  "id": "busy_progress",
+                  "box": {
+                    "h": 5,
+                    "w": 32,
+                    "x": 60,
+                    "y": 86
+                  },
+                  "type": "progress",
+                  "label": "Device progress",
+                  "state_binding": "device progress"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {}
+            },
+            {
+              "id": "warning_variant",
+              "name": "Unsafe Command Warning",
+              "notes": "red/amber only on affected zone; no invalid commit",
+              "condition": "invalid interlock or protected-entry command",
+              "components": [
+                {
+                  "id": "protected_warning",
+                  "box": {
+                    "h": 35,
+                    "w": 60,
+                    "x": 20,
+                    "y": 30
+                  },
+                  "type": "overlay",
+                  "label": "Protected zone warning",
+                  "state_binding": "affected segment"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {
+                "device_status": {
+                  "label": "Unsafe command rejected"
+                }
+              }
+            },
+            {
+              "id": "route_inspect",
+              "name": "Boat Selected",
+              "notes": "popover is separate overlay surface",
+              "condition": "boat selected",
+              "components": [
+                {
+                  "id": "route_highlight",
+                  "box": {
+                    "h": 56,
+                    "w": 84,
+                    "x": 8,
+                    "y": 20
+                  },
+                  "type": "overlay",
+                  "label": "Planned route",
+                  "state_binding": "selected boat route"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {}
+            }
+          ],
+          "implementation_notes": [
+            "deterministic graph simulation",
+            "do not make free boat steering",
+            "device handles may visually exceed physical scale"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/2"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-SAFETY_METER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/0",
+      "requirement": {
+        "value": {
+          "id": "safety_meter",
+          "box": {
+            "h": 7,
+            "w": 22,
+            "x": 6,
+            "y": 5
+          },
+          "type": "meter",
+          "label": "Safety strikes",
+          "state_binding": "strikes/3"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-OPS_COUNTER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/1",
+      "requirement": {
+        "value": {
+          "id": "ops_counter",
+          "box": {
+            "h": 7,
+            "w": 20,
+            "x": 31,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Operations",
+          "state_binding": "operations/par"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-PAUSE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/2",
+      "requirement": {
+        "value": {
+          "id": "pause",
+          "box": {
+            "h": 7,
+            "w": 10,
+            "x": 84,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "state_binding": "running/busy"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-CANAL_GRAPH",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/3",
+      "requirement": {
+        "value": {
+          "id": "canal_graph",
+          "box": {
+            "h": 62,
+            "w": 88,
+            "x": 6,
+            "y": 18
+          },
+          "type": "world_view",
+          "label": "Canal graph",
+          "state_binding": "segments/occupancy/routes",
+          "interaction_role": "result feedback"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-GATE_LEVER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/4",
+      "requirement": {
+        "value": {
+          "id": "gate_lever",
+          "box": {
+            "h": 20,
+            "w": 18,
+            "x": 10,
+            "y": 54
+          },
+          "type": "arc_control",
+          "label": "Sluice lever",
+          "enabled_when": "gate idle && interlock safe",
+          "state_binding": "gate_state",
+          "interaction_role": "arc drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-BRIDGE_WHEEL",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/5",
+      "requirement": {
+        "value": {
+          "id": "bridge_wheel",
+          "box": {
+            "h": 19,
+            "w": 19,
+            "x": 70,
+            "y": 26
+          },
+          "type": "rotary",
+          "label": "Bridge wheel",
+          "enabled_when": "crossing empty",
+          "state_binding": "bridge_state",
+          "interaction_role": "circular drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/5"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-LOCK_CONTROL",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/6",
+      "requirement": {
+        "value": {
+          "id": "lock_control",
+          "box": {
+            "h": 21,
+            "w": 16,
+            "x": 72,
+            "y": 56
+          },
+          "type": "vertical_slider",
+          "label": "Lock level control",
+          "enabled_when": "safe door sequence",
+          "state_binding": "lock_level",
+          "interaction_role": "vertical drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/6"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-SIGNAL_BUOY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/7",
+      "requirement": {
+        "value": {
+          "id": "signal_buoy",
+          "box": {
+            "h": 14,
+            "w": 14,
+            "x": 35,
+            "y": 30
+          },
+          "type": "toggle",
+          "label": "Traffic signal",
+          "enabled_when": "signal available",
+          "state_binding": "signal hold/go",
+          "interaction_role": "tap"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/7"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-BOAT_LAYER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/8",
+      "requirement": {
+        "value": {
+          "id": "boat_layer",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "interactive_layer",
+          "label": "Boats",
+          "state_binding": "boat positions/traits",
+          "interaction_role": "tap inspect"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/8"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-CANAL_BOARD-DEVICE_STATUS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/9",
+      "requirement": {
+        "value": {
+          "id": "device_status",
+          "box": {
+            "h": 7,
+            "w": 86,
+            "x": 7,
+            "y": 86
+          },
+          "type": "status",
+          "label": "Device status",
+          "state_binding": "selected/busy/warning"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/9"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-CANAL_BOARD-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "arc_drag",
+          "action": "snap closed/half/open",
+          "target": "gate_lever",
+          "feedback": "gate/water arrows + clunk/tick",
+          "precondition": "idle && safe",
+          "state_change": "gate state; operations+1",
+          "invalid_input": "shake/no commit"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-CANAL_BOARD-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "circular_drag",
+          "action": "toggle road/water orientation",
+          "target": "bridge_wheel",
+          "feedback": "gear rotation/path update",
+          "precondition": "crossing empty",
+          "state_change": "bridge busy then new state; operations+1",
+          "invalid_input": "red crossing outline/no commit"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-CANAL_BOARD-N_2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/2",
+      "requirement": {
+        "value": {
+          "input": "vertical_drag",
+          "action": "equalize to nearest legal low/high",
+          "target": "lock_control",
+          "feedback": "water/gauge/boat height",
+          "precondition": "safe door sequence",
+          "state_change": "device_busy then level; operations+1",
+          "invalid_input": "warning/no commit"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/2"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-CANAL_BOARD-N_3",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/3",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "toggle hold/go",
+          "target": "signal_buoy",
+          "feedback": "buoy/intent arrow",
+          "precondition": "available",
+          "state_change": "queue permission; operations+1",
+          "invalid_input": "locked pulse"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/3"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-CANAL_BOARD-N_4",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/4",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "select boat",
+          "target": "boat_layer",
+          "feedback": "route highlight/popover",
+          "precondition": "running or device_busy",
+          "state_change": "inspect selection only",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/4"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-RUNNING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/0",
+      "requirement": {
+        "value": "running",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-DEVICE_BUSY",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/1",
+      "requirement": {
+        "value": "device_busy",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-WARNING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/2",
+      "requirement": {
+        "value": "warning",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/2"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-PAUSED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/3",
+      "requirement": {
+        "value": "paused",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/3"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-SUCCESS_PENDING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/4",
+      "requirement": {
+        "value": "success_pending",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/4"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-CANAL_BOARD-FAILURE_PENDING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/5",
+      "requirement": {
+        "value": "failure_pending",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/5"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-CANAL_BOARD-BUSY_VARIANT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "busy_variant",
+          "name": "Device Busy",
+          "notes": "busy device locked; independent devices remain live",
+          "condition": "device animation/equalizing",
+          "components": [
+            {
+              "id": "busy_progress",
+              "box": {
+                "h": 5,
+                "w": 32,
+                "x": 60,
+                "y": 86
+              },
+              "type": "progress",
+              "label": "Device progress",
+              "state_binding": "device progress"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-CANAL_BOARD-WARNING_VARIANT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/1",
+      "requirement": {
+        "value": {
+          "id": "warning_variant",
+          "name": "Unsafe Command Warning",
+          "notes": "red/amber only on affected zone; no invalid commit",
+          "condition": "invalid interlock or protected-entry command",
+          "components": [
+            {
+              "id": "protected_warning",
+              "box": {
+                "h": 35,
+                "w": 60,
+                "x": 20,
+                "y": 30
+              },
+              "type": "overlay",
+              "label": "Protected zone warning",
+              "state_binding": "affected segment"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {
+            "device_status": {
+              "label": "Unsafe command rejected"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/1"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-CANAL_BOARD-ROUTE_INSPECT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/2",
+      "requirement": {
+        "value": {
+          "id": "route_inspect",
+          "name": "Boat Selected",
+          "notes": "popover is separate overlay surface",
+          "condition": "boat selected",
+          "components": [
+            {
+              "id": "route_highlight",
+              "box": {
+                "h": 56,
+                "w": 84,
+                "x": 8,
+                "y": 20
+              },
+              "type": "overlay",
+              "label": "Planned route",
+              "state_binding": "selected boat route"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/2"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-CANAL_BOARD-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "boat_inspect_popover",
+          "from": "canal_board",
+          "trigger": "boat tap",
+          "animation": "popover",
+          "condition": "boat exists"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-CANAL_BOARD-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "pause_overlay",
+          "from": "canal_board",
+          "trigger": "pause",
+          "animation": "overlay",
+          "condition": "running or device_busy"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-CANAL_BOARD-N_2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/2",
+      "requirement": {
+        "value": {
+          "to": "stage_result",
+          "from": "canal_board",
+          "trigger": "all delivered or fail",
+          "animation": "result sheet",
+          "condition": "terminal"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/2"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-BOAT_INSPECT_POPOVER",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/3",
+      "requirement": {
+        "value": {
+          "id": "boat_inspect_popover",
+          "name": "Boat Inspect Popover",
+          "order": 4,
+          "layout": {
+            "regions": [
+              {
+                "h": 27,
+                "w": 76,
+                "x": 12,
+                "y": 56,
+                "id": "popover",
+                "role": "overlay",
+                "label": "boat info"
+              }
+            ]
+          },
+          "states": [
+            "open"
+          ],
+          "purpose": "inspect destination traits and route without pausing simulation",
+          "feedback": [
+            "route remains highlighted behind popover"
+          ],
+          "components": [
+            {
+              "id": "boat_name",
+              "box": {
+                "h": 6,
+                "w": 30,
+                "x": 16,
+                "y": 59
+              },
+              "type": "status",
+              "label": "Boat",
+              "state_binding": "selected_boat"
+            },
+            {
+              "id": "traits",
+              "box": {
+                "h": 10,
+                "w": 34,
+                "x": 16,
+                "y": 67
+              },
+              "type": "chips",
+              "label": "Traits",
+              "state_binding": "size/draft/height/priority"
+            },
+            {
+              "id": "destination",
+              "box": {
+                "h": 8,
+                "w": 28,
+                "x": 54,
+                "y": 59
+              },
+              "type": "status",
+              "label": "Destination",
+              "state_binding": "destination"
+            },
+            {
+              "id": "close",
+              "box": {
+                "h": 8,
+                "w": 14,
+                "x": 70,
+                "y": 72
+              },
+              "type": "button",
+              "label": "Close",
+              "state_binding": "selected"
+            }
+          ],
+          "edge_cases": [
+            "if boat delivered while open, popover closes"
+          ],
+          "transitions": [
+            {
+              "to": "canal_board",
+              "from": "boat_inspect_popover",
+              "trigger": "close/outside",
+              "animation": "dismiss",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "clear selection",
+              "target": "close",
+              "feedback": "popover closes",
+              "precondition": "open",
+              "state_change": "running",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "clear selection",
+              "target": "outside popover",
+              "feedback": "close",
+              "precondition": "open",
+              "state_change": "running",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": [
+            "simulation continues"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/3"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-BOAT_INSPECT_POPOVER-BOAT_NAME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/0",
+      "requirement": {
+        "value": {
+          "id": "boat_name",
+          "box": {
+            "h": 6,
+            "w": 30,
+            "x": 16,
+            "y": 59
+          },
+          "type": "status",
+          "label": "Boat",
+          "state_binding": "selected_boat"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-BOAT_INSPECT_POPOVER-TRAITS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/1",
+      "requirement": {
+        "value": {
+          "id": "traits",
+          "box": {
+            "h": 10,
+            "w": 34,
+            "x": 16,
+            "y": 67
+          },
+          "type": "chips",
+          "label": "Traits",
+          "state_binding": "size/draft/height/priority"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-BOAT_INSPECT_POPOVER-DESTINATION",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/2",
+      "requirement": {
+        "value": {
+          "id": "destination",
+          "box": {
+            "h": 8,
+            "w": 28,
+            "x": 54,
+            "y": 59
+          },
+          "type": "status",
+          "label": "Destination",
+          "state_binding": "destination"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-BOAT_INSPECT_POPOVER-CLOSE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/3",
+      "requirement": {
+        "value": {
+          "id": "close",
+          "box": {
+            "h": 8,
+            "w": 14,
+            "x": 70,
+            "y": 72
+          },
+          "type": "button",
+          "label": "Close",
+          "state_binding": "selected"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-BOAT_INSPECT_POPOVER-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "clear selection",
+          "target": "close",
+          "feedback": "popover closes",
+          "precondition": "open",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-BOAT_INSPECT_POPOVER-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "clear selection",
+          "target": "outside popover",
+          "feedback": "close",
+          "precondition": "open",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-BOAT_INSPECT_POPOVER-OPEN",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/0",
+      "requirement": {
+        "value": "open",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-BOAT_INSPECT_POPOVER-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "canal_board",
+          "from": "boat_inspect_popover",
+          "trigger": "close/outside",
+          "animation": "dismiss",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PAUSE_OVERLAY",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/4",
+      "requirement": {
+        "value": {
+          "id": "pause_overlay",
+          "name": "Pause Overlay",
+          "order": 5,
+          "layout": {
+            "regions": [
+              {
+                "h": 50,
+                "w": 70,
+                "x": 15,
+                "y": 25,
+                "id": "modal",
+                "role": "overlay",
+                "label": "pause modal"
+              }
+            ]
+          },
+          "states": [
+            "paused"
+          ],
+          "purpose": "freeze simulation and resume/restart/exit",
+          "feedback": [
+            "all boat/device timers frozen"
+          ],
+          "components": [
+            {
+              "id": "resume",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 37
+              },
+              "type": "button",
+              "label": "Resume",
+              "state_binding": "paused"
+            },
+            {
+              "id": "restart",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 50
+              },
+              "type": "button",
+              "label": "Restart",
+              "state_binding": "paused"
+            },
+            {
+              "id": "exit",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 63
+              },
+              "type": "button",
+              "label": "Exit",
+              "state_binding": "paused"
+            }
+          ],
+          "edge_cases": [
+            "active gesture cancelled before pause commit"
+          ],
+          "transitions": [
+            {
+              "to": "canal_board",
+              "from": "pause_overlay",
+              "trigger": "resume/restart",
+              "animation": "fade",
+              "condition": "true"
+            },
+            {
+              "to": "stage_select",
+              "from": "pause_overlay",
+              "trigger": "exit",
+              "animation": "pop",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "resume frozen simulation",
+              "target": "resume",
+              "feedback": "close",
+              "precondition": "paused",
+              "state_change": "previous board state",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "reset stage",
+              "target": "restart",
+              "feedback": "reset",
+              "precondition": "paused",
+              "state_change": "running",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "discard stage",
+              "target": "exit",
+              "feedback": "close",
+              "precondition": "paused",
+              "state_change": "select",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": [
+            "overlay only"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/4"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-RESUME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/0",
+      "requirement": {
+        "value": {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 37
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-RESTART",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/1",
+      "requirement": {
+        "value": {
+          "id": "restart",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 50
+          },
+          "type": "button",
+          "label": "Restart",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-EXIT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/2",
+      "requirement": {
+        "value": {
+          "id": "exit",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 63
+          },
+          "type": "button",
+          "label": "Exit",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "resume frozen simulation",
+          "target": "resume",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "previous board state",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "reset stage",
+          "target": "restart",
+          "feedback": "reset",
+          "precondition": "paused",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/2",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "discard stage",
+          "target": "exit",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "select",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/2"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PAUSE_OVERLAY-PAUSED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/0",
+      "requirement": {
+        "value": "paused",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE_OVERLAY-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "canal_board",
+          "from": "pause_overlay",
+          "trigger": "resume/restart",
+          "animation": "fade",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE_OVERLAY-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "stage_select",
+          "from": "pause_overlay",
+          "trigger": "exit",
+          "animation": "pop",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-STAGE_RESULT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/5",
+      "requirement": {
+        "value": {
+          "id": "stage_result",
+          "name": "Stage Result",
+          "order": 6,
+          "layout": {
+            "regions": [
+              {
+                "h": 52,
+                "w": 84,
+                "x": 8,
+                "y": 14,
+                "id": "summary",
+                "role": "evaluation",
+                "label": "result"
+              },
+              {
+                "h": 18,
+                "w": 84,
+                "x": 8,
+                "y": 72,
+                "id": "actions",
+                "role": "navigation",
+                "label": "actions"
+              }
+            ]
+          },
+          "states": [
+            "success",
+            "failure"
+          ],
+          "purpose": "show stars/strikes/operations and retry/next",
+          "feedback": [
+            "success bell/dock pulse resolves before sheet"
+          ],
+          "components": [
+            {
+              "id": "result_title",
+              "box": {
+                "h": 9,
+                "w": 70,
+                "x": 15,
+                "y": 18
+              },
+              "type": "status",
+              "label": "Success/Failure",
+              "state_binding": "success"
+            },
+            {
+              "id": "stars",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 30
+              },
+              "type": "rating",
+              "label": "Stars",
+              "state_binding": "score"
+            },
+            {
+              "id": "stats",
+              "box": {
+                "h": 16,
+                "w": 64,
+                "x": 18,
+                "y": 43
+              },
+              "type": "summary",
+              "label": "Strikes / Ops",
+              "state_binding": "strikes,operations,par"
+            },
+            {
+              "id": "retry",
+              "box": {
+                "h": 11,
+                "w": 36,
+                "x": 10,
+                "y": 75
+              },
+              "type": "button",
+              "label": "Retry",
+              "state_binding": "result"
+            },
+            {
+              "id": "next",
+              "box": {
+                "h": 11,
+                "w": 36,
+                "x": 54,
+                "y": 75
+              },
+              "type": "button",
+              "label": "Next Stage",
+              "enabled_when": "success && next stage exists",
+              "state_binding": "result"
+            }
+          ],
+          "edge_cases": [
+            "unlock is idempotent"
+          ],
+          "transitions": [
+            {
+              "to": "canal_board",
+              "from": "stage_result",
+              "trigger": "retry",
+              "animation": "fade",
+              "condition": "true"
+            },
+            {
+              "to": "stage_brief",
+              "from": "stage_result",
+              "trigger": "next",
+              "animation": "push",
+              "condition": "success && next exists"
+            },
+            {
+              "to": "stage_select",
+              "from": "stage_result",
+              "trigger": "next/continue",
+              "animation": "pop",
+              "condition": "final stage or choose select"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "reset same stage",
+              "target": "retry",
+              "feedback": "press",
+              "precondition": "result",
+              "state_change": "running",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "unlock/select next",
+              "target": "next",
+              "feedback": "press",
+              "precondition": "success && next exists",
+              "state_change": "brief",
+              "invalid_input": "disabled pulse"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "failure_result",
+              "name": "Failure",
+              "notes": "retry primary",
+              "condition": "!success",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "next": {
+                  "state_binding": "disabled"
+                },
+                "result_title": {
+                  "label": "Stage Failed"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "stars: success, no strike, under par"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/5"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_RESULT-RESULT_TITLE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/0",
+      "requirement": {
+        "value": {
+          "id": "result_title",
+          "box": {
+            "h": 9,
+            "w": 70,
+            "x": 15,
+            "y": 18
+          },
+          "type": "status",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_RESULT-STARS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/1",
+      "requirement": {
+        "value": {
+          "id": "stars",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 30
+          },
+          "type": "rating",
+          "label": "Stars",
+          "state_binding": "score"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_RESULT-STATS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/2",
+      "requirement": {
+        "value": {
+          "id": "stats",
+          "box": {
+            "h": 16,
+            "w": 64,
+            "x": 18,
+            "y": 43
+          },
+          "type": "summary",
+          "label": "Strikes / Ops",
+          "state_binding": "strikes,operations,par"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_RESULT-RETRY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/3",
+      "requirement": {
+        "value": {
+          "id": "retry",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 10,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-STAGE_RESULT-NEXT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/4",
+      "requirement": {
+        "value": {
+          "id": "next",
+          "box": {
+            "h": 11,
+            "w": 36,
+            "x": 54,
+            "y": 75
+          },
+          "type": "button",
+          "label": "Next Stage",
+          "enabled_when": "success && next stage exists",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-STAGE_RESULT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "reset same stage",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "running",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-STAGE_RESULT-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "unlock/select next",
+          "target": "next",
+          "feedback": "press",
+          "precondition": "success && next exists",
+          "state_change": "brief",
+          "invalid_input": "disabled pulse"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-STAGE_RESULT-SUCCESS",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/0",
+      "requirement": {
+        "value": "success",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-STAGE_RESULT-FAILURE",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/1",
+      "requirement": {
+        "value": "failure",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-STAGE_RESULT-FAILURE_RESULT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/5/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "failure_result",
+          "name": "Failure",
+          "notes": "retry primary",
+          "condition": "!success",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "next": {
+              "state_binding": "disabled"
+            },
+            "result_title": {
+              "label": "Stage Failed"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_RESULT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "canal_board",
+          "from": "stage_result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_RESULT-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "stage_brief",
+          "from": "stage_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "success && next exists"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-STAGE_RESULT-N_2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/2",
+      "requirement": {
+        "value": {
+          "to": "stage_select",
+          "from": "stage_result",
+          "trigger": "next/continue",
+          "animation": "pop",
+          "condition": "final stage or choose select"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/2"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-RETRY",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/retry",
+      "requirement": {
+        "value": {
+          "reset": "boats,occupancy,devices,timers,strikes,operations"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/retry"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-PAUSED",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/paused",
+      "requirement": {
+        "value": {
+          "freeze_all_timers": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/paused"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-FAILURE",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/failure",
+      "requirement": {
+        "value": {
+          "terminal": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/failure"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-LOADING",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/loading",
+      "requirement": {
+        "value": {
+          "input_lock": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/loading"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-RUNNING",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/running",
+      "requirement": {
+        "value": {
+          "simulation": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/running"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-SUCCESS",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/success",
+      "requirement": {
+        "value": {
+          "terminal": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/success"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-WARNING",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/warning",
+      "requirement": {
+        "value": {
+          "simulation": true,
+          "invalid_state_not_committed": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/warning"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-DEVICE_BUSY",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/device_busy",
+      "requirement": {
+        "value": {
+          "simulation": true,
+          "busy_device_locked": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/device_busy"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-TAP",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/tap",
+      "requirement": {
+        "value": [
+          "signal",
+          "boat",
+          "buttons"
+        ],
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/tap"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-CANCEL",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/cancel",
+      "requirement": {
+        "value": "pointer cancel restores last committed device state and no operation increment",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/cancel"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-ARC_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/arc_drag",
+      "requirement": {
+        "value": "gate notch snap",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/arc_drag"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-PRIORITY",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/priority",
+      "requirement": {
+        "value": [
+          "active device gesture",
+          "pause/popover",
+          "device handles",
+          "boat tap",
+          "board"
+        ],
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/priority"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-MULTITOUCH",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/multitouch",
+      "requirement": {
+        "value": "second pointer ignored while gesture owned",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/multitouch"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-CIRCULAR_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/circular_drag",
+      "requirement": {
+        "value": "bridge threshold then orientation snap",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/circular_drag"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-VERTICAL_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/vertical_drag",
+      "requirement": {
+        "value": "lock legal level snap",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/vertical_drag"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-SINGLE_POINTER",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/single_pointer",
+      "requirement": {
+        "value": true,
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/single_pointer"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SCORE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/score",
+      "requirement": {
+        "value": "success + no strikes + under par operations",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/score"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-DEVICES",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/devices",
+      "requirement": {
+        "value": {
+          "gate": [
+            "closed",
+            "half",
+            "open"
+          ],
+          "lock": [
+            "low",
+            "equalizing",
+            "high"
+          ],
+          "bridge": [
+            "road_open",
+            "water_open"
+          ],
+          "signal": [
+            "hold",
+            "go"
+          ]
+        },
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/devices"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-FAILURE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/failure",
+      "requirement": {
+        "value": "3 strikes or 45s boat timeout",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/failure"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SUCCESS",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/success",
+      "requirement": {
+        "value": "all boats delivered",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/success"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-COLLISION",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/collision",
+      "requirement": {
+        "value": "unsafe shared-segment entry creates strike before overlap",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/collision"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-OCCUPANCY",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/occupancy",
+      "requirement": {
+        "value": "one boat per narrow protected segment",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/occupancy"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-SIMULATION",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/simulation",
+      "requirement": {
+        "value": "deterministic segment graph, not rigid-body",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/simulation"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-BOAT_TRAITS",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/boat_traits",
+      "requirement": {
+        "value": [
+          "destination",
+          "size",
+          "draft",
+          "height",
+          "priority"
+        ],
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/boat_traits"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-LOCK_SAFETY",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/lock_safety",
+      "requirement": {
+        "value": "unequal-water door command rejected",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/lock_safety"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-BOATS_PER_STAGE",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/boats_per_stage",
+      "requirement": {
+        "value": "3-6",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/boats_per_stage"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VERB-N_0",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/0",
+      "requirement": {
+        "value": {
+          "verb": "Gate",
+          "input": "arc drag",
+          "change": "closed/half/open",
+          "target": "sluice lever",
+          "feedback": "gate/water arrows update",
+          "condition": "device idle"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/0"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_1",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/1",
+      "requirement": {
+        "value": {
+          "verb": "Bridge",
+          "input": "circular drag",
+          "change": "road-open/water-open",
+          "target": "swing bridge wheel",
+          "feedback": "bridge rotates/boats hold",
+          "condition": "crossing clear"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/1"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_2",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/2",
+      "requirement": {
+        "value": {
+          "verb": "Water Level",
+          "input": "vertical drag",
+          "change": "chamber low/high",
+          "target": "lock control",
+          "feedback": "surface/gauge/boat height animate",
+          "condition": "safe door sequence"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/2"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_3",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/3",
+      "requirement": {
+        "value": {
+          "verb": "Traffic Signal",
+          "input": "tap",
+          "change": "hold/go",
+          "target": "buoy",
+          "feedback": "buoy/intent arrow",
+          "condition": "signal available"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/3"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_4",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/4",
+      "requirement": {
+        "value": {
+          "verb": "Inspect Boat",
+          "input": "tap",
+          "change": "none",
+          "target": "boat",
+          "feedback": "destination/trait/path highlight",
+          "condition": "running"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/4"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_0",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/0",
+      "requirement": {
+        "value": {
+          "ui": "map/boats/constraints",
+          "exit": "start",
+          "enter": "stage select",
+          "state": "stage_brief",
+          "inputs": [
+            "start",
+            "back"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/0"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_1",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/1",
+      "requirement": {
+        "value": {
+          "ui": "live board/queues/safety",
+          "exit": "success/fail/pause",
+          "enter": "start",
+          "state": "running",
+          "inputs": [
+            "gate",
+            "bridge",
+            "lock",
+            "signal",
+            "inspect",
+            "pause"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/1"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_2",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/2",
+      "requirement": {
+        "value": {
+          "ui": "busy device locked",
+          "exit": "animation done",
+          "enter": "device animates/equalizes",
+          "state": "device_busy",
+          "inputs": [
+            "independent devices",
+            "inspect",
+            "pause"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/2"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_3",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/3",
+      "requirement": {
+        "value": {
+          "ui": "affected zone flashes; no invalid commit",
+          "exit": "timer/action",
+          "enter": "unsafe command",
+          "state": "warning",
+          "inputs": [
+            "next valid action"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/3"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_4",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/4",
+      "requirement": {
+        "value": {
+          "ui": "frozen overlay",
+          "exit": "choice",
+          "enter": "pause",
+          "state": "paused",
+          "inputs": [
+            "resume",
+            "restart",
+            "exit"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/4"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_5",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/5",
+      "requirement": {
+        "value": {
+          "ui": "stars/strikes/ops",
+          "exit": "choice",
+          "enter": "success/fail",
+          "state": "result",
+          "inputs": [
+            "retry",
+            "next"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/5"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-UNIT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/unit",
+      "requirement": {
+        "value": "canal stage",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/unit"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-MVP_COUNT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/mvp_count",
+      "requirement": {
+        "value": 6,
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/mvp_count"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AUTHORING",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/authoring",
+      "requirement": {
+        "value": "data-driven graph/routes; no bespoke standard-stage code",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/authoring"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AXES",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/axes",
+      "requirement": {
+        "value": [
+          "canal graph",
+          "device placement",
+          "boat spawn schedule",
+          "boat traits",
+          "destinations",
+          "water bands",
+          "bridge constraints",
+          "par operations",
+          "special rule"
+        ],
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/axes"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_0",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/0",
+      "requirement": {
+        "value": "Stage Select",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/0"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_1",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/1",
+      "requirement": {
+        "value": "Stage Brief",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/1"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_2",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/2",
+      "requirement": {
+        "value": "Canal Board",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/2"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_3",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/3",
+      "requirement": {
+        "value": "Boat Inspect Popover",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/3"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_4",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/4",
+      "requirement": {
+        "value": "Pause Overlay",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/4"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_5",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/5",
+      "requirement": {
+        "value": "Stage Result",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/5"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_0",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/0",
+      "requirement": {
+        "value": "All six inventory surfaces exist and are reachable",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/0"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_1",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/1",
+      "requirement": {
+        "value": "Gate arc drag, bridge circular drag, lock vertical drag, signal tap and boat inspect each connect to explicit components and state changes",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/1"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_2",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/2",
+      "requirement": {
+        "value": "Protected narrow segment never visually contains two boats; reservation is atomic",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/2"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_3",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/3",
+      "requirement": {
+        "value": "Occupied bridge rotation and unsafe lock sequence are rejected with feedback and no state corruption",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/3"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_4",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/4",
+      "requirement": {
+        "value": "Device busy locks only that device while independent controls remain usable",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/4"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_5",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/5",
+      "requirement": {
+        "value": "Pause freezes boat movement, device animation and timeout timers",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/5"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_6",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/6",
+      "requirement": {
+        "value": "Three strikes or a 45-second boat timeout reaches failure Result",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/6"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_7",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/7",
+      "requirement": {
+        "value": "All boats delivered reaches success Result and computes stars from success/no-strike/par operations",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/7"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_8",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/8",
+      "requirement": {
+        "value": "Six data stages can be played/retried sequentially and occupancy/devices reset cleanly",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/8"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_0",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/0",
+      "requirement": {
+        "value": "Stage1에서 gate만으로 3척 통과 가능",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/0"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_1",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/1",
+      "requirement": {
+        "value": "동일 protected segment 동시 진입이 실제 overlap 없이 차단/strike",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/1"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_2",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/2",
+      "requirement": {
+        "value": "bridge occupied 시 회전 불가 피드백",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/2"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_3",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/3",
+      "requirement": {
+        "value": "lock unsafe sequence가 state corruption 없이 거절",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/3"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_4",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/4",
+      "requirement": {
+        "value": "6 stages 연속/재시작 후 occupancy reset",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/4"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_0",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/0",
+      "requirement": {
+        "value": "6 stage graphs",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_1",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/1",
+      "requirement": {
+        "value": "segments/protected flags",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_2",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/2",
+      "requirement": {
+        "value": "device nodes",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/2"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_3",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/3",
+      "requirement": {
+        "value": "boat spawn schedules",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/3"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_4",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/4",
+      "requirement": {
+        "value": "traits/destinations/routes",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/4"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_5",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/5",
+      "requirement": {
+        "value": "par operations",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/5"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-PERSISTENCE-N_0",
+      "category": "persistence",
+      "source_ref": "/source/pack/developer_handoff/persistence/0",
+      "requirement": {
+        "value": "highest unlocked stage",
+        "source_kind": "persistence"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/persistence/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-PERSISTENCE-N_1",
+      "category": "persistence",
+      "source_ref": "/source/pack/developer_handoff/persistence/1",
+      "requirement": {
+        "value": "best stars",
+        "source_kind": "persistence"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/persistence/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_0",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/0",
+      "requirement": {
+        "value": "reserve protected segment before movement animation",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_1",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/1",
+      "requirement": {
+        "value": "unsafe lock command is rejected, not partially applied",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_2",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/2",
+      "requirement": {
+        "value": "boat inspection never pauses simulation",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/2"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_3",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/3",
+      "requirement": {
+        "value": "no free steering or rigid-body water",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/3"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": null,
+  "blueprint_hash": "4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c",
+  "category_counts": {
+    "state": 13,
+    "component": 29,
+    "input_map": 8,
+    "transition": 12,
+    "interaction": 15,
+    "persistence": 2,
+    "player_verb": 5,
+    "design_state": 6,
+    "global_state": 8,
+    "scoring_rule": 3,
+    "ux_data_hint": 4,
+    "gameplay_rule": 7,
+    "state_variant": 5,
+    "content_quantity": 4,
+    "screen_inventory": 6,
+    "acceptance_scenario": 5,
+    "data_responsibility": 6,
+    "acceptance_criterion": 9,
+    "design_screen_inventory": 6
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T12:57:39.03891+00:00",
+    "evidence_path": "production/contracts/b27929ee-4ad3-4381-8b09-2760ee458ea3/blueprint-review-4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c.json",
+    "blueprint_hash": "4d81434bb2234fba9179430f46bb80c6c1dc649f45018a768278a11573b5161c",
+    "source_checked": "true",
+    "artifact_commit": "aec08372fb2515645a89c23d3095a048a1fdfbed",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Pocket Canal Keeper — Atomic Implementation Contract v1.2\n\n- REQ-SCREEN-STAGE_SELECT | screen_inventory | /source/pack/screens/0\n- REQ-COMPONENT-STAGE_SELECT-STAGE_CARDS | component | /source/pack/screens/0/components/0\n- REQ-COMPONENT-STAGE_SELECT-PROGRESS | component | /source/pack/screens/0/components/1\n- REQ-INTERACTION-STAGE_SELECT-N_0 | interaction | /source/pack/screens/0/interactions/0\n- REQ-STATE-STAGE_SELECT-READY | state | /source/pack/screens/0/states/0\n- REQ-STATE-STAGE_SELECT-LOCKED | state | /source/pack/screens/0/states/1\n- REQ-VARIANT-STAGE_SELECT-LOCKED_STAGE | state_variant | /source/pack/screens/0/state_variants/0\n- REQ-TRANSITION-STAGE_SELECT-N_0 | transition | /source/pack/screens/0/transitions/0\n- REQ-SCREEN-STAGE_BRIEF | screen_inventory | /source/pack/screens/1\n- REQ-COMPONENT-STAGE_BRIEF-MAP_PREVIEW | component | /source/pack/screens/1/components/0\n- REQ-COMPONENT-STAGE_BRIEF-BOAT_MANIFEST | component | /source/pack/screens/1/components/1\n- REQ-COMPONENT-STAGE_BRIEF-CONSTRAINTS | component | /source/pack/screens/1/components/2\n- REQ-COMPONENT-STAGE_BRIEF-START | component | /source/pack/screens/1/components/3\n- REQ-COMPONENT-STAGE_BRIEF-BACK | component | /source/pack/screens/1/components/4\n- REQ-INTERACTION-STAGE_BRIEF-N_0 | interaction | /source/pack/screens/1/interactions/0\n- REQ-INTERACTION-STAGE_BRIEF-N_1 | interaction | /source/pack/screens/1/interactions/1\n- REQ-STATE-STAGE_BRIEF-BRIEF | state | /source/pack/screens/1/states/0\n- REQ-TRANSITION-STAGE_BRIEF-N_0 | transition | /source/pack/screens/1/transitions/0\n- REQ-TRANSITION-STAGE_BRIEF-N_1 | transition | /source/pack/screens/1/transitions/1\n- REQ-SCREEN-CANAL_BOARD | screen_inventory | /source/pack/screens/2\n- REQ-COMPONENT-CANAL_BOARD-SAFETY_METER | component | /source/pack/screens/2/components/0\n- REQ-COMPONENT-CANAL_BOARD-OPS_COUNTER | component | /source/pack/screens/2/components/1\n- REQ-COMPONENT-CANAL_BOARD-PAUSE | component | /source/pack/screens/2/components/2\n- REQ-COMPONENT-CANAL_BOARD-CANAL_GRAPH | component | /source/pack/screens/2/components/3\n- REQ-COMPONENT-CANAL_BOARD-GATE_LEVER | component | /source/pack/screens/2/components/4\n- REQ-COMPONENT-CANAL_BOARD-BRIDGE_WHEEL | component | /source/pack/screens/2/components/5\n- REQ-COMPONENT-CANAL_BOARD-LOCK_CONTROL | component | /source/pack/screens/2/components/6\n- REQ-COMPONENT-CANAL_BOARD-SIGNAL_BUOY | component | /source/pack/screens/2/components/7\n- REQ-COMPONENT-CANAL_BOARD-BOAT_LAYER | component | /source/pack/screens/2/components/8\n- REQ-COMPONENT-CANAL_BOARD-DEVICE_STATUS | component | /source/pack/screens/2/components/9\n- REQ-INTERACTION-CANAL_BOARD-N_0 | interaction | /source/pack/screens/2/interactions/0\n- REQ-INTERACTION-CANAL_BOARD-N_1 | interaction | /source/pack/screens/2/interactions/1\n- REQ-INTERACTION-CANAL_BOARD-N_2 | interaction | /source/pack/screens/2/interactions/2\n- REQ-INTERACTION-CANAL_BOARD-N_3 | interaction | /source/pack/screens/2/interactions/3\n- REQ-INTERACTION-CANAL_BOARD-N_4 | interaction | /source/pack/screens/2/interactions/4\n- REQ-STATE-CANAL_BOARD-RUNNING | state | /source/pack/screens/2/states/0\n- REQ-STATE-CANAL_BOARD-DEVICE_BUSY | state | /source/pack/screens/2/states/1\n- REQ-STATE-CANAL_BOARD-WARNING | state | /source/pack/screens/2/states/2\n- REQ-STATE-CANAL_BOARD-PAUSED | state | /source/pack/screens/2/states/3\n- REQ-STATE-CANAL_BOARD-SUCCESS_PENDING | state | /source/pack/screens/2/states/4\n- REQ-STATE-CANAL_BOARD-FAILURE_PENDING | state | /source/pack/screens/2/states/5\n- REQ-VARIANT-CANAL_BOARD-BUSY_VARIANT | state_variant | /source/pack/screens/2/state_variants/0\n- REQ-VARIANT-CANAL_BOARD-WARNING_VARIANT | state_variant | /source/pack/screens/2/state_variants/1\n- REQ-VARIANT-CANAL_BOARD-ROUTE_INSPECT | state_variant | /source/pack/screens/2/state_variants/2\n- REQ-TRANSITION-CANAL_BOARD-N_0 | transition | /source/pack/screens/2/transitions/0\n- REQ-TRANSITION-CANAL_BOARD-N_1 | transition | /source/pack/screens/2/transitions/1\n- REQ-TRANSITION-CANAL_BOARD-N_2 | transition | /source/pack/screens/2/transitions/2\n- REQ-SCREEN-BOAT_INSPECT_POPOVER | screen_inventory | /source/pack/screens/3\n- REQ-COMPONENT-BOAT_INSPECT_POPOVER-BOAT_NAME | component | /source/pack/screens/3/components/0\n- REQ-COMPONENT-BOAT_INSPECT_POPOVER-TRAITS | component | /source/pack/screens/3/components/1\n- REQ-COMPONENT-BOAT_INSPECT_POPOVER-DESTINATION | component | /source/pack/screens/3/components/2\n- REQ-COMPONENT-BOAT_INSPECT_POPOVER-CLOSE | component | /source/pack/screens/3/components/3\n- REQ-INTERACTION-BOAT_INSPECT_POPOVER-N_0 | interaction | /source/pack/screens/3/interactions/0\n- REQ-INTERACTION-BOAT_INSPECT_POPOVER-N_1 | interaction | /source/pack/screens/3/interactions/1\n- REQ-STATE-BOAT_INSPECT_POPOVER-OPEN | state | /source/pack/screens/3/states/0\n- REQ-TRANSITION-BOAT_INSPECT_POPOVER-N_0 | transition | /source/pack/screens/3/transitions/0\n- REQ-SCREEN-PAUSE_OVERLAY | screen_inventory | /source/pack/screens/4\n- REQ-COMPONENT-PAUSE_OVERLAY-RESUME | component | /source/pack/screens/4/components/0\n- REQ-COMPONENT-PAUSE_OVERLAY-RESTART | component | /source/pack/screens/4/components/1\n- REQ-COMPONENT-PAUSE_OVERLAY-EXIT | component | /source/pack/screens/4/components/2\n- REQ-INTERACTION-PAUSE_OVERLAY-N_0 | interaction | /source/pack/screens/4/interactions/0\n- REQ-INTERACTION-PAUSE_OVERLAY-N_1 | interaction | /source/pack/screens/4/interactions/1\n- REQ-INTERACTION-PAUSE_OVERLAY-N_2 | interaction | /source/pack/screens/4/interactions/2\n- REQ-STATE-PAUSE_OVERLAY-PAUSED | state | /source/pack/screens/4/states/0\n- REQ-TRANSITION-PAUSE_OVERLAY-N_0 | transition | /source/pack/screens/4/transitions/0\n- REQ-TRANSITION-PAUSE_OVERLAY-N_1 | transition | /source/pack/screens/4/transitions/1\n- REQ-SCREEN-STAGE_RESULT | screen_inventory | /source/pack/screens/5\n- REQ-COMPONENT-STAGE_RESULT-RESULT_TITLE | component | /source/pack/screens/5/components/0\n- REQ-COMPONENT-STAGE_RESULT-STARS | component | /source/pack/screens/5/components/1\n- REQ-COMPONENT-STAGE_RESULT-STATS | component | /source/pack/screens/5/components/2\n- REQ-COMPONENT-STAGE_RESULT-RETRY | component | /source/pack/screens/5/components/3\n- REQ-COMPONENT-STAGE_RESULT-NEXT | component | /source/pack/screens/5/components/4\n- REQ-INTERACTION-STAGE_RESULT-N_0 | interaction | /source/pack/screens/5/interactions/0\n- REQ-INTERACTION-STAGE_RESULT-N_1 | interaction | /source/pack/screens/5/interactions/1\n- REQ-STATE-STAGE_RESULT-SUCCESS | state | /source/pack/screens/5/states/0\n- REQ-STATE-STAGE_RESULT-FAILURE | state | /source/pack/screens/5/states/1\n- REQ-VARIANT-STAGE_RESULT-FAILURE_RESULT | state_variant | /source/pack/screens/5/state_variants/0\n- REQ-TRANSITION-STAGE_RESULT-N_0 | transition | /source/pack/screens/5/transitions/0\n- REQ-TRANSITION-STAGE_RESULT-N_1 | transition | /source/pack/screens/5/transitions/1\n- REQ-TRANSITION-STAGE_RESULT-N_2 | transition | /source/pack/screens/5/transitions/2\n- REQ-GLOBAL_STATE-RETRY | global_state | /source/pack/global_states/retry\n- REQ-GLOBAL_STATE-PAUSED | global_state | /source/pack/global_states/paused\n- REQ-GLOBAL_STATE-FAILURE | global_state | /source/pack/global_states/failure\n- REQ-GLOBAL_STATE-LOADING | global_state | /source/pack/global_states/loading\n- REQ-GLOBAL_STATE-RUNNING | global_state | /source/pack/global_states/running\n- REQ-GLOBAL_STATE-SUCCESS | global_state | /source/pack/global_states/success\n- REQ-GLOBAL_STATE-WARNING | global_state | /source/pack/global_states/warning\n- REQ-GLOBAL_STATE-DEVICE_BUSY | global_state | /source/pack/global_states/device_busy\n- REQ-INPUT-TAP | input_map | /source/pack/input_map/tap\n- REQ-INPUT-CANCEL | input_map | /source/pack/input_map/cancel\n- REQ-INPUT-ARC_DRAG | input_map | /source/pack/input_map/arc_drag\n- REQ-INPUT-PRIORITY | input_map | /source/pack/input_map/priority\n- REQ-INPUT-MULTITOUCH | input_map | /source/pack/input_map/multitouch\n- REQ-INPUT-CIRCULAR_DRAG | input_map | /source/pack/input_map/circular_drag\n- REQ-INPUT-VERTICAL_DRAG | input_map | /source/pack/input_map/vertical_drag\n- REQ-INPUT-SINGLE_POINTER | input_map | /source/pack/input_map/single_pointer\n- REQ-SCORING_RULE-SCORE | scoring_rule | /source/design/game_rules/score\n- REQ-GAMEPLAY_RULE-DEVICES | gameplay_rule | /source/design/game_rules/devices\n- REQ-SCORING_RULE-FAILURE | scoring_rule | /source/design/game_rules/failure\n- REQ-SCORING_RULE-SUCCESS | scoring_rule | /source/design/game_rules/success\n- REQ-GAMEPLAY_RULE-COLLISION | gameplay_rule | /source/design/game_rules/collision\n- REQ-GAMEPLAY_RULE-OCCUPANCY | gameplay_rule | /source/design/game_rules/occupancy\n- REQ-GAMEPLAY_RULE-SIMULATION | gameplay_rule | /source/design/game_rules/simulation\n- REQ-GAMEPLAY_RULE-BOAT_TRAITS | gameplay_rule | /source/design/game_rules/boat_traits\n- REQ-GAMEPLAY_RULE-LOCK_SAFETY | gameplay_rule | /source/design/game_rules/lock_safety\n- REQ-GAMEPLAY_RULE-BOATS_PER_STAGE | gameplay_rule | /source/design/game_rules/boats_per_stage\n- REQ-VERB-N_0 | player_verb | /source/design/core_player_verbs/0\n- REQ-VERB-N_1 | player_verb | /source/design/core_player_verbs/1\n- REQ-VERB-N_2 | player_verb | /source/design/core_player_verbs/2\n- REQ-VERB-N_3 | player_verb | /source/design/core_player_verbs/3\n- REQ-VERB-N_4 | player_verb | /source/design/core_player_verbs/4\n- REQ-DESIGN_STATE-N_0 | design_state | /source/design/state_model/0\n- REQ-DESIGN_STATE-N_1 | design_state | /source/design/state_model/1\n- REQ-DESIGN_STATE-N_2 | design_state | /source/design/state_model/2\n- REQ-DESIGN_STATE-N_3 | design_state | /source/design/state_model/3\n- REQ-DESIGN_STATE-N_4 | design_state | /source/design/state_model/4\n- REQ-DESIGN_STATE-N_5 | design_state | /source/design/state_model/5\n- REQ-CONTENT-UNIT | content_quantity | /source/design/content_model/unit\n- REQ-CONTENT-MVP_COUNT | content_quantity | /source/design/content_model/mvp_count\n- REQ-CONTENT-AUTHORING | content_quantity | /source/design/content_model/authoring\n- REQ-CONTENT-AXES | content_quantity | /source/design/content_model/axes\n- REQ-DESIGN_SCREEN-N_0 | design_screen_inventory | /source/design/screen_inventory/0\n- REQ-DESIGN_SCREEN-N_1 | design_screen_inventory | /source/design/screen_inventory/1\n- REQ-DESIGN_SCREEN-N_2 | design_screen_inventory | /source/design/screen_inventory/2\n- REQ-DESIGN_SCREEN-N_3 | design_screen_inventory | /source/design/screen_inventory/3\n- REQ-DESIGN_SCREEN-N_4 | design_screen_inventory | /source/design/screen_inventory/4\n- REQ-DESIGN_SCREEN-N_5 | design_screen_inventory | /source/design/screen_inventory/5\n- REQ-ACCEPTANCE-N_0 | acceptance_criterion | /source/pack/acceptance_criteria/0\n- REQ-ACCEPTANCE-N_1 | acceptance_criterion | /source/pack/acceptance_criteria/1\n- REQ-ACCEPTANCE-N_2 | acceptance_criterion | /source/pack/acceptance_criteria/2\n- REQ-ACCEPTANCE-N_3 | acceptance_criterion | /source/pack/acceptance_criteria/3\n- REQ-ACCEPTANCE-N_4 | acceptance_criterion | /source/pack/acceptance_criteria/4\n- REQ-ACCEPTANCE-N_5 | acceptance_criterion | /source/pack/acceptance_criteria/5\n- REQ-ACCEPTANCE-N_6 | acceptance_criterion | /source/pack/acceptance_criteria/6\n- REQ-ACCEPTANCE-N_7 | acceptance_criterion | /source/pack/acceptance_criteria/7\n- REQ-ACCEPTANCE-N_8 | acceptance_criterion | /source/pack/acceptance_criteria/8\n- REQ-SCENARIO-N_0 | acceptance_scenario | /source/design/test_scenarios/0\n- REQ-SCENARIO-N_1 | acceptance_scenario | /source/design/test_scenarios/1\n- REQ-SCENARIO-N_2 | acceptance_scenario | /source/design/test_scenarios/2\n- REQ-SCENARIO-N_3 | acceptance_scenario | /source/design/test_scenarios/3\n- REQ-SCENARIO-N_4 | acceptance_scenario | /source/design/test_scenarios/4\n- REQ-HANDOFF-REQUIRED_DATA-N_0 | data_responsibility | /source/pack/developer_handoff/required_data/0\n- REQ-HANDOFF-REQUIRED_DATA-N_1 | data_responsibility | /source/pack/developer_handoff/required_data/1\n- REQ-HANDOFF-REQUIRED_DATA-N_2 | data_responsibility | /source/pack/developer_handoff/required_data/2\n- REQ-HANDOFF-REQUIRED_DATA-N_3 | data_responsibility | /source/pack/developer_handoff/required_data/3\n- REQ-HANDOFF-REQUIRED_DATA-N_4 | data_responsibility | /source/pack/developer_handoff/required_data/4\n- REQ-HANDOFF-REQUIRED_DATA-N_5 | data_responsibility | /source/pack/developer_handoff/required_data/5\n- REQ-HANDOFF-PERSISTENCE-N_0 | persistence | /source/pack/developer_handoff/persistence/0\n- REQ-HANDOFF-PERSISTENCE-N_1 | persistence | /source/pack/developer_handoff/persistence/1\n- REQ-HANDOFF-HINTS-N_0 | ux_data_hint | /source/pack/developer_handoff/hints/0\n- REQ-HANDOFF-HINTS-N_1 | ux_data_hint | /source/pack/developer_handoff/hints/1\n- REQ-HANDOFF-HINTS-N_2 | ux_data_hint | /source/pack/developer_handoff/hints/2\n- REQ-HANDOFF-HINTS-N_3 | ux_data_hint | /source/pack/developer_handoff/hints/3",
+  "requirement_count": 153,
+  "wireframe_pack_id": "882d0b63-7088-4055-a687-f84c62ec5b16"
+}

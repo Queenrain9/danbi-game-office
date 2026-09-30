@@ -1,0 +1,4134 @@
+{
+  "id": "86480a6b-e712-4db9-b1ec-921fa4fbf3ec",
+  "title": "Pocket Weather Clerk",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "b05bf62b-6849-434c-82a4-6787557d18ef",
+  "version": "v1.2",
+  "design_id": "684d9802-3c07-4477-828c-37a4a9f9c31d",
+  "created_at": "2026-09-30T08:42:51.907922+00:00",
+  "updated_at": "2026-09-30T20:42:00.384774+00:00",
+  "requirements": [
+    {
+      "id": "REQ-SCREEN-SHIFT_BOARD",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/0",
+      "requirement": {
+        "value": {
+          "id": "shift_board",
+          "name": "Shift Board",
+          "order": 1,
+          "layout": {
+            "regions": [
+              {
+                "h": 10,
+                "w": 88,
+                "x": 6,
+                "y": 5,
+                "id": "title",
+                "role": "status",
+                "label": "shift header"
+              },
+              {
+                "h": 68,
+                "w": 88,
+                "x": 6,
+                "y": 18,
+                "id": "orders",
+                "role": "selection",
+                "label": "order list"
+              },
+              {
+                "h": 8,
+                "w": 88,
+                "x": 6,
+                "y": 88,
+                "id": "footer",
+                "role": "status",
+                "label": "progress"
+              }
+            ]
+          },
+          "states": [
+            "ready",
+            "locked"
+          ],
+          "purpose": "select current unlocked order and see shift progress",
+          "feedback": [
+            "progress updates after resolved order"
+          ],
+          "components": [
+            {
+              "id": "order_cards",
+              "box": {
+                "h": 62,
+                "w": 84,
+                "x": 8,
+                "y": 20
+              },
+              "type": "list",
+              "label": "Order cards",
+              "state_binding": "orders/unlocks",
+              "interaction_role": "tap order"
+            },
+            {
+              "id": "shift_progress",
+              "box": {
+                "h": 5,
+                "w": 60,
+                "x": 8,
+                "y": 89
+              },
+              "type": "progress",
+              "label": "Shift progress",
+              "state_binding": "resolved_count"
+            },
+            {
+              "id": "hard_lock",
+              "box": {
+                "h": 5,
+                "w": 20,
+                "x": 72,
+                "y": 89
+              },
+              "type": "status",
+              "label": "Hard Orders lock",
+              "state_binding": "hard_unlocked"
+            }
+          ],
+          "edge_cases": [
+            "no unlocked order: first order forced unlocked"
+          ],
+          "transitions": [
+            {
+              "to": "order_brief",
+              "from": "shift_board",
+              "trigger": "unlocked order tap",
+              "animation": "push",
+              "condition": "order unlocked"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "select order",
+              "target": "order_cards",
+              "feedback": "card press",
+              "precondition": "order unlocked",
+              "state_change": "selected_order=id",
+              "invalid_input": "locked card pulses"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "hard_locked",
+              "name": "Hard Locked",
+              "notes": "tap locked card gives lock pulse",
+              "condition": "shift not completed",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "hard_lock": {
+                  "label": "Locked"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "data-driven cards from order dataset"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/0"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_BOARD-ORDER_CARDS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/0",
+      "requirement": {
+        "value": {
+          "id": "order_cards",
+          "box": {
+            "h": 62,
+            "w": 84,
+            "x": 8,
+            "y": 20
+          },
+          "type": "list",
+          "label": "Order cards",
+          "state_binding": "orders/unlocks",
+          "interaction_role": "tap order"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_BOARD-SHIFT_PROGRESS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/1",
+      "requirement": {
+        "value": {
+          "id": "shift_progress",
+          "box": {
+            "h": 5,
+            "w": 60,
+            "x": 8,
+            "y": 89
+          },
+          "type": "progress",
+          "label": "Shift progress",
+          "state_binding": "resolved_count"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_BOARD-HARD_LOCK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/2",
+      "requirement": {
+        "value": {
+          "id": "hard_lock",
+          "box": {
+            "h": 5,
+            "w": 20,
+            "x": 72,
+            "y": 89
+          },
+          "type": "status",
+          "label": "Hard Orders lock",
+          "state_binding": "hard_unlocked"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-SHIFT_BOARD-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "select order",
+          "target": "order_cards",
+          "feedback": "card press",
+          "precondition": "order unlocked",
+          "state_change": "selected_order=id",
+          "invalid_input": "locked card pulses"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-SHIFT_BOARD-READY",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/0",
+      "requirement": {
+        "value": "ready",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-SHIFT_BOARD-LOCKED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/1",
+      "requirement": {
+        "value": "locked",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-SHIFT_BOARD-HARD_LOCKED",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/0/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "hard_locked",
+          "name": "Hard Locked",
+          "notes": "tap locked card gives lock pulse",
+          "condition": "shift not completed",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "hard_lock": {
+              "label": "Locked"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-SHIFT_BOARD-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/0/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "order_brief",
+          "from": "shift_board",
+          "trigger": "unlocked order tap",
+          "animation": "push",
+          "condition": "order unlocked"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-ORDER_BRIEF",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/1",
+      "requirement": {
+        "value": {
+          "id": "order_brief",
+          "name": "Order Brief",
+          "order": 2,
+          "layout": {
+            "regions": [
+              {
+                "h": 45,
+                "w": 86,
+                "x": 7,
+                "y": 12,
+                "id": "map",
+                "role": "preview",
+                "label": "district preview"
+              },
+              {
+                "h": 22,
+                "w": 86,
+                "x": 7,
+                "y": 60,
+                "id": "targets",
+                "role": "rules",
+                "label": "targets"
+              },
+              {
+                "h": 10,
+                "w": 86,
+                "x": 7,
+                "y": 85,
+                "id": "actions",
+                "role": "navigation",
+                "label": "actions"
+              }
+            ]
+          },
+          "states": [
+            "brief"
+          ],
+          "purpose": "show targets and constraints before play",
+          "feedback": [
+            "constraints use icons plus short labels"
+          ],
+          "components": [
+            {
+              "id": "district_preview",
+              "box": {
+                "h": 41,
+                "w": 82,
+                "x": 9,
+                "y": 14
+              },
+              "type": "map",
+              "label": "District Preview",
+              "state_binding": "order.layout"
+            },
+            {
+              "id": "target_chips",
+              "box": {
+                "h": 12,
+                "w": 82,
+                "x": 9,
+                "y": 62
+              },
+              "type": "chips",
+              "label": "Target chips",
+              "state_binding": "order.targets"
+            },
+            {
+              "id": "constraint_chips",
+              "box": {
+                "h": 6,
+                "w": 82,
+                "x": 9,
+                "y": 76
+              },
+              "type": "chips",
+              "label": "Constraints",
+              "state_binding": "locks/forbidden/budget"
+            },
+            {
+              "id": "start_btn",
+              "box": {
+                "h": 8,
+                "w": 39,
+                "x": 52,
+                "y": 86
+              },
+              "type": "button",
+              "label": "Start",
+              "state_binding": "ready"
+            },
+            {
+              "id": "back_btn",
+              "box": {
+                "h": 8,
+                "w": 25,
+                "x": 9,
+                "y": 86
+              },
+              "type": "button",
+              "label": "Back",
+              "state_binding": "ready"
+            }
+          ],
+          "edge_cases": [
+            "missing order data blocks Start"
+          ],
+          "transitions": [
+            {
+              "to": "weather_desk",
+              "from": "order_brief",
+              "trigger": "start_btn",
+              "animation": "fade",
+              "condition": "loaded"
+            },
+            {
+              "to": "shift_board",
+              "from": "order_brief",
+              "trigger": "back_btn",
+              "animation": "pop",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "initialize order",
+              "target": "start_btn",
+              "feedback": "press",
+              "precondition": "order loaded",
+              "state_change": "adjusting",
+              "invalid_input": "disabled until loaded"
+            },
+            {
+              "input": "tap",
+              "action": "return board",
+              "target": "back_btn",
+              "feedback": "press",
+              "precondition": "true",
+              "state_change": "none",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": [
+            "brief is read-only"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/1"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_BRIEF-DISTRICT_PREVIEW",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/0",
+      "requirement": {
+        "value": {
+          "id": "district_preview",
+          "box": {
+            "h": 41,
+            "w": 82,
+            "x": 9,
+            "y": 14
+          },
+          "type": "map",
+          "label": "District Preview",
+          "state_binding": "order.layout"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_BRIEF-TARGET_CHIPS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/1",
+      "requirement": {
+        "value": {
+          "id": "target_chips",
+          "box": {
+            "h": 12,
+            "w": 82,
+            "x": 9,
+            "y": 62
+          },
+          "type": "chips",
+          "label": "Target chips",
+          "state_binding": "order.targets"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_BRIEF-CONSTRAINT_CHIPS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/2",
+      "requirement": {
+        "value": {
+          "id": "constraint_chips",
+          "box": {
+            "h": 6,
+            "w": 82,
+            "x": 9,
+            "y": 76
+          },
+          "type": "chips",
+          "label": "Constraints",
+          "state_binding": "locks/forbidden/budget"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_BRIEF-START_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/3",
+      "requirement": {
+        "value": {
+          "id": "start_btn",
+          "box": {
+            "h": 8,
+            "w": 39,
+            "x": 52,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Start",
+          "state_binding": "ready"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_BRIEF-BACK_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/4",
+      "requirement": {
+        "value": {
+          "id": "back_btn",
+          "box": {
+            "h": 8,
+            "w": 25,
+            "x": 9,
+            "y": 86
+          },
+          "type": "button",
+          "label": "Back",
+          "state_binding": "ready"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-ORDER_BRIEF-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "initialize order",
+          "target": "start_btn",
+          "feedback": "press",
+          "precondition": "order loaded",
+          "state_change": "adjusting",
+          "invalid_input": "disabled until loaded"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-ORDER_BRIEF-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "return board",
+          "target": "back_btn",
+          "feedback": "press",
+          "precondition": "true",
+          "state_change": "none",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-ORDER_BRIEF-BRIEF",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/0",
+      "requirement": {
+        "value": "brief",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-ORDER_BRIEF-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "weather_desk",
+          "from": "order_brief",
+          "trigger": "start_btn",
+          "animation": "fade",
+          "condition": "loaded"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-ORDER_BRIEF-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "shift_board",
+          "from": "order_brief",
+          "trigger": "back_btn",
+          "animation": "pop",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-WEATHER_DESK",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/2",
+      "requirement": {
+        "value": {
+          "id": "weather_desk",
+          "name": "Weather Desk",
+          "order": 3,
+          "layout": {
+            "regions": [
+              {
+                "h": 12,
+                "w": 92,
+                "x": 4,
+                "y": 4,
+                "id": "hud",
+                "role": "status",
+                "label": "targets/status"
+              },
+              {
+                "h": 25,
+                "w": 90,
+                "x": 5,
+                "y": 18,
+                "id": "sky",
+                "role": "direct manipulation",
+                "label": "cloud manipulation sky"
+              },
+              {
+                "h": 29,
+                "w": 90,
+                "x": 5,
+                "y": 44,
+                "id": "town",
+                "role": "world feedback",
+                "label": "district diorama"
+              },
+              {
+                "h": 20,
+                "w": 90,
+                "x": 5,
+                "y": 75,
+                "id": "controls",
+                "role": "input",
+                "label": "hardware controls"
+              }
+            ]
+          },
+          "states": [
+            "adjusting",
+            "dragging_cloud",
+            "rotating_wind",
+            "dragging_humidity",
+            "settling",
+            "evaluating",
+            "locked_control"
+          ],
+          "purpose": "core tactile weather manipulation and evaluation entry",
+          "feedback": [
+            "world lighting/shadow/haze/rain are primary",
+            "target satisfied preview glow does not award score"
+          ],
+          "components": [
+            {
+              "id": "target_strip",
+              "box": {
+                "h": 8,
+                "w": 57,
+                "x": 6,
+                "y": 5
+              },
+              "type": "status",
+              "label": "Target chips",
+              "state_binding": "order.targets"
+            },
+            {
+              "id": "adjust_count",
+              "box": {
+                "h": 8,
+                "w": 14,
+                "x": 66,
+                "y": 5
+              },
+              "type": "counter",
+              "label": "Adjustments",
+              "state_binding": "adjustments/8"
+            },
+            {
+              "id": "pause_btn",
+              "box": {
+                "h": 8,
+                "w": 11,
+                "x": 83,
+                "y": 5
+              },
+              "type": "button",
+              "label": "Pause",
+              "enabled_when": "state in adjusting,settling",
+              "state_binding": "not evaluating"
+            },
+            {
+              "id": "cloud_bank",
+              "box": {
+                "h": 18,
+                "w": 46,
+                "x": 14,
+                "y": 21
+              },
+              "type": "draggable",
+              "label": "Cloud Bank",
+              "enabled_when": "adjusting && !cloud_locked",
+              "state_binding": "cloud.position,cover,altitude",
+              "interaction_role": "drag start + live footprint"
+            },
+            {
+              "id": "district_world",
+              "box": {
+                "h": 27,
+                "w": 86,
+                "x": 7,
+                "y": 45
+              },
+              "type": "world_view",
+              "label": "Town districts",
+              "state_binding": "derived_weather,district current",
+              "interaction_role": "gesture result feedback"
+            },
+            {
+              "id": "wind_nozzle",
+              "box": {
+                "h": 16,
+                "w": 23,
+                "x": 7,
+                "y": 77
+              },
+              "type": "rotary",
+              "label": "Wind Nozzle",
+              "enabled_when": "adjusting && !wind_locked",
+              "state_binding": "wind_direction,wind_strength",
+              "interaction_role": "circular drag"
+            },
+            {
+              "id": "humidity_valve",
+              "box": {
+                "h": 16,
+                "w": 18,
+                "x": 34,
+                "y": 77
+              },
+              "type": "vertical_slider",
+              "label": "Humidity Valve",
+              "enabled_when": "adjusting && !humidity_locked",
+              "state_binding": "humidity",
+              "interaction_role": "vertical drag"
+            },
+            {
+              "id": "observe_btn",
+              "box": {
+                "h": 14,
+                "w": 17,
+                "x": 57,
+                "y": 78
+              },
+              "type": "button",
+              "label": "Observe",
+              "enabled_when": "adjusting",
+              "state_binding": "state",
+              "interaction_role": "settle trigger"
+            },
+            {
+              "id": "submit_btn",
+              "box": {
+                "h": 14,
+                "w": 17,
+                "x": 77,
+                "y": 78
+              },
+              "type": "button",
+              "label": "Submit",
+              "enabled_when": "adjustments>0 && state=adjusting",
+              "state_binding": "adjustments,state",
+              "interaction_role": "evaluation trigger"
+            },
+            {
+              "id": "settle_meter",
+              "box": {
+                "h": 3,
+                "w": 37,
+                "x": 57,
+                "y": 73
+              },
+              "type": "progress",
+              "label": "Settle progress",
+              "enabled_when": "settling",
+              "state_binding": "settle_time"
+            }
+          ],
+          "edge_cases": [
+            "multi-touch ignored after first pointer ownership",
+            "budget 8 reached disables further device commits and enables submit",
+            "locked device never increments adjustment"
+          ],
+          "transitions": [
+            {
+              "to": "order_result",
+              "from": "weather_desk",
+              "trigger": "evaluation complete",
+              "animation": "result sheet up",
+              "condition": "success or failure"
+            },
+            {
+              "to": "pause_overlay",
+              "from": "weather_desk",
+              "trigger": "pause_btn",
+              "animation": "overlay",
+              "condition": "not evaluating"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "drag",
+              "action": "move cloud within sky; derive footprint",
+              "target": "cloud_bank",
+              "feedback": "shadow/footprint + altitude haptic",
+              "precondition": "adjusting && !cloud_locked",
+              "state_change": "cloud position; on release adjustments+1 then settling",
+              "invalid_input": "locked shake; out-of-sky clamps/last valid"
+            },
+            {
+              "input": "circular_drag",
+              "action": "snap 8-way direction and strength band",
+              "target": "wind_nozzle",
+              "feedback": "streamers/arrows + detent",
+              "precondition": "adjusting && !wind_locked",
+              "state_change": "wind; on release adjustments+1 then settling",
+              "invalid_input": "cap haptic/no overflow"
+            },
+            {
+              "input": "vertical_drag",
+              "action": "snap 5 percent",
+              "target": "humidity_valve",
+              "feedback": "gauge/haze + 25% haptic",
+              "precondition": "adjusting && !humidity_locked",
+              "state_change": "humidity; on release adjustments+1 then settling",
+              "invalid_input": "clamp/error pulse"
+            },
+            {
+              "input": "tap",
+              "action": "settle simulation",
+              "target": "observe_btn",
+              "feedback": "controls dim/world animates",
+              "precondition": "adjusting",
+              "state_change": "settling 1.2s then adjusting",
+              "invalid_input": "ignored while settling"
+            },
+            {
+              "input": "tap",
+              "action": "evaluate districts",
+              "target": "submit_btn",
+              "feedback": "stamp + district compare",
+              "precondition": "adjustments>0 && adjusting",
+              "state_change": "evaluating then result",
+              "invalid_input": "disabled pulse"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "cloud_drag",
+              "name": "Cloud Dragging",
+              "notes": "town shadow updates live; adjustment commits on release once",
+              "condition": "pointer owns cloud_bank",
+              "components": [
+                {
+                  "id": "cloud_hit_outline",
+                  "box": {
+                    "h": 25,
+                    "w": 55,
+                    "x": 10,
+                    "y": 18
+                  },
+                  "type": "overlay",
+                  "label": "Cloud hit/footprint",
+                  "state_binding": "drag candidate"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {}
+            },
+            {
+              "id": "settling_variant",
+              "name": "Settling",
+              "notes": "world becomes visual priority",
+              "condition": "state=settling",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "cloud_bank": {
+                  "state_binding": "dim/input_locked"
+                },
+                "wind_nozzle": {
+                  "state_binding": "dim/input_locked"
+                },
+                "settle_meter": {
+                  "state_binding": "1.2s progress"
+                },
+                "humidity_valve": {
+                  "state_binding": "dim/input_locked"
+                }
+              }
+            },
+            {
+              "id": "evaluating_variant",
+              "name": "Evaluating",
+              "notes": "all input locked",
+              "condition": "state=evaluating",
+              "components": [
+                {
+                  "id": "district_compare",
+                  "box": {
+                    "h": 27,
+                    "w": 84,
+                    "x": 8,
+                    "y": 45
+                  },
+                  "type": "overlay",
+                  "label": "Target/current compare",
+                  "state_binding": "evaluation"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {
+                "submit_btn": {
+                  "state_binding": "disabled"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "single WeatherSession owns variables",
+            "debounce continuous drag into one commit",
+            "derived weather recalculates after settle"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/2"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-TARGET_STRIP",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/0",
+      "requirement": {
+        "value": {
+          "id": "target_strip",
+          "box": {
+            "h": 8,
+            "w": 57,
+            "x": 6,
+            "y": 5
+          },
+          "type": "status",
+          "label": "Target chips",
+          "state_binding": "order.targets"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-ADJUST_COUNT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/1",
+      "requirement": {
+        "value": {
+          "id": "adjust_count",
+          "box": {
+            "h": 8,
+            "w": 14,
+            "x": 66,
+            "y": 5
+          },
+          "type": "counter",
+          "label": "Adjustments",
+          "state_binding": "adjustments/8"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-PAUSE_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/2",
+      "requirement": {
+        "value": {
+          "id": "pause_btn",
+          "box": {
+            "h": 8,
+            "w": 11,
+            "x": 83,
+            "y": 5
+          },
+          "type": "button",
+          "label": "Pause",
+          "enabled_when": "state in adjusting,settling",
+          "state_binding": "not evaluating"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-CLOUD_BANK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/3",
+      "requirement": {
+        "value": {
+          "id": "cloud_bank",
+          "box": {
+            "h": 18,
+            "w": 46,
+            "x": 14,
+            "y": 21
+          },
+          "type": "draggable",
+          "label": "Cloud Bank",
+          "enabled_when": "adjusting && !cloud_locked",
+          "state_binding": "cloud.position,cover,altitude",
+          "interaction_role": "drag start + live footprint"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-DISTRICT_WORLD",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/4",
+      "requirement": {
+        "value": {
+          "id": "district_world",
+          "box": {
+            "h": 27,
+            "w": 86,
+            "x": 7,
+            "y": 45
+          },
+          "type": "world_view",
+          "label": "Town districts",
+          "state_binding": "derived_weather,district current",
+          "interaction_role": "gesture result feedback"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-WIND_NOZZLE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/5",
+      "requirement": {
+        "value": {
+          "id": "wind_nozzle",
+          "box": {
+            "h": 16,
+            "w": 23,
+            "x": 7,
+            "y": 77
+          },
+          "type": "rotary",
+          "label": "Wind Nozzle",
+          "enabled_when": "adjusting && !wind_locked",
+          "state_binding": "wind_direction,wind_strength",
+          "interaction_role": "circular drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/5"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-HUMIDITY_VALVE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/6",
+      "requirement": {
+        "value": {
+          "id": "humidity_valve",
+          "box": {
+            "h": 16,
+            "w": 18,
+            "x": 34,
+            "y": 77
+          },
+          "type": "vertical_slider",
+          "label": "Humidity Valve",
+          "enabled_when": "adjusting && !humidity_locked",
+          "state_binding": "humidity",
+          "interaction_role": "vertical drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/6"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-OBSERVE_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/7",
+      "requirement": {
+        "value": {
+          "id": "observe_btn",
+          "box": {
+            "h": 14,
+            "w": 17,
+            "x": 57,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Observe",
+          "enabled_when": "adjusting",
+          "state_binding": "state",
+          "interaction_role": "settle trigger"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/7"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-SUBMIT_BTN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/8",
+      "requirement": {
+        "value": {
+          "id": "submit_btn",
+          "box": {
+            "h": 14,
+            "w": 17,
+            "x": 77,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Submit",
+          "enabled_when": "adjustments>0 && state=adjusting",
+          "state_binding": "adjustments,state",
+          "interaction_role": "evaluation trigger"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/8"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-WEATHER_DESK-SETTLE_METER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/9",
+      "requirement": {
+        "value": {
+          "id": "settle_meter",
+          "box": {
+            "h": 3,
+            "w": 37,
+            "x": 57,
+            "y": 73
+          },
+          "type": "progress",
+          "label": "Settle progress",
+          "enabled_when": "settling",
+          "state_binding": "settle_time"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/9"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-WEATHER_DESK-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "drag",
+          "action": "move cloud within sky; derive footprint",
+          "target": "cloud_bank",
+          "feedback": "shadow/footprint + altitude haptic",
+          "precondition": "adjusting && !cloud_locked",
+          "state_change": "cloud position; on release adjustments+1 then settling",
+          "invalid_input": "locked shake; out-of-sky clamps/last valid"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-WEATHER_DESK-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "circular_drag",
+          "action": "snap 8-way direction and strength band",
+          "target": "wind_nozzle",
+          "feedback": "streamers/arrows + detent",
+          "precondition": "adjusting && !wind_locked",
+          "state_change": "wind; on release adjustments+1 then settling",
+          "invalid_input": "cap haptic/no overflow"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-WEATHER_DESK-N_2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/2",
+      "requirement": {
+        "value": {
+          "input": "vertical_drag",
+          "action": "snap 5 percent",
+          "target": "humidity_valve",
+          "feedback": "gauge/haze + 25% haptic",
+          "precondition": "adjusting && !humidity_locked",
+          "state_change": "humidity; on release adjustments+1 then settling",
+          "invalid_input": "clamp/error pulse"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/2"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-WEATHER_DESK-N_3",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/3",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "settle simulation",
+          "target": "observe_btn",
+          "feedback": "controls dim/world animates",
+          "precondition": "adjusting",
+          "state_change": "settling 1.2s then adjusting",
+          "invalid_input": "ignored while settling"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/3"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-WEATHER_DESK-N_4",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/4",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "evaluate districts",
+          "target": "submit_btn",
+          "feedback": "stamp + district compare",
+          "precondition": "adjustments>0 && adjusting",
+          "state_change": "evaluating then result",
+          "invalid_input": "disabled pulse"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/4"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-ADJUSTING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/0",
+      "requirement": {
+        "value": "adjusting",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-DRAGGING_CLOUD",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/1",
+      "requirement": {
+        "value": "dragging_cloud",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-ROTATING_WIND",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/2",
+      "requirement": {
+        "value": "rotating_wind",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/2"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-DRAGGING_HUMIDITY",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/3",
+      "requirement": {
+        "value": "dragging_humidity",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/3"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-SETTLING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/4",
+      "requirement": {
+        "value": "settling",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/4"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-EVALUATING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/5",
+      "requirement": {
+        "value": "evaluating",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/5"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-WEATHER_DESK-LOCKED_CONTROL",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/6",
+      "requirement": {
+        "value": "locked_control",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/6"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-WEATHER_DESK-CLOUD_DRAG",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "cloud_drag",
+          "name": "Cloud Dragging",
+          "notes": "town shadow updates live; adjustment commits on release once",
+          "condition": "pointer owns cloud_bank",
+          "components": [
+            {
+              "id": "cloud_hit_outline",
+              "box": {
+                "h": 25,
+                "w": 55,
+                "x": 10,
+                "y": 18
+              },
+              "type": "overlay",
+              "label": "Cloud hit/footprint",
+              "state_binding": "drag candidate"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-WEATHER_DESK-SETTLING_VARIANT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/1",
+      "requirement": {
+        "value": {
+          "id": "settling_variant",
+          "name": "Settling",
+          "notes": "world becomes visual priority",
+          "condition": "state=settling",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "cloud_bank": {
+              "state_binding": "dim/input_locked"
+            },
+            "wind_nozzle": {
+              "state_binding": "dim/input_locked"
+            },
+            "settle_meter": {
+              "state_binding": "1.2s progress"
+            },
+            "humidity_valve": {
+              "state_binding": "dim/input_locked"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/1"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-WEATHER_DESK-EVALUATING_VARIANT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/2",
+      "requirement": {
+        "value": {
+          "id": "evaluating_variant",
+          "name": "Evaluating",
+          "notes": "all input locked",
+          "condition": "state=evaluating",
+          "components": [
+            {
+              "id": "district_compare",
+              "box": {
+                "h": 27,
+                "w": 84,
+                "x": 8,
+                "y": 45
+              },
+              "type": "overlay",
+              "label": "Target/current compare",
+              "state_binding": "evaluation"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {
+            "submit_btn": {
+              "state_binding": "disabled"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/2"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-WEATHER_DESK-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "order_result",
+          "from": "weather_desk",
+          "trigger": "evaluation complete",
+          "animation": "result sheet up",
+          "condition": "success or failure"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-WEATHER_DESK-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "pause_overlay",
+          "from": "weather_desk",
+          "trigger": "pause_btn",
+          "animation": "overlay",
+          "condition": "not evaluating"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PAUSE_OVERLAY",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/3",
+      "requirement": {
+        "value": {
+          "id": "pause_overlay",
+          "name": "Pause Overlay",
+          "order": 4,
+          "layout": {
+            "regions": [
+              {
+                "h": 50,
+                "w": 70,
+                "x": 15,
+                "y": 25,
+                "id": "modal",
+                "role": "overlay",
+                "label": "pause modal"
+              }
+            ]
+          },
+          "states": [
+            "paused"
+          ],
+          "purpose": "freeze and resume/restart/exit",
+          "feedback": [
+            "simulation fully frozen"
+          ],
+          "components": [
+            {
+              "id": "resume",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 38
+              },
+              "type": "button",
+              "label": "Resume",
+              "state_binding": "paused"
+            },
+            {
+              "id": "restart",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 51
+              },
+              "type": "button",
+              "label": "Restart Order",
+              "state_binding": "paused"
+            },
+            {
+              "id": "exit",
+              "box": {
+                "h": 9,
+                "w": 50,
+                "x": 25,
+                "y": 64
+              },
+              "type": "button",
+              "label": "Exit to Shift",
+              "state_binding": "paused"
+            }
+          ],
+          "edge_cases": [
+            "pause unavailable evaluating"
+          ],
+          "transitions": [
+            {
+              "to": "weather_desk",
+              "from": "pause_overlay",
+              "trigger": "resume/restart",
+              "animation": "fade",
+              "condition": "true"
+            },
+            {
+              "to": "shift_board",
+              "from": "pause_overlay",
+              "trigger": "exit",
+              "animation": "pop",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "resume",
+              "target": "resume",
+              "feedback": "overlay closes",
+              "precondition": "paused",
+              "state_change": "previous desk state",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "reset current order",
+              "target": "restart",
+              "feedback": "reset cue",
+              "precondition": "paused",
+              "state_change": "adjusting",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "discard current order",
+              "target": "exit",
+              "feedback": "close",
+              "precondition": "paused",
+              "state_change": "board",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": [
+            "overlay scene; do not duplicate desk"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/3"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-RESUME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/0",
+      "requirement": {
+        "value": {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 38
+          },
+          "type": "button",
+          "label": "Resume",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-RESTART",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/1",
+      "requirement": {
+        "value": {
+          "id": "restart",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 51
+          },
+          "type": "button",
+          "label": "Restart Order",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE_OVERLAY-EXIT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/2",
+      "requirement": {
+        "value": {
+          "id": "exit",
+          "box": {
+            "h": 9,
+            "w": 50,
+            "x": 25,
+            "y": 64
+          },
+          "type": "button",
+          "label": "Exit to Shift",
+          "state_binding": "paused"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "resume",
+          "target": "resume",
+          "feedback": "overlay closes",
+          "precondition": "paused",
+          "state_change": "previous desk state",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "reset current order",
+          "target": "restart",
+          "feedback": "reset cue",
+          "precondition": "paused",
+          "state_change": "adjusting",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE_OVERLAY-N_2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/2",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "discard current order",
+          "target": "exit",
+          "feedback": "close",
+          "precondition": "paused",
+          "state_change": "board",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/2"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PAUSE_OVERLAY-PAUSED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/0",
+      "requirement": {
+        "value": "paused",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE_OVERLAY-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "weather_desk",
+          "from": "pause_overlay",
+          "trigger": "resume/restart",
+          "animation": "fade",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE_OVERLAY-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "shift_board",
+          "from": "pause_overlay",
+          "trigger": "exit",
+          "animation": "pop",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-ORDER_RESULT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/4",
+      "requirement": {
+        "value": {
+          "id": "order_result",
+          "name": "Order Result",
+          "order": 5,
+          "layout": {
+            "regions": [
+              {
+                "h": 55,
+                "w": 84,
+                "x": 8,
+                "y": 10,
+                "id": "summary",
+                "role": "evaluation",
+                "label": "result"
+              },
+              {
+                "h": 22,
+                "w": 84,
+                "x": 8,
+                "y": 70,
+                "id": "actions",
+                "role": "navigation",
+                "label": "actions"
+              }
+            ]
+          },
+          "states": [
+            "success",
+            "failure"
+          ],
+          "purpose": "show district evaluation, stars, retry/next",
+          "feedback": [
+            "district rows reveal before stars"
+          ],
+          "components": [
+            {
+              "id": "result_title",
+              "box": {
+                "h": 10,
+                "w": 76,
+                "x": 12,
+                "y": 14
+              },
+              "type": "status",
+              "label": "Success/Failure",
+              "state_binding": "success"
+            },
+            {
+              "id": "district_rows",
+              "box": {
+                "h": 25,
+                "w": 76,
+                "x": 12,
+                "y": 27
+              },
+              "type": "list",
+              "label": "District compare",
+              "state_binding": "targets,current"
+            },
+            {
+              "id": "stars",
+              "box": {
+                "h": 8,
+                "w": 50,
+                "x": 25,
+                "y": 55
+              },
+              "type": "rating",
+              "label": "Stars",
+              "state_binding": "score"
+            },
+            {
+              "id": "retry",
+              "box": {
+                "h": 12,
+                "w": 36,
+                "x": 10,
+                "y": 74
+              },
+              "type": "button",
+              "label": "Retry",
+              "state_binding": "result"
+            },
+            {
+              "id": "next",
+              "box": {
+                "h": 12,
+                "w": 36,
+                "x": 54,
+                "y": 74
+              },
+              "type": "button",
+              "label": "Next Order",
+              "enabled_when": "success or failure resolved",
+              "state_binding": "result"
+            }
+          ],
+          "edge_cases": [
+            "retry does not double-count resolved order"
+          ],
+          "transitions": [
+            {
+              "to": "weather_desk",
+              "from": "order_result",
+              "trigger": "retry",
+              "animation": "fade",
+              "condition": "true"
+            },
+            {
+              "to": "order_brief",
+              "from": "order_result",
+              "trigger": "next",
+              "animation": "push",
+              "condition": "resolved_count<5"
+            },
+            {
+              "to": "shift_complete",
+              "from": "order_result",
+              "trigger": "next",
+              "animation": "push",
+              "condition": "resolved_count=5"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "reset same order",
+              "target": "retry",
+              "feedback": "press",
+              "precondition": "result",
+              "state_change": "brief or desk initialized",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "mark resolved and advance",
+              "target": "next",
+              "feedback": "press",
+              "precondition": "result",
+              "state_change": "next brief or shift complete",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "failure_result",
+              "name": "Failure",
+              "notes": "failed conditions emphasized",
+              "condition": "!success",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "result_title": {
+                  "label": "Order Missed"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "result data immutable until action"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/4"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_RESULT-RESULT_TITLE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/0",
+      "requirement": {
+        "value": {
+          "id": "result_title",
+          "box": {
+            "h": 10,
+            "w": 76,
+            "x": 12,
+            "y": 14
+          },
+          "type": "status",
+          "label": "Success/Failure",
+          "state_binding": "success"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_RESULT-DISTRICT_ROWS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/1",
+      "requirement": {
+        "value": {
+          "id": "district_rows",
+          "box": {
+            "h": 25,
+            "w": 76,
+            "x": 12,
+            "y": 27
+          },
+          "type": "list",
+          "label": "District compare",
+          "state_binding": "targets,current"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_RESULT-STARS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/2",
+      "requirement": {
+        "value": {
+          "id": "stars",
+          "box": {
+            "h": 8,
+            "w": 50,
+            "x": 25,
+            "y": 55
+          },
+          "type": "rating",
+          "label": "Stars",
+          "state_binding": "score"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_RESULT-RETRY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/3",
+      "requirement": {
+        "value": {
+          "id": "retry",
+          "box": {
+            "h": 12,
+            "w": 36,
+            "x": 10,
+            "y": 74
+          },
+          "type": "button",
+          "label": "Retry",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-ORDER_RESULT-NEXT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/4",
+      "requirement": {
+        "value": {
+          "id": "next",
+          "box": {
+            "h": 12,
+            "w": 36,
+            "x": 54,
+            "y": 74
+          },
+          "type": "button",
+          "label": "Next Order",
+          "enabled_when": "success or failure resolved",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-ORDER_RESULT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "reset same order",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "brief or desk initialized",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-ORDER_RESULT-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "mark resolved and advance",
+          "target": "next",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "next brief or shift complete",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-ORDER_RESULT-SUCCESS",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/0",
+      "requirement": {
+        "value": "success",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-ORDER_RESULT-FAILURE",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/1",
+      "requirement": {
+        "value": "failure",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-ORDER_RESULT-FAILURE_RESULT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/4/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "failure_result",
+          "name": "Failure",
+          "notes": "failed conditions emphasized",
+          "condition": "!success",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "result_title": {
+              "label": "Order Missed"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-ORDER_RESULT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "weather_desk",
+          "from": "order_result",
+          "trigger": "retry",
+          "animation": "fade",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-ORDER_RESULT-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "order_brief",
+          "from": "order_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "resolved_count<5"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-ORDER_RESULT-N_2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/2",
+      "requirement": {
+        "value": {
+          "to": "shift_complete",
+          "from": "order_result",
+          "trigger": "next",
+          "animation": "push",
+          "condition": "resolved_count=5"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/2"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-SHIFT_COMPLETE",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/5",
+      "requirement": {
+        "value": {
+          "id": "shift_complete",
+          "name": "Shift Complete",
+          "order": 6,
+          "layout": {
+            "regions": [
+              {
+                "h": 55,
+                "w": 84,
+                "x": 8,
+                "y": 15,
+                "id": "summary",
+                "role": "summary",
+                "label": "shift summary"
+              },
+              {
+                "h": 15,
+                "w": 84,
+                "x": 8,
+                "y": 75,
+                "id": "action",
+                "role": "navigation",
+                "label": "continue"
+              }
+            ]
+          },
+          "states": [
+            "complete",
+            "first_unlock"
+          ],
+          "purpose": "summarize five orders and unlock hard orders",
+          "feedback": [
+            "unlock pulse on first completion"
+          ],
+          "components": [
+            {
+              "id": "shift_stats",
+              "box": {
+                "h": 35,
+                "w": 76,
+                "x": 12,
+                "y": 22
+              },
+              "type": "summary",
+              "label": "Order results",
+              "state_binding": "shift_results"
+            },
+            {
+              "id": "unlock",
+              "box": {
+                "h": 9,
+                "w": 76,
+                "x": 12,
+                "y": 60
+              },
+              "type": "status",
+              "label": "Unlock notice",
+              "state_binding": "hard_unlocked"
+            },
+            {
+              "id": "continue",
+              "box": {
+                "h": 10,
+                "w": 60,
+                "x": 20,
+                "y": 78
+              },
+              "type": "button",
+              "label": "Continue",
+              "state_binding": "complete"
+            }
+          ],
+          "edge_cases": [
+            "unlock persistence idempotent"
+          ],
+          "transitions": [
+            {
+              "to": "shift_board",
+              "from": "shift_complete",
+              "trigger": "continue",
+              "animation": "pop",
+              "condition": "true"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "persist unlock and return",
+              "target": "continue",
+              "feedback": "press",
+              "precondition": "complete",
+              "state_change": "board",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "unlock_variant",
+              "name": "First Unlock",
+              "notes": "one-time progression notice",
+              "condition": "first shift completion",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "unlock": {
+                  "label": "Hard Orders Unlocked"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "persist only unlock/progress, not live weather session"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/5"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_COMPLETE-SHIFT_STATS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/0",
+      "requirement": {
+        "value": {
+          "id": "shift_stats",
+          "box": {
+            "h": 35,
+            "w": 76,
+            "x": 12,
+            "y": 22
+          },
+          "type": "summary",
+          "label": "Order results",
+          "state_binding": "shift_results"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_COMPLETE-UNLOCK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/1",
+      "requirement": {
+        "value": {
+          "id": "unlock",
+          "box": {
+            "h": 9,
+            "w": 76,
+            "x": 12,
+            "y": 60
+          },
+          "type": "status",
+          "label": "Unlock notice",
+          "state_binding": "hard_unlocked"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-SHIFT_COMPLETE-CONTINUE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/2",
+      "requirement": {
+        "value": {
+          "id": "continue",
+          "box": {
+            "h": 10,
+            "w": 60,
+            "x": 20,
+            "y": 78
+          },
+          "type": "button",
+          "label": "Continue",
+          "state_binding": "complete"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-SHIFT_COMPLETE-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "persist unlock and return",
+          "target": "continue",
+          "feedback": "press",
+          "precondition": "complete",
+          "state_change": "board",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-SHIFT_COMPLETE-COMPLETE",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/0",
+      "requirement": {
+        "value": "complete",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-SHIFT_COMPLETE-FIRST_UNLOCK",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/1",
+      "requirement": {
+        "value": "first_unlock",
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-SHIFT_COMPLETE-UNLOCK_VARIANT",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/5/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "unlock_variant",
+          "name": "First Unlock",
+          "notes": "one-time progression notice",
+          "condition": "first shift completion",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "unlock": {
+              "label": "Hard Orders Unlocked"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-SHIFT_COMPLETE-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "shift_board",
+          "from": "shift_complete",
+          "trigger": "continue",
+          "animation": "pop",
+          "condition": "true"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-PAUSE",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/pause",
+      "requirement": {
+        "value": {
+          "overlay": true,
+          "freeze_simulation": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/pause"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-RETRY",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/retry",
+      "requirement": {
+        "value": {
+          "reset": "current order variables and adjustment count"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/retry"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-FAILURE",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/failure",
+      "requirement": {
+        "value": {
+          "owner": "order_result"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/failure"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-LOADING",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/loading",
+      "requirement": {
+        "value": {
+          "input_lock": true
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/loading"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-SUCCESS",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/success",
+      "requirement": {
+        "value": {
+          "owner": "order_result"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/success"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-INPUT_LOCK",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/input_lock",
+      "requirement": {
+        "value": {
+          "active_during": [
+            "settling",
+            "evaluating"
+          ]
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/input_lock"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-TAP",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/tap",
+      "requirement": {
+        "value": [
+          "observe",
+          "submit",
+          "pause",
+          "navigation"
+        ],
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/tap"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/drag",
+      "requirement": {
+        "value": {
+          "cloud": "capture pointer until release"
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/drag"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-CANCEL",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/cancel",
+      "requirement": {
+        "value": "pointer cancellation restores last committed device state; no adjustment increment",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/cancel"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-ROTATE",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/rotate",
+      "requirement": {
+        "value": {
+          "wind": "annulus circular delta; snap 8-way"
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/rotate"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-PRIORITY",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/priority",
+      "requirement": {
+        "value": [
+          "active device gesture",
+          "overlay buttons",
+          "core buttons",
+          "background"
+        ],
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/priority"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-MULTITOUCH",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/multitouch",
+      "requirement": {
+        "value": "second pointer ignored while a gesture owns input",
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/multitouch"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-VERTICAL_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/vertical_drag",
+      "requirement": {
+        "value": {
+          "humidity": "5% snap"
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/vertical_drag"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-SINGLE_POINTER",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/single_pointer",
+      "requirement": {
+        "value": true,
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/single_pointer"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_0",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/0",
+      "requirement": {
+        "value": "high humidity + low cloud + low wind = fog",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/0"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_1",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/1",
+      "requirement": {
+        "value": "high humidity + sufficient cloud = rain",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/1"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_2",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/2",
+      "requirement": {
+        "value": "strong wind moves/disperses clouds",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/2"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_3",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/3",
+      "requirement": {
+        "value": "cloud footprint affects only overlapping districts",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/3"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SCORE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/score",
+      "requirement": {
+        "value": "success 1 star; <=5 adjustments +1; no forbidden overshoot +1",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/score"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-FAILURE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/failure",
+      "requirement": {
+        "value": "forbidden condition at submit or adjustment budget exceeded",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/failure"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SUCCESS",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/success",
+      "requirement": {
+        "value": "all district targets within tolerance 15",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/success"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIABLE-HUMIDITY",
+      "category": "gameplay_variable",
+      "source_ref": "/source/design/game_rules/variables/humidity",
+      "requirement": {
+        "value": "0-100",
+        "source_kind": "gameplay_variable"
+      },
+      "source_refs": [
+        "/source/design/game_rules/variables/humidity"
+      ],
+      "verification": "Variable domain is encoded without narrowing or widening its source semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIABLE-CLOUD_COVER",
+      "category": "gameplay_variable",
+      "source_ref": "/source/design/game_rules/variables/cloud_cover",
+      "requirement": {
+        "value": "0-100",
+        "source_kind": "gameplay_variable"
+      },
+      "source_refs": [
+        "/source/design/game_rules/variables/cloud_cover"
+      ],
+      "verification": "Variable domain is encoded without narrowing or widening its source semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIABLE-WIND_STRENGTH",
+      "category": "gameplay_variable",
+      "source_ref": "/source/design/game_rules/variables/wind_strength",
+      "requirement": {
+        "value": "0-3",
+        "source_kind": "gameplay_variable"
+      },
+      "source_refs": [
+        "/source/design/game_rules/variables/wind_strength"
+      ],
+      "verification": "Variable domain is encoded without narrowing or widening its source semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIABLE-CLOUD_ALTITUDE",
+      "category": "gameplay_variable",
+      "source_ref": "/source/design/game_rules/variables/cloud_altitude",
+      "requirement": {
+        "value": "low/mid/high",
+        "source_kind": "gameplay_variable"
+      },
+      "source_refs": [
+        "/source/design/game_rules/variables/cloud_altitude"
+      ],
+      "verification": "Variable domain is encoded without narrowing or widening its source semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIABLE-WIND_DIRECTION",
+      "category": "gameplay_variable",
+      "source_ref": "/source/design/game_rules/variables/wind_direction",
+      "requirement": {
+        "value": "8-way",
+        "source_kind": "gameplay_variable"
+      },
+      "source_refs": [
+        "/source/design/game_rules/variables/wind_direction"
+      ],
+      "verification": "Variable domain is encoded without narrowing or widening its source semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-SHIFT_ORDERS",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/shift_orders",
+      "requirement": {
+        "value": 5,
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/shift_orders"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-BUDGET_RULE-ADJUSTMENT_BUDGET",
+      "category": "budget_rule",
+      "source_ref": "/source/design/game_rules/adjustment_budget",
+      "requirement": {
+        "value": 8,
+        "source_kind": "budget_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/adjustment_budget"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VERB-N_0",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/0",
+      "requirement": {
+        "value": {
+          "verb": "Move Clouds",
+          "input": "drag",
+          "change": "position/coverage changes",
+          "target": "cloud bank",
+          "feedback": "shadow and cloud footprint move",
+          "condition": "adjusting"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/0"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_1",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/1",
+      "requirement": {
+        "value": {
+          "verb": "Aim Wind",
+          "input": "circular drag",
+          "change": "direction/strength changes",
+          "target": "wind nozzle",
+          "feedback": "streamers and drift update",
+          "condition": "adjusting"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/1"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_2",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/2",
+      "requirement": {
+        "value": {
+          "verb": "Tune Humidity",
+          "input": "vertical drag",
+          "change": "humidity changes",
+          "target": "humidity valve",
+          "feedback": "gauge/haze update",
+          "condition": "adjusting"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/2"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_3",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/3",
+      "requirement": {
+        "value": {
+          "verb": "Observe",
+          "input": "tap",
+          "change": "simulation settles",
+          "target": "observe",
+          "feedback": "town weather resolves",
+          "condition": "not settling"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/3"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_4",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/4",
+      "requirement": {
+        "value": {
+          "verb": "Submit",
+          "input": "tap",
+          "change": "order evaluated",
+          "target": "stamp",
+          "feedback": "district compare/result",
+          "condition": "after adjustment"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/4"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_0",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/0",
+      "requirement": {
+        "value": {
+          "ui": "targets/map",
+          "exit": "continue",
+          "enter": "new order",
+          "state": "order_brief",
+          "inputs": [
+            "continue",
+            "back"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/0"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_1",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/1",
+      "requirement": {
+        "value": {
+          "ui": "live controls/count",
+          "exit": "observe/submit",
+          "enter": "brief accepted/settle done",
+          "state": "adjusting",
+          "inputs": [
+            "cloud",
+            "wind",
+            "humidity",
+            "observe",
+            "submit"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/1"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_2",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/2",
+      "requirement": {
+        "value": {
+          "ui": "controls dim, town emphasized",
+          "exit": "1.2s",
+          "enter": "observe/control commit",
+          "state": "settling",
+          "inputs": [
+            "skip"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/2"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_3",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/3",
+      "requirement": {
+        "value": {
+          "ui": "input lock/compare",
+          "exit": "evaluation complete",
+          "enter": "submit",
+          "state": "evaluating",
+          "inputs": []
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/3"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_4",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/4",
+      "requirement": {
+        "value": {
+          "ui": "stars/failed conditions",
+          "exit": "choice",
+          "enter": "evaluation done",
+          "state": "result",
+          "inputs": [
+            "retry",
+            "next"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/4"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_5",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/5",
+      "requirement": {
+        "value": {
+          "ui": "summary",
+          "exit": "continue",
+          "enter": "5 resolved",
+          "state": "shift_complete",
+          "inputs": [
+            "continue"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/5"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-UNIT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/unit",
+      "requirement": {
+        "value": "weather order",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/unit"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-MVP_COUNT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/mvp_count",
+      "requirement": {
+        "value": 5,
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/mvp_count"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AUTHORING",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/authoring",
+      "requirement": {
+        "value": "data-driven combinations; no bespoke code per order",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/authoring"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AXES",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/axes",
+      "requirement": {
+        "value": [
+          "district layout",
+          "target conditions",
+          "initial cloud",
+          "initial wind",
+          "initial humidity",
+          "device locks",
+          "forbidden conditions",
+          "budget"
+        ],
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/axes"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_0",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/0",
+      "requirement": {
+        "value": "Shift Board",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/0"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_1",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/1",
+      "requirement": {
+        "value": "Order Brief",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/1"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_2",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/2",
+      "requirement": {
+        "value": "Weather Desk",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/2"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_3",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/3",
+      "requirement": {
+        "value": "Pause Overlay",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/3"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_4",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/4",
+      "requirement": {
+        "value": "Order Result",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/4"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_5",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/5",
+      "requirement": {
+        "value": "Shift Complete",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/5"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_0",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/0",
+      "requirement": {
+        "value": "All six inventory screens/overlay exist and are reachable",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/0"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_1",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/1",
+      "requirement": {
+        "value": "Cloud drag, wind circular drag and humidity vertical drag each change WeatherSession through their defined hit areas",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/1"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_2",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/2",
+      "requirement": {
+        "value": "Continuous gesture commits exactly one adjustment on release",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/2"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_3",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/3",
+      "requirement": {
+        "value": "Settling locks device input for 1.2 seconds and returns to adjusting",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/3"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_4",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/4",
+      "requirement": {
+        "value": "Submit is disabled before any adjustment and during settling/evaluating",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/4"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_5",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/5",
+      "requirement": {
+        "value": "District evaluation uses the same derived weather shown in the town",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/5"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_6",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/6",
+      "requirement": {
+        "value": "Locked/invalid input never increments adjustment or corrupts state",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/6"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_7",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/7",
+      "requirement": {
+        "value": "Five data-driven orders can complete a Shift; retry and a second Shift start without stale state",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/7"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_8",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/8",
+      "requirement": {
+        "value": "First Shift completion unlocks Hard Orders exactly once",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/8"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_0",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/0",
+      "requirement": {
+        "value": "Order 1을 외부 설명 없이 완료 가능",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/0"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_1",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/1",
+      "requirement": {
+        "value": "바람 변경이 구름의 구역 이동과 결과에 반영",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/1"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_2",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/2",
+      "requirement": {
+        "value": "최소 한 주문은 세 조작을 모두 요구",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/2"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_3",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/3",
+      "requirement": {
+        "value": "invalid/locked 입력이 상태를 오염시키지 않음",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/3"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_4",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/4",
+      "requirement": {
+        "value": "5-order Shift를 재시작해도 stale state 없음",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/4"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_0",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/0",
+      "requirement": {
+        "value": "5 weather orders",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_1",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/1",
+      "requirement": {
+        "value": "district geometry",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_2",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/2",
+      "requirement": {
+        "value": "target tags",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/2"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_3",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/3",
+      "requirement": {
+        "value": "initial variables",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/3"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_4",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/4",
+      "requirement": {
+        "value": "device locks",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/4"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_5",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/5",
+      "requirement": {
+        "value": "forbidden conditions",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/5"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_6",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/6",
+      "requirement": {
+        "value": "budget",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/6"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-PERSISTENCE-N_0",
+      "category": "persistence",
+      "source_ref": "/source/pack/developer_handoff/persistence/0",
+      "requirement": {
+        "value": "hard order unlock",
+        "source_kind": "persistence"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/persistence/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-PERSISTENCE-N_1",
+      "category": "persistence",
+      "source_ref": "/source/pack/developer_handoff/persistence/1",
+      "requirement": {
+        "value": "resolved progression if desired",
+        "source_kind": "persistence"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/persistence/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_0",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/0",
+      "requirement": {
+        "value": "do not count pointer move events as adjustments",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_1",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/1",
+      "requirement": {
+        "value": "do not use physics fluid simulation",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-HINTS-N_2",
+      "category": "ux_data_hint",
+      "source_ref": "/source/pack/developer_handoff/hints/2",
+      "requirement": {
+        "value": "world feedback derives from same state used by evaluator",
+        "source_kind": "ux_data_hint"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/hints/2"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": null,
+  "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+  "category_counts": {
+    "state": 15,
+    "component": 29,
+    "input_map": 8,
+    "transition": 11,
+    "budget_rule": 1,
+    "interaction": 14,
+    "persistence": 2,
+    "player_verb": 5,
+    "design_state": 6,
+    "global_state": 6,
+    "scoring_rule": 3,
+    "ux_data_hint": 3,
+    "gameplay_rule": 5,
+    "state_variant": 6,
+    "content_quantity": 4,
+    "screen_inventory": 6,
+    "gameplay_variable": 5,
+    "acceptance_scenario": 5,
+    "data_responsibility": 7,
+    "acceptance_criterion": 9,
+    "design_screen_inventory": 6
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T12:57:39.03891+00:00",
+    "evidence_path": "production/contracts/86480a6b-e712-4db9-b1ec-921fa4fbf3ec/blueprint-review-da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f.json",
+    "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+    "source_checked": "true",
+    "artifact_commit": "2ffbfabde03a8ee6fce5dfee6dcd56deb43c5a98",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static",
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Pocket Weather Clerk — Atomic Implementation Contract v1.2\n\n- REQ-SCREEN-SHIFT_BOARD | screen_inventory | /source/pack/screens/0\n- REQ-COMPONENT-SHIFT_BOARD-ORDER_CARDS | component | /source/pack/screens/0/components/0\n- REQ-COMPONENT-SHIFT_BOARD-SHIFT_PROGRESS | component | /source/pack/screens/0/components/1\n- REQ-COMPONENT-SHIFT_BOARD-HARD_LOCK | component | /source/pack/screens/0/components/2\n- REQ-INTERACTION-SHIFT_BOARD-N_0 | interaction | /source/pack/screens/0/interactions/0\n- REQ-STATE-SHIFT_BOARD-READY | state | /source/pack/screens/0/states/0\n- REQ-STATE-SHIFT_BOARD-LOCKED | state | /source/pack/screens/0/states/1\n- REQ-VARIANT-SHIFT_BOARD-HARD_LOCKED | state_variant | /source/pack/screens/0/state_variants/0\n- REQ-TRANSITION-SHIFT_BOARD-N_0 | transition | /source/pack/screens/0/transitions/0\n- REQ-SCREEN-ORDER_BRIEF | screen_inventory | /source/pack/screens/1\n- REQ-COMPONENT-ORDER_BRIEF-DISTRICT_PREVIEW | component | /source/pack/screens/1/components/0\n- REQ-COMPONENT-ORDER_BRIEF-TARGET_CHIPS | component | /source/pack/screens/1/components/1\n- REQ-COMPONENT-ORDER_BRIEF-CONSTRAINT_CHIPS | component | /source/pack/screens/1/components/2\n- REQ-COMPONENT-ORDER_BRIEF-START_BTN | component | /source/pack/screens/1/components/3\n- REQ-COMPONENT-ORDER_BRIEF-BACK_BTN | component | /source/pack/screens/1/components/4\n- REQ-INTERACTION-ORDER_BRIEF-N_0 | interaction | /source/pack/screens/1/interactions/0\n- REQ-INTERACTION-ORDER_BRIEF-N_1 | interaction | /source/pack/screens/1/interactions/1\n- REQ-STATE-ORDER_BRIEF-BRIEF | state | /source/pack/screens/1/states/0\n- REQ-TRANSITION-ORDER_BRIEF-N_0 | transition | /source/pack/screens/1/transitions/0\n- REQ-TRANSITION-ORDER_BRIEF-N_1 | transition | /source/pack/screens/1/transitions/1\n- REQ-SCREEN-WEATHER_DESK | screen_inventory | /source/pack/screens/2\n- REQ-COMPONENT-WEATHER_DESK-TARGET_STRIP | component | /source/pack/screens/2/components/0\n- REQ-COMPONENT-WEATHER_DESK-ADJUST_COUNT | component | /source/pack/screens/2/components/1\n- REQ-COMPONENT-WEATHER_DESK-PAUSE_BTN | component | /source/pack/screens/2/components/2\n- REQ-COMPONENT-WEATHER_DESK-CLOUD_BANK | component | /source/pack/screens/2/components/3\n- REQ-COMPONENT-WEATHER_DESK-DISTRICT_WORLD | component | /source/pack/screens/2/components/4\n- REQ-COMPONENT-WEATHER_DESK-WIND_NOZZLE | component | /source/pack/screens/2/components/5\n- REQ-COMPONENT-WEATHER_DESK-HUMIDITY_VALVE | component | /source/pack/screens/2/components/6\n- REQ-COMPONENT-WEATHER_DESK-OBSERVE_BTN | component | /source/pack/screens/2/components/7\n- REQ-COMPONENT-WEATHER_DESK-SUBMIT_BTN | component | /source/pack/screens/2/components/8\n- REQ-COMPONENT-WEATHER_DESK-SETTLE_METER | component | /source/pack/screens/2/components/9\n- REQ-INTERACTION-WEATHER_DESK-N_0 | interaction | /source/pack/screens/2/interactions/0\n- REQ-INTERACTION-WEATHER_DESK-N_1 | interaction | /source/pack/screens/2/interactions/1\n- REQ-INTERACTION-WEATHER_DESK-N_2 | interaction | /source/pack/screens/2/interactions/2\n- REQ-INTERACTION-WEATHER_DESK-N_3 | interaction | /source/pack/screens/2/interactions/3\n- REQ-INTERACTION-WEATHER_DESK-N_4 | interaction | /source/pack/screens/2/interactions/4\n- REQ-STATE-WEATHER_DESK-ADJUSTING | state | /source/pack/screens/2/states/0\n- REQ-STATE-WEATHER_DESK-DRAGGING_CLOUD | state | /source/pack/screens/2/states/1\n- REQ-STATE-WEATHER_DESK-ROTATING_WIND | state | /source/pack/screens/2/states/2\n- REQ-STATE-WEATHER_DESK-DRAGGING_HUMIDITY | state | /source/pack/screens/2/states/3\n- REQ-STATE-WEATHER_DESK-SETTLING | state | /source/pack/screens/2/states/4\n- REQ-STATE-WEATHER_DESK-EVALUATING | state | /source/pack/screens/2/states/5\n- REQ-STATE-WEATHER_DESK-LOCKED_CONTROL | state | /source/pack/screens/2/states/6\n- REQ-VARIANT-WEATHER_DESK-CLOUD_DRAG | state_variant | /source/pack/screens/2/state_variants/0\n- REQ-VARIANT-WEATHER_DESK-SETTLING_VARIANT | state_variant | /source/pack/screens/2/state_variants/1\n- REQ-VARIANT-WEATHER_DESK-EVALUATING_VARIANT | state_variant | /source/pack/screens/2/state_variants/2\n- REQ-TRANSITION-WEATHER_DESK-N_0 | transition | /source/pack/screens/2/transitions/0\n- REQ-TRANSITION-WEATHER_DESK-N_1 | transition | /source/pack/screens/2/transitions/1\n- REQ-SCREEN-PAUSE_OVERLAY | screen_inventory | /source/pack/screens/3\n- REQ-COMPONENT-PAUSE_OVERLAY-RESUME | component | /source/pack/screens/3/components/0\n- REQ-COMPONENT-PAUSE_OVERLAY-RESTART | component | /source/pack/screens/3/components/1\n- REQ-COMPONENT-PAUSE_OVERLAY-EXIT | component | /source/pack/screens/3/components/2\n- REQ-INTERACTION-PAUSE_OVERLAY-N_0 | interaction | /source/pack/screens/3/interactions/0\n- REQ-INTERACTION-PAUSE_OVERLAY-N_1 | interaction | /source/pack/screens/3/interactions/1\n- REQ-INTERACTION-PAUSE_OVERLAY-N_2 | interaction | /source/pack/screens/3/interactions/2\n- REQ-STATE-PAUSE_OVERLAY-PAUSED | state | /source/pack/screens/3/states/0\n- REQ-TRANSITION-PAUSE_OVERLAY-N_0 | transition | /source/pack/screens/3/transitions/0\n- REQ-TRANSITION-PAUSE_OVERLAY-N_1 | transition | /source/pack/screens/3/transitions/1\n- REQ-SCREEN-ORDER_RESULT | screen_inventory | /source/pack/screens/4\n- REQ-COMPONENT-ORDER_RESULT-RESULT_TITLE | component | /source/pack/screens/4/components/0\n- REQ-COMPONENT-ORDER_RESULT-DISTRICT_ROWS | component | /source/pack/screens/4/components/1\n- REQ-COMPONENT-ORDER_RESULT-STARS | component | /source/pack/screens/4/components/2\n- REQ-COMPONENT-ORDER_RESULT-RETRY | component | /source/pack/screens/4/components/3\n- REQ-COMPONENT-ORDER_RESULT-NEXT | component | /source/pack/screens/4/components/4\n- REQ-INTERACTION-ORDER_RESULT-N_0 | interaction | /source/pack/screens/4/interactions/0\n- REQ-INTERACTION-ORDER_RESULT-N_1 | interaction | /source/pack/screens/4/interactions/1\n- REQ-STATE-ORDER_RESULT-SUCCESS | state | /source/pack/screens/4/states/0\n- REQ-STATE-ORDER_RESULT-FAILURE | state | /source/pack/screens/4/states/1\n- REQ-VARIANT-ORDER_RESULT-FAILURE_RESULT | state_variant | /source/pack/screens/4/state_variants/0\n- REQ-TRANSITION-ORDER_RESULT-N_0 | transition | /source/pack/screens/4/transitions/0\n- REQ-TRANSITION-ORDER_RESULT-N_1 | transition | /source/pack/screens/4/transitions/1\n- REQ-TRANSITION-ORDER_RESULT-N_2 | transition | /source/pack/screens/4/transitions/2\n- REQ-SCREEN-SHIFT_COMPLETE | screen_inventory | /source/pack/screens/5\n- REQ-COMPONENT-SHIFT_COMPLETE-SHIFT_STATS | component | /source/pack/screens/5/components/0\n- REQ-COMPONENT-SHIFT_COMPLETE-UNLOCK | component | /source/pack/screens/5/components/1\n- REQ-COMPONENT-SHIFT_COMPLETE-CONTINUE | component | /source/pack/screens/5/components/2\n- REQ-INTERACTION-SHIFT_COMPLETE-N_0 | interaction | /source/pack/screens/5/interactions/0\n- REQ-STATE-SHIFT_COMPLETE-COMPLETE | state | /source/pack/screens/5/states/0\n- REQ-STATE-SHIFT_COMPLETE-FIRST_UNLOCK | state | /source/pack/screens/5/states/1\n- REQ-VARIANT-SHIFT_COMPLETE-UNLOCK_VARIANT | state_variant | /source/pack/screens/5/state_variants/0\n- REQ-TRANSITION-SHIFT_COMPLETE-N_0 | transition | /source/pack/screens/5/transitions/0\n- REQ-GLOBAL_STATE-PAUSE | global_state | /source/pack/global_states/pause\n- REQ-GLOBAL_STATE-RETRY | global_state | /source/pack/global_states/retry\n- REQ-GLOBAL_STATE-FAILURE | global_state | /source/pack/global_states/failure\n- REQ-GLOBAL_STATE-LOADING | global_state | /source/pack/global_states/loading\n- REQ-GLOBAL_STATE-SUCCESS | global_state | /source/pack/global_states/success\n- REQ-GLOBAL_STATE-INPUT_LOCK | global_state | /source/pack/global_states/input_lock\n- REQ-INPUT-TAP | input_map | /source/pack/input_map/tap\n- REQ-INPUT-DRAG | input_map | /source/pack/input_map/drag\n- REQ-INPUT-CANCEL | input_map | /source/pack/input_map/cancel\n- REQ-INPUT-ROTATE | input_map | /source/pack/input_map/rotate\n- REQ-INPUT-PRIORITY | input_map | /source/pack/input_map/priority\n- REQ-INPUT-MULTITOUCH | input_map | /source/pack/input_map/multitouch\n- REQ-INPUT-VERTICAL_DRAG | input_map | /source/pack/input_map/vertical_drag\n- REQ-INPUT-SINGLE_POINTER | input_map | /source/pack/input_map/single_pointer\n- REQ-RULE-N_0 | gameplay_rule | /source/design/game_rules/rules/0\n- REQ-RULE-N_1 | gameplay_rule | /source/design/game_rules/rules/1\n- REQ-RULE-N_2 | gameplay_rule | /source/design/game_rules/rules/2\n- REQ-RULE-N_3 | gameplay_rule | /source/design/game_rules/rules/3\n- REQ-SCORING_RULE-SCORE | scoring_rule | /source/design/game_rules/score\n- REQ-SCORING_RULE-FAILURE | scoring_rule | /source/design/game_rules/failure\n- REQ-SCORING_RULE-SUCCESS | scoring_rule | /source/design/game_rules/success\n- REQ-VARIABLE-HUMIDITY | gameplay_variable | /source/design/game_rules/variables/humidity\n- REQ-VARIABLE-CLOUD_COVER | gameplay_variable | /source/design/game_rules/variables/cloud_cover\n- REQ-VARIABLE-WIND_STRENGTH | gameplay_variable | /source/design/game_rules/variables/wind_strength\n- REQ-VARIABLE-CLOUD_ALTITUDE | gameplay_variable | /source/design/game_rules/variables/cloud_altitude\n- REQ-VARIABLE-WIND_DIRECTION | gameplay_variable | /source/design/game_rules/variables/wind_direction\n- REQ-GAMEPLAY_RULE-SHIFT_ORDERS | gameplay_rule | /source/design/game_rules/shift_orders\n- REQ-BUDGET_RULE-ADJUSTMENT_BUDGET | budget_rule | /source/design/game_rules/adjustment_budget\n- REQ-VERB-N_0 | player_verb | /source/design/core_player_verbs/0\n- REQ-VERB-N_1 | player_verb | /source/design/core_player_verbs/1\n- REQ-VERB-N_2 | player_verb | /source/design/core_player_verbs/2\n- REQ-VERB-N_3 | player_verb | /source/design/core_player_verbs/3\n- REQ-VERB-N_4 | player_verb | /source/design/core_player_verbs/4\n- REQ-DESIGN_STATE-N_0 | design_state | /source/design/state_model/0\n- REQ-DESIGN_STATE-N_1 | design_state | /source/design/state_model/1\n- REQ-DESIGN_STATE-N_2 | design_state | /source/design/state_model/2\n- REQ-DESIGN_STATE-N_3 | design_state | /source/design/state_model/3\n- REQ-DESIGN_STATE-N_4 | design_state | /source/design/state_model/4\n- REQ-DESIGN_STATE-N_5 | design_state | /source/design/state_model/5\n- REQ-CONTENT-UNIT | content_quantity | /source/design/content_model/unit\n- REQ-CONTENT-MVP_COUNT | content_quantity | /source/design/content_model/mvp_count\n- REQ-CONTENT-AUTHORING | content_quantity | /source/design/content_model/authoring\n- REQ-CONTENT-AXES | content_quantity | /source/design/content_model/axes\n- REQ-DESIGN_SCREEN-N_0 | design_screen_inventory | /source/design/screen_inventory/0\n- REQ-DESIGN_SCREEN-N_1 | design_screen_inventory | /source/design/screen_inventory/1\n- REQ-DESIGN_SCREEN-N_2 | design_screen_inventory | /source/design/screen_inventory/2\n- REQ-DESIGN_SCREEN-N_3 | design_screen_inventory | /source/design/screen_inventory/3\n- REQ-DESIGN_SCREEN-N_4 | design_screen_inventory | /source/design/screen_inventory/4\n- REQ-DESIGN_SCREEN-N_5 | design_screen_inventory | /source/design/screen_inventory/5\n- REQ-ACCEPTANCE-N_0 | acceptance_criterion | /source/pack/acceptance_criteria/0\n- REQ-ACCEPTANCE-N_1 | acceptance_criterion | /source/pack/acceptance_criteria/1\n- REQ-ACCEPTANCE-N_2 | acceptance_criterion | /source/pack/acceptance_criteria/2\n- REQ-ACCEPTANCE-N_3 | acceptance_criterion | /source/pack/acceptance_criteria/3\n- REQ-ACCEPTANCE-N_4 | acceptance_criterion | /source/pack/acceptance_criteria/4\n- REQ-ACCEPTANCE-N_5 | acceptance_criterion | /source/pack/acceptance_criteria/5\n- REQ-ACCEPTANCE-N_6 | acceptance_criterion | /source/pack/acceptance_criteria/6\n- REQ-ACCEPTANCE-N_7 | acceptance_criterion | /source/pack/acceptance_criteria/7\n- REQ-ACCEPTANCE-N_8 | acceptance_criterion | /source/pack/acceptance_criteria/8\n- REQ-SCENARIO-N_0 | acceptance_scenario | /source/design/test_scenarios/0\n- REQ-SCENARIO-N_1 | acceptance_scenario | /source/design/test_scenarios/1\n- REQ-SCENARIO-N_2 | acceptance_scenario | /source/design/test_scenarios/2\n- REQ-SCENARIO-N_3 | acceptance_scenario | /source/design/test_scenarios/3\n- REQ-SCENARIO-N_4 | acceptance_scenario | /source/design/test_scenarios/4\n- REQ-HANDOFF-REQUIRED_DATA-N_0 | data_responsibility | /source/pack/developer_handoff/required_data/0\n- REQ-HANDOFF-REQUIRED_DATA-N_1 | data_responsibility | /source/pack/developer_handoff/required_data/1\n- REQ-HANDOFF-REQUIRED_DATA-N_2 | data_responsibility | /source/pack/developer_handoff/required_data/2\n- REQ-HANDOFF-REQUIRED_DATA-N_3 | data_responsibility | /source/pack/developer_handoff/required_data/3\n- REQ-HANDOFF-REQUIRED_DATA-N_4 | data_responsibility | /source/pack/developer_handoff/required_data/4\n- REQ-HANDOFF-REQUIRED_DATA-N_5 | data_responsibility | /source/pack/developer_handoff/required_data/5\n- REQ-HANDOFF-REQUIRED_DATA-N_6 | data_responsibility | /source/pack/developer_handoff/required_data/6\n- REQ-HANDOFF-PERSISTENCE-N_0 | persistence | /source/pack/developer_handoff/persistence/0\n- REQ-HANDOFF-PERSISTENCE-N_1 | persistence | /source/pack/developer_handoff/persistence/1\n- REQ-HANDOFF-HINTS-N_0 | ux_data_hint | /source/pack/developer_handoff/hints/0\n- REQ-HANDOFF-HINTS-N_1 | ux_data_hint | /source/pack/developer_handoff/hints/1\n- REQ-HANDOFF-HINTS-N_2 | ux_data_hint | /source/pack/developer_handoff/hints/2",
+  "requirement_count": 156,
+  "wireframe_pack_id": "d794507b-5a40-4fdf-a2ae-0e719f8b7272"
+}

@@ -1,0 +1,3829 @@
+{
+  "id": "439a4a1d-e8ee-4ca0-83aa-606bdb68321c",
+  "title": "Clockwork Pet Dentist",
+  "source": "chat_automation",
+  "status": "fidelity_pending",
+  "idea_id": "f3b0fa40-a199-4eaa-9d1d-80f9271a5992",
+  "version": "v1.2",
+  "design_id": "6a8fbbea-11c0-461d-9a97-0757ad8d76a4",
+  "created_at": "2026-09-30T12:43:07.30135+00:00",
+  "updated_at": "2026-09-30T20:46:46.913197+00:00",
+  "requirements": [
+    {
+      "id": "REQ-SCREEN-PATIENT_SELECT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/0",
+      "requirement": {
+        "value": {
+          "id": "patient_select",
+          "name": "Patient Select",
+          "order": 1,
+          "layout": {
+            "regions": [
+              {
+                "h": 68,
+                "w": 88,
+                "x": 6,
+                "y": 14,
+                "id": "cards",
+                "role": "selection",
+                "label": "Patients"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "select",
+              "ui": "cards",
+              "enter": "app/result",
+              "allowed_input": "tap"
+            },
+            {
+              "id": "selected",
+              "ui": "selection",
+              "enter": "card tap",
+              "allowed_input": "tap"
+            }
+          ],
+          "purpose": "choose unlocked patient",
+          "feedback": [],
+          "components": [
+            {
+              "id": "patient_cards",
+              "box": {
+                "h": 68,
+                "w": 88,
+                "x": 6,
+                "y": 14
+              },
+              "type": "card_list",
+              "label": "4 patients",
+              "enabled_when": "unlocked",
+              "state_binding": "select",
+              "interaction_role": "select"
+            },
+            {
+              "id": "open",
+              "box": {
+                "h": 9,
+                "w": 60,
+                "x": 20,
+                "y": 86
+              },
+              "type": "button",
+              "label": "VIEW",
+              "enabled_when": "patient_selected",
+              "state_binding": "selected",
+              "interaction_role": "advance"
+            }
+          ],
+          "edge_cases": [],
+          "transitions": [
+            {
+              "to": "patient_brief",
+              "from": "selected",
+              "trigger": "open",
+              "animation": "slide",
+              "condition": "selected"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "select",
+              "target": "patient_cards",
+              "feedback": "outline",
+              "precondition": "unlocked",
+              "state_change": "selected",
+              "invalid_input": "locked cue"
+            },
+            {
+              "input": "tap",
+              "action": "open brief",
+              "target": "open",
+              "feedback": "press",
+              "precondition": "selected",
+              "state_change": "brief",
+              "invalid_input": "disabled"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": []
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/0"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PATIENT_SELECT-PATIENT_CARDS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/0",
+      "requirement": {
+        "value": {
+          "id": "patient_cards",
+          "box": {
+            "h": 68,
+            "w": 88,
+            "x": 6,
+            "y": 14
+          },
+          "type": "card_list",
+          "label": "4 patients",
+          "enabled_when": "unlocked",
+          "state_binding": "select",
+          "interaction_role": "select"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PATIENT_SELECT-OPEN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/0/components/1",
+      "requirement": {
+        "value": {
+          "id": "open",
+          "box": {
+            "h": 9,
+            "w": 60,
+            "x": 20,
+            "y": 86
+          },
+          "type": "button",
+          "label": "VIEW",
+          "enabled_when": "patient_selected",
+          "state_binding": "selected",
+          "interaction_role": "advance"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PATIENT_SELECT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "select",
+          "target": "patient_cards",
+          "feedback": "outline",
+          "precondition": "unlocked",
+          "state_change": "selected",
+          "invalid_input": "locked cue"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PATIENT_SELECT-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/0/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "open brief",
+          "target": "open",
+          "feedback": "press",
+          "precondition": "selected",
+          "state_change": "brief",
+          "invalid_input": "disabled"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PATIENT_SELECT-SELECT",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/0",
+      "requirement": {
+        "value": {
+          "id": "select",
+          "ui": "cards",
+          "enter": "app/result",
+          "allowed_input": "tap"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-PATIENT_SELECT-SELECTED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/0/states/1",
+      "requirement": {
+        "value": {
+          "id": "selected",
+          "ui": "selection",
+          "enter": "card tap",
+          "allowed_input": "tap"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PATIENT_SELECT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/0/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "patient_brief",
+          "from": "selected",
+          "trigger": "open",
+          "animation": "slide",
+          "condition": "selected"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/0/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PATIENT_BRIEF",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/1",
+      "requirement": {
+        "value": {
+          "id": "patient_brief",
+          "name": "Patient Brief",
+          "order": 2,
+          "layout": {
+            "regions": [
+              {
+                "h": 68,
+                "w": 86,
+                "x": 7,
+                "y": 8,
+                "id": "brief",
+                "role": "context",
+                "label": "Brief"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "brief",
+              "ui": "symptoms",
+              "enter": "patient selected",
+              "allowed_input": "start/back"
+            }
+          ],
+          "purpose": "symptoms and constraints",
+          "feedback": [],
+          "components": [
+            {
+              "id": "symptoms",
+              "box": {
+                "h": 68,
+                "w": 86,
+                "x": 7,
+                "y": 8
+              },
+              "type": "card",
+              "label": "Symptoms",
+              "state_binding": "brief"
+            },
+            {
+              "id": "back",
+              "box": {
+                "h": 10,
+                "w": 35,
+                "x": 7,
+                "y": 82
+              },
+              "type": "button",
+              "label": "BACK",
+              "state_binding": "brief",
+              "interaction_role": "back"
+            },
+            {
+              "id": "start",
+              "box": {
+                "h": 10,
+                "w": 42,
+                "x": 51,
+                "y": 82
+              },
+              "type": "button",
+              "label": "START",
+              "enabled_when": "loaded",
+              "state_binding": "brief",
+              "interaction_role": "start"
+            }
+          ],
+          "edge_cases": [],
+          "transitions": [
+            {
+              "to": "treatment",
+              "from": "brief",
+              "trigger": "start",
+              "animation": "open",
+              "condition": "loaded"
+            },
+            {
+              "to": "patient_select",
+              "from": "brief",
+              "trigger": "back",
+              "animation": "slide",
+              "condition": "always"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "create mechanism",
+              "target": "start",
+              "feedback": "mouth opens",
+              "precondition": "loaded",
+              "state_change": "inspection",
+              "invalid_input": "disabled"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": []
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/1"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PATIENT_BRIEF-SYMPTOMS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/0",
+      "requirement": {
+        "value": {
+          "id": "symptoms",
+          "box": {
+            "h": 68,
+            "w": 86,
+            "x": 7,
+            "y": 8
+          },
+          "type": "card",
+          "label": "Symptoms",
+          "state_binding": "brief"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PATIENT_BRIEF-BACK",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/1",
+      "requirement": {
+        "value": {
+          "id": "back",
+          "box": {
+            "h": 10,
+            "w": 35,
+            "x": 7,
+            "y": 82
+          },
+          "type": "button",
+          "label": "BACK",
+          "state_binding": "brief",
+          "interaction_role": "back"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PATIENT_BRIEF-START",
+      "category": "component",
+      "source_ref": "/source/pack/screens/1/components/2",
+      "requirement": {
+        "value": {
+          "id": "start",
+          "box": {
+            "h": 10,
+            "w": 42,
+            "x": 51,
+            "y": 82
+          },
+          "type": "button",
+          "label": "START",
+          "enabled_when": "loaded",
+          "state_binding": "brief",
+          "interaction_role": "start"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PATIENT_BRIEF-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/1/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "create mechanism",
+          "target": "start",
+          "feedback": "mouth opens",
+          "precondition": "loaded",
+          "state_change": "inspection",
+          "invalid_input": "disabled"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PATIENT_BRIEF-BRIEF",
+      "category": "state",
+      "source_ref": "/source/pack/screens/1/states/0",
+      "requirement": {
+        "value": {
+          "id": "brief",
+          "ui": "symptoms",
+          "enter": "patient selected",
+          "allowed_input": "start/back"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PATIENT_BRIEF-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "treatment",
+          "from": "brief",
+          "trigger": "start",
+          "animation": "open",
+          "condition": "loaded"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PATIENT_BRIEF-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/1/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "patient_select",
+          "from": "brief",
+          "trigger": "back",
+          "animation": "slide",
+          "condition": "always"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/1/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-TREATMENT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/2",
+      "requirement": {
+        "value": {
+          "id": "treatment",
+          "name": "Treatment / Mouth",
+          "order": 3,
+          "layout": {
+            "regions": [
+              {
+                "h": 8,
+                "w": 92,
+                "x": 4,
+                "y": 4,
+                "id": "hud",
+                "role": "status",
+                "label": "Status"
+              },
+              {
+                "h": 62,
+                "w": 90,
+                "x": 5,
+                "y": 14,
+                "id": "mouth",
+                "role": "play",
+                "label": "Mouth"
+              },
+              {
+                "h": 14,
+                "w": 90,
+                "x": 5,
+                "y": 78,
+                "id": "dock",
+                "role": "tools",
+                "label": "Tools"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "inspection",
+              "ui": "mouth/probe",
+              "enter": "start/test return",
+              "allowed_input": "pinch/pan/probe/tool"
+            },
+            {
+              "id": "repair",
+              "ui": "tools/parts/tolerance",
+              "enter": "repair action",
+              "allowed_input": "extract/lubricate/align/seat/camera"
+            },
+            {
+              "id": "testing",
+              "ui": "mechanism cycles; input locked",
+              "enter": "crank hold",
+              "allowed_input": "crank release"
+            }
+          ],
+          "purpose": "inspect and repair mechanism",
+          "feedback": [
+            "probe rattle",
+            "extract snap",
+            "oil sheen",
+            "alignment detent",
+            "seat click",
+            "jam pulse"
+          ],
+          "components": [
+            {
+              "id": "mouth_view",
+              "box": {
+                "h": 62,
+                "w": 90,
+                "x": 5,
+                "y": 14
+              },
+              "type": "viewport",
+              "label": "Mechanism",
+              "enabled_when": "!testing",
+              "state_binding": "inspection|repair",
+              "interaction_role": "pinch/pan"
+            },
+            {
+              "id": "gear_layer",
+              "box": {
+                "h": 56,
+                "w": 84,
+                "x": 8,
+                "y": 17
+              },
+              "type": "hit_layer",
+              "label": "Gears/Sockets",
+              "enabled_when": "!testing",
+              "state_binding": "inspection|repair",
+              "interaction_role": "probe/extract/align/seat; +12dp hit"
+            },
+            {
+              "id": "retainers",
+              "box": {
+                "h": 56,
+                "w": 84,
+                "x": 8,
+                "y": 17
+              },
+              "type": "hit_layer",
+              "label": "Retainers",
+              "enabled_when": "retainer_present",
+              "state_binding": "repair",
+              "interaction_role": "release"
+            },
+            {
+              "id": "fault_meter",
+              "box": {
+                "h": 6,
+                "w": 30,
+                "x": 7,
+                "y": 15
+              },
+              "type": "meter",
+              "label": "Wobble/Noise",
+              "state_binding": "probing"
+            },
+            {
+              "id": "tools",
+              "box": {
+                "h": 14,
+                "w": 54,
+                "x": 5,
+                "y": 78
+              },
+              "type": "tool_tray",
+              "label": "Probe Extract Oil",
+              "enabled_when": "!held_part",
+              "state_binding": "inspection|repair",
+              "interaction_role": "tool select/drag"
+            },
+            {
+              "id": "parts",
+              "box": {
+                "h": 14,
+                "w": 34,
+                "x": 61,
+                "y": 78
+              },
+              "type": "part_tray",
+              "label": "Part Tray",
+              "state_binding": "repair",
+              "interaction_role": "part drag/bench"
+            },
+            {
+              "id": "test",
+              "box": {
+                "h": 5,
+                "w": 37,
+                "x": 58,
+                "y": 93
+              },
+              "type": "crank",
+              "label": "BITE TEST",
+              "enabled_when": "required_sockets_occupied",
+              "state_binding": "repair",
+              "interaction_role": "hold crank"
+            },
+            {
+              "id": "pause",
+              "box": {
+                "h": 5,
+                "w": 12,
+                "x": 5,
+                "y": 93
+              },
+              "type": "button",
+              "label": "II",
+              "enabled_when": "!gesture_active",
+              "state_binding": "inspection|repair",
+              "interaction_role": "pause"
+            }
+          ],
+          "edge_cases": [
+            "pointer lost returns held part to last valid location"
+          ],
+          "transitions": [
+            {
+              "to": "part_bench",
+              "from": "repair",
+              "trigger": "grind part",
+              "animation": "overlay",
+              "condition": "part available"
+            },
+            {
+              "to": "testing",
+              "from": "repair",
+              "trigger": "hold test",
+              "animation": "none",
+              "condition": "sockets occupied"
+            },
+            {
+              "to": "repair",
+              "from": "testing",
+              "trigger": "jam/release",
+              "animation": "pulse",
+              "condition": "fault remains"
+            },
+            {
+              "to": "treatment_result",
+              "from": "testing",
+              "trigger": "full cycle",
+              "animation": "success",
+              "condition": "all defects repaired"
+            },
+            {
+              "to": "pause",
+              "from": "inspection",
+              "trigger": "pause",
+              "animation": "modal",
+              "condition": "idle"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "pinch/pan",
+              "action": "zoom/pan clamps",
+              "target": "mouth_view",
+              "feedback": "direct follow",
+              "precondition": "no held part/tool",
+              "state_change": "camera only",
+              "invalid_input": "clamp"
+            },
+            {
+              "input": "tap/short drag",
+              "action": "reveal diagnostic flag",
+              "target": "gear_layer",
+              "feedback": "wobble/noise",
+              "precondition": "probe selected",
+              "state_change": "fault knowledge",
+              "invalid_input": "empty cue"
+            },
+            {
+              "input": "press-drag removal axis",
+              "action": "extract to tray",
+              "target": "gear_layer",
+              "feedback": "resistance then snap",
+              "precondition": "extractor && retainer released",
+              "state_change": "socket empty",
+              "invalid_input": "locked red resistance; unchanged"
+            },
+            {
+              "input": "hold-drag",
+              "action": "lubricate",
+              "target": "gear_layer",
+              "feedback": "oil sheen",
+              "precondition": "oil selected",
+              "state_change": "friction down/overfill up",
+              "invalid_input": "reject non-bearing"
+            },
+            {
+              "input": "circular drag",
+              "action": "change phase",
+              "target": "gear_layer",
+              "feedback": "ghost/detent",
+              "precondition": "replacement over empty socket",
+              "state_change": "phase angle",
+              "invalid_input": "locked installed gear unchanged"
+            },
+            {
+              "input": "drag-release",
+              "action": "seat valid part",
+              "target": "parts→gear_layer",
+              "feedback": "snap/click",
+              "precondition": "socket empty",
+              "state_change": "installed",
+              "invalid_input": "wrong size/phase returns tray"
+            },
+            {
+              "input": "hold",
+              "action": "cycle mechanism",
+              "target": "test",
+              "feedback": "motion/strain",
+              "precondition": "required sockets occupied",
+              "state_change": "testing→repair/result",
+              "invalid_input": "disabled missing-socket cue"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "gear_locked",
+              "name": "Locked",
+              "notes": "extract resists; unchanged",
+              "condition": "retainer attached",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "gear_layer": {
+                  "state_binding": "locked"
+                }
+              }
+            },
+            {
+              "id": "gear_held",
+              "name": "Held",
+              "notes": "held object beats camera",
+              "condition": "part captured",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "mouth_view": {
+                  "state_binding": "camera_locked"
+                }
+              }
+            },
+            {
+              "id": "aligning",
+              "name": "Alignment Candidate",
+              "notes": "circular drag; 3° steps",
+              "condition": "replacement over socket",
+              "components": [
+                {
+                  "id": "ghost",
+                  "box": {
+                    "h": 36,
+                    "w": 56,
+                    "x": 22,
+                    "y": 26
+                  },
+                  "type": "guide",
+                  "label": "Ghost teeth ±12°",
+                  "state_binding": "aligning"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {}
+            },
+            {
+              "id": "seated",
+              "name": "Seated",
+              "notes": "magnetic snap",
+              "condition": "size within 12% and phase ±12°",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "gear_layer": {
+                  "state_binding": "seated"
+                }
+              }
+            },
+            {
+              "id": "jammed",
+              "name": "Jammed",
+              "notes": "stop at reproducible fault",
+              "condition": "test fault",
+              "components": [
+                {
+                  "id": "fault_pulse",
+                  "box": {
+                    "h": 44,
+                    "w": 64,
+                    "x": 18,
+                    "y": 22
+                  },
+                  "type": "indicator",
+                  "label": "Stress location",
+                  "state_binding": "jammed"
+                }
+              ],
+              "hide_components": [],
+              "component_overrides": {}
+            }
+          ],
+          "implementation_notes": [
+            "priority testing > held part/tool > circular rotate > probe > camera",
+            "deterministic state; no rigid-body dependency"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/2"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-MOUTH_VIEW",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/0",
+      "requirement": {
+        "value": {
+          "id": "mouth_view",
+          "box": {
+            "h": 62,
+            "w": 90,
+            "x": 5,
+            "y": 14
+          },
+          "type": "viewport",
+          "label": "Mechanism",
+          "enabled_when": "!testing",
+          "state_binding": "inspection|repair",
+          "interaction_role": "pinch/pan"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-GEAR_LAYER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/1",
+      "requirement": {
+        "value": {
+          "id": "gear_layer",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 17
+          },
+          "type": "hit_layer",
+          "label": "Gears/Sockets",
+          "enabled_when": "!testing",
+          "state_binding": "inspection|repair",
+          "interaction_role": "probe/extract/align/seat; +12dp hit"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-RETAINERS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/2",
+      "requirement": {
+        "value": {
+          "id": "retainers",
+          "box": {
+            "h": 56,
+            "w": 84,
+            "x": 8,
+            "y": 17
+          },
+          "type": "hit_layer",
+          "label": "Retainers",
+          "enabled_when": "retainer_present",
+          "state_binding": "repair",
+          "interaction_role": "release"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-FAULT_METER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/3",
+      "requirement": {
+        "value": {
+          "id": "fault_meter",
+          "box": {
+            "h": 6,
+            "w": 30,
+            "x": 7,
+            "y": 15
+          },
+          "type": "meter",
+          "label": "Wobble/Noise",
+          "state_binding": "probing"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-TOOLS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/4",
+      "requirement": {
+        "value": {
+          "id": "tools",
+          "box": {
+            "h": 14,
+            "w": 54,
+            "x": 5,
+            "y": 78
+          },
+          "type": "tool_tray",
+          "label": "Probe Extract Oil",
+          "enabled_when": "!held_part",
+          "state_binding": "inspection|repair",
+          "interaction_role": "tool select/drag"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-PARTS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/5",
+      "requirement": {
+        "value": {
+          "id": "parts",
+          "box": {
+            "h": 14,
+            "w": 34,
+            "x": 61,
+            "y": 78
+          },
+          "type": "part_tray",
+          "label": "Part Tray",
+          "state_binding": "repair",
+          "interaction_role": "part drag/bench"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/5"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-TEST",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/6",
+      "requirement": {
+        "value": {
+          "id": "test",
+          "box": {
+            "h": 5,
+            "w": 37,
+            "x": 58,
+            "y": 93
+          },
+          "type": "crank",
+          "label": "BITE TEST",
+          "enabled_when": "required_sockets_occupied",
+          "state_binding": "repair",
+          "interaction_role": "hold crank"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/6"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT-PAUSE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/2/components/7",
+      "requirement": {
+        "value": {
+          "id": "pause",
+          "box": {
+            "h": 5,
+            "w": 12,
+            "x": 5,
+            "y": 93
+          },
+          "type": "button",
+          "label": "II",
+          "enabled_when": "!gesture_active",
+          "state_binding": "inspection|repair",
+          "interaction_role": "pause"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/components/7"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "pinch/pan",
+          "action": "zoom/pan clamps",
+          "target": "mouth_view",
+          "feedback": "direct follow",
+          "precondition": "no held part/tool",
+          "state_change": "camera only",
+          "invalid_input": "clamp"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap/short drag",
+          "action": "reveal diagnostic flag",
+          "target": "gear_layer",
+          "feedback": "wobble/noise",
+          "precondition": "probe selected",
+          "state_change": "fault knowledge",
+          "invalid_input": "empty cue"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_2",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/2",
+      "requirement": {
+        "value": {
+          "input": "press-drag removal axis",
+          "action": "extract to tray",
+          "target": "gear_layer",
+          "feedback": "resistance then snap",
+          "precondition": "extractor && retainer released",
+          "state_change": "socket empty",
+          "invalid_input": "locked red resistance; unchanged"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/2"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_3",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/3",
+      "requirement": {
+        "value": {
+          "input": "hold-drag",
+          "action": "lubricate",
+          "target": "gear_layer",
+          "feedback": "oil sheen",
+          "precondition": "oil selected",
+          "state_change": "friction down/overfill up",
+          "invalid_input": "reject non-bearing"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/3"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_4",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/4",
+      "requirement": {
+        "value": {
+          "input": "circular drag",
+          "action": "change phase",
+          "target": "gear_layer",
+          "feedback": "ghost/detent",
+          "precondition": "replacement over empty socket",
+          "state_change": "phase angle",
+          "invalid_input": "locked installed gear unchanged"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/4"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_5",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/5",
+      "requirement": {
+        "value": {
+          "input": "drag-release",
+          "action": "seat valid part",
+          "target": "parts→gear_layer",
+          "feedback": "snap/click",
+          "precondition": "socket empty",
+          "state_change": "installed",
+          "invalid_input": "wrong size/phase returns tray"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/5"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT-N_6",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/2/interactions/6",
+      "requirement": {
+        "value": {
+          "input": "hold",
+          "action": "cycle mechanism",
+          "target": "test",
+          "feedback": "motion/strain",
+          "precondition": "required sockets occupied",
+          "state_change": "testing→repair/result",
+          "invalid_input": "disabled missing-socket cue"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/interactions/6"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-TREATMENT-INSPECTION",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/0",
+      "requirement": {
+        "value": {
+          "id": "inspection",
+          "ui": "mouth/probe",
+          "enter": "start/test return",
+          "allowed_input": "pinch/pan/probe/tool"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-TREATMENT-REPAIR",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/1",
+      "requirement": {
+        "value": {
+          "id": "repair",
+          "ui": "tools/parts/tolerance",
+          "enter": "repair action",
+          "allowed_input": "extract/lubricate/align/seat/camera"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/1"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-STATE-TREATMENT-TESTING",
+      "category": "state",
+      "source_ref": "/source/pack/screens/2/states/2",
+      "requirement": {
+        "value": {
+          "id": "testing",
+          "ui": "mechanism cycles; input locked",
+          "enter": "crank hold",
+          "allowed_input": "crank release"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/states/2"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-TREATMENT-GEAR_LOCKED",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "gear_locked",
+          "name": "Locked",
+          "notes": "extract resists; unchanged",
+          "condition": "retainer attached",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "gear_layer": {
+              "state_binding": "locked"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-TREATMENT-GEAR_HELD",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/1",
+      "requirement": {
+        "value": {
+          "id": "gear_held",
+          "name": "Held",
+          "notes": "held object beats camera",
+          "condition": "part captured",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "mouth_view": {
+              "state_binding": "camera_locked"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/1"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-TREATMENT-ALIGNING",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/2",
+      "requirement": {
+        "value": {
+          "id": "aligning",
+          "name": "Alignment Candidate",
+          "notes": "circular drag; 3° steps",
+          "condition": "replacement over socket",
+          "components": [
+            {
+              "id": "ghost",
+              "box": {
+                "h": 36,
+                "w": 56,
+                "x": 22,
+                "y": 26
+              },
+              "type": "guide",
+              "label": "Ghost teeth ±12°",
+              "state_binding": "aligning"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/2"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-TREATMENT-SEATED",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/3",
+      "requirement": {
+        "value": {
+          "id": "seated",
+          "name": "Seated",
+          "notes": "magnetic snap",
+          "condition": "size within 12% and phase ±12°",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "gear_layer": {
+              "state_binding": "seated"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/3"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-TREATMENT-JAMMED",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/2/state_variants/4",
+      "requirement": {
+        "value": {
+          "id": "jammed",
+          "name": "Jammed",
+          "notes": "stop at reproducible fault",
+          "condition": "test fault",
+          "components": [
+            {
+              "id": "fault_pulse",
+              "box": {
+                "h": 44,
+                "w": 64,
+                "x": 18,
+                "y": 22
+              },
+              "type": "indicator",
+              "label": "Stress location",
+              "state_binding": "jammed"
+            }
+          ],
+          "hide_components": [],
+          "component_overrides": {}
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/state_variants/4"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "part_bench",
+          "from": "repair",
+          "trigger": "grind part",
+          "animation": "overlay",
+          "condition": "part available"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "testing",
+          "from": "repair",
+          "trigger": "hold test",
+          "animation": "none",
+          "condition": "sockets occupied"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT-N_2",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/2",
+      "requirement": {
+        "value": {
+          "to": "repair",
+          "from": "testing",
+          "trigger": "jam/release",
+          "animation": "pulse",
+          "condition": "fault remains"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/2"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT-N_3",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/3",
+      "requirement": {
+        "value": {
+          "to": "treatment_result",
+          "from": "testing",
+          "trigger": "full cycle",
+          "animation": "success",
+          "condition": "all defects repaired"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/3"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT-N_4",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/2/transitions/4",
+      "requirement": {
+        "value": {
+          "to": "pause",
+          "from": "inspection",
+          "trigger": "pause",
+          "animation": "modal",
+          "condition": "idle"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/2/transitions/4"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PART_BENCH",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/3",
+      "requirement": {
+        "value": {
+          "id": "part_bench",
+          "name": "Part Bench Overlay",
+          "order": 4,
+          "layout": {
+            "regions": [
+              {
+                "h": 76,
+                "w": 86,
+                "x": 7,
+                "y": 12,
+                "id": "panel",
+                "role": "modal",
+                "label": "Bench"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "bench",
+              "ui": "part/grinder/gauge",
+              "enter": "part selected",
+              "allowed_input": "grind/rotate/discard/return"
+            }
+          ],
+          "purpose": "grind replacement part",
+          "feedback": [
+            "sparks"
+          ],
+          "components": [
+            {
+              "id": "part",
+              "box": {
+                "h": 38,
+                "w": 38,
+                "x": 18,
+                "y": 25
+              },
+              "type": "interactive_part",
+              "label": "Gear",
+              "enabled_when": "usable",
+              "state_binding": "bench",
+              "interaction_role": "drag/rotate"
+            },
+            {
+              "id": "grinder",
+              "box": {
+                "h": 42,
+                "w": 20,
+                "x": 64,
+                "y": 23
+              },
+              "type": "grinder",
+              "label": "Grinder",
+              "enabled_when": "usable",
+              "state_binding": "bench",
+              "interaction_role": "hold-drag contact"
+            },
+            {
+              "id": "gauge",
+              "box": {
+                "h": 7,
+                "w": 66,
+                "x": 18,
+                "y": 67
+              },
+              "type": "meter",
+              "label": "Fit",
+              "state_binding": "bench"
+            },
+            {
+              "id": "discard",
+              "box": {
+                "h": 8,
+                "w": 32,
+                "x": 10,
+                "y": 78
+              },
+              "type": "button",
+              "label": "DISCARD",
+              "state_binding": "bench",
+              "interaction_role": "discard"
+            },
+            {
+              "id": "return",
+              "box": {
+                "h": 8,
+                "w": 32,
+                "x": 58,
+                "y": 78
+              },
+              "type": "button",
+              "label": "RETURN",
+              "state_binding": "bench",
+              "interaction_role": "close"
+            }
+          ],
+          "edge_cases": [
+            "release stops removal immediately"
+          ],
+          "transitions": [
+            {
+              "to": "treatment",
+              "from": "bench",
+              "trigger": "return",
+              "animation": "down",
+              "condition": "always"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "hold-drag",
+              "action": "remove material",
+              "target": "part→grinder",
+              "feedback": "sparks/gauge",
+              "precondition": "usable",
+              "state_change": "fit decreases",
+              "invalid_input": "minimum clamp warning"
+            },
+            {
+              "input": "tap",
+              "action": "return to treatment",
+              "target": "return",
+              "feedback": "overlay down",
+              "precondition": "always",
+              "state_change": "repair",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [
+            {
+              "id": "overground",
+              "name": "Overground",
+              "notes": "clamp; discard required",
+              "condition": "below minimum size",
+              "components": [],
+              "hide_components": [],
+              "component_overrides": {
+                "part": {
+                  "state_binding": "unusable"
+                },
+                "gauge": {
+                  "state_binding": "warning"
+                }
+              }
+            }
+          ],
+          "implementation_notes": [
+            "blocks treatment input"
+          ]
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/3"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PART_BENCH-PART",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/0",
+      "requirement": {
+        "value": {
+          "id": "part",
+          "box": {
+            "h": 38,
+            "w": 38,
+            "x": 18,
+            "y": 25
+          },
+          "type": "interactive_part",
+          "label": "Gear",
+          "enabled_when": "usable",
+          "state_binding": "bench",
+          "interaction_role": "drag/rotate"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PART_BENCH-GRINDER",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/1",
+      "requirement": {
+        "value": {
+          "id": "grinder",
+          "box": {
+            "h": 42,
+            "w": 20,
+            "x": 64,
+            "y": 23
+          },
+          "type": "grinder",
+          "label": "Grinder",
+          "enabled_when": "usable",
+          "state_binding": "bench",
+          "interaction_role": "hold-drag contact"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PART_BENCH-GAUGE",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/2",
+      "requirement": {
+        "value": {
+          "id": "gauge",
+          "box": {
+            "h": 7,
+            "w": 66,
+            "x": 18,
+            "y": 67
+          },
+          "type": "meter",
+          "label": "Fit",
+          "state_binding": "bench"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PART_BENCH-DISCARD",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/3",
+      "requirement": {
+        "value": {
+          "id": "discard",
+          "box": {
+            "h": 8,
+            "w": 32,
+            "x": 10,
+            "y": 78
+          },
+          "type": "button",
+          "label": "DISCARD",
+          "state_binding": "bench",
+          "interaction_role": "discard"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PART_BENCH-RETURN",
+      "category": "component",
+      "source_ref": "/source/pack/screens/3/components/4",
+      "requirement": {
+        "value": {
+          "id": "return",
+          "box": {
+            "h": 8,
+            "w": 32,
+            "x": 58,
+            "y": 78
+          },
+          "type": "button",
+          "label": "RETURN",
+          "state_binding": "bench",
+          "interaction_role": "close"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/components/4"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PART_BENCH-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "hold-drag",
+          "action": "remove material",
+          "target": "part→grinder",
+          "feedback": "sparks/gauge",
+          "precondition": "usable",
+          "state_change": "fit decreases",
+          "invalid_input": "minimum clamp warning"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-PART_BENCH-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/3/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "return to treatment",
+          "target": "return",
+          "feedback": "overlay down",
+          "precondition": "always",
+          "state_change": "repair",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PART_BENCH-BENCH",
+      "category": "state",
+      "source_ref": "/source/pack/screens/3/states/0",
+      "requirement": {
+        "value": {
+          "id": "bench",
+          "ui": "part/grinder/gauge",
+          "enter": "part selected",
+          "allowed_input": "grind/rotate/discard/return"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VARIANT-PART_BENCH-OVERGROUND",
+      "category": "state_variant",
+      "source_ref": "/source/pack/screens/3/state_variants/0",
+      "requirement": {
+        "value": {
+          "id": "overground",
+          "name": "Overground",
+          "notes": "clamp; discard required",
+          "condition": "below minimum size",
+          "components": [],
+          "hide_components": [],
+          "component_overrides": {
+            "part": {
+              "state_binding": "unusable"
+            },
+            "gauge": {
+              "state_binding": "warning"
+            }
+          }
+        },
+        "source_kind": "state_variant"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/state_variants/0"
+      ],
+      "verification": "Variant condition and visible overrides are bound without semantic loss.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PART_BENCH-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/3/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "treatment",
+          "from": "bench",
+          "trigger": "return",
+          "animation": "down",
+          "condition": "always"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/3/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-PAUSE",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/4",
+      "requirement": {
+        "value": {
+          "id": "pause",
+          "name": "Pause Overlay",
+          "order": 5,
+          "layout": {
+            "regions": [
+              {
+                "h": 36,
+                "w": 70,
+                "x": 15,
+                "y": 30,
+                "id": "panel",
+                "role": "modal",
+                "label": "Pause"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "paused",
+              "ui": "blocked treatment",
+              "enter": "pause",
+              "allowed_input": "resume/quit"
+            }
+          ],
+          "purpose": "pause treatment",
+          "feedback": [],
+          "components": [
+            {
+              "id": "resume",
+              "box": {
+                "h": 9,
+                "w": 52,
+                "x": 24,
+                "y": 40
+              },
+              "type": "button",
+              "label": "RESUME",
+              "state_binding": "paused",
+              "interaction_role": "resume"
+            },
+            {
+              "id": "quit",
+              "box": {
+                "h": 9,
+                "w": 52,
+                "x": 24,
+                "y": 53
+              },
+              "type": "button",
+              "label": "QUIT",
+              "state_binding": "paused",
+              "interaction_role": "quit"
+            }
+          ],
+          "edge_cases": [
+            "background blocked"
+          ],
+          "transitions": [
+            {
+              "to": "treatment",
+              "from": "paused",
+              "trigger": "resume",
+              "animation": "fade",
+              "condition": "always"
+            },
+            {
+              "to": "patient_select",
+              "from": "paused",
+              "trigger": "confirmed quit",
+              "animation": "fade",
+              "condition": "always"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "restore prior",
+              "target": "resume",
+              "feedback": "fade",
+              "precondition": "paused",
+              "state_change": "prior",
+              "invalid_input": "none"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": []
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/4"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE-RESUME",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/0",
+      "requirement": {
+        "value": {
+          "id": "resume",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 40
+          },
+          "type": "button",
+          "label": "RESUME",
+          "state_binding": "paused",
+          "interaction_role": "resume"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-PAUSE-QUIT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/4/components/1",
+      "requirement": {
+        "value": {
+          "id": "quit",
+          "box": {
+            "h": 9,
+            "w": 52,
+            "x": 24,
+            "y": 53
+          },
+          "type": "button",
+          "label": "QUIT",
+          "state_binding": "paused",
+          "interaction_role": "quit"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-PAUSE-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/4/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "restore prior",
+          "target": "resume",
+          "feedback": "fade",
+          "precondition": "paused",
+          "state_change": "prior",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-PAUSE-PAUSED",
+      "category": "state",
+      "source_ref": "/source/pack/screens/4/states/0",
+      "requirement": {
+        "value": {
+          "id": "paused",
+          "ui": "blocked treatment",
+          "enter": "pause",
+          "allowed_input": "resume/quit"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "treatment",
+          "from": "paused",
+          "trigger": "resume",
+          "animation": "fade",
+          "condition": "always"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-PAUSE-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/4/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "patient_select",
+          "from": "paused",
+          "trigger": "confirmed quit",
+          "animation": "fade",
+          "condition": "always"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/4/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCREEN-TREATMENT_RESULT",
+      "category": "screen_inventory",
+      "source_ref": "/source/pack/screens/5",
+      "requirement": {
+        "value": {
+          "id": "treatment_result",
+          "name": "Treatment Result",
+          "order": 6,
+          "layout": {
+            "regions": [
+              {
+                "h": 66,
+                "w": 84,
+                "x": 8,
+                "y": 8,
+                "id": "result",
+                "role": "summary",
+                "label": "Result"
+              },
+              {
+                "h": 14,
+                "w": 84,
+                "x": 8,
+                "y": 80,
+                "id": "actions",
+                "role": "navigation",
+                "label": "Actions"
+              }
+            ]
+          },
+          "states": [
+            {
+              "id": "result",
+              "ui": "rating/report",
+              "enter": "success/3 strikes",
+              "allowed_input": "retry/next"
+            }
+          ],
+          "purpose": "rating and fault report",
+          "feedback": [],
+          "components": [
+            {
+              "id": "stars",
+              "box": {
+                "h": 12,
+                "w": 50,
+                "x": 25,
+                "y": 12
+              },
+              "type": "rating",
+              "label": "1-3 Stars",
+              "state_binding": "result"
+            },
+            {
+              "id": "report",
+              "box": {
+                "h": 42,
+                "w": 84,
+                "x": 8,
+                "y": 32
+              },
+              "type": "report",
+              "label": "Fault report",
+              "state_binding": "result"
+            },
+            {
+              "id": "retry",
+              "box": {
+                "h": 10,
+                "w": 38,
+                "x": 8,
+                "y": 82
+              },
+              "type": "button",
+              "label": "RETRY",
+              "state_binding": "result",
+              "interaction_role": "retry"
+            },
+            {
+              "id": "next",
+              "box": {
+                "h": 10,
+                "w": 38,
+                "x": 54,
+                "y": 82
+              },
+              "type": "button",
+              "label": "NEXT",
+              "enabled_when": "success",
+              "state_binding": "result",
+              "interaction_role": "next"
+            }
+          ],
+          "edge_cases": [
+            "clear runtime state"
+          ],
+          "transitions": [
+            {
+              "to": "patient_brief",
+              "from": "result",
+              "trigger": "retry/next",
+              "animation": "fade",
+              "condition": "patient exists"
+            },
+            {
+              "to": "patient_select",
+              "from": "result",
+              "trigger": "final next",
+              "animation": "fade",
+              "condition": "no next"
+            }
+          ],
+          "interactions": [
+            {
+              "input": "tap",
+              "action": "reset patient",
+              "target": "retry",
+              "feedback": "press",
+              "precondition": "result",
+              "state_change": "brief",
+              "invalid_input": "none"
+            },
+            {
+              "input": "tap",
+              "action": "unlock next",
+              "target": "next",
+              "feedback": "unlock",
+              "precondition": "success",
+              "state_change": "brief/select",
+              "invalid_input": "disabled"
+            }
+          ],
+          "state_variants": [],
+          "implementation_notes": []
+        },
+        "source_kind": "screen_inventory"
+      },
+      "source_refs": [
+        "/source/pack/screens/5"
+      ],
+      "verification": "Screen exists with its complete component/state/interaction inventory.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT_RESULT-STARS",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/0",
+      "requirement": {
+        "value": {
+          "id": "stars",
+          "box": {
+            "h": 12,
+            "w": 50,
+            "x": 25,
+            "y": 12
+          },
+          "type": "rating",
+          "label": "1-3 Stars",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/0"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT_RESULT-REPORT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/1",
+      "requirement": {
+        "value": {
+          "id": "report",
+          "box": {
+            "h": 42,
+            "w": 84,
+            "x": 8,
+            "y": 32
+          },
+          "type": "report",
+          "label": "Fault report",
+          "state_binding": "result"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/1"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT_RESULT-RETRY",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/2",
+      "requirement": {
+        "value": {
+          "id": "retry",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 8,
+            "y": 82
+          },
+          "type": "button",
+          "label": "RETRY",
+          "state_binding": "result",
+          "interaction_role": "retry"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/2"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-COMPONENT-TREATMENT_RESULT-NEXT",
+      "category": "component",
+      "source_ref": "/source/pack/screens/5/components/3",
+      "requirement": {
+        "value": {
+          "id": "next",
+          "box": {
+            "h": 10,
+            "w": 38,
+            "x": 54,
+            "y": 82
+          },
+          "type": "button",
+          "label": "NEXT",
+          "enabled_when": "success",
+          "state_binding": "result",
+          "interaction_role": "next"
+        },
+        "source_kind": "component"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/components/3"
+      ],
+      "verification": "Godot node type, exact percent geometry, state binding, enable guard, and role match the Wireframe component.",
+      "decision_origin": "wireframe_layout",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT_RESULT-N_0",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/0",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "reset patient",
+          "target": "retry",
+          "feedback": "press",
+          "precondition": "result",
+          "state_change": "brief",
+          "invalid_input": "none"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/interactions/0"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-INTERACTION-TREATMENT_RESULT-N_1",
+      "category": "interaction",
+      "source_ref": "/source/pack/screens/5/interactions/1",
+      "requirement": {
+        "value": {
+          "input": "tap",
+          "action": "unlock next",
+          "target": "next",
+          "feedback": "unlock",
+          "precondition": "success",
+          "state_change": "brief/select",
+          "invalid_input": "disabled"
+        },
+        "source_kind": "interaction"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/interactions/1"
+      ],
+      "verification": "The exact input, target, guard, action, state change, feedback, and invalid/cancel path are implemented; runtime feel remains manual playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-STATE-TREATMENT_RESULT-RESULT",
+      "category": "state",
+      "source_ref": "/source/pack/screens/5/states/0",
+      "requirement": {
+        "value": {
+          "id": "result",
+          "ui": "rating/report",
+          "enter": "success/3 strikes",
+          "allowed_input": "retry/next"
+        },
+        "source_kind": "state"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/states/0"
+      ],
+      "verification": "State has a concrete owner and entry/exit/input-lock binding.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT_RESULT-N_0",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/0",
+      "requirement": {
+        "value": {
+          "to": "patient_brief",
+          "from": "result",
+          "trigger": "retry/next",
+          "animation": "fade",
+          "condition": "patient exists"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/0"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-TRANSITION-TREATMENT_RESULT-N_1",
+      "category": "transition",
+      "source_ref": "/source/pack/screens/5/transitions/1",
+      "requirement": {
+        "value": {
+          "to": "patient_select",
+          "from": "result",
+          "trigger": "final next",
+          "animation": "fade",
+          "condition": "no next"
+        },
+        "source_kind": "transition"
+      },
+      "source_refs": [
+        "/source/pack/screens/5/transitions/1"
+      ],
+      "verification": "Transition from/to/trigger/condition has a concrete guarded action path.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-INPUT_LOCK",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/0",
+      "requirement": {
+        "value": {
+          "id": "input_lock",
+          "rule": "testing/modal blocks unrelated input"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/0"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-PAUSED",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/1",
+      "requirement": {
+        "value": {
+          "id": "paused",
+          "rule": "freeze treatment"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/1"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GLOBAL_STATE-DAMAGE_FAILURE",
+      "category": "global_state",
+      "source_ref": "/source/pack/global_states/2",
+      "requirement": {
+        "value": {
+          "id": "damage_failure",
+          "rule": "third damage strike→result"
+        },
+        "source_kind": "global_state"
+      },
+      "source_refs": [
+        "/source/pack/global_states/2"
+      ],
+      "verification": "Global state ownership, overlay/input-lock/freeze behavior, and return path are defined.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-CRANK_HOLD",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/0",
+      "requirement": {
+        "value": {
+          "input": "crank hold",
+          "cancel": "release pauses safely",
+          "priority": 6
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/0"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-HELD_PART_TOOL_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/1",
+      "requirement": {
+        "value": {
+          "input": "held part/tool drag",
+          "cancel": "return valid tray/socket",
+          "priority": 5
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/1"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-CIRCULAR_GEAR_DRAG",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/2",
+      "requirement": {
+        "value": {
+          "input": "circular gear drag",
+          "cancel": "nearest 3°",
+          "priority": 4
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/2"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-PROBE_TAP",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/3",
+      "requirement": {
+        "value": {
+          "input": "probe tap",
+          "cancel": "release",
+          "priority": 3
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/3"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-INPUT-PINCH_PAN",
+      "category": "input_map",
+      "source_ref": "/source/pack/input_map/4",
+      "requirement": {
+        "value": {
+          "input": "pinch/pan",
+          "cancel": "preserve camera",
+          "priority": 2
+        },
+        "source_kind": "input_map"
+      },
+      "source_refs": [
+        "/source/pack/input_map/4"
+      ],
+      "verification": "Input modality, priority, ownership, and cancel rule are represented in the input script contract.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_0",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/0",
+      "requirement": {
+        "value": "locked gear cannot be extracted before retainer release",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/0"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_1",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/1",
+      "requirement": {
+        "value": "wrong size gear cannot seat",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/1"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_2",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/2",
+      "requirement": {
+        "value": "excess grinding can make a part unusable",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/2"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_3",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/3",
+      "requirement": {
+        "value": "over-lubrication reduces cleanliness score but does not hard-fail",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/3"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-RULE-N_4",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/rules/4",
+      "requirement": {
+        "value": "bite test exposes remaining fit/alignment/friction faults",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/rules/4"
+      ],
+      "verification": "Rule value and condition are encoded in data or a named rule symbol.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SCORE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/score",
+      "requirement": {
+        "value": {
+          "1": "treatment complete",
+          "2": "no damage strike",
+          "3": "under par tool actions"
+        },
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/score"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-FAULTS",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/faults",
+      "requirement": {
+        "value": [
+          "cracked tooth",
+          "worn gear",
+          "loose axle",
+          "dry bearing",
+          "misaligned phase"
+        ],
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/faults"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-FAILURE",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/failure",
+      "requirement": {
+        "value": "3 damage strikes",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/failure"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-SCORING_RULE-SUCCESS",
+      "category": "scoring_rule",
+      "source_ref": "/source/design/game_rules/success",
+      "requirement": {
+        "value": "all required defects repaired and full crank cycle completes without jam",
+        "source_kind": "scoring_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/success"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-FIT_TOLERANCE",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/fit_tolerance",
+      "requirement": {
+        "value": 0.12,
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/fit_tolerance"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-DAMAGE_STRIKES",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/damage_strikes",
+      "requirement": {
+        "value": 3,
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/damage_strikes"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-DEFECTS_PER_PATIENT",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/defects_per_patient",
+      "requirement": {
+        "value": "2-4",
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/defects_per_patient"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-GAMEPLAY_RULE-ALIGNMENT_TOLERANCE_DEG",
+      "category": "gameplay_rule",
+      "source_ref": "/source/design/game_rules/alignment_tolerance_deg",
+      "requirement": {
+        "value": 12,
+        "source_kind": "gameplay_rule"
+      },
+      "source_refs": [
+        "/source/design/game_rules/alignment_tolerance_deg"
+      ],
+      "verification": "Numeric and semantic rule is preserved exactly in the rule implementation/data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-VERB-N_0",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/0",
+      "requirement": {
+        "value": {
+          "verb": "Inspect",
+          "input": "pinch/pan",
+          "target": "mouth mechanism",
+          "feedback": "suspect gears highlight under probe",
+          "condition": "inspection/repair",
+          "state_change": "camera focus only"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/0"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_1",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/1",
+      "requirement": {
+        "value": {
+          "verb": "Probe",
+          "input": "tap/short drag",
+          "target": "tooth/gear",
+          "feedback": "wobble/noise meter",
+          "condition": "tool=probe",
+          "state_change": "diagnostic flags revealed"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/1"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_2",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/2",
+      "requirement": {
+        "value": {
+          "verb": "Extract",
+          "input": "press-drag along removal axis",
+          "target": "unlocked damaged gear",
+          "feedback": "resistance then snap",
+          "condition": "retainer released",
+          "state_change": "gear removed to tray"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/2"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_3",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/3",
+      "requirement": {
+        "value": {
+          "verb": "Grind",
+          "input": "drag part against grinder",
+          "target": "replacement gear",
+          "feedback": "sparks, fit gauge",
+          "condition": "part on bench",
+          "state_change": "diameter/tooth fit changes"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/3"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_4",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/4",
+      "requirement": {
+        "value": {
+          "verb": "Lubricate",
+          "input": "drag nozzle + hold",
+          "target": "bearing/gear",
+          "feedback": "oil sheen/meter",
+          "condition": "repair",
+          "state_change": "friction decreases; overfill risk rises"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/4"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_5",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/5",
+      "requirement": {
+        "value": {
+          "verb": "Align",
+          "input": "two-finger rotate or circular drag",
+          "target": "replacement gear",
+          "feedback": "teeth ghost-match",
+          "condition": "socket empty",
+          "state_change": "phase angle changes"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/5"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_6",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/6",
+      "requirement": {
+        "value": {
+          "verb": "Seat",
+          "input": "drag into socket",
+          "target": "replacement gear",
+          "feedback": "magnetic snap",
+          "condition": "size/alignment valid",
+          "state_change": "gear installed"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/6"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-VERB-N_7",
+      "category": "player_verb",
+      "source_ref": "/source/design/core_player_verbs/7",
+      "requirement": {
+        "value": {
+          "verb": "Bite Test",
+          "input": "hold crank",
+          "target": "test crank",
+          "feedback": "motion/noise/strain result",
+          "condition": "all required parts seated",
+          "state_change": "mechanism cycles"
+        },
+        "source_kind": "player_verb"
+      },
+      "source_refs": [
+        "/source/design/core_player_verbs/7"
+      ],
+      "verification": "The core verb retains its input, target, condition, state change, and feedback semantics.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_0",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/0",
+      "requirement": {
+        "value": {
+          "ui": "symptoms, portrait, constraints",
+          "exit": "start",
+          "enter": "patient selected",
+          "state": "patient_brief",
+          "inputs": [
+            "start",
+            "back"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/0"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_1",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/1",
+      "requirement": {
+        "value": {
+          "ui": "mouth, tool tray, symptom meter",
+          "exit": "repair action",
+          "enter": "mouth opens",
+          "state": "inspection",
+          "inputs": [
+            "pinch",
+            "pan",
+            "probe",
+            "select tool"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/1"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_2",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/2",
+      "requirement": {
+        "value": {
+          "ui": "active tool, part tray, tolerance cues",
+          "exit": "test or inspect",
+          "enter": "repair tool selected",
+          "state": "repair",
+          "inputs": [
+            "extract",
+            "grind",
+            "lubricate",
+            "align",
+            "seat",
+            "camera"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/2"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_3",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/3",
+      "requirement": {
+        "value": {
+          "ui": "large part view and fit gauge",
+          "exit": "return",
+          "enter": "removed/replacement part selected for grinding",
+          "state": "bench",
+          "inputs": [
+            "grind",
+            "rotate",
+            "discard",
+            "return"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/3"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_4",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/4",
+      "requirement": {
+        "value": {
+          "ui": "inputs locked except crank; strain/noise feedback",
+          "exit": "jam or full cycle",
+          "enter": "crank held",
+          "state": "testing",
+          "inputs": [
+            "hold/release crank"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/4"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_STATE-N_5",
+      "category": "design_state",
+      "source_ref": "/source/design/state_model/5",
+      "requirement": {
+        "value": {
+          "ui": "rating and diagnosed/repaired faults",
+          "exit": "choice",
+          "enter": "successful cycle or failure limit",
+          "state": "result",
+          "inputs": [
+            "retry",
+            "next"
+          ]
+        },
+        "source_kind": "design_state"
+      },
+      "source_refs": [
+        "/source/design/state_model/5"
+      ],
+      "verification": "Design state entry/exit/input semantics are represented by the runtime state owner.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-UNIT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/unit",
+      "requirement": {
+        "value": "patient repair case",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/unit"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-MVP_COUNT",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/mvp_count",
+      "requirement": {
+        "value": 4,
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/mvp_count"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AUTHORING",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/authoring",
+      "requirement": {
+        "value": "case data references reusable mechanism pieces and fault parameters; standard cases require no bespoke code",
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/authoring"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-CONTENT-AXES",
+      "category": "content_quantity",
+      "source_ref": "/source/design/content_model/axes",
+      "requirement": {
+        "value": [
+          "pet mouth layout",
+          "fault set",
+          "gear sizes",
+          "gear phase",
+          "retainer type",
+          "tool restriction",
+          "par actions",
+          "visual pet shell"
+        ],
+        "source_kind": "content_quantity"
+      },
+      "source_refs": [
+        "/source/design/content_model/axes"
+      ],
+      "verification": "Content unit/quantity/authoring constraint is present in required data.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_0",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/0",
+      "requirement": {
+        "value": "Patient Select",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/0"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_1",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/1",
+      "requirement": {
+        "value": "Patient Brief",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/1"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_2",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/2",
+      "requirement": {
+        "value": "Treatment / Mouth",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/2"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_3",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/3",
+      "requirement": {
+        "value": "Part Bench Overlay",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/3"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_4",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/4",
+      "requirement": {
+        "value": "Pause Overlay",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/4"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-DESIGN_SCREEN-N_5",
+      "category": "design_screen_inventory",
+      "source_ref": "/source/design/screen_inventory/5",
+      "requirement": {
+        "value": "Treatment Result",
+        "source_kind": "design_screen_inventory"
+      },
+      "source_refs": [
+        "/source/design/screen_inventory/5"
+      ],
+      "verification": "Design screen inventory item is reachable in the implemented flow.",
+      "decision_origin": "game_design",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_0",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/0",
+      "requirement": {
+        "value": "All 6 inventory screens/overlays reachable",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/0"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_1",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/1",
+      "requirement": {
+        "value": "All eight core verbs have component+interaction mappings",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/1"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_2",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/2",
+      "requirement": {
+        "value": "Locked gear extraction leaves state unchanged",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/2"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_3",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/3",
+      "requirement": {
+        "value": "Wrong size or >12° phase cannot seat",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/3"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_4",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/4",
+      "requirement": {
+        "value": "Grinding changes fit and overgrind makes part unusable",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/4"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_5",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/5",
+      "requirement": {
+        "value": "Bite Test disabled until required sockets occupied and exposes remaining faults",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/5"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_6",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/6",
+      "requirement": {
+        "value": "Three damage strikes fail; clean full cycle succeeds",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/6"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-ACCEPTANCE-N_7",
+      "category": "acceptance_criterion",
+      "source_ref": "/source/pack/acceptance_criteria/7",
+      "requirement": {
+        "value": "Retry/next clears patient runtime state",
+        "source_kind": "acceptance_criterion"
+      },
+      "source_refs": [
+        "/source/pack/acceptance_criteria/7"
+      ],
+      "verification": "A complete play path exists for the criterion; runtime outcome remains a human playtest.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_0",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/0",
+      "requirement": {
+        "value": "첫 환자를 외부 설명 없이 probe→extract→replace→test로 완주할 수 있다.",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/0"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_1",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/1",
+      "requirement": {
+        "value": "틀린 크기의 gear는 seat되지 않고 상태를 손상시키지 않는다.",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/1"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_2",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/2",
+      "requirement": {
+        "value": "정렬 오차가 큰 gear는 Bite Test에서 같은 위치의 jam으로 재현된다.",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/2"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_3",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/3",
+      "requirement": {
+        "value": "pinch/pan과 part drag가 충돌하지 않는다.",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/3"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-SCENARIO-N_4",
+      "category": "acceptance_scenario",
+      "source_ref": "/source/design/test_scenarios/4",
+      "requirement": {
+        "value": "4환자를 연속 완료/재시도해도 이전 환자 상태가 누수되지 않는다.",
+        "source_kind": "acceptance_scenario"
+      },
+      "source_refs": [
+        "/source/design/test_scenarios/4"
+      ],
+      "verification": "The scenario's complete implementation path exists for human playtest.",
+      "decision_origin": "game_design",
+      "verification_mode": "manual_playtest"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_0",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/0",
+      "requirement": {
+        "value": "PatientCase",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/0"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_1",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/1",
+      "requirement": {
+        "value": "MechanismPart",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/1"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_2",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/2",
+      "requirement": {
+        "value": "FaultDefinition",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/2"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_3",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/3",
+      "requirement": {
+        "value": "RepairRuntime",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/3"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-REQUIRED_DATA-N_4",
+      "category": "data_responsibility",
+      "source_ref": "/source/pack/developer_handoff/required_data/4",
+      "requirement": {
+        "value": "ProgressionState",
+        "source_kind": "data_responsibility"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/required_data/4"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    },
+    {
+      "id": "REQ-HANDOFF-PERSISTENCE-N_0",
+      "category": "persistence",
+      "source_ref": "/source/pack/developer_handoff/persistence",
+      "requirement": {
+        "value": "unlock only; treatment session transient",
+        "source_kind": "persistence"
+      },
+      "source_refs": [
+        "/source/pack/developer_handoff/persistence"
+      ],
+      "verification": "The handoff responsibility is traceable to a concrete data or persistence implementation location.",
+      "decision_origin": "wireframe_completion",
+      "verification_mode": "static"
+    }
+  ],
+  "source_run_at": "2026-09-30T12:43:07.30135+00:00",
+  "blueprint_hash": "34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f",
+  "category_counts": {
+    "state": 9,
+    "component": 24,
+    "input_map": 5,
+    "transition": 13,
+    "interaction": 15,
+    "persistence": 1,
+    "player_verb": 8,
+    "design_state": 6,
+    "global_state": 3,
+    "scoring_rule": 3,
+    "gameplay_rule": 10,
+    "state_variant": 6,
+    "content_quantity": 4,
+    "screen_inventory": 6,
+    "acceptance_scenario": 5,
+    "data_responsibility": 5,
+    "acceptance_criterion": 8,
+    "design_screen_inventory": 6
+  },
+  "blueprint_issues": [],
+  "blueprint_review": {
+    "role": "gate",
+    "reviewed_at": "2026-09-30T17:58:36.090489+00:00",
+    "evidence_path": "production/contracts/439a4a1d-e8ee-4ca0-83aa-606bdb68321c/blueprint-review-34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f.json",
+    "blueprint_hash": "34166ca04b841e55a111ebb1484b1d56779aed20cd9b75d8d0dd7f1b81a5ab0f",
+    "source_checked": "true",
+    "validator_passed": "true",
+    "verification_scope": "construction_blueprint_static"
+  },
+  "blueprint_status": "approved",
+  "contract_markdown": "# Clockwork Pet Dentist — Atomic Implementation Contract v1.2\n\n- REQ-SCREEN-PATIENT_SELECT | screen_inventory | /source/pack/screens/0\n- REQ-COMPONENT-PATIENT_SELECT-PATIENT_CARDS | component | /source/pack/screens/0/components/0\n- REQ-COMPONENT-PATIENT_SELECT-OPEN | component | /source/pack/screens/0/components/1\n- REQ-INTERACTION-PATIENT_SELECT-N_0 | interaction | /source/pack/screens/0/interactions/0\n- REQ-INTERACTION-PATIENT_SELECT-N_1 | interaction | /source/pack/screens/0/interactions/1\n- REQ-STATE-PATIENT_SELECT-SELECT | state | /source/pack/screens/0/states/0\n- REQ-STATE-PATIENT_SELECT-SELECTED | state | /source/pack/screens/0/states/1\n- REQ-TRANSITION-PATIENT_SELECT-N_0 | transition | /source/pack/screens/0/transitions/0\n- REQ-SCREEN-PATIENT_BRIEF | screen_inventory | /source/pack/screens/1\n- REQ-COMPONENT-PATIENT_BRIEF-SYMPTOMS | component | /source/pack/screens/1/components/0\n- REQ-COMPONENT-PATIENT_BRIEF-BACK | component | /source/pack/screens/1/components/1\n- REQ-COMPONENT-PATIENT_BRIEF-START | component | /source/pack/screens/1/components/2\n- REQ-INTERACTION-PATIENT_BRIEF-N_0 | interaction | /source/pack/screens/1/interactions/0\n- REQ-STATE-PATIENT_BRIEF-BRIEF | state | /source/pack/screens/1/states/0\n- REQ-TRANSITION-PATIENT_BRIEF-N_0 | transition | /source/pack/screens/1/transitions/0\n- REQ-TRANSITION-PATIENT_BRIEF-N_1 | transition | /source/pack/screens/1/transitions/1\n- REQ-SCREEN-TREATMENT | screen_inventory | /source/pack/screens/2\n- REQ-COMPONENT-TREATMENT-MOUTH_VIEW | component | /source/pack/screens/2/components/0\n- REQ-COMPONENT-TREATMENT-GEAR_LAYER | component | /source/pack/screens/2/components/1\n- REQ-COMPONENT-TREATMENT-RETAINERS | component | /source/pack/screens/2/components/2\n- REQ-COMPONENT-TREATMENT-FAULT_METER | component | /source/pack/screens/2/components/3\n- REQ-COMPONENT-TREATMENT-TOOLS | component | /source/pack/screens/2/components/4\n- REQ-COMPONENT-TREATMENT-PARTS | component | /source/pack/screens/2/components/5\n- REQ-COMPONENT-TREATMENT-TEST | component | /source/pack/screens/2/components/6\n- REQ-COMPONENT-TREATMENT-PAUSE | component | /source/pack/screens/2/components/7\n- REQ-INTERACTION-TREATMENT-N_0 | interaction | /source/pack/screens/2/interactions/0\n- REQ-INTERACTION-TREATMENT-N_1 | interaction | /source/pack/screens/2/interactions/1\n- REQ-INTERACTION-TREATMENT-N_2 | interaction | /source/pack/screens/2/interactions/2\n- REQ-INTERACTION-TREATMENT-N_3 | interaction | /source/pack/screens/2/interactions/3\n- REQ-INTERACTION-TREATMENT-N_4 | interaction | /source/pack/screens/2/interactions/4\n- REQ-INTERACTION-TREATMENT-N_5 | interaction | /source/pack/screens/2/interactions/5\n- REQ-INTERACTION-TREATMENT-N_6 | interaction | /source/pack/screens/2/interactions/6\n- REQ-STATE-TREATMENT-INSPECTION | state | /source/pack/screens/2/states/0\n- REQ-STATE-TREATMENT-REPAIR | state | /source/pack/screens/2/states/1\n- REQ-STATE-TREATMENT-TESTING | state | /source/pack/screens/2/states/2\n- REQ-VARIANT-TREATMENT-GEAR_LOCKED | state_variant | /source/pack/screens/2/state_variants/0\n- REQ-VARIANT-TREATMENT-GEAR_HELD | state_variant | /source/pack/screens/2/state_variants/1\n- REQ-VARIANT-TREATMENT-ALIGNING | state_variant | /source/pack/screens/2/state_variants/2\n- REQ-VARIANT-TREATMENT-SEATED | state_variant | /source/pack/screens/2/state_variants/3\n- REQ-VARIANT-TREATMENT-JAMMED | state_variant | /source/pack/screens/2/state_variants/4\n- REQ-TRANSITION-TREATMENT-N_0 | transition | /source/pack/screens/2/transitions/0\n- REQ-TRANSITION-TREATMENT-N_1 | transition | /source/pack/screens/2/transitions/1\n- REQ-TRANSITION-TREATMENT-N_2 | transition | /source/pack/screens/2/transitions/2\n- REQ-TRANSITION-TREATMENT-N_3 | transition | /source/pack/screens/2/transitions/3\n- REQ-TRANSITION-TREATMENT-N_4 | transition | /source/pack/screens/2/transitions/4\n- REQ-SCREEN-PART_BENCH | screen_inventory | /source/pack/screens/3\n- REQ-COMPONENT-PART_BENCH-PART | component | /source/pack/screens/3/components/0\n- REQ-COMPONENT-PART_BENCH-GRINDER | component | /source/pack/screens/3/components/1\n- REQ-COMPONENT-PART_BENCH-GAUGE | component | /source/pack/screens/3/components/2\n- REQ-COMPONENT-PART_BENCH-DISCARD | component | /source/pack/screens/3/components/3\n- REQ-COMPONENT-PART_BENCH-RETURN | component | /source/pack/screens/3/components/4\n- REQ-INTERACTION-PART_BENCH-N_0 | interaction | /source/pack/screens/3/interactions/0\n- REQ-INTERACTION-PART_BENCH-N_1 | interaction | /source/pack/screens/3/interactions/1\n- REQ-STATE-PART_BENCH-BENCH | state | /source/pack/screens/3/states/0\n- REQ-VARIANT-PART_BENCH-OVERGROUND | state_variant | /source/pack/screens/3/state_variants/0\n- REQ-TRANSITION-PART_BENCH-N_0 | transition | /source/pack/screens/3/transitions/0\n- REQ-SCREEN-PAUSE | screen_inventory | /source/pack/screens/4\n- REQ-COMPONENT-PAUSE-RESUME | component | /source/pack/screens/4/components/0\n- REQ-COMPONENT-PAUSE-QUIT | component | /source/pack/screens/4/components/1\n- REQ-INTERACTION-PAUSE-N_0 | interaction | /source/pack/screens/4/interactions/0\n- REQ-STATE-PAUSE-PAUSED | state | /source/pack/screens/4/states/0\n- REQ-TRANSITION-PAUSE-N_0 | transition | /source/pack/screens/4/transitions/0\n- REQ-TRANSITION-PAUSE-N_1 | transition | /source/pack/screens/4/transitions/1\n- REQ-SCREEN-TREATMENT_RESULT | screen_inventory | /source/pack/screens/5\n- REQ-COMPONENT-TREATMENT_RESULT-STARS | component | /source/pack/screens/5/components/0\n- REQ-COMPONENT-TREATMENT_RESULT-REPORT | component | /source/pack/screens/5/components/1\n- REQ-COMPONENT-TREATMENT_RESULT-RETRY | component | /source/pack/screens/5/components/2\n- REQ-COMPONENT-TREATMENT_RESULT-NEXT | component | /source/pack/screens/5/components/3\n- REQ-INTERACTION-TREATMENT_RESULT-N_0 | interaction | /source/pack/screens/5/interactions/0\n- REQ-INTERACTION-TREATMENT_RESULT-N_1 | interaction | /source/pack/screens/5/interactions/1\n- REQ-STATE-TREATMENT_RESULT-RESULT | state | /source/pack/screens/5/states/0\n- REQ-TRANSITION-TREATMENT_RESULT-N_0 | transition | /source/pack/screens/5/transitions/0\n- REQ-TRANSITION-TREATMENT_RESULT-N_1 | transition | /source/pack/screens/5/transitions/1\n- REQ-GLOBAL_STATE-INPUT_LOCK | global_state | /source/pack/global_states/0\n- REQ-GLOBAL_STATE-PAUSED | global_state | /source/pack/global_states/1\n- REQ-GLOBAL_STATE-DAMAGE_FAILURE | global_state | /source/pack/global_states/2\n- REQ-INPUT-CRANK_HOLD | input_map | /source/pack/input_map/0\n- REQ-INPUT-HELD_PART_TOOL_DRAG | input_map | /source/pack/input_map/1\n- REQ-INPUT-CIRCULAR_GEAR_DRAG | input_map | /source/pack/input_map/2\n- REQ-INPUT-PROBE_TAP | input_map | /source/pack/input_map/3\n- REQ-INPUT-PINCH_PAN | input_map | /source/pack/input_map/4\n- REQ-RULE-N_0 | gameplay_rule | /source/design/game_rules/rules/0\n- REQ-RULE-N_1 | gameplay_rule | /source/design/game_rules/rules/1\n- REQ-RULE-N_2 | gameplay_rule | /source/design/game_rules/rules/2\n- REQ-RULE-N_3 | gameplay_rule | /source/design/game_rules/rules/3\n- REQ-RULE-N_4 | gameplay_rule | /source/design/game_rules/rules/4\n- REQ-SCORING_RULE-SCORE | scoring_rule | /source/design/game_rules/score\n- REQ-GAMEPLAY_RULE-FAULTS | gameplay_rule | /source/design/game_rules/faults\n- REQ-SCORING_RULE-FAILURE | scoring_rule | /source/design/game_rules/failure\n- REQ-SCORING_RULE-SUCCESS | scoring_rule | /source/design/game_rules/success\n- REQ-GAMEPLAY_RULE-FIT_TOLERANCE | gameplay_rule | /source/design/game_rules/fit_tolerance\n- REQ-GAMEPLAY_RULE-DAMAGE_STRIKES | gameplay_rule | /source/design/game_rules/damage_strikes\n- REQ-GAMEPLAY_RULE-DEFECTS_PER_PATIENT | gameplay_rule | /source/design/game_rules/defects_per_patient\n- REQ-GAMEPLAY_RULE-ALIGNMENT_TOLERANCE_DEG | gameplay_rule | /source/design/game_rules/alignment_tolerance_deg\n- REQ-VERB-N_0 | player_verb | /source/design/core_player_verbs/0\n- REQ-VERB-N_1 | player_verb | /source/design/core_player_verbs/1\n- REQ-VERB-N_2 | player_verb | /source/design/core_player_verbs/2\n- REQ-VERB-N_3 | player_verb | /source/design/core_player_verbs/3\n- REQ-VERB-N_4 | player_verb | /source/design/core_player_verbs/4\n- REQ-VERB-N_5 | player_verb | /source/design/core_player_verbs/5\n- REQ-VERB-N_6 | player_verb | /source/design/core_player_verbs/6\n- REQ-VERB-N_7 | player_verb | /source/design/core_player_verbs/7\n- REQ-DESIGN_STATE-N_0 | design_state | /source/design/state_model/0\n- REQ-DESIGN_STATE-N_1 | design_state | /source/design/state_model/1\n- REQ-DESIGN_STATE-N_2 | design_state | /source/design/state_model/2\n- REQ-DESIGN_STATE-N_3 | design_state | /source/design/state_model/3\n- REQ-DESIGN_STATE-N_4 | design_state | /source/design/state_model/4\n- REQ-DESIGN_STATE-N_5 | design_state | /source/design/state_model/5\n- REQ-CONTENT-UNIT | content_quantity | /source/design/content_model/unit\n- REQ-CONTENT-MVP_COUNT | content_quantity | /source/design/content_model/mvp_count\n- REQ-CONTENT-AUTHORING | content_quantity | /source/design/content_model/authoring\n- REQ-CONTENT-AXES | content_quantity | /source/design/content_model/axes\n- REQ-DESIGN_SCREEN-N_0 | design_screen_inventory | /source/design/screen_inventory/0\n- REQ-DESIGN_SCREEN-N_1 | design_screen_inventory | /source/design/screen_inventory/1\n- REQ-DESIGN_SCREEN-N_2 | design_screen_inventory | /source/design/screen_inventory/2\n- REQ-DESIGN_SCREEN-N_3 | design_screen_inventory | /source/design/screen_inventory/3\n- REQ-DESIGN_SCREEN-N_4 | design_screen_inventory | /source/design/screen_inventory/4\n- REQ-DESIGN_SCREEN-N_5 | design_screen_inventory | /source/design/screen_inventory/5\n- REQ-ACCEPTANCE-N_0 | acceptance_criterion | /source/pack/acceptance_criteria/0\n- REQ-ACCEPTANCE-N_1 | acceptance_criterion | /source/pack/acceptance_criteria/1\n- REQ-ACCEPTANCE-N_2 | acceptance_criterion | /source/pack/acceptance_criteria/2\n- REQ-ACCEPTANCE-N_3 | acceptance_criterion | /source/pack/acceptance_criteria/3\n- REQ-ACCEPTANCE-N_4 | acceptance_criterion | /source/pack/acceptance_criteria/4\n- REQ-ACCEPTANCE-N_5 | acceptance_criterion | /source/pack/acceptance_criteria/5\n- REQ-ACCEPTANCE-N_6 | acceptance_criterion | /source/pack/acceptance_criteria/6\n- REQ-ACCEPTANCE-N_7 | acceptance_criterion | /source/pack/acceptance_criteria/7\n- REQ-SCENARIO-N_0 | acceptance_scenario | /source/design/test_scenarios/0\n- REQ-SCENARIO-N_1 | acceptance_scenario | /source/design/test_scenarios/1\n- REQ-SCENARIO-N_2 | acceptance_scenario | /source/design/test_scenarios/2\n- REQ-SCENARIO-N_3 | acceptance_scenario | /source/design/test_scenarios/3\n- REQ-SCENARIO-N_4 | acceptance_scenario | /source/design/test_scenarios/4\n- REQ-HANDOFF-REQUIRED_DATA-N_0 | data_responsibility | /source/pack/developer_handoff/required_data/0\n- REQ-HANDOFF-REQUIRED_DATA-N_1 | data_responsibility | /source/pack/developer_handoff/required_data/1\n- REQ-HANDOFF-REQUIRED_DATA-N_2 | data_responsibility | /source/pack/developer_handoff/required_data/2\n- REQ-HANDOFF-REQUIRED_DATA-N_3 | data_responsibility | /source/pack/developer_handoff/required_data/3\n- REQ-HANDOFF-REQUIRED_DATA-N_4 | data_responsibility | /source/pack/developer_handoff/required_data/4\n- REQ-HANDOFF-PERSISTENCE-N_0 | persistence | /source/pack/developer_handoff/persistence",
+  "requirement_count": 137,
+  "wireframe_pack_id": "dd91a7c2-0c9b-444d-bce1-e40fd0b1a926"
+}

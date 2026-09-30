@@ -1,0 +1,12 @@
+{
+  "role": "gate",
+  "reviewed_at": "2026-09-30T12:57:39.03891+00:00",
+  "evidence_path": "production/contracts/86480a6b-e712-4db9-b1ec-921fa4fbf3ec/blueprint-review-da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f.json",
+  "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+  "source_checked": "true",
+  "artifact_commit": "2ffbfabde03a8ee6fce5dfee6dcd56deb43c5a98",
+  "validator_passed": "true",
+  "verification_scope": "construction_blueprint_static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true
+}

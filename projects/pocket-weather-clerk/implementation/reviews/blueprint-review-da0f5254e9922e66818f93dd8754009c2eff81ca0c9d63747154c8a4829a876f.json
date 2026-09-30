@@ -1,0 +1,35 @@
+{
+  "contract_id": "86480a6b-e712-4db9-b1ec-921fa4fbf3ec",
+  "blueprint_hash": "da0f5254e9922e66818f93dd8754009c2eff81ca0c9d63747154c8a4829a876f",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "reviewed_at": "2026-09-30T12:56:49.451Z",
+  "independent_semantic_review": {
+    "passed": true,
+    "principle": "semantic_fidelity_over_textual_purity",
+    "requirement_count": 156,
+    "source_pointer_failures": 0,
+    "source_value_mismatches": 0,
+    "missing_implementations": 0,
+    "missing_static_tests": 0,
+    "rule_value_mismatches": 0,
+    "static_stage_coverage": [
+      "skeleton",
+      "geometry",
+      "state",
+      "input",
+      "presentation",
+      "integration"
+    ],
+    "preserved_inputs": [
+      "tap",
+      "drag",
+      "circular_drag",
+      "vertical_drag"
+    ],
+    "runtime_qa_performed": false,
+    "manual_playtest_required": true,
+    "manual_test_count": 33
+  }
+}
