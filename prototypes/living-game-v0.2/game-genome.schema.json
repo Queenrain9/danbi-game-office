@@ -1,0 +1,36 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://danbi.game/schemas/game-genome-v0.2.json",
+  "title":"Living Game Genome v0.2",
+  "type":"object",
+  "required":["schema_version","game_id","title","design_id","promise","core_loop","verbs","art_direction","world_seed","diagnostic","progress"],
+  "properties":{
+    "schema_version":{"const":"0.2"},
+    "game_id":{"type":"string"},
+    "title":{"type":"string"},
+    "created_at":{"type":"string","format":"date-time"},
+    "design_id":{"type":"string"},
+    "promise":{"type":"string"},
+    "core_loop":{"type":"string"},
+    "verbs":{"type":"array","items":{"type":"string"},"minItems":1},
+    "art_direction":{
+      "type":"object",
+      "required":["id","name"],
+      "properties":{"id":{"type":"string"},"name":{"type":"string"}}
+    },
+    "world_seed":{"type":"integer"},
+    "diagnostic":{
+      "type":"object",
+      "required":["metrics","experiments"],
+      "properties":{
+        "metrics":{"type":"object","additionalProperties":{"type":"number"}},
+        "experiments":{"type":"array","items":{"type":"string"}}
+      }
+    },
+    "progress":{
+      "type":"object",
+      "required":["best","visits"],
+      "properties":{"best":{"type":"number","minimum":0},"visits":{"type":"integer","minimum":0}}
+    }
+  }
+}
