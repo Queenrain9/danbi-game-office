@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Living Game v0.2 — Crystallization Prototype</title>
+<style>
+:root{--bg:#07090d;--panel:#11141b;--text:#f5f6f2;--muted:#8d94a4;--accent:#d8f36d;--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow-x:hidden}.app{min-height:100vh;display:grid;place-items:center;padding:20px}.shell{width:min(1060px,100%);min-height:720px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:radial-gradient(circle at 70% 10%,rgba(216,243,109,.05),transparent 32%),rgba(10,12,17,.96);box-shadow:0 35px 120px rgba(0,0,0,.5)}
+.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line)}.brand{font-size:12px;font-weight:900;letter-spacing:.15em}.brand b{color:var(--accent)}button{font:inherit}.ghost{border:1px solid var(--line);background:transparent;color:#a5abba;border-radius:999px;padding:9px 13px;cursor:pointer}
+main{padding:28px}.hero{min-height:580px;display:flex;flex-direction:column;justify-content:center;max-width:760px;margin:auto}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:13px}h1{font-size:clamp(42px,8vw,86px);line-height:.93;letter-spacing:-.06em;margin:0 0 22px}h2{font-size:clamp(30px,5vw,56px);line-height:1;letter-spacing:-.05em;margin:0 0 18px}p{line-height:1.7;color:var(--muted)}.actions{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:30px}.primary,.secondary{border-radius:18px;padding:21px 22px;text-align:left;cursor:pointer}.primary{border:0;background:var(--accent);color:#0c1008;font-weight:900}.secondary{border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text);font-weight:800}.meta{font-size:12px;font-weight:500;opacity:.65;margin-top:7px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px}.stage{position:relative;min-height:600px;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#090b10;touch-action:none;user-select:none}.stage canvas{display:block;width:100%;height:600px}.hud{position:absolute;left:20px;top:18px;right:20px;display:flex;justify-content:space-between;gap:10px;pointer-events:none}.hud-pill{padding:8px 11px;border-radius:999px;background:rgba(7,9,13,.56);backdrop-filter:blur(9px);font-size:11px;color:#b2b7c3;border:1px solid rgba(255,255,255,.08)}.side{border:1px solid var(--line);border-radius:24px;padding:22px;background:rgba(255,255,255,.02);display:flex;flex-direction:column}.side h3{font-size:23px;line-height:1.05;margin:4px 0 12px}.signal{margin-top:auto;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:#707888;line-height:1.6}.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px var(--accent);margin-right:7px;animation:p 1.3s infinite}@keyframes p{50%{opacity:.3}}
+.design{max-width:930px;margin:15px auto}.locked{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(216,243,109,.28);background:rgba(216,243,109,.06);color:var(--accent);padding:8px 10px;border-radius:999px;font-size:11px;font-weight:800;margin-bottom:18px}.spec{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}.spec-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(255,255,255,.025)}.spec-card b{display:block;margin-bottom:6px}.spec-card span{color:#8f96a6;font-size:13px;line-height:1.55}
+.art-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}.art-card{overflow:hidden;border:1px solid var(--line);border-radius:22px;background:#0e1117;color:var(--text);cursor:pointer;text-align:left;transition:.18s}.art-card:hover{transform:translateY(-4px);border-color:rgba(216,243,109,.5)}.preview{height:210px;position:relative;overflow:hidden}.preview:before,.preview:after{content:"";position:absolute;border-radius:50%}.preview:before{width:58px;height:58px;left:28%;top:42%}.preview:after{width:28px;height:28px;right:25%;top:30%}
+.art-neon{background:radial-gradient(circle at 70% 30%,#183069 0 10%,transparent 11%),linear-gradient(155deg,#070710,#191143 55%,#091620)}.art-neon:before{background:#efff7a;box-shadow:0 0 40px #b9ff67}.art-neon:after{background:#ff4eb8;box-shadow:0 0 30px #ff4eb8}.art-paper{background:linear-gradient(145deg,#e9dfca,#bfab8d)}.art-paper:before{background:#252321;box-shadow:10px 12px 0 rgba(48,39,30,.15)}.art-paper:after{background:#a84f3d;box-shadow:7px 8px 0 rgba(48,39,30,.12)}.art-space{background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.7) 0 1px,transparent 2px),radial-gradient(circle at 75% 60%,rgba(255,255,255,.5) 0 1px,transparent 2px),linear-gradient(160deg,#02040a,#08111f 60%,#010204);background-size:67px 67px,93px 93px,auto}.art-space:before{background:#d7e8ff;box-shadow:0 0 26px #7aa8ff}.art-space:after{background:#8090a8;box-shadow:0 0 15px rgba(130,160,255,.6)}.art-body{padding:17px}.art-body h3{margin:0 0 6px;font-size:20px}.art-body p{font-size:12px;margin:0}
+.game{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px}.game-canvas{position:relative;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#080a0e;min-height:590px}.game-canvas canvas{display:block;width:100%;height:590px;touch-action:none}.game-side{border:1px solid var(--line);border-radius:22px;padding:20px;background:rgba(255,255,255,.02)}.game-side h3{margin:6px 0 8px}.score{font-size:42px;font-weight:900;letter-spacing:-.05em}.small{font-size:12px;color:#747b8a;line-height:1.6}.pack{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}.game-card{border:1px solid var(--line);border-radius:18px;padding:18px;background:rgba(255,255,255,.025);color:var(--text);cursor:pointer;text-align:left}.game-card h3{margin:4px 0 8px;font-size:22px}.tag{display:inline-block;border-radius:999px;padding:6px 8px;background:rgba(216,243,109,.09);color:var(--accent);font-size:10px;margin:0 4px 5px 0}
+@media(max-width:780px){.app{padding:0}.shell{min-height:100vh;border-radius:0;border:0}.top{height:58px}main{padding:18px}.actions,.lab,.game,.spec,.art-grid,.pack{grid-template-columns:1fr}.stage canvas{height:520px}.stage{min-height:520px}.side{min-height:190px}.preview{height:150px}}
+</style>
+</head>
+<body>
+<div class="app"><div class="shell"><div class="top"><div class="brand">LIVING <b>GAME</b> / v0.2</div><button class="ghost" id="homeBtn">처음으로</button></div><main id="root"></main></div></div>
+<script>
+const root=document.getElementById("root");document.getElementById("homeBtn").onclick=home;
+const STORE="living_game_pack_v02";
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>crypto?.randomUUID?.()||"g-"+Date.now()+"-"+Math.random().toString(36).slice(2);
+function loadPack(){try{return JSON.parse(localStorage.getItem(STORE)||"[]")}catch{return[]}}
+function savePack(v){localStorage.setItem(STORE,JSON.stringify(v))}
+let session=null, raf=0, gameRaf=0;
+
+function home(){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);
+ const n=loadPack().length;
+ root.innerHTML=`<section class="hero"><div class="eyebrow">NO SURVEY · START PLAYING</div><h1>점 하나에서<br>게임 하나까지.</h1><p>무엇을 좋아하는지 묻지 않습니다. 먼저 놀아보세요. 시스템은 당신의 행동을 보고 다음 세계를 그때그때 결정합니다.</p><div class="actions"><button class="primary" id="newBtn">새 게임<div class="meta">작은 점에서 시작</div></button><button class="secondary" id="packBtn">내 게임팩<div class="meta">${n}개의 게임</div></button></div></section>`;
+ document.getElementById("newBtn").onclick=start;document.getElementById("packBtn").onclick=showPack;
+}
+function start(){
+ cancelAnimationFrame(raf);
+ session={
+  started:performance.now(),phaseStarted:performance.now(),phase:0,maxPhases:6,
+  player:{x:.5,y:.5,vx:0,vy:0,r:.018}, pointer:{x:.5,y:.5,down:false},
+  metrics:{distance:0,fast:0,idle:0,edge:0,taps:0,targetNear:0,targetHits:0,avoid:0,orbit:0,collect:0,companion:0,retries:0},
+  last:{x:.5,y:.5,t:performance.now()}, entities:[], experiment:"origin", message:"점 하나뿐입니다. 어떻게 해야 하는지는 정해져 있지 않습니다.",
+  trail:[], choiceHistory:[]
+ };
+ renderLab();setExperiment("origin");loop();
+}
+function renderLab(){
+ root.innerHTML=`<section class="lab"><div class="stage" id="stage"><canvas id="c"></canvas><div class="hud"><span class="hud-pill"><span class="pulse"></span>세계가 관찰 중</span><span class="hud-pill" id="phaseHud">형태 없음</span></div></div><aside class="side"><div class="eyebrow">PLAY FIRST</div><h3 id="sideTitle">무엇을 해야 하는지는 알려주지 않을게요.</h3><p id="sideText">${session.message}</p><div class="signal">이 프로토타입은 정답을 묻지 않습니다. 움직임, 멈춤, 접근, 회피, 반복 같은 행동에 따라 다음 실험 자체가 달라집니다.</div></aside></section>`;
+ const c=document.getElementById("c"),stage=document.getElementById("stage");resize(c,stage);
+ const pos=e=>{const r=c.getBoundingClientRect();const p=e.touches?.[0]||e;return{x:clamp((p.clientX-r.left)/r.width,0,1),y:clamp((p.clientY-r.top)/r.height,0,1)}};
+ function down(e){e.preventDefault();const p=pos(e);session.pointer={...p,down:true};session.metrics.taps++;session.player.x=p.x;session.player.y=p.y}
+ function move(e){if(!session.pointer.down)return;e.preventDefault();const p=pos(e);session.pointer.x=p.x;session.pointer.y=p.y}
+ function up(){session.pointer.down=false}
+ c.addEventListener("pointerdown",down);c.addEventListener("pointermove",move);window.addEventListener("pointerup",up,{once:false});
+ c.addEventListener("touchstart",down,{passive:false});c.addEventListener("touchmove",move,{passive:false});window.addEventListener("touchend",up,{once:false});
+ window.onresize=()=>resize(c,stage);
+}
+function resize(c,stage){const d=Math.min(2,devicePixelRatio||1),r=stage.getBoundingClientRect();c.width=Math.max(300,Math.floor(r.width*d));c.height=Math.max(300,Math.floor((innerWidth<780?520:600)*d));c._d=d}
+function chooseNext(){
+ const m=session.metrics, p=session.phase;
+ const options=[];
+ const add=(id,score)=>options.push({id,score:score+Math.random()*.45});
+ if(p===0){
+  add("runner",m.distance*2+m.fast*3);
+  add("neighbor",m.idle*1.8+m.taps*.35);
+  add("echo",m.distance*.8+m.taps*.5);
+ }else{
+  add("runner",m.fast*1.6+m.targetHits*2+m.retries);
+  add("collect",m.distance*.7+m.edge+m.collect*2);
+  add("companion",m.targetNear*.9+m.companion*2+m.idle*.3);
+  add("obstacles",m.fast+m.avoid*2+m.retries*.5);
+  add("orbit",m.targetNear*.7+m.orbit*2+m.idle*.25);
+  add("echo",m.distance*.5+m.taps*.3+(p%2?0.5:0));
+ }
+ const last=session.choiceHistory.slice(-2);for(const o of options)if(last.includes(o.id))o.score-=1.1;
+ options.sort((a,b)=>b.score-a.score);return options[0].id;
+}
+function setExperiment(id){
+ session.experiment=id;session.entities=[];session.phaseStarted=performance.now();session.choiceHistory.push(id);
+ const E=session.entities;
+ if(id==="origin"){session.message="점 하나뿐입니다. 움직여도 되고, 가만히 있어도 됩니다."}
+ if(id==="runner"){E.push({type:"runner",x:.72,y:.42,vx:.0026,vy:.0017,r:.016});session.message="무언가가 나타났고, 당신의 움직임에 반응하기 시작했습니다."}
+ if(id==="neighbor"){E.push({type:"neighbor",x:.68,y:.52,r:.018,pulse:0});session.message="곁에 작은 점 하나가 생겼습니다. 먼저 다가오지는 않습니다."}
+ if(id==="echo"){E.push({type:"echo",x:.5,y:.5,r:.012,history:[]});session.message="방금 지나간 자리에 흔적이 남기 시작합니다."}
+ if(id==="collect"){for(let i=0;i<7;i++)E.push({type:"collect",x:.12+Math.random()*.76,y:.12+Math.random()*.76,r:.011});session.message="공간 곳곳에 작은 조각들이 생겼습니다."}
+ if(id==="companion"){E.push({type:"companion",x:.68,y:.5,vx:0,vy:0,r:.016});session.message="한 점이 당신을 따라오려 합니다."}
+ if(id==="obstacles"){for(let i=0;i<5;i++)E.push({type:"obstacle",x:.18+i*.16,y:.25+Math.random()*.5,w:.035,h:.18+Math.random()*.1});session.message="공간에 통과해야 할 틈이 생겼습니다."}
+ if(id==="orbit"){E.push({type:"orbit",x:.62,y:.5,r:.014,a:0});session.message="한 점이 당신 주위를 돌기 시작했습니다."}
+ const title=document.getElementById("sideTitle"),text=document.getElementById("sideText"),hud=document.getElementById("phaseHud");
+ if(title)title.textContent=pLabel(id);if(text)text.textContent=session.message;if(hud)hud.textContent="변형 "+Math.min(session.phase+1,session.maxPhases)+"/"+session.maxPhases;
+}
+function pLabel(id){return({origin:"아직 게임은 없습니다.",runner:"세계가 움직임을 시험합니다.",neighbor:"세계가 거리를 시험합니다.",echo:"세계가 흔적을 기억합니다.",collect:"세계가 소유를 만들어 봅니다.",companion:"세계가 관계를 만들어 봅니다.",obstacles:"세계가 기술을 요구합니다.",orbit:"세계가 공간을 비틀어 봅니다."})[id]||"세계가 바뀝니다."}
+function update(dt){
+ const s=session,p=s.player,m=s.metrics,now=performance.now();
+ let ox=p.x,oy=p.y;
+ if(s.pointer.down){p.x+=(s.pointer.x-p.x)*clamp(dt*.018,0,1);p.y+=(s.pointer.y-p.y)*clamp(dt*.018,0,1)}
+ p.x=clamp(p.x,.025,.975);p.y=clamp(p.y,.035,.965);
+ const d=Math.hypot(p.x-ox,p.y-oy),speed=d/Math.max(.001,dt/16.67);m.distance+=d;if(speed>.012)m.fast+=d*6;if(d<.00025)m.idle+=dt/1000;if(p.x<.08||p.x>.92||p.y<.08||p.y>.92)m.edge+=dt/1000;
+ s.trail.push({x:p.x,y:p.y,t:now});while(s.trail.length&&now-s.trail[0].t>1700)s.trail.shift();
+ for(const e of s.entities){
+  if(e.type==="runner"){const dx=e.x-p.x,dy=e.y-p.y,dd=Math.hypot(dx,dy)||1;e.x=clamp(e.x+dx/dd*.00055*dt,.04,.96);e.y=clamp(e.y+dy/dd*.00055*dt,.05,.95);if(dd<.075){m.targetHits++;m.retries++;e.x=Math.random()>.5?.14:.86;e.y=.18+Math.random()*.64}}
+  if(e.type==="neighbor"){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<.11){m.targetNear+=dt/1000;e.pulse+=dt}}
+  if(e.type==="collect"&&!e.gone){const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<.045){e.gone=true;m.collect++}}
+  if(e.type==="companion"){const dx=p.x-e.x,dy=p.y-e.y,dd=Math.hypot(dx,dy)||1;if(dd>.08){e.x+=dx/dd*.00022*dt;e.y+=dy/dd*.00022*dt}else{m.companion+=dt/1000}}
+  if(e.type==="orbit"){e.a+=dt*.0022;e.x=p.x+Math.cos(e.a)*.13;e.y=p.y+Math.sin(e.a)*.13;if(s.pointer.down)m.orbit+=dt/1000}
+  if(e.type==="obstacle"){if(p.x>e.x-e.w&&p.x<e.x+e.w&&p.y>e.y-e.h/2&&p.y<e.y+e.h/2){m.avoid+=.08;p.x=ox;p.y=oy}}
+ }
+ const phaseDur=s.phase===0?6500:7200;
+ if(now-s.phaseStarted>phaseDur){
+  s.phase++;
+  if(s.phase>=s.maxPhases){crystallize();return false}
+  setExperiment(chooseNext());
+ }
+ return true;
+}
+function draw(){
+ const c=document.getElementById("c");if(!c)return;const x=c.getContext("2d"),d=c._d||1,w=c.width,h=c.height;x.clearRect(0,0,w,h);
+ x.fillStyle="#090b10";x.fillRect(0,0,w,h);
+ x.strokeStyle="rgba(255,255,255,.035)";x.lineWidth=d;for(let i=1;i<10;i++){x.beginPath();x.moveTo(w*i/10,0);x.lineTo(w*i/10,h);x.stroke()}for(let i=1;i<8;i++){x.beginPath();x.moveTo(0,h*i/8);x.lineTo(w,h*i/8);x.stroke()}
+ const pt=(px,py)=>[px*w,py*h];
+ if(session.experiment==="echo"&&session.trail.length>1){x.beginPath();session.trail.forEach((q,i)=>{const [a,b]=pt(q.x,q.y);i?x.lineTo(a,b):x.moveTo(a,b)});x.strokeStyle="rgba(216,243,109,.24)";x.lineWidth=3*d;x.stroke()}
+ for(const e of session.entities){
+  if(e.gone)continue;
+  const [a,b]=pt(e.x,e.y);
+  if(e.type==="obstacle"){x.fillStyle="rgba(255,255,255,.11)";x.fillRect((e.x-e.w)*w,(e.y-e.h/2)*h,e.w*2*w,e.h*h);continue}
+  x.beginPath();x.arc(a,b,e.r*Math.min(w,h),0,Math.PI*2);
+  if(e.type==="runner")x.fillStyle="#ff547f";else if(e.type==="collect")x.fillStyle="#79b8ff";else if(e.type==="companion")x.fillStyle="#c28cff";else if(e.type==="orbit")x.fillStyle="#ffcb69";else x.fillStyle="rgba(255,255,255,.72)";
+  x.fill();
+ }
+ const [px,py]=pt(session.player.x,session.player.y);x.beginPath();x.arc(px,py,session.player.r*Math.min(w,h),0,Math.PI*2);x.fillStyle="#eaff7b";x.shadowBlur=24*d;x.shadowColor="#c8ff58";x.fill();x.shadowBlur=0;
+}
+function loop(t){
+ const now=t||performance.now();session._lastFrame=session._lastFrame||now;const dt=Math.min(33,now-session._lastFrame);session._lastFrame=now;
+ if(update(dt)===false)return;draw();raf=requestAnimationFrame(loop);
+}
+function designFrom(m){
+ const scores=[
+  {id:"trace",score:m.fast*1.8+m.targetHits*4+m.avoid*1.7+m.retries*1.5},
+  {id:"relic",score:m.collect*5+m.distance*2+m.edge*.8},
+  {id:"keeper",score:m.companion*1.8+m.targetNear*1.2+m.idle*.3},
+  {id:"orbit",score:m.orbit*1.6+m.targetNear*.6+m.distance*.7},
+  {id:"drift",score:m.distance*1.5+m.edge*1.4+m.taps*.45}
+ ].sort((a,b)=>b.score-a.score);
+ return scores[0].id;
+}
+const designs={
+ trace:{title:"TRACE//RUN",promise:"움직이는 표식을 추적하고 장애물을 통과하며 연속 기록을 늘리는 짧은 스킬 게임.",loop:"추적 → 통과 → 연속 기록 → 더 빠른 표적",verbs:["추적","회피","재도전"],mode:"trace"},
+ relic:{title:"RELIC DRIFT",promise:"움직이는 공간을 누비며 흩어진 조각을 모으고, 위험한 구역까지 욕심낼지 결정하는 수집 게임.",loop:"탐색 → 수집 → 위험 구역 → 기록 갱신",verbs:["탐색","수집","귀환"],mode:"relic"},
+ keeper:{title:"TWIN LIGHT",promise:"당신을 따라오는 작은 존재와 거리를 맞추며 위험한 공간을 함께 통과하는 동행 게임.",loop:"이동 → 동행 유지 → 위험 통과 → 유대 기록",verbs:["유도","보호","동행"],mode:"keeper"},
+ orbit:{title:"ORBIT DRAW",promise:"당신 주위를 도는 위성의 궤도를 이용해 공간의 신호를 연결하는 움직임 퍼즐.",loop:"이동 → 궤도 조절 → 신호 연결 → 더 복잡한 배치",verbs:["회전","정렬","연결"],mode:"orbit"},
+ drift:{title:"EDGE SIGNAL",promise:"경계와 빈 공간을 탐색해 보이지 않는 신호를 찾아내는 짧은 탐험 게임.",loop:"이동 → 신호 감지 → 접근 → 새로운 영역",verbs:["탐색","감지","발견"],mode:"drift"}
+};
+const arts=[
+ {id:"neon",name:"Neon Signal",desc:"검은 공간, 강한 발광, 전자 신호 같은 세계.",cls:"art-neon"},
+ {id:"paper",name:"Paper World",desc:"종이와 잉크, 손으로 만든 장난감 같은 세계.",cls:"art-paper"},
+ {id:"space",name:"Silent Space",desc:"차갑고 조용한 심우주 관측 장치 같은 세계.",cls:"art-space"}
+];
+function crystallize(){
+ cancelAnimationFrame(raf);
+ const d=designs[designFrom(session.metrics)];session.design=d;
+ root.innerHTML=`<section class="design"><div class="locked">✓ GAME DESIGN LOCKED</div><div class="eyebrow">FOUND IT</div><h2>${d.title}</h2><p style="font-size:17px;max-width:720px">${d.promise}</p><div class="spec"><div class="spec-card"><b>핵심 루프</b><span>${d.loop}</span></div><div class="spec-card"><b>주요 행동</b><span>${d.verbs.join(" · ")}</span></div></div><div class="eyebrow" style="margin-top:32px">이제 하나만 고르세요</div><h3 style="font-size:26px;margin:0">이 게임은 어떤 모습이면 좋을까요?</h3><p>게임 내용은 이미 확정됐습니다. 아래 세 개는 <b style="color:#fff">같은 게임의 아트 방향</b>입니다.</p><div class="art-grid">${arts.map(a=>`<button class="art-card" data-art="${a.id}"><div class="preview ${a.cls}"></div><div class="art-body"><h3>${a.name}</h3><p>${a.desc}</p></div></button>`).join("")}</div></section>`;
+ document.querySelectorAll(".art-card").forEach(b=>b.onclick=()=>finalize(b.dataset.art));
+}
+function finalize(artId){
+ const d=session.design,a=arts.find(x=>x.id===artId);
+ const g={schema_version:"0.2",game_id:uid(),title:d.title,created_at:new Date().toISOString(),design_id:d.mode,promise:d.promise,core_loop:d.loop,verbs:d.verbs,art_direction:{id:a.id,name:a.name},world_seed:Math.floor(Math.random()*1e9),diagnostic:{metrics:session.metrics,experiments:session.choiceHistory},progress:{best:0,visits:0}};
+ const pack=loadPack();pack.unshift(g);savePack(pack);playGame(g.game_id);
+}
+function theme(id){
+ if(id==="paper")return{bg:"#d7ccb7",grid:"rgba(55,45,34,.08)",player:"#252321",accent:"#a84f3d",enemy:"#496c72",text:"#2b2925"};
+ if(id==="space")return{bg:"#030711",grid:"rgba(170,205,255,.055)",player:"#d8ebff",accent:"#739cff",enemy:"#8a789f",text:"#dbe8ff"};
+ return{bg:"#070812",grid:"rgba(142,102,255,.08)",player:"#eaff75",accent:"#ff4eb8",enemy:"#62b7ff",text:"#f7f7ff"};
+}
+function playGame(id){
+ cancelAnimationFrame(gameRaf);const pack=loadPack(),g=pack.find(x=>x.game_id===id);if(!g)return showPack();g.progress.visits=(g.progress.visits||0)+1;savePack(pack);
+ root.innerHTML=`<section class="game"><div class="game-canvas" id="gameStage"><canvas id="gc"></canvas></div><aside class="game-side"><div class="eyebrow">NOW PLAYING</div><h3>${g.title}</h3><p class="small">${g.promise}</p><div style="margin:20px 0 4px" class="small">SCORE</div><div class="score" id="score">0</div><div class="small" id="best">BEST ${g.progress.best||0}</div><p class="small" style="margin-top:24px">마우스/손가락으로 점을 움직이세요. 게임 규칙은 아트 선택과 관계없이 동일합니다.</p><button class="ghost" id="backPack" style="margin-top:12px">내 게임팩</button></aside></section>`;
+ document.getElementById("backPack").onclick=showPack;
+ const c=document.getElementById("gc"),st=document.getElementById("gameStage");resizeGame(c,st);runPlayable(c,g,pack);
+}
+function resizeGame(c,st){const d=Math.min(2,devicePixelRatio||1),r=st.getBoundingClientRect();c.width=Math.max(300,Math.floor(r.width*d));c.height=Math.floor((innerWidth<780?520:590)*d);c._d=d}
+function runPlayable(c,g,pack){
+ const T=theme(g.art_direction.id),ctx=c.getContext("2d"),S={p:{x:.5,y:.6},ptr:{x:.5,y:.6,down:false},score:0,t:0,items:[],target:{x:.75,y:.3,vx:.0015,vy:.0012},buddy:{x:.43,y:.63},orbit:0};
+ const pos=e=>{const r=c.getBoundingClientRect(),q=e.touches?.[0]||e;return{x:clamp((q.clientX-r.left)/r.width,0,1),y:clamp((q.clientY-r.top)/r.height,0,1)}};
+ const dn=e=>{e.preventDefault();S.ptr={...pos(e),down:true}},mv=e=>{if(S.ptr.down){e.preventDefault();Object.assign(S.ptr,pos(e))}},up=()=>S.ptr.down=false;
+ c.onpointerdown=dn;c.onpointermove=mv;window.onpointerup=up;c.ontouchstart=dn;c.ontouchmove=mv;window.ontouchend=up;
+ if(g.design_id==="relic"||g.design_id==="drift")for(let i=0;i<10;i++)S.items.push({x:.08+Math.random()*.84,y:.08+Math.random()*.84,on:true});
+ if(g.design_id==="orbit")for(let i=0;i<7;i++)S.items.push({x:.1+Math.random()*.8,y:.12+Math.random()*.76,on:true});
+ let last=performance.now();
+ function tick(now){
+  const dt=Math.min(32,now-last);last=now;S.t+=dt;if(S.ptr.down){S.p.x+=(S.ptr.x-S.p.x)*.22;S.p.y+=(S.ptr.y-S.p.y)*.22}S.p.x=clamp(S.p.x,.03,.97);S.p.y=clamp(S.p.y,.04,.96);
+  if(g.design_id==="trace"){const dx=S.target.x-S.p.x,dy=S.target.y-S.p.y,dd=Math.hypot(dx,dy)||1;S.target.x=clamp(S.target.x+dx/dd*.00042*dt,.04,.96);S.target.y=clamp(S.target.y+dy/dd*.00042*dt,.05,.95);if(dd<.065){S.score+=10;S.target.x=Math.random()>.5?.12:.88;S.target.y=.14+Math.random()*.72}}
+  if(g.design_id==="relic"||g.design_id==="drift"){for(const it of S.items)if(it.on&&Math.hypot(it.x-S.p.x,it.y-S.p.y)<.045){it.on=false;S.score+=10}if(S.items.every(x=>!x.on)){S.items.forEach(x=>{x.x=.08+Math.random()*.84;x.y=.08+Math.random()*.84;x.on=true})}}
+  if(g.design_id==="keeper"){S.buddy.x+=(S.p.x-S.buddy.x)*.025;S.buddy.y+=(S.p.y-S.buddy.y)*.025;const dd=Math.hypot(S.p.x-S.buddy.x,S.p.y-S.buddy.y);if(dd>.055&&dd<.18)S.score+=dt*.004}
+  if(g.design_id==="orbit"){S.orbit+=dt*.0024;const ox=S.p.x+Math.cos(S.orbit)*.12,oy=S.p.y+Math.sin(S.orbit)*.12;for(const it of S.items)if(it.on&&Math.hypot(it.x-ox,it.y-oy)<.04){it.on=false;S.score+=12}if(S.items.every(x=>!x.on)){S.items.forEach(x=>{x.x=.08+Math.random()*.84;x.y=.08+Math.random()*.84;x.on=true})}}
+  drawGame(ctx,c,S,g,T);
+  const n=Math.floor(S.score);document.getElementById("score").textContent=n;if(n>(g.progress.best||0)){g.progress.best=n;const i=pack.findIndex(x=>x.game_id===g.game_id);pack[i]=g;savePack(pack);document.getElementById("best").textContent="BEST "+n}
+  gameRaf=requestAnimationFrame(tick);
+ }
+ gameRaf=requestAnimationFrame(tick);
+}
+function drawGame(x,c,S,g,T){
+ const w=c.width,h=c.height,d=c._d||1;x.fillStyle=T.bg;x.fillRect(0,0,w,h);x.strokeStyle=T.grid;x.lineWidth=d;for(let i=1;i<12;i++){x.beginPath();x.moveTo(w*i/12,0);x.lineTo(w*i/12,h);x.stroke()}for(let i=1;i<9;i++){x.beginPath();x.moveTo(0,h*i/9);x.lineTo(w,h*i/9);x.stroke()}
+ const dot=(px,py,r,col)=>{x.beginPath();x.arc(px*w,py*h,r*Math.min(w,h),0,Math.PI*2);x.fillStyle=col;x.shadowBlur=18*d;x.shadowColor=col;x.fill();x.shadowBlur=0};
+ if(g.design_id==="trace")dot(S.target.x,S.target.y,.015,T.accent);
+ if(g.design_id==="relic"||g.design_id==="drift"||g.design_id==="orbit")for(const it of S.items)if(it.on)dot(it.x,it.y,.009,T.enemy);
+ if(g.design_id==="keeper")dot(S.buddy.x,S.buddy.y,.014,T.accent);
+ if(g.design_id==="orbit"){const ox=S.p.x+Math.cos(S.orbit)*.12,oy=S.p.y+Math.sin(S.orbit)*.12;x.beginPath();x.arc(S.p.x*w,S.p.y*h,.12*Math.min(w,h),0,Math.PI*2);x.strokeStyle=T.grid;x.stroke();dot(ox,oy,.011,T.accent)}
+ dot(S.p.x,S.p.y,.018,T.player);
+}
+function showPack(){
+ cancelAnimationFrame(raf);cancelAnimationFrame(gameRaf);const p=loadPack();
+ root.innerHTML=`<section class="design"><div class="eyebrow">MY GAMEPACK</div><h2>내 게임팩</h2><p>플레이에서 태어나고, 아트 방향까지 확정된 게임들입니다.</p>${p.length?`<div class="pack">${p.map(g=>`<button class="game-card" data-id="${g.game_id}"><div class="small">${new Date(g.created_at).toLocaleString("ko-KR")} · 방문 ${g.progress?.visits||0}회</div><h3>${g.title}</h3><span class="tag">${g.art_direction?.name||"Art"}</span>${(g.verbs||[]).map(v=>`<span class="tag">${v}</span>`).join("")}<p>${g.promise}</p></button>`).join("")}</div>`:`<p style="margin-top:60px">아직 게임이 없습니다.</p>`}</section>`;
+ document.querySelectorAll(".game-card").forEach(b=>b.onclick=()=>playGame(b.dataset.id));
+}
+home();
+</script>
+</body>
+</html>
