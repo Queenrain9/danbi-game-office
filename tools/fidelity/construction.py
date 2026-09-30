@@ -972,11 +972,15 @@ def main():
     elif args.command=='verify-adapter-registry':
         baseline=None
         if args.baseline_ref:
-            raw=subprocess.check_output(
-                ['git','-C',str(REPO_ROOT),'show',args.baseline_ref+':production/godot/interaction_runtime/registry.json'],
-                stderr=subprocess.PIPE,
-            )
-            baseline=json.loads(raw.decode('utf-8'))
+            try:
+                raw=subprocess.check_output(
+                    ['git','-C',str(REPO_ROOT),'show',args.baseline_ref+':production/godot/interaction_runtime/registry.json'],
+                    stderr=subprocess.PIPE,
+                )
+                baseline=json.loads(raw.decode('utf-8'))
+            except subprocess.CalledProcessError:
+                # First registry introduction has no historical manifest to freeze.
+                baseline=None
         errors=verify_adapter_registry(REPO_ROOT,baseline)
         result=json.dumps({'status':'failed' if errors else 'passed','errors':errors},ensure_ascii=False,indent=2)
         if errors:
