@@ -15,6 +15,7 @@ spec = importlib.util.spec_from_file_location('construction', Path(__file__).wit
 construction = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(construction)
 STAGES = construction.STAGES
+SOURCE_COVERAGE_VERSION = construction.SOURCE_COVERAGE_VERSION
 VOLATILE = {'status','created_at','updated_at','source_run_at'}
 
 
@@ -31,6 +32,15 @@ def check_sources(blueprint, contract, pack, design):
         issues.append({'code':'SOURCE_IDENTITY','message':'Current source relationship mismatch'})
     if contract.get('blueprint_hash') and contract['blueprint_hash'] != blueprint.get('blueprint_hash'):
         issues.append({'code':'BLUEPRINT_HASH','message':'DB hash mismatch'})
+    if contract.get('source_coverage_version') == SOURCE_COVERAGE_VERSION:
+        if blueprint.get('source_coverage_version') != SOURCE_COVERAGE_VERSION:
+            issues.append({'code':'SOURCE_COVERAGE_VERSION','message':'Blueprint does not opt in to current source coverage policy'})
+        coverage = construction.source_coverage_report(blueprint)
+        same('SOURCE_COVERAGE_REPORT', contract.get('source_coverage'), coverage)
+        same('BLUEPRINT_SOURCE_COVERAGE', blueprint.get('source_coverage'), coverage)
+        same('DESIGN_WIREFRAME_NOTES', contract.get('design_wireframe_notes') or [], blueprint.get('design_wireframe_notes') or [])
+        if coverage.get('missing_count'):
+            issues.append({'code':'SOURCE_COVERAGE','message':'Canonical Game Design/Wireframe source coverage is incomplete'})
     return issues
 
 
