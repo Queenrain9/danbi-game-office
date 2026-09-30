@@ -1,0 +1,41 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://danbi.game/schemas/living-game-genome-v0.3.json",
+  "title":"Living Game Genome v0.3",
+  "type":"object",
+  "required":["schema_version","game_id","title","goal","verbs","objective","world","art","progress"],
+  "properties":{
+    "schema_version":{"const":"0.3"},
+    "game_id":{"type":"string"},
+    "created_at":{"type":"string","format":"date-time"},
+    "title":{"type":"string"},
+    "goal":{"type":"string"},
+    "verbs":{"type":"array","items":{"type":"string"}},
+    "objective":{"type":"string"},
+    "world":{
+      "type":"object",
+      "required":["control","space","time","entities","systems","visualForm","mutations"],
+      "properties":{
+        "control":{"type":"string"},
+        "space":{"type":"string"},
+        "time":{"type":"string"},
+        "entities":{"type":"array","items":{"type":"string"}},
+        "systems":{"type":"array","items":{"type":"string"}},
+        "goal":{"type":["string","null"]},
+        "visualForm":{"type":"string"},
+        "mutations":{"type":"array","items":{"type":"string"}}
+      }
+    },
+    "metrics":{"type":"object","additionalProperties":{"type":"number"}},
+    "art":{"enum":["neon","ink","machine"]},
+    "progress":{
+      "type":"object",
+      "required":["score","best","visits"],
+      "properties":{
+        "score":{"type":"number"},
+        "best":{"type":"number"},
+        "visits":{"type":"integer","minimum":0}
+      }
+    }
+  }
+}
