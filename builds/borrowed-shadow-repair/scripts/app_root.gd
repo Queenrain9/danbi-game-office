@@ -5,6 +5,7 @@ const SNAP_POSITION_PX := 18.0
 const SNAP_ROTATION_DEG := 12.0
 const TRACE_CORRIDOR_PX := 20.0
 const HOLD_SECONDS := 0.6
+const SessionData = preload("res://scripts/session_data.gd")
 
 var current_screen := "night_workshop"
 var current_state := "ready"
@@ -20,6 +21,18 @@ var rework_used := false
 var input_locked := false
 var score := 0
 var grade := "C"
+var session := SessionData.new()
+var piece_nodes:Array[ColorRect]=[]
+var piece_positions:Array[Vector2]=[]
+var piece_angles:Array[float]=[]
+var piece_snapped:Array[bool]=[]
+var selected_piece := -1
+var last_valid_position := Vector2.ZERO
+var last_valid_angle := 0.0
+var trace_started := false
+var trace_reached_end := false
+var trace_error := false
+var paused := false
 
 var ink := Color("#efe7d0")
 var night := Color("#161526")
@@ -32,6 +45,7 @@ func _ready() -> void:
     set_process_input(true)
     _build_presentation()
     _connect_runtime_actions()
+    session.load_progress()
     start_order(1)
 
 func _draw() -> void:
@@ -129,16 +143,26 @@ func start_order(index: int) -> void:
     $Screens/shadow_workbench/stitch_btn.disabled = true
     $Screens/stitch_mode/test_btn.disabled = true
     show_screen("night_workshop", "ready")
+    _build_pieces()
     _refresh_components()
 
+func _build_pieces() -> void:
+    for n in piece_nodes: if is_instance_valid(n): n.queue_free()
+    piece_nodes.clear(); piece_positions.clear(); piece_angles.clear(); piece_snapped.clear()
+    var tray:Control=$Screens/shadow_workbench/piece_tray
+    for i in range(required_pieces):
+        var p:=ColorRect.new(); p.name="Piece%d"%i; p.color=violet; p.size=Vector2(48,48); p.position=Vector2(12+i*58,14); p.mouse_filter=Control.MOUSE_FILTER_IGNORE; tray.add_child(p)
+        piece_nodes.append(p); piece_positions.append(p.global_position); piece_angles.append(0.0); piece_snapped.append(false)
+
 func show_screen(screen_id: String, state_id: String) -> void:
-    if input_locked:
-        return
-    current_screen = screen_id
-    current_state = state_id
-    for child in $Screens.get_children():
-        child.visible = child.name == screen_id
-    _refresh_components()
+    if input_locked or paused: return
+    input_locked=true
+    var tween:=create_tween(); tween.tween_interval(0.08); tween.tween_callback(_finish_screen_change.bind(screen_id,state_id))
+
+func _finish_screen_change(screen_id:String,state_id:String)->void:
+    current_screen=screen_id; current_state=state_id
+    for child in $Screens.get_children(): child.visible=child.name==screen_id
+    input_locked=false; _refresh_components()
 
 func set_state(state_id: String) -> void:
     current_state = state_id
@@ -157,63 +181,74 @@ func _refresh_components() -> void:
             node.queue_redraw()
             for child in node.get_children(): child.queue_redraw()
 
-func diagnose_at(_local_position: Vector2) -> void:
-    if current_screen != "customer_intake" or current_state != "observing":
-        return
+func diagnose_at(local_position: Vector2) -> void:
+    if current_screen != "customer_intake" or current_state != "observing": return
+    var area:Control=$Screens/customer_intake/symptom_targets
+    var hotspots=[Vector2(area.size.x*.22,area.size.y*.5),Vector2(area.size.x*.52,area.size.y*.5),Vector2(area.size.x*.78,area.size.y*.5)]
+    var hit=false
+    for h in hotspots: if local_position.distance_to(h)<=24.0: hit=true
+    if not hit: return
     diagnosed = true
     score = 20
     set_state("diagnosed")
 
-func begin_piece_drag() -> void:
-    if current_screen != "shadow_workbench" or snapped_pieces >= required_pieces:
-        return
-    dragging = true
+func begin_piece_drag(piece_index:int=0) -> void:
+    if current_screen!="shadow_workbench" or piece_index<0 or piece_index>=required_pieces or piece_snapped[piece_index]: return
+    selected_piece=piece_index; dragging=true
+    last_valid_position=piece_nodes[selected_piece].global_position; last_valid_angle=piece_nodes[selected_piece].rotation_degrees
     set_state("dragging")
 
-func update_piece_drag(global_position: Vector2) -> void:
-    if not dragging:
-        return
-    var anchor := $Screens/shadow_workbench/silhouette.get_global_rect().get_center()
-    set_state("snap_candidate" if global_position.distance_to(anchor) <= SNAP_POSITION_PX * 4.0 else "dragging")
+func update_piece_drag(global_position:Vector2) -> void:
+    if not dragging or selected_piece<0:return
+    var p:=piece_nodes[selected_piece]; p.global_position=global_position-p.size*.5
+    var anchor:=_anchor_for(selected_piece)
+    var angle_error:=absf(piece_angles[selected_piece]-_anchor_angle(selected_piece))
+    set_state("snap_candidate" if p.global_position.distance_to(anchor)<=SNAP_POSITION_PX and angle_error<=SNAP_ROTATION_DEG else "dragging")
 
-func end_piece_drag(global_position: Vector2) -> void:
-    if not dragging:
-        return
-    dragging = false
-    var anchor := $Screens/shadow_workbench/silhouette.get_global_rect().get_center()
-    var angle_error := absf(fposmod(selected_angle + 180.0, 30.0) - 15.0)
-    if global_position.distance_to(anchor) <= SNAP_POSITION_PX * 4.0 and angle_error <= SNAP_ROTATION_DEG:
-        snapped_pieces += 1
-        selected_angle = 0.0
-        set_state("snapped")
-        if snapped_pieces < required_pieces:
-            set_state("selected")
-        else:
-            score += 50
+func end_piece_drag(global_position:Vector2) -> void:
+    if not dragging or selected_piece<0:return
+    dragging=false
+    var p:=piece_nodes[selected_piece]; p.global_position=global_position-p.size*.5
+    var anchor:=_anchor_for(selected_piece); var angle_error:=absf(piece_angles[selected_piece]-_anchor_angle(selected_piece))
+    if p.global_position.distance_to(anchor)<=SNAP_POSITION_PX and angle_error<=SNAP_ROTATION_DEG:
+        p.global_position=anchor; p.rotation_degrees=_anchor_angle(selected_piece); piece_snapped[selected_piece]=true; snapped_pieces=piece_snapped.count(true); set_state("snapped")
+        if snapped_pieces==required_pieces: score+=50
     else:
-        set_state("collision")
+        p.global_position=last_valid_position; p.rotation_degrees=last_valid_angle; set_state("collision")
     _refresh_components()
 
-func rotate_piece(delta_degrees: float) -> void:
-    if current_screen != "shadow_workbench" or snapped_pieces >= required_pieces:
-        return
-    selected_angle = snappedf(selected_angle + delta_degrees, 15.0)
+func _anchor_for(i:int)->Vector2:
+    var r=$Screens/shadow_workbench/silhouette.get_global_rect()
+    return r.position+Vector2(60+(i%3)*130,110+(i/3)*150)
+
+func _anchor_angle(i:int)->float:
+    return 15.0*float((i%3)-1)
+
+func rotate_piece(delta_degrees:float)->void:
+    if current_screen!="shadow_workbench" or selected_piece<0 or piece_snapped[selected_piece]:return
+    piece_angles[selected_piece]=snappedf(piece_angles[selected_piece]+delta_degrees,15.0)
+    piece_nodes[selected_piece].rotation_degrees=piece_angles[selected_piece]
+    last_valid_angle=piece_angles[selected_piece]
     set_state("selected")
 
 func begin_trace() -> void:
     if current_screen == "stitch_mode" and snapped_pieces >= required_pieces:
         trace_quality = 1.0
+        trace_started=true; trace_reached_end=false; trace_error=false
         set_state("tracing")
 
 func update_trace(local_position: Vector2, area_size: Vector2) -> void:
     if current_state != "tracing": return
     var expected_y := area_size.y * (0.35 + 0.3 * (local_position.x / maxf(area_size.x, 1.0)))
     var deviation := absf(local_position.y - expected_y)
-    trace_quality = minf(trace_quality, clampf(1.0 - deviation / (TRACE_CORRIDOR_PX * 4.0), 0.0, 1.0))
+    if deviation > TRACE_CORRIDOR_PX:
+        trace_quality=0.0; trace_error=true; set_state("error"); return
+    trace_quality=minf(trace_quality,1.0-deviation/TRACE_CORRIDOR_PX)
+    if local_position.x >= area_size.x-30.0: trace_reached_end=true
 
 func end_trace() -> void:
     if current_state != "tracing": return
-    seam_locked = trace_quality >= 0.55
+    seam_locked = trace_started and trace_reached_end and not trace_error
     if seam_locked:
         score += 30
         set_state("locked")
@@ -261,6 +296,7 @@ func transition_rework_overlay_01() -> void:
         snapped_pieces = maxi(required_pieces - 1, 0)
         show_screen("shadow_workbench", "selected")
 func transition_result_01() -> void:
+    session.complete_contract(order_index)
     start_order(1 if order_index >= TOTAL_ORDERS else order_index + 1)
 
 func apply_night_workshop_state_ready() -> void: show_screen("night_workshop", "ready")
