@@ -90,3 +90,21 @@ Fetch the **original game commit** and DB rows again in a clean checkout. Run `c
 - `check-build` verifies a real Git commit and clean project bytes. The artifact lives in a later separate commit to avoid self-referential hashes.
 - The CLI only prepares validation output and RPC payloads. It cannot grant independent approval or write a DB status by itself.
 - Both live Blueprints at handoff remain blocked. They require correction, independent approval, a full Godot build and a fresh Gate review before any actual game can be declared PLAYTEST READY.
+
+
+## Compiler atomicity and self-healing
+
+Implementation Contract + Fidelity Blueprint compilation is one atomic game-level unit:
+
+`source read → Contract checkpoint → Blueprint → validator → blueprint/history write → checkpoint complete`.
+
+A Contract row with `status='draft'` and `blueprint_status='missing'` is a resumable checkpoint, not a failed artifact. The next Compiler run must recover it before creating another new Contract. The database helpers are:
+
+- `danbi_next_compiler_candidate()` — returns `resume_missing` first, then a new Wireframe, and only considers true blocked work after the normal queue can keep moving.
+- `danbi_compiler_checkpoint(contract_id)` — reports complete only when the Blueprint, 64-character hash, empty issue set, `pending_review|approved` status, and matching `danbi_blueprint_history` row all exist.
+
+Within one scheduled run, game A must reach a complete checkpoint before game B is touched. A raw Contract INSERT is never a successful Compiler completion.
+
+Large Contract/Blueprint payloads must be passed as structured JSON or safely encoded/escaped before JSONB conversion. Do not construct megabyte-scale raw SQL JSON literals from free text. Transport/serialization failures such as an unescaped newline are retryable local failures; they must not become semantic blockers or cause the Compiler to skip to the next game.
+
+A genuine `blueprint_status='blocked'` item does not starve the rest of production. Its issue record remains available for repair while new eligible Wireframes may continue through the Compiler.
