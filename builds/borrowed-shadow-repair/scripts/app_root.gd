@@ -6,8 +6,6 @@ const SNAP_ROTATION_DEG := 12.0
 const TRACE_CORRIDOR_PX := 20.0
 const HOLD_SECONDS := 0.6
 const SessionData = preload("res://scripts/session_data.gd")
-const SnapV1 = preload("res://runtime/interaction/snap_v1.gd")
-const TraceV1 = preload("res://runtime/interaction/trace_v1.gd")
 
 var current_screen := "night_workshop"
 var current_state := "ready"
@@ -35,8 +33,6 @@ var trace_started := false
 var trace_reached_end := false
 var trace_error := false
 var paused := false
-var snap_adapter = SnapV1.new()
-var trace_adapter = TraceV1.new()
 
 var ink := Color("#efe7d0")
 var night := Color("#161526")
@@ -218,17 +214,16 @@ func update_piece_drag(global_position:Vector2) -> void:
     if not dragging or selected_piece<0:return
     var p:=piece_nodes[selected_piece]; p.global_position=global_position-p.size*.5
     var anchor:=_anchor_for(selected_piece)
-    var snap = snap_adapter.evaluate_transform(p.global_position,anchor,SNAP_POSITION_PX,piece_angles[selected_piece],_anchor_angle(selected_piece),SNAP_ROTATION_DEG)
-    set_state("snap_candidate" if snap.snapped else "dragging")
+    var angle_error:=absf(piece_angles[selected_piece]-_anchor_angle(selected_piece))
+    set_state("snap_candidate" if p.global_position.distance_to(anchor)<=SNAP_POSITION_PX and angle_error<=SNAP_ROTATION_DEG else "dragging")
 
 func end_piece_drag(global_position:Vector2) -> void:
     if not dragging or selected_piece<0:return
     dragging=false
     var p:=piece_nodes[selected_piece]; p.global_position=global_position-p.size*.5
-    var anchor:=_anchor_for(selected_piece)
-    var snap = snap_adapter.evaluate_transform(p.global_position,anchor,SNAP_POSITION_PX,piece_angles[selected_piece],_anchor_angle(selected_piece),SNAP_ROTATION_DEG)
-    if snap.snapped:
-        p.global_position=snap.position; p.rotation_degrees=snap.rotation_deg; piece_snapped[selected_piece]=true; snapped_pieces=piece_snapped.count(true); Input.vibrate_handheld(18); set_state("snapped")
+    var anchor:=_anchor_for(selected_piece); var angle_error:=absf(piece_angles[selected_piece]-_anchor_angle(selected_piece))
+    if p.global_position.distance_to(anchor)<=SNAP_POSITION_PX and angle_error<=SNAP_ROTATION_DEG:
+        p.global_position=anchor; p.rotation_degrees=_anchor_angle(selected_piece); piece_snapped[selected_piece]=true; snapped_pieces=piece_snapped.count(true); Input.vibrate_handheld(18); set_state("snapped")
         if snapped_pieces==required_pieces: score+=50
     else:
         p.global_position=last_valid_position; p.rotation_degrees=last_valid_angle; set_state("collision")
@@ -251,29 +246,22 @@ func rotate_piece(delta_degrees:float)->void:
 
 func begin_trace() -> void:
     if current_screen == "stitch_mode" and snapped_pieces >= required_pieces:
-        var area := $Screens/stitch_mode/seam_canvas.size
-        var start := Vector2(24.0,area.y*0.35)
-        var finish := Vector2(area.x-24.0,area.y*0.65)
-        trace_adapter.configure([start,finish],{"tolerance_px":TRACE_CORRIDOR_PX,"min_coverage":0.9})
-        trace_adapter.begin(start)
-        trace_quality=1.0;trace_started=true;trace_reached_end=false;trace_error=false
+        trace_quality = 1.0
+        trace_started=true; trace_reached_end=false; trace_error=false
         set_state("tracing")
 
 func update_trace(local_position: Vector2, area_size: Vector2) -> void:
     if current_state != "tracing": return
-    var result=trace_adapter.append_point(local_position)
-    if not result.get("valid",false):
-        trace_quality=0.0;trace_error=true;set_state("error");return
-    trace_quality=minf(trace_quality,float(result.get("quality",1.0)))
-    trace_reached_end=float(result.get("coverage",0.0))>=0.9
+    var expected_y := area_size.y * (0.35 + 0.3 * (local_position.x / maxf(area_size.x, 1.0)))
+    var deviation := absf(local_position.y - expected_y)
+    if deviation > TRACE_CORRIDOR_PX:
+        trace_quality=0.0; trace_error=true; set_state("error"); return
+    trace_quality=minf(trace_quality,1.0-deviation/TRACE_CORRIDOR_PX)
+    if local_position.x >= area_size.x-30.0: trace_reached_end=true
 
 func end_trace() -> void:
     if current_state != "tracing": return
-    var area := $Screens/stitch_mode/seam_canvas.size
-    var finish := Vector2(area.x-24.0,area.y*0.65)
-    var result=trace_adapter.finish(finish)
-    seam_locked=trace_started and bool(result.get("passed",false)) and not trace_error
-    trace_quality=minf(trace_quality,float(result.get("quality",trace_quality)))
+    seam_locked = trace_started and trace_reached_end and not trace_error
     if seam_locked:
         score += 30
         Input.vibrate_handheld(28)
