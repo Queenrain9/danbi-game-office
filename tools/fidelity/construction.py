@@ -521,6 +521,134 @@ def resolve_source(b, pointer):
     return cur
 
 
+SOURCE_COVERAGE_VERSION = 'source-coverage-v1'
+DISCREPANCY_RETURN_TARGETS = {'preproduction','game_design','compiler','none'}
+
+def _ptr_escape(value):
+    return str(value).replace('~','~0').replace('/','~1')
+
+def requirement_source_refs(requirement, binding_value=None):
+    refs=[]
+    for value in (requirement.get('source_refs'), requirement.get('source_ref'), binding_value):
+        if isinstance(value,str):
+            refs.append(value)
+        elif isinstance(value,list):
+            refs.extend(x for x in value if isinstance(x,str))
+    return list(dict.fromkeys(refs))
+
+def expected_source_refs(source):
+    refs=[]
+    pack=source.get('pack') if isinstance(source,dict) else {}
+    design=source.get('design') if isinstance(source,dict) else {}
+    pack=pack if isinstance(pack,dict) else {}
+    design=design if isinstance(design,dict) else {}
+
+    screens=pack.get('screens') if isinstance(pack.get('screens'),list) else []
+    for si,screen in enumerate(screens):
+        if not isinstance(screen,dict):
+            continue
+        base=f'/source/pack/screens/{si}'
+        refs.append(base)
+        for field in ('components','interactions','states','state_variants','transitions','edge_cases','feedback'):
+            values=screen.get(field)
+            if isinstance(values,list):
+                refs.extend(f'{base}/{field}/{j}' for j in range(len(values)))
+
+    flow=pack.get('screen_flow')
+    if isinstance(flow,dict):
+        for field in ('guards','branches','exceptions'):
+            values=flow.get(field)
+            if isinstance(values,list):
+                refs.extend(f'/source/pack/screen_flow/{_ptr_escape(field)}/{j}' for j in range(len(values)))
+
+    states=pack.get('global_states')
+    if isinstance(states,list):
+        refs.extend(f'/source/pack/global_states/{j}' for j in range(len(states)))
+
+    input_map=pack.get('input_map')
+    if isinstance(input_map,dict):
+        for field in ('gestures','conflicts','cancel'):
+            values=input_map.get(field)
+            if isinstance(values,list):
+                refs.extend(f'/source/pack/input_map/{_ptr_escape(field)}/{j}' for j in range(len(values)))
+        if input_map.get('multitouch') not in (None,'',[],{}):
+            refs.append('/source/pack/input_map/multitouch')
+
+    edge_cases=pack.get('edge_cases')
+    if isinstance(edge_cases,list):
+        refs.extend(f'/source/pack/edge_cases/{j}' for j in range(len(edge_cases)))
+
+    acceptance=pack.get('acceptance_criteria')
+    if isinstance(acceptance,list):
+        refs.extend(f'/source/pack/acceptance_criteria/{j}' for j in range(len(acceptance)))
+
+    handoff=pack.get('developer_handoff')
+    if isinstance(handoff,dict):
+        for key,value in handoff.items():
+            if value not in (None,'',[],{}):
+                refs.append('/source/pack/developer_handoff/'+_ptr_escape(key))
+
+    for field in ('core_player_verbs','feedback_system','test_scenarios','wireframe_handoff'):
+        values=design.get(field)
+        if isinstance(values,list):
+            refs.extend(f'/source/design/{field}/{j}' for j in range(len(values)))
+
+    rules=design.get('game_rules')
+    if isinstance(rules,dict):
+        refs.extend('/source/design/game_rules/'+_ptr_escape(key) for key in rules.keys())
+
+    if design.get('progression') not in (None,'',[],{}):
+        refs.append('/source/design/progression')
+
+    return list(dict.fromkeys(refs))
+
+def source_coverage_report(blueprint):
+    expected=expected_source_refs(blueprint.get('source') or {})
+    covered=[]
+    source_bindings=(blueprint.get('bindings') or {}).get('sources',{})
+    for req in blueprint.get('requirements',[]) if isinstance(blueprint.get('requirements'),list) else []:
+        binding_value=source_bindings.get(req.get('id')) if isinstance(source_bindings,dict) else None
+        covered.extend(requirement_source_refs(req,binding_value))
+    covered_set=set(covered)
+    missing=[ref for ref in expected if ref not in covered_set]
+    return {
+        'version': SOURCE_COVERAGE_VERSION,
+        'expected_count': len(expected),
+        'covered_count': len(expected)-len(missing),
+        'missing_count': len(missing),
+        'missing_refs': missing,
+    }
+
+def validate_discrepancy_notes(blueprint):
+    errors=[]
+    notes=blueprint.get('design_wireframe_notes',[])
+    if notes is None:
+        return errors
+    if not isinstance(notes,list):
+        return [('design_wireframe_notes','Expected an array')]
+    for i,note in enumerate(notes):
+        path=f'design_wireframe_notes/{i}'
+        if not isinstance(note,dict):
+            errors.append((path,'Each discrepancy note must be an object'))
+            continue
+        if not str(note.get('message') or '').strip():
+            errors.append((path,'Discrepancy note needs message'))
+        target=note.get('return_to','none')
+        if target not in DISCREPANCY_RETURN_TARGETS:
+            errors.append((path,'return_to must be preproduction, game_design, compiler, or none'))
+        for field in ('design_refs','wireframe_refs'):
+            refs=note.get(field,[])
+            if refs is None:
+                refs=[]
+            if not isinstance(refs,list) or any(not isinstance(x,str) for x in refs):
+                errors.append((path,field+' must be an array of RFC6901 source refs'))
+                continue
+            for ref in refs:
+                try: resolve_source(blueprint,ref)
+                except (KeyError,IndexError,ValueError,TypeError):
+                    errors.append((path,field+' contains unresolved source ref '+str(ref)))
+    return errors
+
 def is_static(t):
     return t.get('verification_scope', 'static' if t.get('kind') == 'static' else 'manual_playtest') == 'static'
 
@@ -648,10 +776,24 @@ def validate(b, project=None, claims=None, commit=None):
         error('REFERENCE_SIZE', 'bindings.reference_size', str(exc))
     if source.get('requirements') != reqs or source.get('pack', {}).get('screens') != b.get('screens'): error('SOURCE_DRIFT', '', 'Frozen source requirements/screens differ')
     if source.get('pack', {}).get('id') != b.get('wireframe_pack_id') or source.get('pack', {}).get('design_id') != source.get('design', {}).get('id'): error('SOURCE_IDENTITY', '', 'Pack/design identity mismatch')
+    source_bindings = bindings.get('sources', {}) if isinstance(bindings.get('sources', {}), dict) else {}
     for r in reqs:
-        pointer = bindings.get('sources', {}).get(r.get('id'), r.get('source_ref'))
-        try: resolve_source(b, pointer)
-        except (KeyError, IndexError, ValueError, TypeError): error('SOURCE_REF', r.get('id'), 'Unresolved RFC6901 source reference')
+        pointers = requirement_source_refs(r, source_bindings.get(r.get('id')))
+        if not pointers:
+            error('SOURCE_REF', r.get('id'), 'At least one RFC6901 source_ref/source_refs entry is required')
+            continue
+        for pointer in pointers:
+            try: resolve_source(b, pointer)
+            except (KeyError, IndexError, ValueError, TypeError):
+                error('SOURCE_REF', r.get('id'), 'Unresolved RFC6901 source reference: '+str(pointer))
+    coverage = source_coverage_report(b)
+    if b.get('source_coverage_version') == SOURCE_COVERAGE_VERSION and coverage['missing_count']:
+        sample=', '.join(coverage['missing_refs'][:8])
+        error('SOURCE_COVERAGE','requirements',f"{coverage['missing_count']} source items are not linked by any requirement source_refs; first: {sample}")
+    if b.get('source_coverage_version') == SOURCE_COVERAGE_VERSION and b.get('source_coverage') != coverage:
+        error('SOURCE_COVERAGE_REPORT','source_coverage','Stored source coverage report differs from deterministic recomputation')
+    for path,message in validate_discrepancy_notes(b):
+        error('DESIGN_WIREFRAME_NOTE',path,message)
     if bindings.get('coordinate_space') != 'screen_percent': error('GEOMETRY', '', 'Only explicit screen_percent supported')
     if bindings.get('stretch_mode') != 'canvas_items': error('GEOMETRY', '', 'Foundation supports canvas_items')
     try: resource_path(bindings.get('scene_path'))
@@ -878,6 +1020,8 @@ def validate(b, project=None, claims=None, commit=None):
             'manual_test_ids':[t.get('id') for t in tests if not is_static(t)],
             'blueprint_hash':b.get('blueprint_hash'),'commit':commit,
             'adapter_pins':blueprint_adapter_pins(b),
+            'source_coverage':coverage,
+            'design_wireframe_notes':b.get('design_wireframe_notes',[]),
             'results':[{'test_id':t.get('id'),'status':'failed' if errors else 'passed'} for t in tests if is_static(t)],
             'limitation':'Structural checks only; independent code/source review must verify game-specific semantics. Not runtime QA.'}
 
