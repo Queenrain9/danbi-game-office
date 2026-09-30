@@ -134,6 +134,20 @@ Compiler target resolution follows the reference helper `resolve_interaction_tar
 
 Example: Midnight Lost Property's `hotspot` tap on the inspection screen resolves to the only `manipulable` Lost Item component with `target_selector="hotspot"`; the source target string remains unchanged.
 
+## Compiler source coverage v1
+
+New and explicitly recompiled unapproved Contracts use `source_coverage_version='source-coverage-v1'`.
+
+Coverage is item-based. Every canonical Game Design/Wireframe source item must appear in at least one atomic requirement through `source_ref` or `source_refs[]`. One requirement may cite multiple source items when they describe the same implementation obligation; the goal is zero source omission, not an inflated requirement count.
+
+The canonical source set is computed by `public.danbi_contract_source_coverage(contract_id)`. It includes Wireframe screens and their components/interactions/states/state variants/transitions/edge cases/feedback, screen-flow guards/branches/exceptions, global states, input-map gesture/conflict/cancel/multitouch details, top-level edge cases, acceptance criteria, developer handoff fields, plus Game Design core player verbs, game rules, feedback, test scenarios, wireframe handoff, and progression.
+
+For an opted-in Contract, `missing_count` must be zero before `danbi_compiler_checkpoint(contract_id)` can report `complete=true`. Store the deterministic report in `danbi_implementation_contracts.source_coverage`. The Blueprint freezes `source_coverage_version`, `source_coverage`, and the exact Contract requirements. Historical approved Blueprints that predate this policy are not invalidated solely because the opt-in field is absent.
+
+The Compiler also records Design↔Wireframe differences in `design_wireframe_notes[]`; it does not decide which source is semantically correct. Each note includes a message, `design_refs[]`, `wireframe_refs[]`, and `return_to` = `preproduction | game_design | compiler | none`. The independent Gate makes the verdict and uses `return_to` so source-meaning defects go to the owning upstream room while construction/trace defects return to Compiler.
+
+Operational GitHub/Supabase/network/tool/storage failures remain run-ledger failures and must not be converted into semantic game blockers.
+
 ## Compiler → independent Blueprint review
 
 Export **current full DB rows** for Contract, Wireframe Pack and Game Design to JSON. The Blueprint must keep `schema_version: fidelity-v1`, a frozen `source` with `pack`, `design`, and `requirements`, identical `screens` and `requirements`, plus `hash_algorithm: sha256-canonical-json-v1`. Add `bindings.scene_path`, `reference_size`, `coordinate_space: screen_percent`, `stretch_mode: canvas_items`, explicit `nodes`, `components`, `connections`, `interactions`, `implementations` (one or more `res://` file/node or symbol references per requirement), `reusable_components`, and `tests` with deterministic `checks` and `stage`. Use `construction_pattern` on each node; `registry` lists supported patterns. Every stage needs a static test, every requirement needs static implementation coverage, and executable behavior has a separate manual test. Use zero-based RFC6901 JSON pointers for `bindings.sources`.
