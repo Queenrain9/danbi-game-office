@@ -1,5 +1,7 @@
 import importlib.util
+import json
 from pathlib import Path
+import tempfile
 import unittest
 
 ROOT = Path(__file__).parents[1]
@@ -7,20 +9,21 @@ spec=importlib.util.spec_from_file_location("construction",ROOT/"tools/fidelity/
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class InteractionAdapterTests(unittest.TestCase):
-    def test_registry(self):
-        self.assertEqual(set(m.INTERACTION_ADAPTERS),{"drag_v1","snap_v1","hold_v1","swipe_v1","trace_v1","pinch_v1"})
+    def test_registry_exposes_only_production_entries_to_compiler(self):
+        registry=m.load_adapter_registry()
+        production={adapter_id for adapter_id,entry in registry["adapters"].items() if entry["status"]=="production"}
+        self.assertEqual(set(m.INTERACTION_ADAPTERS),production)
 
-    def test_registry_lifecycle_is_production_for_current_v1_set(self):
+    def test_registry_entries_have_lifecycle_and_frozen_metadata(self):
         registry=m.load_adapter_registry()
         self.assertEqual(registry["schema_version"],"interaction-runtime-registry-v1")
-        self.assertEqual(set(registry["adapters"]),set(m.INTERACTION_ADAPTERS))
         for adapter_id,entry in registry["adapters"].items():
             self.assertEqual(entry["adapter_id"],adapter_id)
-            self.assertEqual(entry["status"],"production")
-            self.assertRegex(entry["sha256"],r"^[0-9a-f]{64}$")
-            self.assertTrue(entry["class_name"].endswith("V1"))
-            self.assertIn("4.7.2",entry["validated_godot"])
-            self.assertTrue(entry["ci_run"])
+            self.assertIn(entry["status"],{"candidate","production","deprecated"})
+            if entry["status"] in {"production","deprecated"}:
+                self.assertRegex(entry["sha256"],r"^[0-9a-f]{64}$")
+                self.assertTrue(entry["validated_godot"])
+                self.assertTrue(entry["ci_run"])
 
     def test_production_selector_excludes_candidate_and_deprecated(self):
         fake={
@@ -39,6 +42,54 @@ class InteractionAdapterTests(unittest.TestCase):
         changed={"adapters":{"drag_v1":dict(previous["adapters"]["drag_v1"])}}
         changed["adapters"]["drag_v1"]["sha256"]="b"*64
         self.assertTrue(any(x["code"]=="ADAPTER_FROZEN" for x in m.registry_transition_issues(previous,changed)))
+
+    def test_new_adapter_must_enter_registry_as_candidate(self):
+        previous={"adapters":{}}
+        current={"adapters":{"drag_v2":{
+            "adapter_id":"drag_v2","semantic_kind":"drag","status":"production",
+            "sha256":"a"*64,"source_path":"production/godot/interaction_runtime/drag_v2.gd",
+            "script_path":"res://runtime/interaction/drag_v2.gd","class_name":"DanbiDragV2",
+            "entry_symbol":"handle_event","required_params":[],"validated_godot":["4.7.2"],
+            "ci_run":"123","superseded_by":None
+        }}}
+        issues=m.registry_transition_issues(previous,current)
+        self.assertTrue(any(x["code"]=="ADAPTER_LIFECYCLE" for x in issues))
+
+    def test_candidate_can_promote_to_production(self):
+        base={
+            "adapter_id":"drag_v2","semantic_kind":"drag","status":"candidate",
+            "sha256":None,"source_path":"production/godot/interaction_runtime/drag_v2.gd",
+            "script_path":"res://runtime/interaction/drag_v2.gd","class_name":"DanbiDragV2",
+            "entry_symbol":"handle_event","required_params":[],"validated_godot":[],"ci_run":None,
+            "superseded_by":None
+        }
+        previous={"adapters":{"drag_v2":dict(base)}}
+        promoted={"adapters":{"drag_v2":dict(base,status="production",sha256="a"*64,validated_godot=["4.7.2"],ci_run="123")}}
+        self.assertEqual(m.registry_transition_issues(previous,promoted),[])
+
+    def test_adapter_class_name_version_matches_file_version(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            runtime=root/"production/godot/interaction_runtime"
+            runtime.mkdir(parents=True)
+            (runtime/"drag_v2.gd").write_text("class_name DanbiDragV1\nextends RefCounted\n",encoding="utf-8")
+            registry={
+                "schema_version":"interaction-runtime-registry-v1",
+                "hash_algorithm":"sha256-lf-bytes-v1",
+                "lifecycle":["candidate","production","deprecated"],
+                "adapters":{
+                    "drag_v2":{
+                        "adapter_id":"drag_v2","status":"candidate","semantic_kind":"drag",
+                        "source_path":"production/godot/interaction_runtime/drag_v2.gd",
+                        "script_path":"res://runtime/interaction/drag_v2.gd","sha256":None,
+                        "class_name":"DanbiDragV1","entry_symbol":"handle_event","required_params":[],
+                        "validated_godot":[],"ci_run":None,"superseded_by":None
+                    }
+                }
+            }
+            (runtime/"registry.json").write_text(json.dumps(registry),encoding="utf-8")
+            issues=m.verify_adapter_registry(root)
+            self.assertTrue(any(x["code"]=="ADAPTER_CLASS_VERSION" for x in issues))
 
     def test_drag_snap_compilation_pins_immutable_adapter_metadata(self):
         src={"interaction_semantics":{"kind":"drag","target_component_id":"piece","cancel":"return_origin","completion":{"kind":"snap","target_component_id":"slot","tolerance_px":24}}}
