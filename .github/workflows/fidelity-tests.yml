@@ -1,3 +1,4 @@
+# Tiny Stagehand bridge validation follows current main
 name: Fidelity compiler tests
 
 on:
