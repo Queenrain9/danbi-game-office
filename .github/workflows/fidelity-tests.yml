@@ -1,0 +1,26 @@
+name: Fidelity compiler tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/fidelity/**"
+      - "tests/test_fidelity.py"
+      - "tests/test_production.py"
+      - "tests/test_interaction_adapters.py"
+      - ".github/workflows/fidelity-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run fidelity unit tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
