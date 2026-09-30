@@ -1065,8 +1065,42 @@ function setIdeaQueueFilter(value){
   render();
 }
 
+const IDEA_GENRE_GROUPS = [
+  {id:"puzzle", label:"퍼즐", words:["puzzle","logic","spatial","matching","match","escape","퍼즐","논리","추리 퍼즐"]},
+  {id:"strategy", label:"전략", words:["strategy","strategic","tactics","tactical","systems","systemic","management","planning","defense","builder","buildcraft","전략","전술","운영"]},
+  {id:"action", label:"액션", words:["action","combat","chase","pursuit","platformer","shooter","brawler","timing action","액션","전투","추격"]},
+  {id:"sim", label:"시뮬·경영", words:["simulation","simulator","sim","tycoon","management","shop","restaurant","farming","crafting","life sim","경영","시뮬","운영","상점","농장"]},
+  {id:"mystery", label:"추리·서사", words:["mystery","detective","deduction","investigation","crime","narrative","story","dialogue","social deduction","rumor","추리","수사","탐정","미스터리","서사","대화","소문"]},
+  {id:"roguelike", label:"로그라이크", words:["roguelike","roguelite","run-based","procedural","로그라이크","로그라이트"]},
+  {id:"survival", label:"생존·탐험", words:["survival","expedition","exploration","explore","adventure","journey","caravan","생존","탐험","원정","모험"]},
+  {id:"rhythm", label:"리듬", words:["rhythm","music","beat","tempo","리듬","음악","박자"]},
+  {id:"card", label:"카드·덱", words:["card","deck","deckbuilder","deckbuilding","poker","카드","덱","포커"]},
+  {id:"social", label:"소셜·파티", words:["social","party","multiplayer","co-op","coop","crowd","audience","소셜","파티","협동","관객"]}
+];
+
+function ideaGenreSource(p){
+  return [p.genre,p.title,p.one_line,p.core_action].filter(Boolean).join(" ").toLocaleLowerCase("ko-KR");
+}
+
+function ideaBroadGenreTags(p){
+  const text=ideaGenreSource(p);
+  const tags=IDEA_GENRE_GROUPS.filter(group=>group.words.some(word=>text.includes(word))).map(group=>group.id);
+  return tags.length?tags:["other"];
+}
+
+function availableIdeaGenreGroups(ps){
+  const counts={};
+  ideaPendingPool(ps).forEach(p=>ideaBroadGenreTags(p).forEach(tag=>counts[tag]=(counts[tag]||0)+1));
+  const groups=IDEA_GENRE_GROUPS
+    .filter(group=>counts[group.id])
+    .map(group=>({...group,count:counts[group.id]}));
+  if(counts.other) groups.push({id:"other",label:"기타",count:counts.other});
+  return groups;
+}
+
 function setIdeaGenreFilter(value){
-  ideaGenreFilter=value||"all";
+  const valid=["all",...IDEA_GENRE_GROUPS.map(x=>x.id),"other"];
+  ideaGenreFilter=valid.includes(value)?value:"all";
   localStorage.setItem("danbiIdeaGenreFilter",ideaGenreFilter);
   render();
 }
@@ -1090,7 +1124,7 @@ function filteredIdeaQueue(ps){
   let out=ideaPendingPool(ps);
   if(ideaQueueFilter==="priority") out=out.filter(p=>!!p.human_priority);
   if(ideaQueueFilter==="regular") out=out.filter(p=>!p.human_priority);
-  if(ideaGenreFilter!=="all") out=out.filter(p=>(p.genre||"")===ideaGenreFilter);
+  if(ideaGenreFilter!=="all") out=out.filter(p=>ideaBroadGenreTags(p).includes(ideaGenreFilter));
   const tokens=(ideaSearchQuery||"").trim().toLocaleLowerCase("ko-KR").split(/\s+/).filter(Boolean);
   if(tokens.length) out=out.filter(p=>{
     const hay=ideaSearchText(p);
@@ -1144,8 +1178,9 @@ function ideaModeHeader(ps){
 function ideasAllView(ps){
   const pending=ideaPendingPool(ps);
   const priorityCount=pending.filter(p=>!!p.human_priority).length;
-  const genres=[...new Set(pending.map(p=>p.genre).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"ko"));
-  if(ideaGenreFilter!=="all" && !genres.includes(ideaGenreFilter)) ideaGenreFilter="all";
+  const genreGroups=availableIdeaGenreGroups(pending);
+  const availableGenreIds=genreGroups.map(x=>x.id);
+  if(ideaGenreFilter!=="all" && !availableGenreIds.includes(ideaGenreFilter)) ideaGenreFilter="all";
   const visible=filteredIdeaQueue(pending);
   const filterActive=ideaGenreFilter!=="all" || ideaSortMode!=="queue" || ideaQueueFilter==="regular";
   return `<div class="idea-workspace">
@@ -1156,7 +1191,7 @@ function ideasAllView(ps){
         <div class="idea-filter-popover">
           <select class="idea-filter-select" onchange="setIdeaGenreFilter(this.value)">
             <option value="all">모든 장르</option>
-            ${genres.map(g=>`<option value="${esc(g)}" ${ideaGenreFilter===g?"selected":""}>${esc(g)}</option>`).join("")}
+            ${genreGroups.map(g=>`<option value="${g.id}" ${ideaGenreFilter===g.id?"selected":""}>${esc(g.label)} · ${g.count}</option>`).join("")}
           </select>
           <select class="idea-filter-select" onchange="setIdeaSortMode(this.value)">
             <option value="queue" ${ideaSortMode==="queue"?"selected":""}>처리 순서</option>
