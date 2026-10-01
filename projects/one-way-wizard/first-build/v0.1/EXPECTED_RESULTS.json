@@ -1,0 +1,15 @@
+{
+  "source": "manually_derived",
+  "reference_hash": "30e8fd88b03a98781dbdd682437a6478b3b2f40f3b8b2ef46e5a47b7ccf79a13",
+  "derivations": {
+    "rule_tick": "1/60 s; debug_step(1.0) = 60 ticks",
+    "wrap": "x=.99 + .22*.10 = 1.012 -> wrapped x=.012; lifetime 18-.10 = 17.9",
+    "mana": "start4; valid cast ->3; one regen at each 4.0s up to4",
+    "cap": "count8 rejects new Bolt with no mana cost",
+    "redirect": "heading0 + 90 clockwise = 90",
+    "split_positive_cross": "child = parent +30 degrees",
+    "split_negative_cross": "child = parent -30 degrees",
+    "merge": "headings0/30 -> shorter-arc mean15; max lifetime12 +4 =16; damage2; empowered",
+    "wave2": "7 scheduled enemies; final scheduled spawn at9.6s"
+  }
+}
