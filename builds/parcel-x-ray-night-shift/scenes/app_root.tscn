@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource path="res://scripts/app_root.gd" type="Script" id="1"]
 [ext_resource path="res://scripts/interactions.gd" type="Script" id="2"]
+[ext_resource path="res://scripts/shift_controller.gd" type="Script" id="3"]
+[ext_resource path="res://scripts/case_router.gd" type="Script" id="4"]
+[ext_resource path="res://scripts/components/parcelview.gd" type="Script" id="5"]
+[ext_resource path="res://scripts/components/scanrail.gd" type="Script" id="6"]
+[ext_resource path="res://scripts/components/evidencepin.gd" type="Script" id="7"]
+[ext_resource path="res://scripts/components/droplane.gd" type="Script" id="8"]
+[ext_resource path="res://scripts/components/rulechip.gd" type="Script" id="9"]
+[ext_resource path="res://scripts/components/resultstamp.gd" type="Script" id="10"]
 
 [node name="AppRoot" type="Control"]
 layout_mode=3
@@ -54,6 +62,7 @@ offset_right=496.8
 offset_bottom=652.8
 [node name="RuleChip" type="Control" parent="Screens/parcel_intake/rule_chips"]
 layout_mode=1
+script=ExtResource("9")
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -76,6 +85,7 @@ offset_right=329.4
 offset_bottom=105.6
 [node name="RuleChip" type="Control" parent="Screens/inspection/case_rule"]
 layout_mode=1
+script=ExtResource("9")
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -99,6 +109,8 @@ offset_bottom=604.8
 mouse_filter=1
 [node name="ParcelView" type="Control" parent="Screens/inspection/xray_box"]
 layout_mode=1
+mouse_filter=2
+script=ExtResource("5")
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -114,6 +126,7 @@ offset_right=507.6
 offset_bottom=604.8
 [node name="ScanRail" type="Control" parent="Screens/inspection/scan_rail"]
 layout_mode=1
+script=ExtResource("6")
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -124,6 +137,7 @@ offset_right=226.8
 offset_bottom=681.6
 text="Evidence Pins 0/4"
 [node name="EvidencePin" type="Control" parent="Screens/inspection/pin_tray"]
+script=ExtResource("7")
 [node name="pass_lane" type="Control" parent="Screens/inspection"]
 offset_left=27.0
 offset_top=748.8
@@ -131,6 +145,8 @@ offset_right=178.2
 offset_bottom=873.6
 [node name="DropLane" type="Control" parent="Screens/inspection/pass_lane"]
 layout_mode=1
+script=ExtResource("8")
+classification="PASS"
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -141,6 +157,8 @@ offset_right=345.6
 offset_bottom=873.6
 [node name="DropLane" type="Control" parent="Screens/inspection/repack_lane"]
 layout_mode=1
+script=ExtResource("8")
+classification="REPACK"
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -151,6 +169,8 @@ offset_right=513.0
 offset_bottom=873.6
 [node name="DropLane" type="Control" parent="Screens/inspection/isolate_lane"]
 layout_mode=1
+script=ExtResource("8")
+classification="ISOLATE"
 anchors_preset=15
 anchor_right=1.0
 anchor_bottom=1.0
@@ -166,6 +186,7 @@ offset_top=76.8
 offset_right=432.0
 offset_bottom=172.8
 [node name="ResultStamp" type="Control" parent="Screens/classification_result/stamp"]
+script=ExtResource("10")
 [node name="score_delta" type="Label" parent="Screens/classification_result"]
 offset_left=183.6
 offset_top=192.0
@@ -272,7 +293,9 @@ mouse_filter=2
 script=ExtResource("2")
 [node name="ReusableComponents" type="Control" parent="."]
 [node name="ShiftController" type="Control" parent="."]
+script=ExtResource("3")
 [node name="CaseRouter" type="Control" parent="."]
+script=ExtResource("4")
 [node name="HUDLayer" type="Control" parent="."]
 [node name="OverlayLayer" type="Control" parent="."]
 [connection signal="pressed" from="Screens/night_hub/start_shift" to="InteractionController" method="on_night_hub_01_load_first_parcel"]
