@@ -1,0 +1,628 @@
+{
+  "status": "passed",
+  "errors": [],
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "commit": "65aabc6e21cb92816a4c8e9024f8af6d89c45425",
+  "results": [
+    {
+      "test_id": "STAGE:geometry",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STAGE:input",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STAGE:integration",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STAGE:presentation",
+      "status": "passed",
+      "stage": "presentation",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STAGE:skeleton",
+      "status": "passed",
+      "stage": "skeleton",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STAGE:state",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:01",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:02",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:03",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:04",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:05",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ACC:06",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ARC:required_data",
+      "status": "passed",
+      "stage": "skeleton",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ARC:reusable_components",
+      "status": "passed",
+      "stage": "skeleton",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ARC:scene_hierarchy",
+      "status": "passed",
+      "stage": "skeleton",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:ARC:state_ownership",
+      "status": "passed",
+      "stage": "skeleton",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:classification_result:continue",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:classification_result:evidence_replay",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:classification_result:reason",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:classification_result:score_delta",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:classification_result:stamp",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:case_rule",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:isolate_lane",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:manual_btn",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:pass_lane",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:pin_tray",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:repack_lane",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:scan_count",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:scan_plane",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:scan_rail",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection:xray_box",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:night_hub:shift_card",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:night_hub:start_shift",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:parcel_intake:begin_inspect",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:parcel_intake:case_counter",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:parcel_intake:label_card",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:parcel_intake:rule_chips",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:pause:pause_scrim",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:pause:quit",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:pause:resume",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:rule_manual:close_rule",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:rule_manual:modal_scrim",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:rule_manual:rule_panel",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:accuracy",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:critical",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:efficiency",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:grade",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:next",
+      "status": "passed",
+      "stage": "geometry",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:CNT:mvp_scope",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:GST:input_lock",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:GST:paused",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INP:classify",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INP:pin",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INP:rotate",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INP:scan",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:classification_result:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:inspection:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:inspection:02",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:inspection:03",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:inspection:04",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:night_hub:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:parcel_intake:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:pause:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:pause:02",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:rule_manual:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:INT:shift_summary:01",
+      "status": "passed",
+      "stage": "input",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:combo",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:failure",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:hazard:01",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:hazard:02",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:hazard:03",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scan_budget",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:correct",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:critical_isolate",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:efficient_bonus",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:false_pin",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:wrong_other",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:RUL:scoring:wrong_pass",
+      "status": "passed",
+      "stage": "integration",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:classification_result:result",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:inspection:classifying",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:inspection:inspect",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:night_hub:hub",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:parcel_intake:intake",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:pause:paused",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:rule_manual:rule_overlay",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:STA:shift_summary:summary",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:classification_result:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:classification_result:02",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:inspection:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:inspection:02",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:night_hub:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:parcel_intake:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:pause:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:pause:02",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:rule_manual:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:TRN:shift_summary:01",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:VAR:inspection:classifying",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:VAR:inspection:input_locked",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:VAR:inspection:rotating",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    },
+    {
+      "test_id": "STATIC:VAR:inspection:scanning",
+      "status": "passed",
+      "stage": "state",
+      "verification_scope": "static"
+    }
+  ],
+  "promotion_eligible": true,
+  "independent_semantic_review_required": true,
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "repaired_review_id": "558eb14f-79ce-443c-8149-050dc3fa8660",
+  "structural_summary": {
+    "requirement_claims": "94/94 IMPLEMENTED",
+    "open_repair_tickets": 0,
+    "project_path": "builds/parcel-x-ray-night-shift",
+    "scene_path": "res://scenes/app_root.tscn",
+    "legacy_adapter_bindings": "none",
+    "checks": [
+      "project.godot main scene and 540x960 canvas_items viewport",
+      "Blueprint scene graph, node geometry, scripts, reusable attachments and connections",
+      "source rule values, 10-case content pool and 8-case shift flow",
+      "yaw/pitch rotate, unbounded scan with fifth-scan penalty, visible-shape evidence pins",
+      "lane-center classification, cancel-to-table, modal and result input locks",
+      "result explanation, score, critical misses, efficiency and summary-to-hub path"
+    ]
+  }
+}
