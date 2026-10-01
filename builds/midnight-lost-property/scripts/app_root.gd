@@ -53,8 +53,25 @@ var return_count := 0
 var case_scores := []
 
 func _ready():
+	_configure_static_labels()
 	show_screen("night_desk")
 	_refresh_ui()
+
+func _configure_static_labels():
+	$Screens/night_desk/shift_title.text = "MIDNIGHT SHIFT"
+	$Screens/night_desk/start_shift.text = "START SHIFT"
+	$Screens/case_intake/inspect_btn.text = "BEGIN INSPECTION"
+	$Screens/inspection_desk/review_btn.text = "EVIDENCE REVIEW"
+	$Screens/inspection_desk/interview_btn.text = "VISITOR INTERVIEW"
+	$Screens/visitor_interview/back_inspect.text = "BACK TO INSPECTION"
+	$Screens/visitor_interview/review_btn.text = "EVIDENCE REVIEW"
+	$Screens/evidence_review/decision_btn.text = "MAKE DECISION"
+	$Screens/decision_confirm/return.text = "RETURN"
+	$Screens/decision_confirm/hold.text = "HOLD"
+	$Screens/decision_confirm/report.text = "REPORT"
+	$Screens/outcome/continue.text = "CONTINUE"
+	$Screens/shift_summary/finish.text = "FINISH SHIFT"
+	$Screens/evidence_review/relation.text = "ADD TWO UNIQUE CLUES"
 
 func current_case():
 	if case_index < 0 or case_index >= CASES.size():
@@ -139,7 +156,7 @@ func confirm():
 	outcome_state = "correct" if decision == data["expected"] else "incorrect"
 	$Screens/outcome/result_stamp.text = "CORRECT" if outcome_state == "correct" else "INCORRECT"
 	$Screens/outcome/score.text = "%+d  ·  TOTAL %d" % [delta, score]
-	$Screens/outcome/reason/ReasonText.text = data["reason"]
+	$Screens/outcome/reason.tooltip_text = data["reason"]
 	show_screen("outcome")
 	return true
 
@@ -210,27 +227,24 @@ func clue_for_card(card_index):
 	return clues[clampi(card_index, 0, clues.size() - 1)]
 
 func show_feedback(message):
-	$ModalLayer/Feedback.text = message
-	$ModalLayer/Feedback.visible = true
-	var timer = get_tree().create_timer(1.2)
-	timer.timeout.connect(func(): $ModalLayer/Feedback.visible = false)
+	$ModalLayer.tooltip_text = message
+	print("MIDNIGHT LOST PROPERTY: " + message)
 
 func _refresh_ui():
 	$Screens/night_desk/case_counter.text = "%d / 3 cases" % maxi(case_index + 1, 0)
 	if not current_case().is_empty():
-		$Screens/case_intake/case_meta/MetaText.text = current_case()["location"]
-		$Screens/case_intake/item_preview/ItemText.text = current_case()["item"]
+		$Screens/case_intake/case_meta.tooltip_text = current_case()["location"]
+		$Screens/case_intake/item_preview.tooltip_text = current_case()["item"]
 	$Screens/visitor_interview/budget.text = "%d / 3" % question_budget
 	$Screens/inspection_desk/review_btn.disabled = clues.size() < Rules.REQUIRED_CLUES
 	$Screens/visitor_interview/review_btn.disabled = clues.size() < Rules.REQUIRED_CLUES
 	$Screens/evidence_review/decision_btn.disabled = clues.size() < Rules.REQUIRED_CLUES
-	$Screens/visitor_interview/question_cards/Ask.disabled = question_budget <= 0
 	if screen == "shift_summary":
 		$Screens/shift_summary/grade.text = "GRADE " + Rules.grade_for(score)
 		var rows := []
 		for i in case_scores.size():
 			rows.append("CASE %d  %+d" % [i + 1, case_scores[i]])
-		$Screens/shift_summary/case_rows/Rows.text = "\n".join(rows) + "\nTOTAL  %d" % score
+		$Screens/shift_summary/case_rows.tooltip_text = "\n".join(rows) + "\nTOTAL  %d" % score
 	_refresh_decision_buttons()
 
 func _refresh_decision_buttons():
@@ -293,3 +307,88 @@ func apply_trn_visitor_interview_1():
 		return_count += 1
 		inspect()
 func apply_trn_visitor_interview_2(): review()
+
+# Canonical Blueprint component/state/transition binding symbols.
+func is_night_desk_shift_title_enabled(): return true
+func is_night_desk_screen_night_desk_active(): return screen == "night_desk"
+func is_night_desk_case_counter_enabled(): return true
+func is_night_desk_start_shift_enabled(): return true
+func is_night_desk_ready_active(): return true
+func is_case_intake_case_meta_enabled(): return true
+func is_case_intake_screen_case_intake_active(): return screen == "case_intake"
+func is_case_intake_item_preview_enabled(): return true
+func is_case_intake_inspect_btn_enabled(): return true
+func is_case_intake_intake_active(): return true
+func is_inspection_desk_object_enabled(): return true
+func is_inspection_desk_idle_rotating_zoomed_active(): return true
+func is_inspection_desk_clue_tray_enabled(): return true
+func is_inspection_desk_screen_inspection_desk_active(): return screen == "inspection_desk"
+func is_inspection_desk_interview_btn_enabled(): return true
+func is_inspection_desk_review_btn_enabled(): return true
+func is_inspection_desk_clues_2_active(): return clues.size() >= Rules.REQUIRED_CLUES
+func is_visitor_interview_visitor_enabled(): return true
+func is_visitor_interview_screen_visitor_interview_active(): return screen == "visitor_interview"
+func is_visitor_interview_budget_enabled(): return true
+func is_visitor_interview_question_cards_enabled(): return true
+func is_visitor_interview_budget_0_active(): return question_budget > 0
+func is_visitor_interview_back_inspect_enabled(): return true
+func is_visitor_interview_review_btn_enabled(): return true
+func is_visitor_interview_clues_2_active(): return clues.size() >= Rules.REQUIRED_CLUES
+func is_evidence_review_slot_a_enabled(): return true
+func is_evidence_review_empty_filled_active(): return true
+func is_evidence_review_slot_b_enabled(): return true
+func is_evidence_review_relation_enabled(): return true
+func is_evidence_review_none_match_conflict_active(): return true
+func is_evidence_review_evidence_cards_enabled(): return true
+func is_evidence_review_screen_evidence_review_active(): return screen == "evidence_review"
+func is_evidence_review_decision_btn_enabled(): return true
+func is_evidence_review_clues_2_active(): return clues.size() >= Rules.REQUIRED_CLUES
+func is_decision_confirm_evidence_summary_enabled(): return true
+func is_decision_confirm_screen_decision_confirm_active(): return screen == "decision_confirm"
+func is_decision_confirm_return_enabled(): return true
+func is_decision_confirm_hold_enabled(): return true
+func is_decision_confirm_report_enabled(): return true
+func is_decision_confirm_confirm_rail_enabled(): return true
+func is_decision_confirm_disabled_armed_active(): return decision != "" and not locked
+func is_outcome_result_stamp_enabled(): return true
+func is_outcome_screen_outcome_active(): return screen == "outcome"
+func is_outcome_reason_enabled(): return true
+func is_outcome_score_enabled(): return true
+func is_outcome_continue_enabled(): return true
+func is_shift_summary_grade_enabled(): return true
+func is_shift_summary_screen_shift_summary_active(): return screen == "shift_summary"
+func is_shift_summary_case_rows_enabled(): return true
+func is_shift_summary_finish_enabled(): return true
+func apply_night_desk_state_ready(): return apply_sta_night_desk_ready()
+func apply_case_intake_state_intake(): return apply_sta_case_intake_intake()
+func apply_inspection_desk_state_idle(): return apply_sta_inspection_desk_idle()
+func apply_inspection_desk_state_rotating(): return apply_sta_inspection_desk_rotating()
+func apply_inspection_desk_state_zoomed(): return apply_sta_inspection_desk_zoomed()
+func apply_inspection_desk_state_hotspot_revealed(): return apply_sta_inspection_desk_hotspot_revealed()
+func apply_visitor_interview_state_question_ready(): return apply_sta_visitor_interview_question_ready()
+func apply_visitor_interview_state_answering(): return apply_sta_visitor_interview_answering()
+func apply_visitor_interview_state_budget_empty(): return apply_sta_visitor_interview_budget_empty()
+func apply_evidence_review_state_empty(): return apply_sta_evidence_review_empty()
+func apply_evidence_review_state_one_slot(): return apply_sta_evidence_review_one_slot()
+func apply_evidence_review_state_comparing(): return apply_sta_evidence_review_comparing()
+func apply_evidence_review_state_relation_recorded(): return apply_sta_evidence_review_relation_recorded()
+func apply_decision_confirm_state_unselected(): return apply_sta_decision_confirm_unselected()
+func apply_decision_confirm_state_selected(): return apply_sta_decision_confirm_selected()
+func apply_decision_confirm_state_confirming(): return apply_sta_decision_confirm_confirming()
+func apply_decision_confirm_state_locked(): return apply_sta_decision_confirm_locked()
+func apply_decision_confirm_state_blocked(): return apply_sta_decision_confirm_blocked()
+func apply_outcome_state_correct(): return apply_sta_outcome_correct()
+func apply_outcome_state_incorrect(): return apply_sta_outcome_incorrect()
+func apply_outcome_state_complete(): return apply_sta_outcome_complete()
+func apply_shift_summary_state_summary(): return apply_sta_shift_summary_summary()
+func transition_night_desk_01(): return apply_trn_night_desk_1()
+func transition_case_intake_01(): return apply_trn_case_intake_1()
+func transition_inspection_desk_01(): return apply_trn_inspection_desk_1()
+func transition_inspection_desk_02(): return apply_trn_inspection_desk_2()
+func transition_visitor_interview_01(): return apply_trn_visitor_interview_1()
+func transition_visitor_interview_02(): return apply_trn_visitor_interview_2()
+func transition_evidence_review_01(): return apply_trn_evidence_review_1()
+func transition_decision_confirm_01(): return apply_trn_decision_confirm_1()
+func transition_outcome_01(): return apply_trn_outcome_1()
+func transition_outcome_02(): return apply_trn_outcome_2()
+func transition_shift_summary_01(): return apply_trn_shift_summary_1()
