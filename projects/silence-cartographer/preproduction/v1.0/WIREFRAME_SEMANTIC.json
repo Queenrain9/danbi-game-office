@@ -1,0 +1,1122 @@
+{
+  "semantic_version": "front-wireframe-v1",
+  "title": "Silence Cartographer",
+  "version": "v1.0",
+  "target_device": "Mobile",
+  "orientation": "portrait",
+  "reference_size": {
+    "w": 540,
+    "h": 960
+  },
+  "upstream": {
+    "design_id": "e063eabf-e2c7-4dcf-a360-9b84c4f03bb5",
+    "first_build_plan_id": "00de9466-558c-4ef8-af0d-86eadc7fcc02",
+    "first_build_status": "ready",
+    "validation_strength": "normal",
+    "validation_reference_hash": "49f93d312ce6c8188677564361646ed40c49151b712134bf94f99eaf04c2cdb9",
+    "first_build_spec_hash": "355d9ecda46759731bf7ad8b5bcabf748e4d3eaa0517dbe29e198d221ca9354a",
+    "rules_test_hash": "a619fb56f7fc06a6970cef38e7bedc9f6fa7a76d979faa44bfd0c73b445d46ad"
+  },
+  "interaction_principles": [
+    "The cave map is the primary play surface.",
+    "Accepted turn actions resolve rule state immediately; presentation replays frozen events afterward.",
+    "Only one continuous gameplay gesture may own the pointer at a time.",
+    "While resolve presentation is playing, new gameplay actions are ignored; Pause may freeze/resume presentation after the committing pointer ends.",
+    "Hidden predator response is directional only until its current tile is revealed.",
+    "Invalid/cancelled input never spends Air/Clickers and never advances predator state."
+  ],
+  "global_ui_rules": {
+    "reference_size": {
+      "w": 540,
+      "h": 960
+    },
+    "touch_target_min_px": 44,
+    "safe_area": "interactive controls remain inside 4% horizontal and 3% vertical margins",
+    "cave_grid": "M1-M3 use authored 4x4 tile coordinates inside the cave_map region; fixture topology is authoritative",
+    "presentation": {
+      "rule_commit": "immediate on accepted gesture completion",
+      "echo_reveal_replay_max_ms": 320,
+      "predator_replay_max_ms": 280,
+      "gameplay_input_lock": "accepted rule action until presentation queue completes",
+      "duplicate_input": "ignored while presentation lock is active",
+      "pause_during_resolve": "freeze/resume presentation cursor without re-running the rule action"
+    },
+    "accessibility": [
+      "shape/icon differences accompany color for tile/objective/predator states",
+      "hidden predator cue uses direction icon plus pulse, not color only",
+      "Air and Clickers always include numeric text"
+    ]
+  },
+  "screen_flow": {
+    "normal": [
+      "S1_EXPEDITION_SELECT",
+      "S2_MISSION_BRIEF",
+      "S3_CAVE_EXPLORATION",
+      "S5_MISSION_RESULT"
+    ],
+    "branches": [
+      "S3_CAVE_EXPLORATION -> S4_PAUSE_OVERLAY -> S3_CAVE_EXPLORATION",
+      "S5 success M1/M2 -> S2 next mission brief",
+      "S5 retry -> S3 same mission reset",
+      "S4 retry -> S3 same mission reset",
+      "S4/S5 select -> S1"
+    ],
+    "guards": [
+      "Only M1-M3 exist in First Build UI.",
+      "Persistent grades/unlocks and M4-M6 are not shown.",
+      "Terminal result blocks gameplay input immediately."
+    ]
+  },
+  "screens": [
+    {
+      "id": "S1_EXPEDITION_SELECT",
+      "name": "Expedition Select",
+      "order": 1,
+      "purpose": "Choose M1-M3.",
+      "layout": {
+        "regions": [
+          {
+            "id": "header",
+            "role": "title",
+            "x": 6,
+            "y": 4,
+            "w": 88,
+            "h": 10
+          },
+          {
+            "id": "missions",
+            "role": "selection",
+            "x": 8,
+            "y": 18,
+            "w": 84,
+            "h": 58
+          },
+          {
+            "id": "actions",
+            "role": "advance",
+            "x": 8,
+            "y": 82,
+            "w": 84,
+            "h": 10
+          }
+        ]
+      },
+      "states": [
+        "ready",
+        "selected"
+      ],
+      "components": [
+        {
+          "id": "mission_m1",
+          "type": "mission_card",
+          "label": "M1 Basic Echo Maze",
+          "box": {
+            "x": 8,
+            "y": 18,
+            "w": 84,
+            "h": 17
+          },
+          "state_binding": "selectable"
+        },
+        {
+          "id": "mission_m2",
+          "type": "mission_card",
+          "label": "M2 Alcove Crossing",
+          "box": {
+            "x": 8,
+            "y": 38,
+            "w": 84,
+            "h": 17
+          },
+          "state_binding": "selectable"
+        },
+        {
+          "id": "mission_m3",
+          "type": "mission_card",
+          "label": "M3 Remote Decoy",
+          "box": {
+            "x": 8,
+            "y": 58,
+            "w": 84,
+            "h": 17
+          },
+          "state_binding": "selectable"
+        },
+        {
+          "id": "open_brief",
+          "type": "button",
+          "label": "OPEN BRIEF",
+          "box": {
+            "x": 56,
+            "y": 82,
+            "w": 36,
+            "h": 10
+          },
+          "state_binding": "enabled when selected"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "select_mission",
+          "input": "tap",
+          "target": "mission_m1|mission_m2|mission_m3",
+          "precondition": "ready",
+          "state_change": "selected_mission changes",
+          "feedback": "selected card emphasis",
+          "invalid_input": "none"
+        },
+        {
+          "id": "open_brief_action",
+          "input": "tap",
+          "target": "open_brief",
+          "precondition": "mission selected",
+          "state_change": "navigate S2",
+          "feedback": "brief opens",
+          "invalid_input": "disabled before selection"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "selected",
+          "to": "S2_MISSION_BRIEF",
+          "trigger": "open_brief",
+          "condition": "mission selected"
+        }
+      ],
+      "feedback": [
+        "cards show mission class and starting Air/Clickers only"
+      ],
+      "edge_cases": [
+        "no selection keeps OPEN BRIEF disabled"
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "M4-M6 and persistent grades/unlocks are NOT NOW."
+      ]
+    },
+    {
+      "id": "S2_MISSION_BRIEF",
+      "name": "Mission Brief",
+      "order": 2,
+      "purpose": "Read objective/resources/controls before committing.",
+      "layout": {
+        "regions": [
+          {
+            "id": "summary",
+            "role": "objective/resources",
+            "x": 6,
+            "y": 5,
+            "w": 88,
+            "h": 18
+          },
+          {
+            "id": "preview",
+            "role": "read_only_map",
+            "x": 8,
+            "y": 26,
+            "w": 84,
+            "h": 42
+          },
+          {
+            "id": "legend",
+            "role": "controls",
+            "x": 8,
+            "y": 70,
+            "w": 84,
+            "h": 10
+          },
+          {
+            "id": "actions",
+            "role": "navigation",
+            "x": 6,
+            "y": 84,
+            "w": 88,
+            "h": 10
+          }
+        ]
+      },
+      "states": [
+        "brief",
+        "loading"
+      ],
+      "components": [
+        {
+          "id": "brief_summary",
+          "type": "brief_panel",
+          "label": "Objective + Air + Clickers",
+          "box": {
+            "x": 6,
+            "y": 5,
+            "w": 88,
+            "h": 18
+          },
+          "state_binding": "selected fixture"
+        },
+        {
+          "id": "cave_preview",
+          "type": "top_down_preview",
+          "label": "Cave Preview",
+          "box": {
+            "x": 8,
+            "y": 26,
+            "w": 84,
+            "h": 42
+          },
+          "state_binding": "authored topology with darkness"
+        },
+        {
+          "id": "control_legend",
+          "type": "legend",
+          "label": "Swipe Move · Tap Ping · Hold Knock · Drag Clicker · Tap Hide",
+          "box": {
+            "x": 8,
+            "y": 70,
+            "w": 84,
+            "h": 10
+          },
+          "state_binding": "M1-M3 controls"
+        },
+        {
+          "id": "back",
+          "type": "button",
+          "label": "BACK",
+          "box": {
+            "x": 6,
+            "y": 84,
+            "w": 40,
+            "h": 10
+          },
+          "state_binding": "enabled"
+        },
+        {
+          "id": "start",
+          "type": "button",
+          "label": "START EXPEDITION",
+          "box": {
+            "x": 54,
+            "y": 84,
+            "w": 40,
+            "h": 10
+          },
+          "state_binding": "enabled when fixture loaded"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "brief_back",
+          "input": "tap",
+          "target": "back",
+          "precondition": "brief",
+          "state_change": "navigate S1",
+          "feedback": "slide back",
+          "invalid_input": "none"
+        },
+        {
+          "id": "brief_start",
+          "input": "tap",
+          "target": "start",
+          "precondition": "fixture loaded",
+          "state_change": "load authored initial state; navigate S3",
+          "feedback": "initial revealed tiles appear",
+          "invalid_input": "disabled while loading"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "brief",
+          "to": "S1_EXPEDITION_SELECT",
+          "trigger": "back",
+          "condition": "always"
+        },
+        {
+          "from": "brief",
+          "to": "S3_CAVE_EXPLORATION",
+          "trigger": "start",
+          "condition": "fixture loaded"
+        }
+      ],
+      "feedback": [
+        "brief never leaks hidden predator exact tile"
+      ],
+      "edge_cases": [
+        "fixture load failure leaves START disabled"
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Brief spends no resources and advances no predator state."
+      ]
+    },
+    {
+      "id": "S3_CAVE_EXPLORATION",
+      "name": "Cave Exploration",
+      "order": 3,
+      "purpose": "Primary M1-M3 play surface.",
+      "layout": {
+        "regions": [
+          {
+            "id": "hud",
+            "role": "status",
+            "x": 4,
+            "y": 3,
+            "w": 92,
+            "h": 9
+          },
+          {
+            "id": "cave_map",
+            "role": "playfield",
+            "x": 4,
+            "y": 16,
+            "w": 92,
+            "h": 52
+          },
+          {
+            "id": "response_band",
+            "role": "predator_feedback",
+            "x": 8,
+            "y": 69,
+            "w": 84,
+            "h": 6
+          },
+          {
+            "id": "controls",
+            "role": "actions",
+            "x": 5,
+            "y": 77,
+            "w": 90,
+            "h": 18
+          }
+        ]
+      },
+      "states": [
+        "Exploration",
+        "EchoResolve",
+        "PredatorResolve",
+        "TerminalTransition"
+      ],
+      "components": [
+        {
+          "id": "objective_chip",
+          "type": "objective_chip",
+          "label": "FIND RELIC / RETURN",
+          "box": {
+            "x": 4,
+            "y": 3,
+            "w": 40,
+            "h": 8
+          },
+          "state_binding": "relic_collected"
+        },
+        {
+          "id": "air_counter",
+          "type": "numeric_resource",
+          "label": "AIR",
+          "box": {
+            "x": 46,
+            "y": 3,
+            "w": 18,
+            "h": 8
+          },
+          "state_binding": "air"
+        },
+        {
+          "id": "clicker_counter",
+          "type": "numeric_resource",
+          "label": "CLICKER",
+          "box": {
+            "x": 66,
+            "y": 3,
+            "w": 18,
+            "h": 8
+          },
+          "state_binding": "clickers"
+        },
+        {
+          "id": "pause",
+          "type": "button",
+          "label": "Ⅱ",
+          "box": {
+            "x": 87,
+            "y": 3,
+            "w": 9,
+            "h": 8
+          },
+          "state_binding": "enabled unless continuous gesture/terminal"
+        },
+        {
+          "id": "cave_map",
+          "type": "grid_world",
+          "label": "4x4 Cave Grid",
+          "box": {
+            "x": 4,
+            "y": 16,
+            "w": 92,
+            "h": 52
+          },
+          "state_binding": "fixture topology/reveal/player/visible predator/objective tiles"
+        },
+        {
+          "id": "echo_overlay",
+          "type": "world_overlay",
+          "label": "Echo Contour",
+          "box": {
+            "x": 4,
+            "y": 16,
+            "w": 92,
+            "h": 52
+          },
+          "state_binding": "sound presentation events"
+        },
+        {
+          "id": "hidden_predator_cue",
+          "type": "direction_cue",
+          "label": "Hidden Predator Response",
+          "box": {
+            "x": 8,
+            "y": 69,
+            "w": 84,
+            "h": 6
+          },
+          "state_binding": "direction only when predator tile unrevealed"
+        },
+        {
+          "id": "sound_control",
+          "type": "press_control",
+          "label": "SOUND",
+          "box": {
+            "x": 5,
+            "y": 78,
+            "w": 42,
+            "h": 16
+          },
+          "state_binding": "tap=Ping; hold>=600ms=Knock"
+        },
+        {
+          "id": "clicker_token",
+          "type": "draggable_token",
+          "label": "CLICKER",
+          "box": {
+            "x": 51,
+            "y": 78,
+            "w": 21,
+            "h": 16
+          },
+          "state_binding": "clickers>0"
+        },
+        {
+          "id": "hide_button",
+          "type": "button",
+          "label": "HIDE",
+          "box": {
+            "x": 76,
+            "y": 78,
+            "w": 19,
+            "h": 16
+          },
+          "state_binding": "enabled only on Alcove"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "move_swipe",
+          "input": "cardinal swipe",
+          "target": "cave_map",
+          "precondition": "Exploration; no continuous gesture; no presentation lock",
+          "state_change": "dominant-axis swipe maps to one semantic Move(direction)",
+          "feedback": "drag direction preview then player/predator presentation",
+          "invalid_input": "unrevealed/nonwalkable/nonadjacent direction rejected with no state/resource change",
+          "cancel_behavior": "distance<24px or pointer cancel => no action",
+          "timing_rules": {
+            "max_duration_ms": 450
+          },
+          "spatial_rules": {
+            "min_distance_px": 24,
+            "dominant_axis_ratio": 1.35
+          }
+        },
+        {
+          "id": "sound_ping",
+          "input": "tap/release <600ms",
+          "target": "sound_control",
+          "precondition": "Exploration; no presentation lock",
+          "state_change": "Ping resolves on valid release",
+          "feedback": "short echo contour and directional predator response when heard",
+          "invalid_input": "drag-off/cancel => no action",
+          "cancel_behavior": "leave expanded bounds by >12px before release"
+        },
+        {
+          "id": "sound_knock",
+          "input": "hold/release >=600ms",
+          "target": "sound_control",
+          "precondition": "Exploration; no presentation lock",
+          "state_change": "Knock resolves on valid release",
+          "feedback": "600ms fill ring then large echo contour",
+          "invalid_input": "drag-off cancels with no Ping fallback",
+          "timing_rules": {
+            "hold_ms": 600
+          },
+          "cancel_behavior": "leave expanded bounds by >12px before release"
+        },
+        {
+          "id": "throw_clicker",
+          "input": "drag/release",
+          "target": "clicker_token -> cave_map tile",
+          "precondition": "clickers>0; target revealed+walkable; graph distance<=4; no presentation lock",
+          "state_change": "valid release maps to Clicker(target_tile)",
+          "feedback": "valid target outlines; valid release remote echo; invalid release snap-back",
+          "invalid_input": "invalid tile/range leaves Air/Clickers/predator unchanged",
+          "priority": "Clicker drag owns pointer and suppresses Move swipe",
+          "spatial_rules": "validity comes from production rule query, not UI-only distance math"
+        },
+        {
+          "id": "hide_here",
+          "input": "tap",
+          "target": "hide_button",
+          "precondition": "player tile is Alcove; no presentation lock",
+          "state_change": "maps to one Hide action",
+          "feedback": "one-resolution shield ring",
+          "invalid_input": "disabled outside Alcove"
+        },
+        {
+          "id": "pause_play",
+          "input": "tap",
+          "target": "pause",
+          "precondition": "not terminal; no active continuous gesture",
+          "state_change": "open S4; freeze presentation only",
+          "feedback": "dim cave under modal",
+          "invalid_input": "ignored while pointer capture is active"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "Exploration",
+          "to": "EchoResolve",
+          "trigger": "accepted Ping/Knock/Clicker",
+          "condition": "rule already committed"
+        },
+        {
+          "from": "Exploration",
+          "to": "PredatorResolve",
+          "trigger": "accepted Move/Hide",
+          "condition": "rule already committed"
+        },
+        {
+          "from": "EchoResolve",
+          "to": "PredatorResolve",
+          "trigger": "echo presentation complete",
+          "condition": "pending predator event"
+        },
+        {
+          "from": "PredatorResolve",
+          "to": "Exploration",
+          "trigger": "presentation complete",
+          "condition": "result null"
+        },
+        {
+          "from": "Exploration|EchoResolve|PredatorResolve",
+          "to": "S4_PAUSE_OVERLAY",
+          "trigger": "pause",
+          "condition": "no active continuous gesture"
+        },
+        {
+          "from": "Exploration|EchoResolve|PredatorResolve",
+          "to": "S5_MISSION_RESULT",
+          "trigger": "terminal presentation",
+          "condition": "result != null"
+        }
+      ],
+      "state_variants": [
+        {
+          "id": "unrevealed_tile",
+          "name": "Unrevealed",
+          "condition": "tile not revealed",
+          "notes": "No exact floor/predator identity."
+        },
+        {
+          "id": "revealed_tile",
+          "name": "Revealed",
+          "condition": "tile revealed",
+          "notes": "Show floor/wall/Entrance/Relic/Alcove."
+        },
+        {
+          "id": "hidden_predator_heard",
+          "name": "Hidden Predator Heard",
+          "condition": "heard response while tile unrevealed",
+          "notes": "Direction only; no exact tile/distance/path."
+        },
+        {
+          "id": "revealed_predator",
+          "name": "Revealed Predator",
+          "condition": "predator tile revealed",
+          "notes": "Exact marker plus Patrol/Hunt/Return state icon."
+        },
+        {
+          "id": "on_alcove",
+          "name": "Alcove Available",
+          "condition": "player on Alcove",
+          "notes": "HIDE enabled."
+        },
+        {
+          "id": "relic_collected",
+          "name": "Return Objective",
+          "condition": "relic_collected=true",
+          "notes": "Objective flips to Entrance."
+        },
+        {
+          "id": "resolve_input_lock",
+          "name": "Resolve Input Lock",
+          "condition": "presentation queue active",
+          "notes": "Gameplay disabled; Pause available."
+        }
+      ],
+      "feedback": [
+        "Air decrements numerically at semantic commit.",
+        "Ping/Knock/Clicker have distinct echo signatures.",
+        "Hidden heard predator uses directional cue only.",
+        "Revealed predator shows exact position and current AI substate.",
+        "Relic pickup flips objective to Return and emphasizes Entrance."
+      ],
+      "edge_cases": [
+        "second gameplay input during resolve is ignored",
+        "SOUND pointer loss cancels entire action",
+        "Clicker invalid release snaps back",
+        "Pause during resolve freezes/resumes presentation cursor only",
+        "terminal result blocks gameplay immediately"
+      ],
+      "implementation_notes": [
+        "Rule queries own adjacency/reveal/range validity.",
+        "No free Wait control.",
+        "No hidden-predator debug leak in production presentation."
+      ]
+    },
+    {
+      "id": "S4_PAUSE_OVERLAY",
+      "name": "Pause Overlay",
+      "order": 4,
+      "purpose": "Freeze presentation and preserve authoritative rule state.",
+      "layout": {
+        "regions": [
+          {
+            "id": "dim",
+            "role": "context",
+            "x": 0,
+            "y": 0,
+            "w": 100,
+            "h": 100
+          },
+          {
+            "id": "panel",
+            "role": "actions",
+            "x": 16,
+            "y": 28,
+            "w": 68,
+            "h": 44
+          }
+        ]
+      },
+      "states": [
+        "Paused"
+      ],
+      "components": [
+        {
+          "id": "resume",
+          "type": "button",
+          "label": "RESUME",
+          "box": {
+            "x": 24,
+            "y": 35,
+            "w": 52,
+            "h": 9
+          },
+          "state_binding": "enabled"
+        },
+        {
+          "id": "retry",
+          "type": "button",
+          "label": "RETRY",
+          "box": {
+            "x": 24,
+            "y": 49,
+            "w": 52,
+            "h": 9
+          },
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select",
+          "type": "button",
+          "label": "EXPEDITION SELECT",
+          "box": {
+            "x": 24,
+            "y": 63,
+            "w": 52,
+            "h": 9
+          },
+          "state_binding": "enabled"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "resume_exact",
+          "input": "tap",
+          "target": "resume",
+          "precondition": "Paused",
+          "state_change": "resume exact presentation/Exploration",
+          "feedback": "modal closes",
+          "invalid_input": "none"
+        },
+        {
+          "id": "retry_pause",
+          "input": "tap",
+          "target": "retry",
+          "precondition": "Paused",
+          "state_change": "reset same mission; S3",
+          "feedback": "fresh authored state",
+          "invalid_input": "none"
+        },
+        {
+          "id": "select_pause",
+          "input": "tap",
+          "target": "select",
+          "precondition": "Paused",
+          "state_change": "discard transient mission state; S1",
+          "feedback": "atlas appears",
+          "invalid_input": "none"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "Paused",
+          "to": "S3_CAVE_EXPLORATION",
+          "trigger": "resume",
+          "condition": "always"
+        },
+        {
+          "from": "Paused",
+          "to": "S3_CAVE_EXPLORATION",
+          "trigger": "retry",
+          "condition": "always"
+        },
+        {
+          "from": "Paused",
+          "to": "S1_EXPEDITION_SELECT",
+          "trigger": "select",
+          "condition": "always"
+        }
+      ],
+      "feedback": [
+        "frozen cave remains visible under dim layer"
+      ],
+      "edge_cases": [
+        "background input is consumed by modal"
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "Resolve presentation cursor is preserved."
+      ]
+    },
+    {
+      "id": "S5_MISSION_RESULT",
+      "name": "Mission Result",
+      "order": 5,
+      "purpose": "Explain success/contact/Air result and navigation.",
+      "layout": {
+        "regions": [
+          {
+            "id": "outcome",
+            "role": "result",
+            "x": 8,
+            "y": 10,
+            "w": 84,
+            "h": 24
+          },
+          {
+            "id": "summary",
+            "role": "resources",
+            "x": 8,
+            "y": 38,
+            "w": 84,
+            "h": 22
+          },
+          {
+            "id": "actions",
+            "role": "navigation",
+            "x": 8,
+            "y": 70,
+            "w": 84,
+            "h": 24
+          }
+        ]
+      },
+      "states": [
+        "success",
+        "failure_contact",
+        "failure_air"
+      ],
+      "components": [
+        {
+          "id": "outcome_card",
+          "type": "result_card",
+          "label": "SUCCESS / CAUGHT / OUT OF AIR",
+          "box": {
+            "x": 8,
+            "y": 10,
+            "w": 84,
+            "h": 24
+          },
+          "state_binding": "result"
+        },
+        {
+          "id": "remaining_air",
+          "type": "numeric_summary",
+          "label": "AIR REMAINING",
+          "box": {
+            "x": 20,
+            "y": 40,
+            "w": 60,
+            "h": 10
+          },
+          "state_binding": "air"
+        },
+        {
+          "id": "retry_result",
+          "type": "button",
+          "label": "RETRY",
+          "box": {
+            "x": 8,
+            "y": 72,
+            "w": 38,
+            "h": 9
+          },
+          "state_binding": "enabled"
+        },
+        {
+          "id": "select_result",
+          "type": "button",
+          "label": "SELECT",
+          "box": {
+            "x": 54,
+            "y": 72,
+            "w": 38,
+            "h": 9
+          },
+          "state_binding": "enabled"
+        },
+        {
+          "id": "next_result",
+          "type": "button",
+          "label": "NEXT",
+          "box": {
+            "x": 31,
+            "y": 85,
+            "w": 38,
+            "h": 9
+          },
+          "state_binding": "success and M1/M2 only"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "retry_result_action",
+          "input": "tap",
+          "target": "retry_result",
+          "precondition": "terminal",
+          "state_change": "reset same mission; S3",
+          "feedback": "fresh authored state",
+          "invalid_input": "none"
+        },
+        {
+          "id": "select_result_action",
+          "input": "tap",
+          "target": "select_result",
+          "precondition": "terminal",
+          "state_change": "S1",
+          "feedback": "atlas appears",
+          "invalid_input": "none"
+        },
+        {
+          "id": "next_result_action",
+          "input": "tap",
+          "target": "next_result",
+          "precondition": "success M1/M2",
+          "state_change": "select next mission; S2",
+          "feedback": "next brief appears",
+          "invalid_input": "disabled otherwise"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "success|failure_contact|failure_air",
+          "to": "S3_CAVE_EXPLORATION",
+          "trigger": "retry",
+          "condition": "always"
+        },
+        {
+          "from": "success|failure_contact|failure_air",
+          "to": "S1_EXPEDITION_SELECT",
+          "trigger": "select",
+          "condition": "always"
+        },
+        {
+          "from": "success",
+          "to": "S2_MISSION_BRIEF",
+          "trigger": "next",
+          "condition": "M1/M2"
+        }
+      ],
+      "feedback": [
+        "failure names Contact vs Air; success shows remaining Air only"
+      ],
+      "edge_cases": [
+        "M3 success has no NEXT"
+      ],
+      "state_variants": [],
+      "implementation_notes": [
+        "No grade/unlock UI in First Build."
+      ]
+    }
+  ],
+  "global_states": [
+    {
+      "id": "continuous_gesture_capture",
+      "rule": "SOUND hold or Clicker drag owns pointer; other gameplay input ignored."
+    },
+    {
+      "id": "presentation_input_lock",
+      "rule": "Accepted action committed; gameplay input disabled until presentation ends; Pause allowed."
+    },
+    {
+      "id": "paused",
+      "rule": "Rule state and presentation cursor frozen; background input blocked."
+    },
+    {
+      "id": "terminal",
+      "rule": "Gameplay blocked once result is authoritative."
+    },
+    {
+      "id": "hidden_information",
+      "rule": "Unrevealed predator exact tile is never rendered."
+    }
+  ],
+  "input_map": [
+    {
+      "id": "I1",
+      "input": "cardinal swipe on cave_map",
+      "maps_to": "Move(direction)",
+      "priority": 30,
+      "cancel": "<24px or pointer cancel",
+      "conflicts": "continuous gesture/presentation/modal"
+    },
+    {
+      "id": "I2",
+      "input": "tap SOUND <600ms",
+      "maps_to": "Ping",
+      "priority": 40,
+      "cancel": "drag-off >12px"
+    },
+    {
+      "id": "I3",
+      "input": "hold SOUND >=600ms then release",
+      "maps_to": "Knock",
+      "priority": 40,
+      "cancel": "drag-off >12px"
+    },
+    {
+      "id": "I4",
+      "input": "drag CLICKER to cave tile",
+      "maps_to": "Clicker(target_tile)",
+      "priority": 50,
+      "cancel": "invalid/outside release snap-back",
+      "conflicts": "suppresses Move"
+    },
+    {
+      "id": "I5",
+      "input": "tap HIDE",
+      "maps_to": "Hide",
+      "priority": 35,
+      "cancel": "disabled outside Alcove"
+    },
+    {
+      "id": "I6",
+      "input": "tap PAUSE",
+      "maps_to": "Pause overlay only",
+      "priority": 80,
+      "cancel": "disabled only during active continuous gesture/terminal"
+    },
+    {
+      "id": "I7",
+      "input": "modal/navigation tap",
+      "maps_to": "screen transition",
+      "priority": 100,
+      "cancel": "background consumed"
+    }
+  ],
+  "edge_cases": [
+    {
+      "case": "SOUND 599ms",
+      "recovery": "Ping"
+    },
+    {
+      "case": "SOUND 600ms",
+      "recovery": "Knock"
+    },
+    {
+      "case": "SOUND drag-off",
+      "recovery": "cancel entire sound action; no Ping fallback"
+    },
+    {
+      "case": "Clicker invalid release",
+      "recovery": "snap back; no rule/resource change"
+    },
+    {
+      "case": "gameplay input during resolve",
+      "recovery": "ignore; do not queue turn"
+    },
+    {
+      "case": "Pause during resolve",
+      "recovery": "freeze presentation cursor; rule state unchanged"
+    },
+    {
+      "case": "hidden predator reacts",
+      "recovery": "direction cue only"
+    },
+    {
+      "case": "pointer lost",
+      "recovery": "cancel active continuous gesture"
+    }
+  ],
+  "developer_handoff": {
+    "rule_boundary": "First Build/Validation own deterministic rules; Wireframe owns screens/input/presentation.",
+    "not_now": [
+      "M4 Branching Hunt",
+      "M5 Return Pressure",
+      "M6 Combined Expedition",
+      "persistent grades/unlocks",
+      "final visual/audio polish"
+    ],
+    "input_debug_interface": {
+      "debug_tap(position:Vector2)->bool": "same production hit-test/input router",
+      "debug_swipe(from:Vector2,to:Vector2,duration:float)->bool": "same production gesture recognizer",
+      "debug_drag(path:Array[Vector2],duration:float)->bool": "same production pointer capture/drop validation",
+      "debug_press(position:Vector2,duration:float,release_position:Vector2)->bool": "same production press/hold/release recognizer",
+      "debug_ui_snapshot()->Dictionary": "read-only UI/presentation state"
+    },
+    "input_test_path": "projects/silence-cartographer/preproduction/v1.0/tests/input_smoke.gd",
+    "input_test_policy": "INPUT tests prove mapping/policy through production input path; frozen rule hooks are setup/observation only."
+  },
+  "acceptance_criteria": [
+    "M1-M3 only; no M4-M6/grade/unlock UI.",
+    "Mission Brief starts exact authored fixture and spends no resources.",
+    "One cardinal swipe maps to one adjacent Move attempt.",
+    "SOUND <600ms maps to Ping; >=600ms maps to Knock.",
+    "SOUND drag-off/cancel produces no semantic action.",
+    "Clicker drag valid/invalid releases use production rule validity; invalid release changes nothing.",
+    "Hide is available only on an Alcove.",
+    "Resolve presentation locks gameplay input; duplicate input cannot queue another turn.",
+    "Pause blocks background input and resumes resolve presentation without duplicating rules.",
+    "Hidden predator never exposes exact unrevealed tile.",
+    "Success/contact/Air failure reach Result and Retry restores mission start.",
+    "INPUT smoke observes at least one rule-state change through frozen read-only observability."
+  ],
+  "primary_interaction": "Cave-map cardinal swipe + shared tap/hold SOUND + Clicker drag",
+  "core_screen": "Cave Exploration"
+}
