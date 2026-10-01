@@ -1,0 +1,101 @@
+{
+  "version": "v0.1",
+  "first_build_goal": [
+    "Test whether long-lived wrapping projectiles remain readable tactical assets instead of becoming visual noise.",
+    "Test whether Redirect and Split feel understandable and useful when applied to an already-living projectile."
+  ],
+  "source": {
+    "design_version": "v0.2",
+    "validation_reference": "projects/one-way-wizard/game-design/rules-v0.2.json",
+    "validation_strength": "reduced"
+  },
+  "include": {
+    "arena": "Wave2 Split Lane",
+    "wave_roster": "Wave2 fixed spawn schedule: 4 Chasers + 3 Drifters",
+    "actions": [
+      "Move",
+      "Aim/Cast Bolt",
+      "Redirect",
+      "Split",
+      "Pause"
+    ],
+    "rules": [
+      "fixed 60Hz rule clock",
+      "projectile wrap",
+      "18s lifetime",
+      "cap8",
+      "mana regen",
+      "Redirect90",
+      "Split30",
+      "enemy contact/HP",
+      "Wave2 clear/failure",
+      "Retry"
+    ]
+  },
+  "not_now": [
+    "Wave1 and Wave3 as playable content",
+    "Anchor enemy/hazard",
+    "Carry Select",
+    "full three-wave run",
+    "persistent score/best clear",
+    "final audiovisual polish",
+    "Merge as a required player-facing decision"
+  ],
+  "fixed_content": {
+    "wave": "wave2",
+    "arena": "Split Lane",
+    "source": "projects/one-way-wizard/game-design/rules-v0.2.json"
+  },
+  "must_work": [
+    {
+      "id": "M1",
+      "text": "Rule simulation advances on the fixed 60Hz clock independent from render FPS.",
+      "check": "debug_step(1.0) advances exactly 60 ticks and produces deterministic snapshot."
+    },
+    {
+      "id": "M2",
+      "text": "Cast Bolt costs one mana, obeys 0.35s cooldown and cap8 rejection is no-cost.",
+      "check": "cast fixture compares mana/projectile count before and after valid/invalid cast."
+    },
+    {
+      "id": "M3",
+      "text": "Projectile wraps at arena edges without resetting its 18s lifetime.",
+      "check": "x=.99 heading0 stepped .1s -> x=.012 and lifetime17.9 within tolerance."
+    },
+    {
+      "id": "M4",
+      "text": "Mana regenerates one every 4.0s up to4.",
+      "check": "mana2 + debug_step(8.0) with no casts -> mana4."
+    },
+    {
+      "id": "M5",
+      "text": "Redirect rotates a contacted projectile exactly +90° clockwise and consumes charge only on hit.",
+      "check": "redirect collision fixture transforms heading0->90."
+    },
+    {
+      "id": "M6",
+      "text": "Split preserves parent and creates one child at deterministic ±30° with inherited state; cap8 failure is no-cost.",
+      "check": "split fixtures test cross-product sign and cap boundary."
+    },
+    {
+      "id": "M7",
+      "text": "Merge rule kernel is deterministic even though Merge is not required in the playable slice.",
+      "check": "two normal bolts at headings0/30 merge to heading15, damage2, lifetime16; empowered cannot remerge."
+    },
+    {
+      "id": "M8",
+      "text": "Wave2 spawns exactly 7 enemies on the frozen 0..9.6s schedule with frozen archetype stats.",
+      "check": "step across spawn boundaries and compare enemy list/spawn cursor."
+    },
+    {
+      "id": "M9",
+      "text": "Enemy contact costs one HP then grants 1.0s invulnerability; HP0 fails the run.",
+      "check": "contact fixture tests repeated overlap inside/outside invulnerability."
+    },
+    {
+      "id": "M10",
+      "text": "Pause freezes simulation and Retry restores the fixed Wave2 initial state.",
+      "check": "snapshot stays identical during Pause and equals initial snapshot after Retry."
+    }
+  ]
+}
