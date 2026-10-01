@@ -1,0 +1,80 @@
+{
+  "contract_id": "14e612d3-ed05-4038-a7fe-e0f825b99f9d",
+  "title": "Night Signal Operator",
+  "blueprint_hash": "363c587b5e18e0e443ca0402f8590adb4dc55403bf868125767675c31c4540ba",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "reviewed_at": "2026-10-01T01:05:50.33003Z",
+  "execution_id": "0750af60-eabd-415d-875f-ebcd7e48fee8",
+  "connector_native": true,
+  "checks": {
+    "schema_identity": true,
+    "current_source_matches_frozen": true,
+    "requirements_match_contract": true,
+    "screens_match_frozen_pack": true,
+    "hash_identity": {
+      "embedded_matches_contract": true,
+      "history_row_present": true,
+      "compiler_checkpoint_complete": true,
+      "algorithm": "sha256-canonical-json-v1"
+    },
+    "source_coverage": {
+      "version": "source-coverage-v1",
+      "expected_count": 141,
+      "covered_count": 141,
+      "missing_count": 0
+    },
+    "geometry": {
+      "reference_size": {
+        "width": 540,
+        "height": 960
+      },
+      "coordinate_space": "screen_percent",
+      "stretch_mode": "canvas_items",
+      "geometry_tolerance_px": 2
+    },
+    "requirement_static_coverage": {
+      "requirements": 141,
+      "implementations": 141,
+      "tests": 141,
+      "missing_implementation": 0,
+      "missing_static_test": 0,
+      "unknown_test_requirement": 0,
+      "duplicate_test_ids": 0
+    },
+    "stages": [
+      "skeleton",
+      "geometry",
+      "state",
+      "input",
+      "presentation",
+      "integration"
+    ],
+    "runtime_recorded_as_static": false,
+    "design_wireframe_discrepancy": "none",
+    "semantic_fidelity": {
+      "core_loop_preserved": true,
+      "input_modalities_preserved": [
+        "circular drag",
+        "horizontal drag",
+        "press/release",
+        "tap"
+      ],
+      "numeric_rules_preserved": [
+        "directions=8",
+        "colors=3",
+        "pulses=1-4",
+        "strikes=3",
+        "vessels=5",
+        "short=.25-.65s",
+        "long=.8-1.5s",
+        "deadline=25-45s"
+      ],
+      "pause_deadline_semantics_preserved": true,
+      "send_and_failure_semantics_preserved": true,
+      "legacy_unstructured_interactions_use_explicit_script_fallback": true
+    }
+  },
+  "evidence_path": "production/contracts/14e612d3-ed05-4038-a7fe-e0f825b99f9d/reviews/gate-363c587b5e18e0e443ca0402f8590adb4dc55403bf868125767675c31c4540ba.json"
+}
