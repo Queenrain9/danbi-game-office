@@ -1,0 +1,7 @@
+{
+  "status": "conditional",
+  "persistence_required": true,
+  "evidence": "Every Bolt lasts 18s and travels 3.96 arena widths at speed0.22, so the playable necessarily contains long-lived wrap trajectories.",
+  "transformation_gap": "Wave2 success does not mechanically require Redirect/Split; fresh-cast dominance has not been ruled out.",
+  "action": "Proceed deliberately so the human playtest can measure transformation desirability; keep this gap visible."
+}
