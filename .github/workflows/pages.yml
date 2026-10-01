@@ -23,14 +23,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Godot Web exporter
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.2
+          use-dotnet: false
+          include-templates: true
+
+      - name: Check Web export and player routing
+        run: |
+          python3 -m unittest discover -s tests -p test_web_export.py -v
+          node --test tests/web-player.test.cjs
+
+      - name: Assemble site and export ready Godot builds
+        run: |
+          mkdir -p _site
+          git archive HEAD | tar -x -C _site
+          python3 tools/web/export.py --output _site/play
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
 
       - name: Deploy
         id: deployment

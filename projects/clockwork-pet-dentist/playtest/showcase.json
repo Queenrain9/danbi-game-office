@@ -1,5 +1,8 @@
 {
   "schema_version": "playtest-showcase-v0.3.1",
+  "status": "ready",
+  "project_path": "builds/clockwork-pet-dentist",
+  "repo_full_name": "Queenrain9/danbi-game-office",
   "title": "Clockwork Pet Dentist · SHOWROOM TEST",
   "one_line": "태엽 기계동물의 입속에서 고장 난 톱니 이빨을 진단하고 정밀 도구로 제거·가공·교체한 뒤 실제 물림을 시험하는 모바일 수리 시뮬레이션.",
   "build_job_id": "985e2695-2c3c-47f3-8c51-bbadbd581850",

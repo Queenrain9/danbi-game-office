@@ -42,6 +42,10 @@ python -m http.server 5173
 
 `.github/workflows/pages.yml`이 `main` push마다 GitHub Pages에 정적 사이트를 배포합니다.
 
+PLAYTEST READY / ready showcase의 Godot 프로젝트는 같은 배포에서 Web export됩니다.
+플레이테스트실의 **웹에서 플레이**로 카드 안에서 실행하거나 **새 탭으로 열기**를 사용할 수 있습니다.
+배포 경로와 재실행 방법은 [Godot Web 플레이 가이드](docs/godot-web-playtest.md)를 참고하세요.
+
 처음 한 번 GitHub Pages가 아직 활성화되지 않은 저장소라면:
 
 **Repository → Settings → Pages → Build and deployment → Source → GitHub Actions**
