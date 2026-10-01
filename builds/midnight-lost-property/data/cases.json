@@ -1,0 +1,8 @@
+{
+  "schema_version": "midnight-lost-property-v1",
+  "cases": [
+    {"id":"case_1","location":"Platform 4","time":"00:18","item":"Silver commuter watch","physical_clues":["engraved initials J.K.","fresh glass crack","platform dust"],"statement_clues":["lost before midnight","describes an uncracked face"],"relation":"CONFLICT","expected_decision":"HOLD"},
+    {"id":"case_2","location":"Night bus 17","time":"01:42","item":"Canvas medicine pouch","physical_clues":["pharmacy receipt","blue route tag","insulin label"],"statement_clues":["names the pharmacy","matches route and dosage"],"relation":"MATCH","expected_decision":"RETURN"},
+    {"id":"case_3","location":"Locker hall","time":"03:07","item":"Unmarked brass key","physical_clues":["restricted-room stamp","filed serial edge","red fiber trace"],"statement_clues":["denies restricted access","cannot explain filed serial"],"relation":"CONFLICT","expected_decision":"REPORT"}
+  ]
+}
