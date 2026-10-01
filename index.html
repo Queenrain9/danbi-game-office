@@ -2340,11 +2340,9 @@ function fidelityPendingCard(b){
 }
 function fidelityPage(){
   const currentReviews=fidelityReviews.filter(r=>!isSupersededReview(r));
-  const supersededReviews=fidelityReviews.filter(r=>isSupersededReview(r));
   return genericHeader("Static Fidelity Gate","완성된 Godot Build를 Wireframe + Implementation Contract + 실제 코드와 독립적으로 대조하고 검수 결과를 남깁니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false)]).then(()=>toast(\'설계 검수실 새로고침\'))">↻ 새로고침</button>')+
     '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Static Fidelity Gate Hourly</strong><span>independent verifier</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 50분</b></span><span>VERIFIED / PARTIAL / MISSING / CONFLICT / BROKEN</span><span>FAIL → Repair → Build Farm</span><span>ALL VERIFIED → PLAYTEST READY</span></div></div>'+
-    '<div class="section-head"><div><h2>설계 검수 결과</h2><p>실제로 수행된 현재 Blueprint/Build의 독립 검수 결과만 표시합니다.</p></div></div><div class="cards">'+(currentReviews.map(fidelityReviewCard).join("") || '<div class="empty">아직 현재 Build에 대한 설계 검수 결과가 없습니다.<br>검수 대기 상태는 Build Farm에서 확인합니다.</div>')+'</div>'+
-    (supersededReviews.length?'<div class="section-head"><div><h2>Superseded History</h2><p>reset 이전 이력 · 현재 승인/Repair 판단에 사용하지 않음</p></div></div><div class="cards">'+supersededReviews.map(fidelityReviewCard).join("")+'</div>':'');
+    '<div class="section-head"><div><h2>설계 검수 결과</h2><p>현재 파이프라인에서 유효한 Blueprint/Build의 독립 검수 결과만 표시합니다.</p></div></div><div class="cards">'+(currentReviews.map(fidelityReviewCard).join("") || '<div class="empty">아직 현재 Build에 대한 설계 검수 결과가 없습니다.<br>검수 대기 상태는 Build Farm에서 확인합니다.</div>')+'</div>';
 }
 
 function buildCard(p){
