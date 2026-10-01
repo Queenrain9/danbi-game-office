@@ -1,0 +1,543 @@
+{
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "status": "passed",
+  "errors": [],
+  "manual_test_ids": [
+    "MANUAL:ACC:1",
+    "MANUAL:ACC:2",
+    "MANUAL:ACC:3",
+    "MANUAL:ACC:4",
+    "MANUAL:ACC:5",
+    "MANUAL:ACC:6",
+    "MANUAL:ACC:7",
+    "MANUAL:INP:1",
+    "MANUAL:INP:2",
+    "MANUAL:INP:3",
+    "MANUAL:INP:4",
+    "MANUAL:INP:5",
+    "MANUAL:INT:case_intake:1",
+    "MANUAL:INT:decision_confirm:1",
+    "MANUAL:INT:decision_confirm:2",
+    "MANUAL:INT:evidence_review:1",
+    "MANUAL:INT:evidence_review:2",
+    "MANUAL:INT:inspection_desk:1",
+    "MANUAL:INT:inspection_desk:2",
+    "MANUAL:INT:inspection_desk:3",
+    "MANUAL:INT:night_desk:1",
+    "MANUAL:INT:outcome:1",
+    "MANUAL:INT:shift_summary:1",
+    "MANUAL:INT:visitor_interview:1"
+  ],
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "commit": "40b9a1399d5125bf6f3641390db83997f04d0da3",
+  "adapter_pins": [],
+  "source_coverage": {
+    "version": "source-coverage-v1",
+    "expected_count": 144,
+    "covered_count": 99,
+    "missing_count": 45,
+    "missing_refs": [
+      "/source/pack/screens/0",
+      "/source/pack/screens/0/feedback/0",
+      "/source/pack/screens/1",
+      "/source/pack/screens/1/edge_cases/0",
+      "/source/pack/screens/2",
+      "/source/pack/screens/2/edge_cases/0",
+      "/source/pack/screens/2/feedback/0",
+      "/source/pack/screens/2/feedback/1",
+      "/source/pack/screens/3",
+      "/source/pack/screens/3/edge_cases/0",
+      "/source/pack/screens/3/feedback/0",
+      "/source/pack/screens/4",
+      "/source/pack/screens/4/edge_cases/0",
+      "/source/pack/screens/4/feedback/0",
+      "/source/pack/screens/5",
+      "/source/pack/screens/5/edge_cases/0",
+      "/source/pack/screens/5/feedback/0",
+      "/source/pack/screens/6",
+      "/source/pack/screens/6/feedback/0",
+      "/source/pack/screens/7",
+      "/source/pack/edge_cases/0",
+      "/source/pack/edge_cases/1",
+      "/source/pack/edge_cases/2",
+      "/source/pack/edge_cases/3",
+      "/source/design/core_player_verbs/0",
+      "/source/design/core_player_verbs/1",
+      "/source/design/core_player_verbs/2",
+      "/source/design/core_player_verbs/3",
+      "/source/design/feedback_system/0",
+      "/source/design/feedback_system/1",
+      "/source/design/feedback_system/2",
+      "/source/design/feedback_system/3",
+      "/source/design/test_scenarios/0",
+      "/source/design/test_scenarios/1",
+      "/source/design/test_scenarios/2",
+      "/source/design/test_scenarios/3",
+      "/source/design/test_scenarios/4",
+      "/source/design/wireframe_handoff/0",
+      "/source/design/wireframe_handoff/1",
+      "/source/design/wireframe_handoff/2",
+      "/source/design/wireframe_handoff/3",
+      "/source/design/wireframe_handoff/4",
+      "/source/design/wireframe_handoff/5",
+      "/source/design/wireframe_handoff/6",
+      "/source/design/progression"
+    ]
+  },
+  "design_wireframe_notes": [],
+  "results": [
+    {
+      "test_id": "STATIC:ACC:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:3",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:4",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:5",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:6",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ACC:7",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:implementation_order",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:persistence",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:required_data",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:reusable",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:scene_hierarchy",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:ARC:state_owner",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:case_meta",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:inspect_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:item_preview",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:confirm_rail",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:evidence_summary",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:hold",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:report",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:return",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:decision_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:evidence_cards",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:relation",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:slot_a",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:slot_b",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:clue_tray",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:interview_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:object",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:review_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:case_counter",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:shift_title",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:start_shift",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:continue",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:reason",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:result_stamp",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:score",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:case_rows",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:finish",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:grade",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:back_inspect",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:budget",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:question_cards",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:review_btn",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:visitor",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CNT:mvp_scope",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:CNT:screen_inventory",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:decision_locked",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:loading",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:GST:pause",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:3",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:4",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INP:5",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:case_intake:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:decision_confirm:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:decision_confirm:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:evidence_review:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:evidence_review:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:3",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:night_desk:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:outcome:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:shift_summary:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:INT:visitor_interview:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:clues",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:decisions",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:grades",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:principle",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:questions",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:RUL:score",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:case_intake:intake",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:blocked",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:confirming",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:locked",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:selected",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:unselected",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:comparing",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:empty",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:one_slot",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:relation_recorded",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:hotspot_revealed",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:idle",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:rotating",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:zoomed",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:night_desk:ready",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:outcome:complete",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:outcome:correct",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:outcome:incorrect",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:shift_summary:summary",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:answering",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:budget_empty",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:question_ready",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:case_intake:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:decision_confirm:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:evidence_review:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:inspection_desk:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:inspection_desk:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:night_desk:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:outcome:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:outcome:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:shift_summary:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:visitor_interview:1",
+      "status": "passed"
+    },
+    {
+      "test_id": "STATIC:TRN:visitor_interview:2",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:skeleton",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:geometry",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:state",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:input",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:presentation",
+      "status": "passed"
+    },
+    {
+      "test_id": "STAGE:integration",
+      "status": "passed"
+    }
+  ],
+  "limitation": "Structural checks only; independent code/source review must verify game-specific semantics. Not runtime QA.",
+  "promotion_eligible": true,
+  "independent_semantic_review_required": true
+}
