@@ -1,0 +1,682 @@
+{
+  "semantic_version": "front-wireframe-v1",
+  "title": "One-Way Wizard",
+  "version": "v1.0",
+  "target_device": "Mobile",
+  "orientation": "portrait",
+  "upstream": {
+    "design_id": "3695b972-2670-4f3c-af86-b870b0d51aef",
+    "first_build_plan_id": "3311a727-e6be-4028-ae79-bd6a2e16375b",
+    "first_build_status": "conditional",
+    "validation_strength": "reduced",
+    "known_validation_gap": "Wave2 success does not mechanically require Redirect/Split; fresh-cast dominance has not been ruled out. The playable proceeds specifically to measure whether transformations are desirable in human play.",
+    "validation_reference_hash": "30e8fd88b03a98781dbdd682437a6478b3b2f40f3b8b2ef46e5a47b7ccf79a13",
+    "first_build_spec_hash": "c3e6b69a6a5c010724e8f7dace82eee1654c6a4e98dc161f34b9bc6a23023e2b",
+    "rules_test_hash": "4ea207de07329f023ee22665a6521714edbb19df5f352ab53fdfcadba5db96f5"
+  },
+  "interaction_principles": [
+    "Fixed60Hz rules own time; presentation follows.",
+    "Separate movement and retained aim; explicit single-shot CAST/REDIRECT/SPLIT.",
+    "Conditional validation gap stays visible; no gameplay coercion invented."
+  ],
+  "global_ui_rules": {
+    "reference_size": {
+      "w": 540,
+      "h": 960
+    },
+    "accessibility": [
+      "Minimum44px hit areas; text>=16px,4.5:1 contrast; shape plus color distinguish Bolt,pulse,enemy; labels on buttons.",
+      "Reduced motion suppresses screen shake/long trails while keeping heading/wrap cues and unchanged clock."
+    ],
+    "input_contract": {
+      "version": "input-contract-v1",
+      "reference_size": {
+        "w": 540,
+        "h": 960
+      },
+      "scaling": "Uniform fit after safe-area insets; inverse-transform pointers to logical reference px before hit-testing. Aspect ratio preserved.",
+      "regions": {
+        "arena": {
+          "x": 22,
+          "y": 154,
+          "w": 496,
+          "h": 496
+        },
+        "move_pad": {
+          "x": 24,
+          "y": 690,
+          "w": 220,
+          "h": 200
+        },
+        "aim_pad": {
+          "x": 296,
+          "y": 690,
+          "w": 220,
+          "h": 200
+        },
+        "cast": {
+          "x": 24,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        },
+        "redirect": {
+          "x": 200,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        },
+        "split": {
+          "x": 376,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        }
+      },
+      "reference_points": {
+        "start": [
+          270,
+          830
+        ],
+        "back": [
+          60,
+          70
+        ],
+        "pause": [
+          494,
+          70
+        ],
+        "resume": [
+          270,
+          380
+        ],
+        "retry_pause": [
+          270,
+          500
+        ],
+        "quit_pause": [
+          270,
+          620
+        ],
+        "retry_result": [
+          150,
+          800
+        ],
+        "brief_result": [
+          390,
+          800
+        ],
+        "move_center": [
+          134,
+          790
+        ],
+        "aim_center": [
+          406,
+          790
+        ],
+        "cast": [
+          94,
+          924
+        ],
+        "redirect": [
+          270,
+          924
+        ],
+        "split": [
+          446,
+          924
+        ]
+      },
+      "thresholds": {
+        "move_deadzone_px": 16,
+        "move_saturation_px": 80,
+        "aim_deadzone_px": 16,
+        "tap_max_travel_px": 12,
+        "tap_max_duration_ms": 500
+      },
+      "mapping": [
+        {
+          "id": "I1",
+          "gesture": "move-pad drag/hold",
+          "action": "debug_set_move_vector semantic production setter",
+          "formula": "length<=16 -> Vector2.ZERO; otherwise normalized delta * min((length-16)/64,1); X right, Y down",
+          "release": "set zero; pointer loss, modal or focus loss also zero"
+        },
+        {
+          "id": "I2",
+          "gesture": "aim-pad drag",
+          "action": "aim only, no rule action",
+          "formula": "length>16 sets atan2(dy,dx) in degrees normalized [0,360); length<=16 keeps previous aim; initial aim0",
+          "release": "retain aim; preview current cast/tool direction, no auto-fire"
+        },
+        {
+          "id": "I3",
+          "gesture": "tap CAST",
+          "action": "production Cast at retained aim angle",
+          "guard": "production mana/cooldown/cap validator",
+          "repeat": "one call per valid release; no hold auto-repeat"
+        },
+        {
+          "id": "I4",
+          "gesture": "tap REDIRECT",
+          "action": "production launch_tool('redirect',aim)",
+          "guard": "upstream charge/pulse validator; charge spent only on hit",
+          "repeat": "one launch per release; no selecting projectile directly"
+        },
+        {
+          "id": "I5",
+          "gesture": "tap SPLIT",
+          "action": "production launch_tool('split',aim)",
+          "guard": "upstream validator; never consume charge on cap failure",
+          "repeat": "one launch per release"
+        },
+        {
+          "id": "I6",
+          "gesture": "navigation tap",
+          "action": "brief start, pause, resume, retry, back to brief"
+        }
+      ],
+      "policies": {
+        "button_tap": "Commit only on pointer-up inside original control, max displacement<=12px and duration<=500ms inclusive. Leaving bound or exceeding either threshold permanently cancels gesture. No release fallback to CAST.",
+        "priority": "Modal/navigation > buttons > pad region > arena/background. First pointer in each pad owns that pad until release; movement and aiming may use different pointers simultaneously; one pointer cannot own two controls. Additional pointers on already captured control are ignored.",
+        "duplicate": "Each (pointer_id,sequence_id) release consumed once; a later distinct sequence is a new gesture.",
+        "presentation": "Real-time rule clock continues at frozen60Hz during casts, trails, impact and transform animation. Presentation never gates input or advances timers. No cooldown invented by UI. Only Pause and terminal result block gameplay.",
+        "pause": "Pause immediately freezes rule clock/timers; zero movement and cancel active pointer captures/pending taps. Resume preserves rule state and retained aim but requires fresh pointer down; stale releases ignored. Focus loss enters same Pause.",
+        "terminal": "Authoritative result blocks gameplay immediately, zeros movement, cancels captures and shows Result. No fabricated clear/failure condition.",
+        "retry": "Production retry restores fixed WAVE2_INITIAL, resets UI aim0, zero move, clears pending pointer sequences, transient trails and input observer history; never wave1.",
+        "input_invalid": "Disabled CAST/tool buttons remain readable with reason: mana/cooldown/cap/no charge. Production validator rechecks at release. Invalid input creates no cast/pulse and no cost; time may still advance independently in live play.",
+        "simulation_test_mode": "Fixtures use existing deterministic manual debug_step clock. Synthetic gestures dispatch input events without secretly stepping simulation; duration parameter is recognizer metadata. debug_step uses production60Hz update. Interactive production continues automatic clock. Tests compare rule snapshots before explicit steps and may use existing fixtures only."
+      },
+      "hooks": {
+        "debug_tap(position:Vector2)->bool": "Generate80ms pointer down/up via production input router; true only on committed enabled UI action.",
+        "debug_drag(path:Array[Vector2],duration:float)->bool": "Feed timed down/move/up production events; duration seconds. Movement lasts while pointer held and zeros on release.",
+        "debug_pointer(event:Dictionary)->bool": "Production router with logical position Vector2,phase down/move/up/cancel,pointer_id int,sequence_id int,time_ms int. True for recognized valid event; callers observe snapshots for semantic outcome.",
+        "debug_ui_snapshot()->Dictionary": "Read-only screen,aim_degrees,move_vector,pointer_capture_count,dispatch_history (accepted cast/tool dictionaries and navigation events); history reset on fixture load/retry. No production state mutation. dispatch_history entries use type='cast'|'redirect'|'split' and angle_degrees for accepted semantic calls; navigation entries use type='navigation'.",
+        "debug_load_fixture(name:String)": "Existing rule setup hook; synchronize UI to Arena ready, reset aim0/captures/history; fixture definitions unchanged.",
+        "debug_step(seconds:float)": "Existing production fixed-clock hook; no render-clock substitution."
+      },
+      "test_result_fixture_policy": "Use TEST_CONTACT from RULE contract, repeating exact60-tick intervals until authoritative HP0 within a bounded loop. Use existing WAVE2_INITIAL for retry. No test-only terminal setter."
+    }
+  },
+  "screen_flow": {
+    "normal": [
+      "S1_WAVE2_BRIEF",
+      "S2_ARENA",
+      "S4_RESULT"
+    ],
+    "branches": [
+      "S2 -> S3 -> S2",
+      "S3 retry -> S2",
+      "S3 brief -> S1",
+      "S4 retry -> S2",
+      "S4 brief -> S1"
+    ]
+  },
+  "screens": [
+    {
+      "id": "S1_WAVE2_BRIEF",
+      "name": "Wave2 Brief",
+      "states": [
+        "ready"
+      ],
+      "purpose": "Introduce conditional playable, objective and controls.",
+      "layout": {
+        "header": [
+          24,
+          40,
+          492,
+          90
+        ],
+        "summary": [
+          24,
+          160,
+          492,
+          150
+        ],
+        "controls_legend": [
+          24,
+          350,
+          492,
+          200
+        ],
+        "validation_notice": [
+          24,
+          600,
+          492,
+          120
+        ],
+        "start": [
+          200,
+          790,
+          140,
+          80
+        ]
+      },
+      "components": [
+        {
+          "id": "conditional_notice",
+          "binding": "CONDITIONAL · reduced validation; Redirect/Split necessity unproven"
+        },
+        {
+          "id": "objective",
+          "binding": "Clear fixed Wave2; survive with upstream HP rules"
+        },
+        {
+          "id": "start",
+          "binding": "WAVE2_INITIAL"
+        }
+      ],
+      "interactions": [
+        "START -> S2; no Wave1/Wave3 or Carry menu"
+      ],
+      "feedback": [
+        "Explain aim is retained; CAST fires one Bolt; tools launch pulses at current aim."
+      ],
+      "edge_cases": [
+        "Fixture-load error disables Start and gives retry message."
+      ]
+    },
+    {
+      "id": "S2_ARENA",
+      "name": "Split Lane Arena",
+      "states": [
+        "playing",
+        "cast_unavailable",
+        "tool_unavailable",
+        "impact_feedback"
+      ],
+      "purpose": "Live projectile reuse and transformation.",
+      "layout": {
+        "hud": [
+          24,
+          40,
+          492,
+          100
+        ],
+        "arena": {
+          "x": 22,
+          "y": 154,
+          "w": 496,
+          "h": 496
+        },
+        "move_pad": {
+          "x": 24,
+          "y": 690,
+          "w": 220,
+          "h": 200
+        },
+        "aim_pad": {
+          "x": 296,
+          "y": 690,
+          "w": 220,
+          "h": 200
+        },
+        "cast": {
+          "x": 24,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        },
+        "redirect": {
+          "x": 200,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        },
+        "split": {
+          "x": 376,
+          "y": 900,
+          "w": 140,
+          "h": 48
+        },
+        "pause": [
+          470,
+          46,
+          48,
+          48
+        ]
+      },
+      "components": [
+        {
+          "id": "hud",
+          "binding": "HP,mana,Redirect/Split charges,projectile count/cap,spawn progress; no score/unlock"
+        },
+        {
+          "id": "wizard",
+          "binding": "production wizard position; collision unchanged"
+        },
+        {
+          "id": "pillars",
+          "binding": "frozen Split Lane geometry"
+        },
+        {
+          "id": "bolts",
+          "binding": "production projectile positions/headings; short trails, arrowhead, lifetime fade; empowered shape marker"
+        },
+        {
+          "id": "enemies",
+          "binding": "Chaser/Drifter icons + HP; frozen positions"
+        },
+        {
+          "id": "aim_preview",
+          "binding": "retained aim; clearly distinct from actual projectile and pulse"
+        },
+        {
+          "id": "wrap_cues",
+          "binding": "matching exit/entry edge flash; purely visual"
+        },
+        {
+          "id": "tools",
+          "binding": "pulse trail distinct from Bolt; hit flash on transformed projectile; no homing or invented rule"
+        },
+        {
+          "id": "pause",
+          "binding": "production Pause transition; available during live effects"
+        }
+      ],
+      "interactions": [
+        {
+          "id": "I1",
+          "gesture": "move-pad drag/hold",
+          "action": "debug_set_move_vector semantic production setter",
+          "formula": "length<=16 -> Vector2.ZERO; otherwise normalized delta * min((length-16)/64,1); X right, Y down",
+          "release": "set zero; pointer loss, modal or focus loss also zero"
+        },
+        {
+          "id": "I2",
+          "gesture": "aim-pad drag",
+          "action": "aim only, no rule action",
+          "formula": "length>16 sets atan2(dy,dx) in degrees normalized [0,360); length<=16 keeps previous aim; initial aim0",
+          "release": "retain aim; preview current cast/tool direction, no auto-fire"
+        },
+        {
+          "id": "I3",
+          "gesture": "tap CAST",
+          "action": "production Cast at retained aim angle",
+          "guard": "production mana/cooldown/cap validator",
+          "repeat": "one call per valid release; no hold auto-repeat"
+        },
+        {
+          "id": "I4",
+          "gesture": "tap REDIRECT",
+          "action": "production launch_tool('redirect',aim)",
+          "guard": "upstream charge/pulse validator; charge spent only on hit",
+          "repeat": "one launch per release; no selecting projectile directly"
+        },
+        {
+          "id": "I5",
+          "gesture": "tap SPLIT",
+          "action": "production launch_tool('split',aim)",
+          "guard": "upstream validator; never consume charge on cap failure",
+          "repeat": "one launch per release"
+        },
+        {
+          "id": "I6",
+          "gesture": "navigation tap",
+          "action": "brief start, pause, resume, retry, back to brief"
+        }
+      ],
+      "feedback": [
+        "Numeric costs update from production state; failed cast/tool gives explicit reason.",
+        "Redirect +90 and Split child visualization follows authoritative events; animation never locks inputs.",
+        "HP damage shield feedback follows existing invulnerability; no extra immunity."
+      ],
+      "edge_cases": [
+        "Two-pad multi-touch ownership",
+        "Pause/focus loss cancels captures",
+        "Resource changes between down/up revalidated",
+        "Repeated release ignored",
+        "Terminal immediate gameplay block"
+      ]
+    },
+    {
+      "id": "S3_PAUSE",
+      "name": "Pause Overlay",
+      "states": [
+        "paused"
+      ],
+      "purpose": "Freeze rules exactly.",
+      "layout": {
+        "panel": [
+          90,
+          280,
+          360,
+          410
+        ],
+        "resume": [
+          130,
+          340,
+          280,
+          80
+        ],
+        "retry": [
+          130,
+          460,
+          280,
+          80
+        ],
+        "brief": [
+          130,
+          580,
+          280,
+          80
+        ]
+      },
+      "components": [
+        {
+          "id": "resume",
+          "binding": "resume frozen Wave2"
+        },
+        {
+          "id": "retry",
+          "binding": "reset same fixed Wave2"
+        },
+        {
+          "id": "brief",
+          "binding": "return to brief"
+        }
+      ],
+      "interactions": [
+        "modal consumes background; Resume -> S2; Retry -> S2 WAVE2_INITIAL; Brief -> S1"
+      ],
+      "feedback": [
+        "Dim arena, show Paused; numeric resources preserved."
+      ],
+      "edge_cases": [
+        "Stale gesture releases after resume cannot cast."
+      ]
+    },
+    {
+      "id": "S4_RESULT",
+      "name": "Wave2 Result",
+      "states": [
+        "success",
+        "failure"
+      ],
+      "purpose": "Authoritative outcome and retry.",
+      "layout": {
+        "outcome": [
+          24,
+          160,
+          492,
+          220
+        ],
+        "gap_notice": [
+          24,
+          430,
+          492,
+          220
+        ],
+        "retry": [
+          70,
+          760,
+          160,
+          80
+        ],
+        "brief": [
+          310,
+          760,
+          160,
+          80
+        ]
+      },
+      "components": [
+        {
+          "id": "outcome",
+          "binding": "production result (success or HP failure)"
+        },
+        {
+          "id": "retry",
+          "binding": "same Wave2 fixed initial state"
+        },
+        {
+          "id": "brief",
+          "binding": "Wave2 Brief"
+        },
+        {
+          "id": "validation_notice",
+          "binding": "conditional/reduced; observed success does not prove Redirect/Split necessary"
+        }
+      ],
+      "interactions": [
+        "Retry -> S2; Brief -> S1; no Next/Carry/score"
+      ],
+      "feedback": [
+        "Keep conditional notice visible in handoff and representative playtest."
+      ],
+      "edge_cases": [
+        "All gameplay actions blocked; no projectile selection persistence."
+      ]
+    }
+  ],
+  "global_states": [
+    {
+      "id": "live_rule_clock",
+      "rule": "60Hz independent of presentation"
+    },
+    {
+      "id": "multi_touch_capture",
+      "rule": "Modal/navigation > buttons > pad region > arena/background. First pointer in each pad owns that pad until release; movement and aiming may use different pointers simultaneously; one pointer cannot own two controls. Additional pointers on already captured control are ignored."
+    },
+    {
+      "id": "paused",
+      "rule": "Pause immediately freezes rule clock/timers; zero movement and cancel active pointer captures/pending taps. Resume preserves rule state and retained aim but requires fresh pointer down; stale releases ignored. Focus loss enters same Pause."
+    },
+    {
+      "id": "terminal",
+      "rule": "Authoritative result blocks gameplay immediately, zeros movement, cancels captures and shows Result. No fabricated clear/failure condition."
+    }
+  ],
+  "input_map": [
+    {
+      "id": "I1",
+      "gesture": "move-pad drag/hold",
+      "action": "debug_set_move_vector semantic production setter",
+      "formula": "length<=16 -> Vector2.ZERO; otherwise normalized delta * min((length-16)/64,1); X right, Y down",
+      "release": "set zero; pointer loss, modal or focus loss also zero"
+    },
+    {
+      "id": "I2",
+      "gesture": "aim-pad drag",
+      "action": "aim only, no rule action",
+      "formula": "length>16 sets atan2(dy,dx) in degrees normalized [0,360); length<=16 keeps previous aim; initial aim0",
+      "release": "retain aim; preview current cast/tool direction, no auto-fire"
+    },
+    {
+      "id": "I3",
+      "gesture": "tap CAST",
+      "action": "production Cast at retained aim angle",
+      "guard": "production mana/cooldown/cap validator",
+      "repeat": "one call per valid release; no hold auto-repeat"
+    },
+    {
+      "id": "I4",
+      "gesture": "tap REDIRECT",
+      "action": "production launch_tool('redirect',aim)",
+      "guard": "upstream charge/pulse validator; charge spent only on hit",
+      "repeat": "one launch per release; no selecting projectile directly"
+    },
+    {
+      "id": "I5",
+      "gesture": "tap SPLIT",
+      "action": "production launch_tool('split',aim)",
+      "guard": "upstream validator; never consume charge on cap failure",
+      "repeat": "one launch per release"
+    },
+    {
+      "id": "I6",
+      "gesture": "navigation tap",
+      "action": "brief start, pause, resume, retry, back to brief"
+    }
+  ],
+  "edge_cases": [
+    {
+      "id": "button_tap",
+      "rule": "Commit only on pointer-up inside original control, max displacement<=12px and duration<=500ms inclusive. Leaving bound or exceeding either threshold permanently cancels gesture. No release fallback to CAST."
+    },
+    {
+      "id": "priority",
+      "rule": "Modal/navigation > buttons > pad region > arena/background. First pointer in each pad owns that pad until release; movement and aiming may use different pointers simultaneously; one pointer cannot own two controls. Additional pointers on already captured control are ignored."
+    },
+    {
+      "id": "duplicate",
+      "rule": "Each (pointer_id,sequence_id) release consumed once; a later distinct sequence is a new gesture."
+    },
+    {
+      "id": "presentation",
+      "rule": "Real-time rule clock continues at frozen60Hz during casts, trails, impact and transform animation. Presentation never gates input or advances timers. No cooldown invented by UI. Only Pause and terminal result block gameplay."
+    },
+    {
+      "id": "pause",
+      "rule": "Pause immediately freezes rule clock/timers; zero movement and cancel active pointer captures/pending taps. Resume preserves rule state and retained aim but requires fresh pointer down; stale releases ignored. Focus loss enters same Pause."
+    },
+    {
+      "id": "terminal",
+      "rule": "Authoritative result blocks gameplay immediately, zeros movement, cancels captures and shows Result. No fabricated clear/failure condition."
+    },
+    {
+      "id": "retry",
+      "rule": "Production retry restores fixed WAVE2_INITIAL, resets UI aim0, zero move, clears pending pointer sequences, transient trails and input observer history; never wave1."
+    },
+    {
+      "id": "input_invalid",
+      "rule": "Disabled CAST/tool buttons remain readable with reason: mana/cooldown/cap/no charge. Production validator rechecks at release. Invalid input creates no cast/pulse and no cost; time may still advance independently in live play."
+    },
+    {
+      "id": "simulation_test_mode",
+      "rule": "Fixtures use existing deterministic manual debug_step clock. Synthetic gestures dispatch input events without secretly stepping simulation; duration parameter is recognizer metadata. debug_step uses production60Hz update. Interactive production continues automatic clock. Tests compare rule snapshots before explicit steps and may use existing fixtures only."
+    }
+  ],
+  "developer_handoff": {
+    "known_validation_gap": "Wave2 success does not mechanically require Redirect/Split; fresh-cast dominance has not been ruled out. The playable proceeds specifically to measure whether transformations are desirable in human play.",
+    "validation_strength": "reduced",
+    "rule_authority": "Frozen rules-v0.2 bytes + FIRST_BUILD_SPEC v0.1 + unchanged RULE test; First Build Retry resets Wave2.",
+    "not_now": [
+      "Wave1 and Wave3 as playable content",
+      "Anchor enemy/hazard",
+      "Carry Select",
+      "full three-wave run",
+      "persistent score/best clear",
+      "final audiovisual polish",
+      "Merge as a required player-facing decision"
+    ],
+    "input_test_path": "projects/one-way-wizard/preproduction/v1.0/tests/input_smoke.gd",
+    "playtest_questions": [
+      "Can players read old projectile lanes while moving and aiming?",
+      "Do players voluntarily use Redirect/Split rather than fresh-cast spam?",
+      "Does fresh-cast dominance persist when tools are equally accessible?",
+      "Are transform pulses and toroidal wrap understandable under overlapping trails?"
+    ],
+    "execution_status": "INPUT contract authored before production implementation; runtime execution belongs to Builder."
+  },
+  "acceptance_criteria": [
+    "Four screens; only Wave2 Split Lane.",
+    "Move/aim/Cast/Redirect/Split use production router and frozen semantic setters.",
+    "Deadzone and tap boundaries,cancel,multi-touch,duplicates tested.",
+    "Animation does not pause real-time rule clock or discard valid inputs.",
+    "Pause and terminal block inputs; Retry restores Wave2.",
+    "Conditional/reduced validation and gap remain visible."
+  ],
+  "primary_interaction": "Move pad + retained aim pad + explicit Cast/Redirect/Split taps",
+  "core_screen": "Split Lane Arena"
+}
