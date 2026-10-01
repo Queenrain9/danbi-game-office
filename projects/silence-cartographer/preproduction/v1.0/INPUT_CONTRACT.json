@@ -1,0 +1,68 @@
+{
+  "version": "input-contract-v1",
+  "reference_size": {
+    "w": 540,
+    "h": 960
+  },
+  "thresholds": {
+    "move_min_distance_px": 24,
+    "move_max_duration_ms": 450,
+    "move_dominant_axis_ratio": 1.35,
+    "sound_knock_threshold_ms": 600,
+    "sound_drag_off_cancel_px": 12
+  },
+  "reference_points": {
+    "s1_m1_card": [
+      270,
+      254
+    ],
+    "s1_open_brief": [
+      400,
+      835
+    ],
+    "s2_start": [
+      400,
+      854
+    ],
+    "s3_pause": [
+      494,
+      67
+    ],
+    "s3_sound": [
+      140,
+      826
+    ],
+    "s3_clicker": [
+      332,
+      826
+    ],
+    "s3_hide": [
+      462,
+      826
+    ],
+    "s4_resume": [
+      270,
+      379
+    ],
+    "s5_retry": [
+      146,
+      734
+    ]
+  },
+  "cave_grid": {
+    "box_px": {
+      "x": 22,
+      "y": 154,
+      "w": 497,
+      "h": 499
+    },
+    "tile_center_formula": "x=22+(col+0.5)*(497/4); y=154+(row+0.5)*(499/4)"
+  },
+  "policies": [
+    "Debug pointer hooks traverse production input routing.",
+    "Frozen rule fixture hooks may be used for deterministic setup only.",
+    "No gameplay action is queued during presentation_input_lock.",
+    "Pause remains available during resolve presentation after committing pointer release.",
+    "Cancelled SOUND hold never falls back to Ping."
+  ]
+}
