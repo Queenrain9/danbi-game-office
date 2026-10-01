@@ -1,0 +1,70 @@
+{
+  "verification_scope": "static",
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "independent_review_required": true,
+  "status": "failed",
+  "promotion_eligible": false,
+  "title": "Parcel X-Ray Night Shift",
+  "job_id": "9cf75474-c24f-48e2-a91c-74de92df5946",
+  "contract_id": "3956862d-8262-431f-ae6c-32ce57e99a07",
+  "commit": "987a6c1095fbf9047702ea242a080c68ba003deb",
+  "blueprint_hash": "86ab906ef7ccbcf82e8cd48edefa58c2c61e3a60709331f753fbb13f975eda5e",
+  "execution_id": "0750af60-eabd-415d-875f-ebcd7e48fee8",
+  "connector_native": true,
+  "errors": [
+    {
+      "code": "SCRIPT_BINDING",
+      "path": "res://scenes/app_root.tscn",
+      "message": "Blueprint-required reusable component scripts and the inspection xray_box interaction script are not attached to their declared nodes in the final game scene."
+    },
+    {
+      "code": "SYMBOL",
+      "path": "res://scripts/app_root.gd",
+      "message": "Multiple Blueprint state, variant, transition, state_binding and enabled_when symbols referenced by the approved Blueprint are absent from the attached AppRoot script."
+    },
+    {
+      "code": "CONNECTION",
+      "path": "res://scenes/app_root.tscn",
+      "message": "Inspection Rule Manual entry and Pause entry are not wired from the live inspection scene, so required overlay/session routes are not reachable from gameplay."
+    },
+    {
+      "code": "RULE_CONFLICT",
+      "path": "res://scripts/rules.gd",
+      "message": "Live rule functions change source values/meaning: combo bonus, failure model, hazard logic, false-pin, wrong-pass, wrong-other and efficiency values differ from Game Design."
+    },
+    {
+      "code": "SCAN_BUDGET_CONFLICT",
+      "path": "res://scripts/interactions.gd",
+      "message": "Scan handling enforces a hard four-scan cap although Game Design defines soft_target=4, hard_limit=null, with efficiency penalty starting at the fifth scan."
+    },
+    {
+      "code": "PIN_CONFLICT",
+      "path": "res://scripts/interactions.gd",
+      "message": "Evidence pinning records arbitrary tap positions after scanning instead of resolving taps against a visible internal X-ray shape as required."
+    },
+    {
+      "code": "LIVE_PATH_CONFLICT",
+      "path": "res://scripts/app_root.gd",
+      "message": "The scene-attached gameplay path uses case_index modulo routing and simplified scoring rather than the source hazard evaluator/scoring semantics; a fuller unattached main.gd cannot substitute for the live scene path."
+    },
+    {
+      "code": "PRESENTATION_TRACE",
+      "path": "res://scripts/app_root.gd",
+      "message": "Result/summary presentation is incomplete: explanation is stored as tooltip text and critical/efficiency summary fields are not populated by the live AppRoot flow."
+    }
+  ],
+  "checked": {
+    "project_config": true,
+    "final_commit_tree": true,
+    "main_scene": true,
+    "scene_graph": true,
+    "geometry_sampled_against_blueprint": true,
+    "requirement_claim_count": 94,
+    "builder_claims_trusted": false,
+    "semantic_sources_re_read": true,
+    "adapter_pins": "none in approved Blueprint",
+    "runtime_executed": false
+  },
+  "limitation": "Static connector-native review only; no Godot runtime claim. Failed static/semantic review does not produce passing Gate evidence."
+}
