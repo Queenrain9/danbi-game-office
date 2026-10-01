@@ -1,0 +1,38 @@
+{
+  "schema_version": "playtest-showcase-v0.3.1",
+  "title": "Clockwork Pet Dentist · SHOWROOM TEST",
+  "one_line": "태엽 기계동물의 입속에서 고장 난 톱니 이빨을 진단하고 정밀 도구로 제거·가공·교체한 뒤 실제 물림을 시험하는 모바일 수리 시뮬레이션.",
+  "build_job_id": "985e2695-2c3c-47f3-8c51-bbadbd581850",
+  "final_commit": "6848add6dca911f79732f677b774c76c5ae3a871",
+  "blueprint_hash": "def7cbba3cf3646d38ad6d6324a7dec565d1f006a556901d5b86b67e09e48827",
+  "fidelity_review_id": "92e294b9-5c21-4ce1-ab44-476e9d4953f1",
+  "provider": "gpt_image",
+  "recovery_note": "Recovered previously generated ChatGPT triptych from current conversation media and split it deterministically into A/B/C panels without regeneration; each panel was persisted through the media persistence bridge.",
+  "art_options": [
+    {
+      "id": "A",
+      "title": "정밀 토이 워크숍",
+      "direction_summary": "밝은 아이보리·황동과 단순한 큰 기어 실루엣으로 조작 대상을 가장 빠르게 읽을 수 있는 제품화 안정형 방향. 귀여운 기계동물의 표정은 살리되 치료 영역의 가독성을 최우선으로 둔다.",
+      "site_url": "https://cdn.creativeclaw.co/u/a31b55a7/images/de233b67-86a2-4ba2-933d-617093eb448a.png",
+      "provider": "gpt_image",
+      "generated_at": "2026-10-01 02:20:02.025883+00"
+    },
+    {
+      "id": "B",
+      "title": "포근한 황동 진료소",
+      "direction_summary": "털·황동·청록 에나멜과 따뜻한 공방 조명을 사용해 ‘작은 기계동물을 직접 치료한다’는 판타지를 가장 강하게 밀어주는 방향. 정밀 공구와 기어가 수공예 진료소처럼 느껴진다.",
+      "site_url": "https://cdn.creativeclaw.co/u/a31b55a7/images/5e9165e8-f70d-4a98-80e1-99f054fb7638.png",
+      "provider": "gpt_image",
+      "generated_at": "2026-10-01 02:20:05.064904+00"
+    },
+    {
+      "id": "C",
+      "title": "그래픽 기어 팝",
+      "direction_summary": "각진 셀 셰이딩과 큰 색면, 강한 청록·주황 포인트로 기어와 도구를 아이콘처럼 읽히게 만드는 독자적 스타일. 모바일 화면에서 한눈에 기억되는 실루엣을 노린다.",
+      "site_url": "https://cdn.creativeclaw.co/u/a31b55a7/images/5b2853f3-633f-4111-81b1-3a4147c82f0e.png",
+      "provider": "gpt_image",
+      "generated_at": "2026-10-01 02:20:08.578303+00"
+    }
+  ],
+  "no_art_applied_to_build": true
+}
