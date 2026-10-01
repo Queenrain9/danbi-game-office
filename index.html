@@ -563,6 +563,81 @@
 @media(max-width:560px){.pt-queue{grid-template-columns:1fr}.pt-title{font-size:20px}.pt-ident{grid-template-columns:86px minmax(0,1fr)}}
 
 
+/* Playtest game library */
+.pt-library-head{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px}
+.pt-library-head h2{font-size:24px;margin:0 0 6px;color:#edf4fc}
+.pt-library-head p,.pt-library-count{font-size:12px;color:#8298b0;margin:0}
+.pt-library-tools{display:flex;gap:8px}
+.pt-library-tools input,.pt-library-tools select{font:inherit;font-size:12px;background:#111c2b;color:#dbe7f6;border:1px solid #2a3b50;border-radius:10px;padding:11px 12px;min-width:0}
+.pt-library-tools input{width:230px}
+.pt-library-count{margin-bottom:12px}
+.pt-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+.pt-library-card{display:block;width:100%;max-width:420px;padding:0;border:1px solid #25364a;border-radius:16px;background:#101b29;color:#dce8f6;text-align:left;font:inherit;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s}
+.pt-library-card:hover{border-color:#688db9;transform:translateY(-2px)}
+.pt-library-card:focus-visible,.pt-art-preview:focus-visible{outline:2px solid #8ab4f8;outline-offset:4px}
+.pt-library-cover{height:220px;background:#08111d;display:flex;align-items:center;justify-content:center;padding:12px}
+.pt-library-cover img{width:100%;height:100%;object-fit:contain;display:block;border-radius:5px}
+.pt-library-cover>span{font-size:48px}
+.pt-library-copy{padding:17px}
+.pt-library-meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#8dafd4}
+.pt-library-copy h3{font-size:16px;line-height:1.45;margin:10px 0 8px;color:#edf4fc}
+.pt-library-copy p{font-size:11px;color:#91a4ba;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0;min-height:35px}
+.pt-library-open{display:block;margin-top:16px;font-size:12px;color:#a7c8f4}
+.pt-library-empty{grid-column:1/-1;padding:70px 20px;text-align:center;color:#8fa3bb;border:1px dashed #283d54;border-radius:15px}
+.pt-library-pages{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:25px;font-size:12px;color:#8fa3bb}
+html:has(.pt-game-dialog[open]){overflow:hidden}
+.pt-game-dialog,.pt-art-dialog{padding:0;border:1px solid #354b65;border-radius:18px;background:#0c1725;color:#dce8f6;box-shadow:0 30px 90px #0008;width:min(920px,calc(100vw - 40px));max-width:none;max-height:calc(100dvh - 40px);overflow:auto}
+.pt-game-dialog::backdrop,.pt-art-dialog::backdrop{background:rgba(2,7,14,.8);backdrop-filter:blur(5px)}
+.pt-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid #26384e;position:sticky;top:0;background:#0c1725;z-index:2}
+.pt-dialog-head h2{font-size:18px;line-height:1.4;margin:0;overflow-wrap:anywhere}
+.pt-dialog-head .btn{flex-shrink:0}
+.pt-dialog-body{padding:20px 24px}
+.pt-game-intro p{font-size:12px;line-height:1.7;color:#9ab0c9;margin:12px 0 18px}
+.pt-game-dialog .pt-player{margin-top:0}
+.pt-game-dialog .pt-player-frame{width:min(100%,calc(66dvh * 9 / 16),360px);aspect-ratio:9/16;margin-top:14px}
+.pt-game-dialog:has(iframe) .pt-game-intro,.pt-game-dialog:has(iframe) .pt-art-section,.pt-game-dialog:has(iframe) .pt-fold{display:none}
+.pt-game-dialog:has(iframe){position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-height:100dvh;border:0;border-radius:0;background:#05090f;display:flex;flex-direction:column;overflow:hidden}
+.pt-game-dialog:has(iframe) .pt-dialog-head{position:static;flex-shrink:0;padding:12px 18px;background:#0a1320}
+.pt-game-dialog:has(iframe) .pt-dialog-head h2{font-size:14px}
+.pt-game-dialog:has(iframe) .pt-dialog-body{padding:0;flex:1;min-height:0;display:flex}
+.pt-game-dialog:has(iframe) .pt-player{padding:0;margin:0;border:0;border-radius:0;background:none;display:flex;flex-direction:column;flex:1;min-height:0}
+.pt-game-dialog:has(iframe) .pt-player-head{order:2;padding:9px 18px;justify-content:center;background:#0a1320;flex-shrink:0}
+.pt-game-dialog:has(iframe) .pt-player-head h3,.pt-game-dialog:has(iframe) .pt-player-actions button:first-child{display:none}
+.pt-game-dialog:has(iframe) #playtestPlayerMount{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#05090f}
+.pt-game-dialog:has(iframe) .pt-player-frame{display:block;margin:0;border:0;border-radius:0;width:min(100vw,calc((100dvh - 130px) * 9 / 16));height:min(calc(100dvh - 130px),calc(100vw * 16 / 9));aspect-ratio:9/16}
+.pt-game-dialog .pt-player:has(#playtestPlayerMount:empty) .pt-player-actions button:last-child{display:none}
+.pt-art-section{margin:22px 0}
+.pt-art-section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.pt-art-section-head h3{font-size:14px;margin:0}
+.pt-art-section-head>span{font-size:11px;color:#8fa5bf}
+.pt-art-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pt-art-thumb{min-width:0}
+.pt-art-preview{display:flex;align-items:center;justify-content:center;width:100%;height:190px;padding:8px;border:1px solid #293e55;border-radius:10px;background:#07111e;cursor:zoom-in;color:#8ca0b7}
+.pt-art-preview img{width:100%;height:100%;object-fit:contain;display:block}
+.pt-art-thumb.choice .pt-art-preview{border-color:#8ab4f8;box-shadow:0 0 0 2px #8ab4f833}
+.pt-art-caption{display:flex;gap:8px;align-items:baseline;margin-top:9px;line-height:1.5;font-size:11px}
+.pt-art-caption b{font-size:13px;color:#a4c7f5}
+.pt-art-caption span{color:#a6b9cd}
+.pt-art-pick{margin-top:8px;width:100%;font-size:11px}
+.pt-fold{border-top:1px solid #27384c;margin-top:14px;padding:14px 0 0}
+.pt-fold summary{font-size:12px;color:#b9cce1;cursor:pointer;padding:4px 0}
+.pt-fold p,.pt-detail-muted{font-size:11px;line-height:1.7;color:#8fa4bc}
+.pt-fold .pt-verdict{border:0;background:none;padding:12px 0 0;margin:0}
+.pt-fold .pt-ident{margin-top:14px}
+.pt-art-dialog{width:min(1000px,calc(100vw - 40px))}
+.pt-art-dialog[open]{display:flex;flex-direction:column;height:calc(100dvh - 32px);overflow:hidden}
+.pt-art-dialog .pt-dialog-head{position:static;flex-shrink:0}
+.pt-art-full{padding:18px;display:flex;justify-content:center;background:#070f19}
+.pt-art-full img{display:block;max-width:100%;width:auto;height:auto;max-height:calc(100dvh - 250px);object-fit:contain}
+.pt-art-description{padding:0 24px 20px}
+.pt-art-description p{font-size:12px;line-height:1.65;color:#adc0d4;margin:16px 0}
+.pt-art-dialog-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;font-size:12px}
+.pt-art-dialog .pt-art-full{flex:1;min-height:0;overflow:hidden}
+.pt-art-dialog .pt-art-full img{width:100%;height:100%;max-height:100%;object-fit:contain}
+.pt-art-dialog .pt-art-description{flex-shrink:0;max-height:32dvh;overflow:auto}
+@media(max-width:600px){.pt-library-head{align-items:stretch;flex-direction:column;gap:16px}.pt-library-tools input{flex:1;width:auto}.pt-library-tools select{width:128px}.pt-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pt-library-cover{height:170px;padding:8px}.pt-library-copy{padding:12px}.pt-library-copy h3{font-size:13px}.pt-library-meta{flex-direction:column;gap:4px}.pt-library-head h2{font-size:22px}.pt-game-dialog,.pt-art-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:13px}.pt-dialog-head{padding:14px}.pt-dialog-head h2{font-size:15px}.pt-dialog-body{padding:15px}.pt-art-thumbs{gap:8px}.pt-art-preview{height:145px;padding:4px}.pt-art-caption{font-size:10px;gap:4px;align-items:flex-start}.pt-art-caption span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pt-player-head{gap:10px}.pt-player-actions{gap:6px}.pt-player-actions .btn{font-size:11px;padding:9px}.pt-art-full{padding:10px}.pt-art-description{padding:0 15px 15px}.pt-art-full img{max-height:calc(100dvh - 280px)}}
+@media(max-width:360px){.pt-library-grid{grid-template-columns:1fr}.pt-art-preview{height:115px}}
+
 /* Post-playtest Studio v0.1 */
 .pt-art-card.choice{outline:2px solid rgba(111,160,226,.75);box-shadow:0 0 0 4px rgba(111,160,226,.08)}
 .pt-verdict{margin-top:18px;border:1px solid rgba(120,160,208,.12);background:rgba(17,27,42,.72);border-radius:15px;padding:15px}
@@ -707,6 +782,9 @@ let playtestReadyBuilds = [];
 let playtestWebExports = [];
 let playtestPlayer = null;
 let playtestFocusId = null;
+let playtestGalleryFilter = "all";
+let playtestGallerySearch = "";
+let playtestGalleryPage = 1;
 let playtestDecisions = [];
 let playtestDiagnostics = [];
 let enhancementProjects = [];
@@ -1040,7 +1118,7 @@ async function loadPlaytestShowcase(showToast=false){
     playtestShowcases=Array.isArray(payload.showcases)?payload.showcases:[];
     playtestReadyBuilds=Array.isArray(payload.ready_builds)?payload.ready_builds:[];
     const rows=playtestRows();
-    if(rows.length && !rows.some(x=>x.build_job_id===playtestFocusId)) playtestFocusId=rows[0].build_job_id;
+
     if(current==="review" || current==="dashboard") render();
     if(showToast) toast("플레이테스트실 새로고침 · "+rows.length+"개");
   }catch(err){
@@ -1147,12 +1225,12 @@ function playtestWebUrl(row){
 function playtestPlayerCard(row){
   const entry=playtestWebEntry(row), url=playtestWebUrl(row);
   const unavailable=entry?.status==="failed"?"이 빌드의 Web export가 실패했습니다. GitHub 빌드에서 원본을 확인할 수 있습니다.":"이 빌드의 웹 플레이 버전이 아직 배포되지 않았습니다.";
-  return '<div class="pt-player" id="playtestPlayer"><div class="pt-player-head"><h3>Godot 웹 플레이</h3><div class="pt-player-actions">'+
-    (url?'<button class="btn primary" onclick="startPlaytestPlayer()">▶ 웹에서 플레이</button><a class="btn ghost" href="'+esc(url)+'" target="_blank" rel="noopener">새 탭으로 열기 ↗</a><button class="btn ghost" onclick="stopPlaytestPlayer()">종료 / 다시 시작</button>':'<button class="btn ghost" disabled>웹 빌드 준비 중</button>')+
-    '</div></div><p id="playtestPlayerStatus">'+esc(url?"버튼을 누르면 이 카드 안에서 게임이 실행됩니다. 게임 화면을 클릭해 조작하세요.":unavailable)+'</p><div id="playtestPlayerMount"></div></div>';
+  return '<div class="pt-player" id="playtestPlayer"><div class="pt-player-head"><h3>게임 플레이</h3><div class="pt-player-actions">'+
+    (url?'<button class="btn primary" onclick="startPlaytestPlayer()">▶ 웹에서 플레이</button><a class="btn ghost" href="'+esc(url)+'" target="_blank" rel="noopener">새 탭으로 열기 ↗</a><button class="btn ghost" onclick="stopPlaytestPlayer()">종료</button>':'<button class="btn ghost" disabled>웹 빌드 준비 중</button>')+
+    '</div></div>'+(url?'':'<p>'+esc(unavailable)+'</p>')+'<div id="playtestPlayerMount"></div></div>';
 }
 function startPlaytestPlayer(){
-  const row=playtestPendingRows().find(x=>x.build_job_id===playtestFocusId);
+  const row=playtestRows().find(x=>x.build_job_id===playtestFocusId);
   const url=playtestWebUrl(row), mount=document.getElementById("playtestPlayerMount");
   if(!url||!mount) return;
   if(playtestPlayer?.url===url&&mount.querySelector("iframe")) return;
@@ -1164,19 +1242,14 @@ function startPlaytestPlayer(){
   frame.src=url;
   mount.replaceChildren(frame);
   playtestPlayer={buildId:row.build_job_id,url};
-  document.getElementById("playtestPlayerStatus").textContent="게임을 불러오는 중입니다. 화면이 나타나면 클릭해 조작하세요. 새 탭에서도 실행할 수 있습니다.";
   frame.focus();
 }
 function stopPlaytestPlayer(){
   playtestPlayer=null;
-  render();
+  document.getElementById("playtestPlayerMount")?.replaceChildren();
 }
 
-function setPlaytestFocus(id){
-  playtestFocusId=id;
-  render();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
+function setPlaytestFocus(id){ openPlaytestGame(id); }
 
 function copyPlaytestPath(id){
   const row=playtestRows().find(x=>x.build_job_id===id);
@@ -1262,8 +1335,7 @@ async function submitPlaytestDecision(showcaseId,decision){
     });
     delete playtestDraft[showcaseId];
     await Promise.all([loadPostPlaytest(false),loadPlaytestShowcase(false)]);
-    const pending=playtestPendingRows();
-    playtestFocusId=pending[0]?.build_job_id||null;
+    closePlaytestGame();
     render();
     toast(decision==="UNJUDGEABLE"?"빌드 진단실로 인계됨":decision==="KEEP"?"게임 고도화실 + 아트 제작본부로 인계됨":decision==="KILL"?"폐기작 기록실로 이동됨":"재검토로 보류됨");
   }catch(err){
@@ -2456,72 +2528,141 @@ function buildPage(){
   (blocked.length?buildStatusSection("문제 확인","Build Farm에서 semantic/source blocker 확인이 필요한 게임입니다.","red",blocked,""):"");
 }
 
-function reviewResultColumn(decision,title,sub){
-  const rows=playtestProcessed(decision);
-  const items=rows.slice(0,5).map(d=>{
-    const r=playtestRowByShowcase(d.showcase_id);
-    const extra=d.selected_art_option?"Art "+d.selected_art_option:(d.decision_note||"메모 없음");
-    return '<div class="pt-result-item"><b>'+esc(r?.title||"처리된 게임")+'</b><span>'+esc(extra)+'</span></div>';
-  }).join("");
-  return '<div class="pt-result-col"><h3>'+esc(title)+' · '+rows.length+'</h3><span>'+esc(sub)+'</span>'+(items||'<div class="pt-result-item"><span>아직 없음</span></div>')+'</div>';
+function playtestGalleryRows(){
+  const query=playtestGallerySearch.trim().toLocaleLowerCase();
+  return playtestRows().filter(row=>{
+    const decision=playtestDecisionFor(row.id)?.decision;
+    const matches=playtestGalleryFilter==="all"||(playtestGalleryFilter==="pending"?!decision:decision===playtestGalleryFilter);
+    return matches&&(!query||(row.title||"").toLocaleLowerCase().includes(query));
+  });
 }
-
+function playtestGalleryLabel(row){
+  const decision=playtestDecisionFor(row.id);
+  return decision?verdictLabel(decision.decision):row.status==="ready"?"판단 대기":"입고 준비 중";
+}
+function filterPlaytestGallery(value){
+  playtestGalleryFilter=value;
+  playtestGalleryPage=1;
+  render();
+}
+function searchPlaytestGallery(value){
+  playtestGallerySearch=value;
+  playtestGalleryPage=1;
+  // Only replace the results so typing keeps its focus and cursor.
+  document.getElementById("playtestGalleryResults").innerHTML=playtestGalleryContent();
+}
+function pagePlaytestGallery(page){
+  playtestGalleryPage=page;
+  document.getElementById("playtestGalleryResults").innerHTML=playtestGalleryContent();
+}
+function playtestGalleryContent(){
+  const rows=playtestGalleryRows(), pages=Math.max(1,Math.ceil(rows.length/24));
+  playtestGalleryPage=Math.min(pages,Math.max(1,playtestGalleryPage));
+  const cards=rows.slice((playtestGalleryPage-1)*24,playtestGalleryPage*24).map(row=>{
+    const opt=playtestOptions(row).find(o=>playtestArtUrl(row,o));
+    const cover=opt?playtestArtUrl(row,opt):"";
+    return '<button class="pt-library-card" id="pt-card-'+esc(row.build_job_id)+'" onclick="openPlaytestGame(\''+esc(row.build_job_id)+'\')">'+
+      '<div class="pt-library-cover">'+(cover?'<img src="'+esc(cover)+'" alt="" loading="lazy">':'<span aria-hidden="true">🎮</span>')+'</div>'+
+      '<div class="pt-library-copy"><div class="pt-library-meta"><span>'+esc(playtestGalleryLabel(row))+'</span><span>'+esc(playtestWebUrl(row)?"▶ 플레이 가능":"웹 준비 중")+'</span></div>'+
+      '<h3>'+esc(row.title)+'</h3><p>'+esc(row.one_line||"게임을 눌러 자세히 보기")+'</p><span class="pt-library-open">게임 열기 ↗</span></div></button>';
+  }).join("");
+  return '<div class="pt-library-count">'+rows.length+'개 게임</div><div class="pt-library-grid">'+
+    (cards||'<div class="pt-library-empty">'+(playtestGallerySearch||playtestGalleryFilter!=="all"?"조건에 맞는 게임이 없습니다.":"게임이 입고되면 이곳에 쌓입니다.")+'</div>')+'</div>'+
+    (pages>1?'<div class="pt-library-pages"><button class="btn ghost" onclick="pagePlaytestGallery('+(playtestGalleryPage-1)+')" '+(playtestGalleryPage===1?'disabled':'')+'>이전</button><span>'+playtestGalleryPage+' / '+pages+'</span><button class="btn ghost" onclick="pagePlaytestGallery('+(playtestGalleryPage+1)+')" '+(playtestGalleryPage===pages?'disabled':'')+'>다음</button></div>':'');
+}
 function reviewPage(){
-  const rows=playtestPendingRows();
-  const focus=rows.find(x=>x.build_job_id===playtestFocusId)||rows[0]||null;
-  if(focus) playtestFocusId=focus.build_job_id;
-
-  let showroom="";
-  if(!focus){
-    showroom='<div class="pt-empty"><strong>현재 판단 대기 게임이 없습니다.</strong><span>PLAYTEST READY 빌드가 쇼룸에 입고되면 Graybox + 아트 3안과 함께 여기 나타납니다.</span></div>';
-  }else{
-    const status=playtestStatusMeta(focus);
-    const opts=playtestOptions(focus);
-    const completed=opts.filter(x=>playtestArtUrl(focus,x)).length;
-    const repo=focus.repo_full_name||"Queenrain9/danbi-game-office";
-    const projectPath=focus.build?.project_path||focus.project_path||"-";
-    const buildUrl=playtestBuildUrl(focus);
-    const draft=focus.id?(playtestDraft[focus.id]||{}):{};
-
-    const queue='<aside class="pt-sidebar"><div class="pt-side-head"><strong>판단 대기 · '+rows.length+'</strong><span>실제로 플레이한 뒤에만 분류합니다.</span></div><div class="pt-queue">'+rows.map(r=>{
-      const m=playtestStatusMeta(r);
-      const n=playtestOptions(r).filter(x=>playtestArtUrl(r,x)).length;
-      return '<button class="'+(r.build_job_id===focus.build_job_id?'active':'')+'" onclick="setPlaytestFocus(\''+esc(r.build_job_id)+'\')"><div class="pt-queue-title">'+esc(r.title)+'</div><div class="pt-queue-meta"><span class="pt-dot '+m.dot+'"></span><span>'+esc(m.label)+'</span><span>·</span><span>ART '+n+'/3</span></div></button>';
-    }).join("")+'</div></aside>';
-
-    const art='<div class="pt-art-head"><div><h2>Visual Direction A / B / C</h2><p>KEEP이면 하나를 고르거나 아래 메모에 원하는 방향을 직접 적을 수 있습니다.</p></div><div class="pt-art-count">'+completed+'/3 READY</div></div>'+
-      '<div class="pt-art-grid">'+opts.map(o=>{
-        const url=playtestArtUrl(focus,o);
-        const chosen=draft.art===o.id;
-        const title=o.title||("Art "+o.id);
-        const summary=o.direction_summary||(url?"Visual direction preview":"Playtest Intake가 이 방향을 생성 중입니다.");
-        const choose=focus.id&&url?' onclick="setPlaytestArtChoice(\''+esc(focus.id)+'\',\''+esc(o.id)+'\')"':'';
-        return '<article data-playtest-art="'+esc(o.id)+'" class="pt-art-card '+(chosen?'choice':'')+'"'+choose+'><div class="pt-art-visual">'+
-          (url?'<img src="'+esc(url)+'" alt="'+esc(title)+'" loading="lazy">':'<div class="pt-art-empty"><i></i><span>'+esc(focus.status==="awaiting_intake"?"입고 대기":"이미지 생성 중")+'</span></div>')+
-          '</div><div class="pt-art-copy"><div class="pt-art-row"><span class="pt-art-letter">OPTION '+esc(o.id)+'</span>'+(chosen?'<span class="pt-pill good">SELECTED</span>':url?'<span class="pt-pill good">READY</span>':'<span class="pt-pill warn">PENDING</span>')+'</div><div class="pt-art-title">'+esc(title)+'</div><div class="pt-art-summary">'+esc(summary)+'</div></div></article>';
-      }).join("")+'</div>';
-
-    const verdict=focus.id&&focus.status==="ready"
-      ? '<div class="pt-verdict"><div class="pt-verdict-head"><div><strong>플레이테스트 판단</strong><span>고장이라 평가할 수 없으면 취향 평가를 하지 말고 빌드 진단실로 보냅니다.</span></div></div>'+
-        '<textarea id="playtestDecisionNote" oninput="setPlaytestNote(\''+esc(focus.id)+'\',this.value)" placeholder="문제 상황, 좋았던 점, 싫었던 점, 원하는 아트 방향 등을 적어두세요.">'+esc(draft.note||"")+'</textarea>'+
-        '<div class="pt-verdict-actions"><button class="btn warn" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'UNJUDGEABLE\')">⚠ 판단 불가</button><button class="btn good" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'KEEP\')">♥ KEEP</button><button class="btn" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'MAYBE\')">? MAYBE</button><button class="btn bad" onclick="submitPlaytestDecision(\''+esc(focus.id)+'\',\'KILL\')">× KILL</button></div>'+
-        '<div class="pt-route-note">판단 불가 → 빌드 진단실 · KEEP → 게임 고도화실 + AI 아트 제작본부 · MAYBE → 플레이테스트 보류 · KILL → 폐기작 기록실</div></div>'
-      : '<div class="pt-verdict"><div class="pt-verdict-head"><div><strong>입고 준비 중</strong><span>A/B/C와 showcase 기록이 준비되면 판단 버튼이 열립니다.</span></div></div></div>';
-
-    const stage='<section class="pt-stage"><div class="pt-hero"><div class="pt-hero-main"><div class="pt-eyebrow">PLAYTEST SHOWROOM</div><div class="pt-title">'+esc(focus.title)+'</div><div class="pt-oneline">'+esc(focus.one_line||focus.build?.build_summary||"설계 검수를 통과한 Graybox playable입니다.")+'</div><div class="pt-status"><span class="pt-pill good">GRAYBOX</span><span class="pt-pill good">FIDELITY PASS</span><span class="pt-pill '+status.cls+'">'+esc(status.label)+'</span></div></div></div>'+
-      '<div class="pt-build-box"><div class="pt-build-card"><h3>실제 플레이 빌드</h3><div class="pt-ident"><span>Repository</span><b>'+esc(repo)+'</b><span>Godot path</span><b>'+esc(projectPath)+'</b><span>Final commit</span><b>'+esc(shortHash(focus.final_commit,12))+'</b><span>Blueprint</span><b>'+esc(shortHash(focus.blueprint_hash,12))+'</b></div><div class="pt-build-actions"><button class="btn primary" onclick="window.open(\''+esc(buildUrl)+'\',\'_blank\')">GitHub 빌드 열기 ↗</button><button class="btn ghost" onclick="copyPlaytestPath(\''+esc(focus.build_job_id)+'\')">프로젝트 경로 복사</button></div></div>'+
-      '<div class="pt-note-card"><h3>입고 상태</h3><p>'+esc(focus.generation_note||"Graybox playable + 3 GPT concept previews; no art applied to build.")+'</p>'+(focus.last_error?'<div class="pt-error">'+esc(focus.last_error)+'</div>':'')+'</div></div>'+playtestPlayerCard(focus)+art+verdict+'</section>';
-    showroom='<div class="pt-shell">'+queue+stage+'</div>';
-  }
-
-  const results='<div class="pt-results"><div class="section-head"><div><h2>처리 결과</h2><p>쇼룸 판단은 사라지지 않고 다음 공간으로 인계된 기록으로 남습니다.</p></div></div><div class="pt-result-grid">'+
-    reviewResultColumn("UNJUDGEABLE","판단 불가","빌드 진단실")+
-    reviewResultColumn("KEEP","KEEP","고도화 + 아트")+
-    reviewResultColumn("MAYBE","MAYBE","재검토 보류")+
-    reviewResultColumn("KILL","KILL","폐기작 기록실")+
-    '</div></div>';
-
-  return genericHeader("Playtest Showroom","먼저 플레이 가능한지 확인하고, 그 다음에 게임을 살릴지 판단합니다.")+showroom+results;
+  const filters=[["all","전체 게임"],["pending","판단 대기"],["KEEP","KEEP"],["MAYBE","MAYBE"],["UNJUDGEABLE","판단 불가"],["KILL","KILL"]];
+  return '<section class="pt-library"><div class="pt-library-head"><div><h2>게임 라이브러리</h2><p>게임을 눌러 플레이하고, 아트 방향을 살펴보세요.</p></div>'+
+    '<div class="pt-library-tools"><input type="search" aria-label="게임 이름 검색" placeholder="게임 이름 검색" value="'+esc(playtestGallerySearch)+'" oninput="searchPlaytestGallery(this.value)">'+
+    '<select aria-label="게임 상태 필터" onchange="filterPlaytestGallery(this.value)">'+filters.map(([value,label])=>'<option value="'+value+'" '+(value===playtestGalleryFilter?'selected':'')+'>'+label+'</option>').join("")+'</select></div></div>'+
+    '<div id="playtestGalleryResults">'+playtestGalleryContent()+'</div></section>';
+}
+function playtestGameDetail(row){
+  const decision=playtestDecisionFor(row.id), draft=playtestDraft[row.id]||{};
+  const selected=draft.art||decision?.selected_art_option;
+  const art=playtestOptions(row).map(opt=>{
+    const url=playtestArtUrl(row,opt), chosen=selected===opt.id;
+    return '<article class="pt-art-thumb '+(chosen?'choice':'')+'" data-playtest-art="'+opt.id+'"><button class="pt-art-preview" '+(url?'onclick="openPlaytestArt(\''+opt.id+'\')"':'disabled')+' aria-label="아트 '+opt.id+' 확대 보기">'+
+      (url?'<img src="'+esc(url)+'" alt="'+esc(opt.title||('아트 '+opt.id))+'">':'<span>준비 중</span>')+'</button><div class="pt-art-caption"><b>'+opt.id+'</b><span>'+esc(opt.title||'아트 준비 중')+'</span></div>'+
+      (row.id&&url&&!decision?'<button class="btn ghost pt-art-pick" aria-pressed="'+chosen+'" onclick="setPlaytestArtChoice(\''+esc(row.id)+'\',\''+opt.id+'\')">'+(chosen?'✓ 선택됨':opt.id+' 선택')+'</button>':'')+'</article>';
+  }).join("");
+  const verdict=decision
+    ? '<details class="pt-fold"><summary>판단 기록 · '+esc(verdictLabel(decision.decision))+'</summary><p>'+esc(decision.decision_note||"메모 없음")+'</p>'+(selected?'<p>선택 아트 · '+esc(selected)+'</p>':'')+'</details>'
+    : row.id&&row.status==="ready"
+      ? '<details class="pt-fold"><summary>판단 남기기</summary><div class="pt-verdict"><textarea id="playtestDecisionNote" aria-label="플레이테스트 메모" oninput="setPlaytestNote(\''+esc(row.id)+'\',this.value)" placeholder="플레이해 본 느낌이나 원하는 방향을 적어주세요.">'+esc(draft.note||"")+'</textarea><div class="pt-verdict-actions">'+
+        [["UNJUDGEABLE","⚠ 판단 불가","warn"],["KEEP","♥ KEEP","good"],["MAYBE","? MAYBE",""],["KILL","× KILL","bad"]].map(([value,label,cls])=>'<button class="btn '+cls+'" onclick="submitPlaytestDecision(\''+esc(row.id)+'\',\''+value+'\')">'+label+'</button>').join("")+'</div></div></details>'
+      : '<p class="pt-detail-muted">입고가 완료되면 판단을 남길 수 있습니다.</p>';
+  return '<div class="pt-game-intro"><span class="pt-pill">'+esc(playtestGalleryLabel(row))+'</span><p>'+esc(row.one_line||"")+'</p></div>'+
+    playtestPlayerCard(row)+'<section class="pt-art-section"><div class="pt-art-section-head"><h3>아트 방향</h3><span>눌러서 크게 보기</span></div><div class="pt-art-thumbs">'+art+'</div></section>'+verdict+
+    '<details class="pt-fold"><summary>빌드 정보</summary><div class="pt-ident"><span>Godot path</span><b>'+esc(row.build?.project_path||row.project_path||"-")+'</b><span>Final commit</span><b>'+esc(shortHash(row.final_commit,12))+'</b></div><div class="pt-build-actions"><a class="btn ghost" href="'+esc(playtestBuildUrl(row))+'" target="_blank" rel="noopener">GitHub 원본 ↗</a><button class="btn ghost" onclick="copyPlaytestPath(\''+esc(row.build_job_id)+'\')">경로 복사</button></div><p>'+esc(row.generation_note||"")+'</p>'+(row.last_error?'<p class="pt-error">'+esc(row.last_error)+'</p>':'')+'</details>';
+}
+function openPlaytestGame(id){
+  const row=playtestRows().find(x=>x.build_job_id===id);
+  if(!row) return;
+  closePlaytestGame();
+  playtestFocusId=id;
+  const dialog=document.createElement("dialog");
+  dialog.id="playtestGameDialog";
+  dialog.className="pt-game-dialog";
+  dialog.setAttribute("aria-labelledby","ptGameTitle");
+  dialog.innerHTML='<div class="pt-dialog-head"><h2 id="ptGameTitle">'+esc(row.title)+'</h2><button class="btn ghost" autofocus onclick="closePlaytestGame()" aria-label="게임 닫기">✕ 닫기</button></div><div class="pt-dialog-body">'+playtestGameDetail(row)+'</div>';
+  dialog.addEventListener("cancel",event=>{event.preventDefault();closePlaytestGame();});
+  dialog.addEventListener("click",event=>{
+    const box=dialog.getBoundingClientRect();
+    if(event.target===dialog&&(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)) closePlaytestGame();
+  });
+  document.body.append(dialog);
+  dialog.showModal();
+}
+function closePlaytestGame(){
+  closePlaytestArt();
+  const id=playtestFocusId;
+  const dialog=document.getElementById("playtestGameDialog");
+  if(dialog){dialog.close();dialog.remove();}
+  playtestPlayer=null;
+  playtestFocusId=null;
+  document.getElementById("pt-card-"+id)?.focus({preventScroll:true});
+}
+function openPlaytestArt(id){
+  const row=playtestRows().find(x=>x.build_job_id===playtestFocusId);
+  const opt=playtestOptions(row).find(x=>x.id===id), url=playtestArtUrl(row,opt);
+  if(!url) return;
+  closePlaytestArt();
+  const dialog=document.createElement("dialog");
+  dialog.id="playtestArtDialog";
+  dialog.className="pt-art-dialog";
+  dialog.setAttribute("aria-labelledby","ptArtTitle");
+  dialog.innerHTML='<div class="pt-dialog-head"><h2 id="ptArtTitle">'+id+' · '+esc(opt.title||"아트 방향")+'</h2><button class="btn ghost" autofocus onclick="closePlaytestArt()" aria-label="아트 닫기">✕ 닫기</button></div><div class="pt-art-full"><img src="'+esc(url)+'" alt="'+esc(opt.title||'아트 '+id)+'"></div><div class="pt-art-description"><p>'+esc(opt.direction_summary||"")+'</p><div class="pt-art-dialog-actions">'+
+    '<button class="btn ghost" onclick="openPlaytestArt(\''+({A:'C',B:'A',C:'B'}[id])+'\')">← 이전</button><span>'+id+'</span><button class="btn ghost" onclick="openPlaytestArt(\''+({A:'B',B:'C',C:'A'}[id])+'\')">다음 →</button>'+
+    (row.id&&!playtestDecisionFor(row.id)?'<button class="btn primary" onclick="setPlaytestArtChoice(\''+esc(row.id)+'\',\''+id+'\');closePlaytestArt()">'+id+' 선택</button>':'')+'</div></div>';
+  dialog.addEventListener("cancel",event=>{event.preventDefault();closePlaytestArt();});
+  dialog.addEventListener("click",event=>{
+    const box=dialog.getBoundingClientRect();
+    if(event.target===dialog&&(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)) closePlaytestArt();
+  });
+  dialog.addEventListener("keydown",event=>{
+    if(event.key==="ArrowRight"||event.key==="ArrowLeft"){
+      event.preventDefault();
+      openPlaytestArt((event.key==="ArrowRight"?{A:'B',B:'C',C:'A'}:{A:'C',B:'A',C:'B'})[id]);
+    }
+  });
+  document.body.append(dialog);
+  dialog.showModal();
+}
+function closePlaytestArt(){
+  const dialog=document.getElementById("playtestArtDialog");
+  if(dialog){dialog.close();dialog.remove();}
+}
+function syncPlaytestArtChoice(){
+  const row=playtestRows().find(x=>x.build_job_id===playtestFocusId);
+  if(!row) return;
+  const choice=playtestDraft[row.id]?.art||playtestDecisionFor(row.id)?.selected_art_option;
+  document.querySelectorAll("[data-playtest-art]").forEach(card=>{
+    const chosen=card.dataset.playtestArt===choice;
+    card.classList.toggle("choice",chosen);
+    const button=card.querySelector(".pt-art-pick");
+    if(button){button.setAttribute("aria-pressed",String(chosen));button.textContent=chosen?"✓ 선택됨":card.dataset.playtestArt+" 선택";}
+  });
 }
 
 function directedCard(p){
@@ -2630,21 +2771,9 @@ function settingsPage(){
     '</div>';
 }
 function render(){
-  // Polling and art choices must not destroy a running iframe and restart the game.
-  if(current==="review"&&playtestPlayer&&document.querySelector("#playtestPlayerMount iframe")){
-    const row=playtestPendingRows().find(x=>x.build_job_id===playtestFocusId);
-    if(row?.build_job_id===playtestPlayer.buildId&&playtestWebUrl(row)===playtestPlayer.url){
-      const choice=playtestDraft[row.id]?.art;
-      document.querySelectorAll("[data-playtest-art]").forEach(card=>{
-        const chosen=card.dataset.playtestArt===choice;
-        card.classList.toggle("choice",chosen);
-        const pill=card.querySelector(".pt-art-row .pt-pill");
-        if(pill&&pill.classList.contains("good")) pill.textContent=chosen?"SELECTED":"READY";
-      });
-      return;
-    }
-  }
-  playtestPlayer=null;
+  // Dialogs live outside #content; keep game state, drafts and expanded sections during polls.
+  if(current!=="review") closePlaytestGame();
+  else syncPlaytestArtChoice();
   const routes=["dashboard","planning","ideas","design","wireframe","implementation","build","fidelity","review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard","activity","settings"];
   if(!routes.includes(current)) current="dashboard";
   navRender();

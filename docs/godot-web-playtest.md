@@ -1,11 +1,18 @@
 # Godot Web playback in the playtest showroom
 
 GitHub Pages deploys the dashboard and Godot Web exports in one artifact. Open
-`https://queenrain9.github.io/danbi-game-office/#review`, select a game, and click
-**웹에서 플레이**. The game starts inside its card; **새 탭으로 열기** opens the
-same source build separately. **종료 / 다시 시작** unloads it; click play again to restart.
-Changing rooms or games unloads the player. Polling and selecting A/B/C preserve
-the running game; refreshed showroom metadata is displayed after stopping it.
+`https://queenrain9.github.io/danbi-game-office/#review`, click a game card in the
+searchable library, and click **웹에서 플레이** in its detail dialog. Playback
+switches to a dedicated viewport-filling player without nested detail/card
+frames or loading instructions; **종료** returns to art previews, and clicking
+play again restarts. **새 탭으로 열기** opens the same source build separately.
+Closing the dialog or changing rooms unloads the player. Polling preserves the
+running game and unsent notes. A/B/C thumbnails show the full image; click a
+thumbnail to open the separate art viewer with its description and previous/next
+controls. Image viewing and art selection are separate actions. Build metadata
+and verdict entry are collapsed until requested. Completed decisions stay in the
+library, with status filters and 24 games per page; availability still depends on
+the records supplied by the existing sync endpoint (currently fetched up to 100).
 
 ## Source and routes
 
