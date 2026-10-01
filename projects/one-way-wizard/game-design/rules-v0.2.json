@@ -1,0 +1,303 @@
+{
+  "version": "v0.2",
+  "time": {
+    "rule_tick_seconds": 0.016666666666666666,
+    "debug_step_policy": "seconds must resolve to an integer number of rule ticks; render FPS is irrelevant"
+  },
+  "arena": {
+    "width": 1,
+    "height": 1,
+    "wizard_start": [
+      0.5,
+      0.5
+    ],
+    "projectile_wrap": true,
+    "wizard_wrap": false,
+    "enemy_wrap": false,
+    "variants": {
+      "wave1": {
+        "name": "Open",
+        "pillars": []
+      },
+      "wave2": {
+        "name": "Split Lane",
+        "pillars": [
+          {
+            "center": [
+              0.42,
+              0.5
+            ],
+            "radius": 0.08
+          },
+          {
+            "center": [
+              0.58,
+              0.5
+            ],
+            "radius": 0.08
+          }
+        ]
+      },
+      "wave3": {
+        "name": "Crossfield",
+        "pillars": [
+          {
+            "center": [
+              0.35,
+              0.35
+            ],
+            "radius": 0.06
+          },
+          {
+            "center": [
+              0.65,
+              0.35
+            ],
+            "radius": 0.06
+          },
+          {
+            "center": [
+              0.35,
+              0.65
+            ],
+            "radius": 0.06
+          },
+          {
+            "center": [
+              0.65,
+              0.65
+            ],
+            "radius": 0.06
+          }
+        ]
+      }
+    }
+  },
+  "wizard": {
+    "hp": 3,
+    "speed": 0.3,
+    "radius": 0.035,
+    "contact_invulnerability_seconds": 1,
+    "collision_resolution": "clamp arena; resolve attempted X component first then Y; reject a component that would intersect a pillar"
+  },
+  "projectile": {
+    "speed": 0.22,
+    "radius": 0.012,
+    "lifetime_seconds": 18,
+    "cap": 8,
+    "damage": 1,
+    "same_projectile_enemy_hit_cooldown_seconds": 0.5,
+    "pillars": "projectiles pass through pillars",
+    "wrap": "crossing an edge re-enters the opposite edge at the same normalized coordinate; lifetime is unchanged"
+  },
+  "cast": {
+    "mana_start": 4,
+    "mana_max": 4,
+    "mana_regen_seconds": 4,
+    "cooldown_seconds": 0.35,
+    "cost": 1
+  },
+  "tools": {
+    "redirect": {
+      "start_charges": 2,
+      "gain_each_wave": 1,
+      "pulse_speed": 0.4,
+      "pulse_radius": 0.02,
+      "pulse_lifetime_seconds": 1.2,
+      "result": "rotate contacted projectile heading +90 degrees clockwise in screen coordinates; consume charge only on valid hit"
+    },
+    "split": {
+      "start_charges": 1,
+      "gain_each_wave": 1,
+      "pulse_speed": 0.4,
+      "pulse_radius": 0.02,
+      "pulse_lifetime_seconds": 1.2,
+      "result": "preserve parent; child inherits remaining lifetime, damage and empowered flag; cross(pulse_velocity, projectile_velocity)>=0 gives +30 degrees else -30 degrees; cap8 means no child and no charge cost"
+    },
+    "merge": {
+      "max_heading_difference_degrees": 45,
+      "contact_distance": "sum of projectile radii",
+      "result": "normal bolts only; midpoint position; circular-mean heading on shorter arc; damage2; standard speed; lifetime=min(max(A,B)+4,18); empowered=true"
+    }
+  },
+  "enemies": {
+    "chaser": {
+      "hp": 2,
+      "speed": 0.075,
+      "radius": 0.035,
+      "movement": "directly toward wizard each rule tick; collision uses same deterministic X-then-Y component resolution as wizard"
+    },
+    "drifter": {
+      "hp": 2,
+      "speed": 0.09,
+      "radius": 0.035,
+      "movement": "authored initial heading; reflect on arena boundary; if next position intersects pillar, reflect velocity across pillar normal and remain at pre-collision position for that tick"
+    },
+    "anchor": {
+      "hp": 5,
+      "speed": 0,
+      "radius": 0.045,
+      "hazard": {
+        "interval_seconds": 3,
+        "start_radius": 0.04,
+        "expansion_speed": 0.15,
+        "max_radius": 0.28,
+        "thickness": 0.02,
+        "damage": 1,
+        "hit_rule": "each emitted ring can damage wizard at most once; ring does not wrap and expires at max radius"
+      }
+    }
+  },
+  "spawns": {
+    "points": {
+      "A": [
+        0.05,
+        0.15
+      ],
+      "B": [
+        0.95,
+        0.15
+      ],
+      "C": [
+        0.95,
+        0.85
+      ],
+      "D": [
+        0.05,
+        0.85
+      ],
+      "E": [
+        0.5,
+        0.05
+      ],
+      "F": [
+        0.5,
+        0.95
+      ]
+    },
+    "wave1": [
+      {
+        "t": 0,
+        "type": "Chaser",
+        "point": "A"
+      },
+      {
+        "t": 1.8,
+        "type": "Chaser",
+        "point": "C"
+      },
+      {
+        "t": 3.6,
+        "type": "Chaser",
+        "point": "B"
+      },
+      {
+        "t": 5.4,
+        "type": "Chaser",
+        "point": "D"
+      },
+      {
+        "t": 7.2,
+        "type": "Chaser",
+        "point": "E"
+      },
+      {
+        "t": 9,
+        "type": "Chaser",
+        "point": "F"
+      }
+    ],
+    "wave2": [
+      {
+        "t": 0,
+        "type": "Chaser",
+        "point": "A"
+      },
+      {
+        "t": 1.6,
+        "type": "Drifter",
+        "point": "B",
+        "heading_degrees": 135
+      },
+      {
+        "t": 3.2,
+        "type": "Chaser",
+        "point": "C"
+      },
+      {
+        "t": 4.8,
+        "type": "Drifter",
+        "point": "D",
+        "heading_degrees": 315
+      },
+      {
+        "t": 6.4,
+        "type": "Chaser",
+        "point": "E"
+      },
+      {
+        "t": 8,
+        "type": "Chaser",
+        "point": "F"
+      },
+      {
+        "t": 9.6,
+        "type": "Drifter",
+        "point": "A",
+        "heading_degrees": 45
+      }
+    ],
+    "wave3": [
+      {
+        "t": 0,
+        "type": "Chaser",
+        "point": "A"
+      },
+      {
+        "t": 1.5,
+        "type": "Anchor",
+        "point": "C"
+      },
+      {
+        "t": 3,
+        "type": "Drifter",
+        "point": "B",
+        "heading_degrees": 135
+      },
+      {
+        "t": 4.5,
+        "type": "Chaser",
+        "point": "D"
+      },
+      {
+        "t": 6,
+        "type": "Anchor",
+        "point": "A"
+      },
+      {
+        "t": 7.5,
+        "type": "Chaser",
+        "point": "F"
+      },
+      {
+        "t": 9,
+        "type": "Drifter",
+        "point": "E",
+        "heading_degrees": 225
+      },
+      {
+        "t": 10.5,
+        "type": "Chaser",
+        "point": "C"
+      }
+    ]
+  },
+  "pause": "freeze rule tick accumulator and all timers exactly",
+  "retry": "reset to wave1, empty projectile field, initial HP/resources and wave1 spawn schedule",
+  "carry": {
+    "max": 3,
+    "next_wave_lifetime_seconds": 12,
+    "unselected": "dissolve",
+    "zero_selection_allowed": true
+  }
+}
