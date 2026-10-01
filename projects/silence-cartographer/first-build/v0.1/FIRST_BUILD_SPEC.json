@@ -1,0 +1,127 @@
+{
+  "version": "v0.1",
+  "first_build_goal": [
+    "Make the sound-information tradeoff legible: revealing more cave must also visibly change predator risk.",
+    "Prove the deterministic Patrol/Hunt/ReturnToPatrol loop can support a complete Relic-out-and-back mission."
+  ],
+  "source": {
+    "design_version": "v0.2",
+    "validation_reference": "projects/silence-cartographer/design-validation/v0.2/sim/sim.py",
+    "fixtures": "projects/silence-cartographer/game-design/expeditions-v0.2.json"
+  },
+  "include": {
+    "missions": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "actions": [
+      "Move",
+      "Ping",
+      "Knock",
+      "Throw Clicker",
+      "Hide"
+    ],
+    "states": [
+      "Mission Select",
+      "Mission Brief",
+      "Exploration",
+      "Echo Resolve",
+      "Predator Resolve",
+      "Pause",
+      "Result"
+    ],
+    "failure": [
+      "predator contact",
+      "Air exhaustion"
+    ],
+    "success": "Relic collected and player returns to Entrance"
+  },
+  "not_now": [
+    "M4 Branching Hunt",
+    "M5 Return Pressure",
+    "M6 Combined Expedition",
+    "persistent grades/unlocks",
+    "final visual/audio polish"
+  ],
+  "rules": {
+    "accepted_action_cost_air": 1,
+    "ping": {
+      "reveal": 3,
+      "hearing": 5
+    },
+    "knock": {
+      "reveal": 5,
+      "hearing": 8
+    },
+    "clicker": {
+      "reveal": 2,
+      "hearing": 7,
+      "range": 4
+    },
+    "hunt_steps": 3,
+    "success_priority": "Relic+Entrance success is resolved before Air=0 failure on that action",
+    "predator_states": [
+      "Patrol",
+      "Hunt",
+      "ReturnToPatrol"
+    ]
+  },
+  "fixed_content": [
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "must_work": [
+    {
+      "id": "M1",
+      "text": "Loading a fixed mission restores its authored initial rule state.",
+      "check": "debug_load_fixture('M1') exposes Entrance, starting Air/Clickers, initial reveal and authored predator state."
+    },
+    {
+      "id": "M2",
+      "text": "Invalid movement into an unrevealed tile changes nothing.",
+      "check": "invalid debug_act(move) returns false and snapshot is unchanged."
+    },
+    {
+      "id": "M3",
+      "text": "Ping reveals radius3, costs one Air and uses hearing radius5.",
+      "check": "M1 synthetic step compares Air/reveal/predator retarget after Ping."
+    },
+    {
+      "id": "M4",
+      "text": "Knock reveals radius5 and uses hearing radius8.",
+      "check": "M1 route after Knock has expected reveal and Hunt state."
+    },
+    {
+      "id": "M5",
+      "text": "Clicker is a remote sound origin with range4 and correct costs.",
+      "check": "M3 route action clicker(2,2) consumes one Clicker and one Air and Hunt targets 2,2."
+    },
+    {
+      "id": "M6",
+      "text": "Predator Hunt lasts at most three steps then deterministically ReturnToPatrol.",
+      "check": "replay crosses Hunt expiry and compares mode/return target to reference."
+    },
+    {
+      "id": "M7",
+      "text": "Hide protects same-tile contact for one predator resolution only.",
+      "check": "M2 authored route includes Hide and survives the protected resolution."
+    },
+    {
+      "id": "M8",
+      "text": "Relic pickup changes objective and returning to Entrance succeeds.",
+      "check": "authored M1-M3 success routes end in result=success."
+    },
+    {
+      "id": "M9",
+      "text": "Contact and Air exhaustion are real failure states.",
+      "check": "small loaded scenes force each failure and compare result."
+    },
+    {
+      "id": "M10",
+      "text": "Retry restores the complete authored mission rule state.",
+      "check": "mutate state, retry, and compare snapshot to initial snapshot."
+    }
+  ]
+}
