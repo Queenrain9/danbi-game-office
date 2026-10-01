@@ -1,0 +1,1723 @@
+{
+  "schema_version": "danbi-gate-static-report-v1",
+  "role": "gate",
+  "kind": "static",
+  "status": "failed",
+  "job_id": "0c4821f4-9db2-4ff9-985e-ad87ccf4ce73",
+  "contract_id": "f556078a-f98d-4509-b08a-26509a651d78",
+  "commit": "4bc09d26e8e2917ea353875f06cae1e753b7909a",
+  "blueprint_hash": "da421ffc7b6bf94b78cb46f8974b827ff74ab7f022987a9ca0927205f7a227d0",
+  "source_checked": true,
+  "validator_passed": false,
+  "runtime_qa_performed": false,
+  "manual_playtest_required": true,
+  "errors": [
+    {
+      "code": "SCRIPT_ATTACHMENT_MISSING",
+      "path": "res://scenes/app_root.tscn",
+      "message": "Five Blueprint reusable-component scripts are not attached to their declared use-site nodes."
+    },
+    {
+      "code": "CONNECTIONS_MISSING",
+      "path": "res://scenes/app_root.tscn",
+      "message": "Blueprint declares seven pressed connections; the final scene has four, omitting all decision choice buttons."
+    },
+    {
+      "code": "INTERACTION_STUBS",
+      "path": "res://scripts/interactions.gd",
+      "message": "Decision selection is pass; evidence drag/drop returns strings; required long-press/cancel/feedback paths are not implemented."
+    },
+    {
+      "code": "SOURCE_RULE_CONFLICT",
+      "path": "res://scripts/rules.gd",
+      "message": "Grade thresholds and scoring branches conflict with approved source values."
+    },
+    {
+      "code": "FLOW_UNREACHABLE",
+      "path": "res://scenes/app_root.tscn",
+      "message": "Interview, evidence review, decision selection, and decision-button paths lack required connections, preventing a full session."
+    },
+    {
+      "code": "CONTENT_MISSING",
+      "path": "builds/midnight-lost-property",
+      "message": "No CaseData, EvidenceData, VisitorData, or DecisionRule content resources are present."
+    }
+  ],
+  "test_ids": [
+    "STATIC:ACC:1",
+    "STATIC:ACC:2",
+    "STATIC:ACC:3",
+    "STATIC:ACC:4",
+    "STATIC:ACC:5",
+    "STATIC:ACC:6",
+    "STATIC:ACC:7",
+    "STATIC:ARC:implementation_order",
+    "STATIC:ARC:persistence",
+    "STATIC:ARC:required_data",
+    "STATIC:ARC:reusable",
+    "STATIC:ARC:scene_hierarchy",
+    "STATIC:ARC:state_owner",
+    "STATIC:CMP:case_intake:case_meta",
+    "STATIC:CMP:case_intake:inspect_btn",
+    "STATIC:CMP:case_intake:item_preview",
+    "STATIC:CMP:decision_confirm:confirm_rail",
+    "STATIC:CMP:decision_confirm:evidence_summary",
+    "STATIC:CMP:decision_confirm:hold",
+    "STATIC:CMP:decision_confirm:report",
+    "STATIC:CMP:decision_confirm:return",
+    "STATIC:CMP:evidence_review:decision_btn",
+    "STATIC:CMP:evidence_review:evidence_cards",
+    "STATIC:CMP:evidence_review:relation",
+    "STATIC:CMP:evidence_review:slot_a",
+    "STATIC:CMP:evidence_review:slot_b",
+    "STATIC:CMP:inspection_desk:clue_tray",
+    "STATIC:CMP:inspection_desk:interview_btn",
+    "STATIC:CMP:inspection_desk:object",
+    "STATIC:CMP:inspection_desk:review_btn",
+    "STATIC:CMP:night_desk:case_counter",
+    "STATIC:CMP:night_desk:shift_title",
+    "STATIC:CMP:night_desk:start_shift",
+    "STATIC:CMP:outcome:continue",
+    "STATIC:CMP:outcome:reason",
+    "STATIC:CMP:outcome:result_stamp",
+    "STATIC:CMP:outcome:score",
+    "STATIC:CMP:shift_summary:case_rows",
+    "STATIC:CMP:shift_summary:finish",
+    "STATIC:CMP:shift_summary:grade",
+    "STATIC:CMP:visitor_interview:back_inspect",
+    "STATIC:CMP:visitor_interview:budget",
+    "STATIC:CMP:visitor_interview:question_cards",
+    "STATIC:CMP:visitor_interview:review_btn",
+    "STATIC:CMP:visitor_interview:visitor",
+    "STATIC:CNT:mvp_scope",
+    "STATIC:CNT:screen_inventory",
+    "STATIC:GST:decision_locked",
+    "STATIC:GST:loading",
+    "STATIC:GST:pause",
+    "STATIC:INP:1",
+    "STATIC:INP:2",
+    "STATIC:INP:3",
+    "STATIC:INP:4",
+    "STATIC:INP:5",
+    "STATIC:INT:case_intake:1",
+    "STATIC:INT:decision_confirm:1",
+    "STATIC:INT:decision_confirm:2",
+    "STATIC:INT:evidence_review:1",
+    "STATIC:INT:evidence_review:2",
+    "STATIC:INT:inspection_desk:1",
+    "STATIC:INT:inspection_desk:2",
+    "STATIC:INT:inspection_desk:3",
+    "STATIC:INT:night_desk:1",
+    "STATIC:INT:outcome:1",
+    "STATIC:INT:shift_summary:1",
+    "STATIC:INT:visitor_interview:1",
+    "STATIC:RUL:clues",
+    "STATIC:RUL:decisions",
+    "STATIC:RUL:grades",
+    "STATIC:RUL:principle",
+    "STATIC:RUL:questions",
+    "STATIC:RUL:score",
+    "STATIC:STA:case_intake:intake",
+    "STATIC:STA:decision_confirm:blocked",
+    "STATIC:STA:decision_confirm:confirming",
+    "STATIC:STA:decision_confirm:locked",
+    "STATIC:STA:decision_confirm:selected",
+    "STATIC:STA:decision_confirm:unselected",
+    "STATIC:STA:evidence_review:comparing",
+    "STATIC:STA:evidence_review:empty",
+    "STATIC:STA:evidence_review:one_slot",
+    "STATIC:STA:evidence_review:relation_recorded",
+    "STATIC:STA:inspection_desk:hotspot_revealed",
+    "STATIC:STA:inspection_desk:idle",
+    "STATIC:STA:inspection_desk:rotating",
+    "STATIC:STA:inspection_desk:zoomed",
+    "STATIC:STA:night_desk:ready",
+    "STATIC:STA:outcome:complete",
+    "STATIC:STA:outcome:correct",
+    "STATIC:STA:outcome:incorrect",
+    "STATIC:STA:shift_summary:summary",
+    "STATIC:STA:visitor_interview:answering",
+    "STATIC:STA:visitor_interview:budget_empty",
+    "STATIC:STA:visitor_interview:question_ready",
+    "STATIC:TRN:case_intake:1",
+    "STATIC:TRN:decision_confirm:1",
+    "STATIC:TRN:evidence_review:1",
+    "STATIC:TRN:inspection_desk:1",
+    "STATIC:TRN:inspection_desk:2",
+    "STATIC:TRN:night_desk:1",
+    "STATIC:TRN:outcome:1",
+    "STATIC:TRN:outcome:2",
+    "STATIC:TRN:shift_summary:1",
+    "STATIC:TRN:visitor_interview:1",
+    "STATIC:TRN:visitor_interview:2",
+    "STAGE:skeleton",
+    "STAGE:geometry",
+    "STAGE:state",
+    "STAGE:input",
+    "STAGE:presentation",
+    "STAGE:integration"
+  ],
+  "results": [
+    {
+      "test_id": "STATIC:ACC:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:3",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:4",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:5",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:6",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ACC:7",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:implementation_order",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:persistence",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:required_data",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:reusable",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:scene_hierarchy",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:ARC:state_owner",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:case_meta",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:inspect_btn",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:case_intake:item_preview",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:confirm_rail",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:evidence_summary",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:hold",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:report",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:decision_confirm:return",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:decision_btn",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:evidence_cards",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:relation",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:slot_a",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:evidence_review:slot_b",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:clue_tray",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:interview_btn",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:object",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:inspection_desk:review_btn",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:case_counter",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:shift_title",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:night_desk:start_shift",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:continue",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:reason",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:result_stamp",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:outcome:score",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:case_rows",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:finish",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:shift_summary:grade",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:back_inspect",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:budget",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:question_cards",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:review_btn",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CMP:visitor_interview:visitor",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CNT:mvp_scope",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:CNT:screen_inventory",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:GST:decision_locked",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:GST:loading",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:GST:pause",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INP:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INP:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INP:3",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INP:4",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INP:5",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:case_intake:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:decision_confirm:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:decision_confirm:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:evidence_review:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:evidence_review:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:inspection_desk:3",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:night_desk:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:outcome:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:shift_summary:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:INT:visitor_interview:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:clues",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:decisions",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:grades",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:principle",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:questions",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:RUL:score",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:case_intake:intake",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:blocked",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:confirming",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:locked",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:selected",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:decision_confirm:unselected",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:comparing",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:empty",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:one_slot",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:evidence_review:relation_recorded",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:hotspot_revealed",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:idle",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:rotating",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:inspection_desk:zoomed",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:night_desk:ready",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:outcome:complete",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:outcome:correct",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:outcome:incorrect",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:shift_summary:summary",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:answering",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:budget_empty",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:STA:visitor_interview:question_ready",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:case_intake:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:decision_confirm:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:evidence_review:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:inspection_desk:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:inspection_desk:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:night_desk:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:outcome:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:outcome:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:shift_summary:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:visitor_interview:1",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STATIC:TRN:visitor_interview:2",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:skeleton",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:geometry",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:state",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:input",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:presentation",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    },
+    {
+      "test_id": "STAGE:integration",
+      "status": "failed",
+      "detail": "Independent Gate found the final committed implementation structurally or semantically incomplete; no static pass is claimed."
+    }
+  ],
+  "requirement_results": [
+    {
+      "requirement_id": "ACC:1",
+      "verdict": "BROKEN",
+      "expected": "8개 화면이 정의된 흐름대로 이동한다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:2",
+      "verdict": "BROKEN",
+      "expected": "Inspection에서 drag/pinch/hotspot이 충돌 없이 동작한다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:3",
+      "verdict": "BROKEN",
+      "expected": "질문 예산이 3→0으로 감소하고 0에서 추가 질문이 차단된다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:4",
+      "verdict": "BROKEN",
+      "expected": "단서 카드를 long-press drag하여 두 비교 슬롯에 배치할 수 있다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:5",
+      "verdict": "BROKEN",
+      "expected": "단서 2개 미만이면 Decision 확정이 불가능하다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:6",
+      "verdict": "BROKEN",
+      "expected": "RETURN/HOLD/REPORT 선택 뒤 confirm swipe 완료 시 판정이 잠긴다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ACC:7",
+      "verdict": "BROKEN",
+      "expected": "세 번째 Outcome 뒤 Shift Summary로 이동한다",
+      "observed": "The final project cannot realize the acceptance flow because core transitions, comparison drag-drop, decision selection, and outcome rules are absent or disconnected.",
+      "rationale": "The acceptance requirement is broken by upstream missing state, input, rule, and integration paths.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "ARC:implementation_order",
+      "verdict": "BROKEN",
+      "expected": "[\"navigation/state machine\",\"inspection gestures\",\"evidence tray\",\"interview budget\",\"compare drag-drop\",\"decision lock\",\"outcome/summary\"]",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "ARC:persistence",
+      "verdict": "BROKEN",
+      "expected": "shift progress only",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "ARC:required_data",
+      "verdict": "BROKEN",
+      "expected": "[\"CaseData\",\"EvidenceData\",\"VisitorData\",\"DecisionRule\"]",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "ARC:reusable",
+      "verdict": "BROKEN",
+      "expected": "[\"EvidenceCard\",\"PrimaryButton\",\"StatusChip\",\"DragDropSlot\",\"ConfirmRail\"]",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "ARC:scene_hierarchy",
+      "verdict": "BROKEN",
+      "expected": "[\"AppRoot\",\"ShiftController\",\"CaseSceneRouter\",\"HUDLayer\",\"ModalLayer\"]",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "ARC:state_owner",
+      "verdict": "BROKEN",
+      "expected": "CaseSessionState",
+      "observed": "The final commit contains placeholder ownership nodes and minimal component scripts; required data resources and reusable behavior are not constructed or attached.",
+      "rationale": "Foundational construction is incomplete, so the approved ownership and reusable structure cannot execute.",
+      "repair_group": "g1_architecture"
+    },
+    {
+      "requirement_id": "CMP:case_intake:case_meta",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"case_meta\",\"box\":{\"h\":11,\"w\":82,\"x\":9,\"y\":8},\"type\":\"panel\",\"label\":\"발견 장소 / 시간\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:case_intake:inspect_btn",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"inspect_btn\",\"box\":{\"h\":9,\"w\":64,\"x\":18,\"y\":78},\"type\":\"button\",\"label\":\"조사 시작\",\"state_binding\":\"intake\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:case_intake:item_preview",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"item_preview\",\"box\":{\"h\":36,\"w\":64,\"x\":18,\"y\":28},\"type\":\"object\",\"label\":\"분실물\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:decision_confirm:confirm_rail",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"confirm_rail\",\"box\":{\"h\":10,\"w\":76,\"x\":12,\"y\":75},\"type\":\"slider\",\"label\":\"밀어서 확정\",\"state_binding\":\"disabled|armed\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:decision_confirm:evidence_summary",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"evidence_summary\",\"box\":{\"h\":25,\"w\":82,\"x\":9,\"y\":8},\"type\":\"panel\",\"label\":\"근거 요약\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:decision_confirm:hold",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"hold\",\"box\":{\"h\":15,\"w\":26,\"x\":37,\"y\":43},\"type\":\"button\",\"label\":\"HOLD\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:decision_confirm:report",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"report\",\"box\":{\"h\":15,\"w\":26,\"x\":66,\"y\":43},\"type\":\"button\",\"label\":\"REPORT\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:decision_confirm:return",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"return\",\"box\":{\"h\":15,\"w\":26,\"x\":8,\"y\":43},\"type\":\"button\",\"label\":\"RETURN\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:evidence_review:decision_btn",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"decision_btn\",\"box\":{\"h\":7,\"w\":60,\"x\":20,\"y\":89},\"type\":\"button\",\"label\":\"판정하기\",\"state_binding\":\"clues>=2\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:evidence_review:evidence_cards",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"evidence_cards\",\"box\":{\"h\":18,\"w\":84,\"x\":8,\"y\":65},\"type\":\"tray\",\"label\":\"단서 카드\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:evidence_review:relation",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"relation\",\"box\":{\"h\":8,\"w\":56,\"x\":22,\"y\":47},\"type\":\"status\",\"label\":\"관계 결과\",\"state_binding\":\"none|match|conflict\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:evidence_review:slot_a",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"slot_a\",\"box\":{\"h\":20,\"w\":32,\"x\":12,\"y\":23},\"type\":\"dropzone\",\"label\":\"비교 A\",\"state_binding\":\"empty|filled\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:evidence_review:slot_b",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"slot_b\",\"box\":{\"h\":20,\"w\":32,\"x\":56,\"y\":23},\"type\":\"dropzone\",\"label\":\"비교 B\",\"state_binding\":\"empty|filled\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:inspection_desk:clue_tray",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"clue_tray\",\"box\":{\"h\":9,\"w\":86,\"x\":7,\"y\":75},\"type\":\"tray\",\"label\":\"단서 트레이\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:inspection_desk:interview_btn",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"interview_btn\",\"box\":{\"h\":7,\"w\":40,\"x\":54,\"y\":89},\"type\":\"button\",\"label\":\"방문객 질문\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:inspection_desk:object",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"object\",\"box\":{\"h\":45,\"w\":76,\"x\":12,\"y\":19},\"type\":\"manipulable\",\"label\":\"Lost Item\",\"state_binding\":\"idle|rotating|zoomed\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:inspection_desk:review_btn",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"review_btn\",\"box\":{\"h\":7,\"w\":40,\"x\":7,\"y\":89},\"type\":\"button\",\"label\":\"단서 대조\",\"state_binding\":\"clues>=2\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:night_desk:case_counter",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"case_counter\",\"box\":{\"h\":6,\"w\":20,\"x\":70,\"y\":7},\"type\":\"status\",\"label\":\"0 / 3 cases\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:night_desk:shift_title",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"shift_title\",\"box\":{\"h\":6,\"w\":55,\"x\":10,\"y\":7},\"type\":\"label\",\"label\":\"MIDNIGHT SHIFT\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:night_desk:start_shift",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"start_shift\",\"box\":{\"h\":9,\"w\":64,\"x\":18,\"y\":83},\"type\":\"button\",\"label\":\"근무 시작\",\"state_binding\":\"ready\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:outcome:continue",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"continue\",\"box\":{\"h\":8,\"w\":60,\"x\":20,\"y\":84},\"type\":\"button\",\"label\":\"계속\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:outcome:reason",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"reason\",\"box\":{\"h\":28,\"w\":80,\"x\":10,\"y\":24},\"type\":\"panel\",\"label\":\"왜 맞았나/틀렸나\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:outcome:result_stamp",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"result_stamp\",\"box\":{\"h\":12,\"w\":50,\"x\":25,\"y\":9},\"type\":\"status\",\"label\":\"판정 결과\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:outcome:score",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"score\",\"box\":{\"h\":12,\"w\":64,\"x\":18,\"y\":61},\"type\":\"status\",\"label\":\"점수 변화\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:shift_summary:case_rows",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"case_rows\",\"box\":{\"h\":36,\"w\":80,\"x\":10,\"y\":34},\"type\":\"list\",\"label\":\"사건 3개 요약\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:shift_summary:finish",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"finish\",\"box\":{\"h\":8,\"w\":60,\"x\":20,\"y\":83},\"type\":\"button\",\"label\":\"근무 종료\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:shift_summary:grade",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"grade\",\"box\":{\"h\":15,\"w\":44,\"x\":28,\"y\":10},\"type\":\"status\",\"label\":\"근무 등급\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:visitor_interview:back_inspect",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"back_inspect\",\"box\":{\"h\":6,\"w\":40,\"x\":7,\"y\":91},\"type\":\"button\",\"label\":\"물건 다시 보기\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:visitor_interview:budget",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"budget\",\"box\":{\"h\":6,\"w\":20,\"x\":72,\"y\":5},\"type\":\"status\",\"label\":\"질문 3/3\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:visitor_interview:question_cards",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"question_cards\",\"box\":{\"h\":20,\"w\":82,\"x\":9,\"y\":65},\"type\":\"list\",\"label\":\"질문 카드\",\"state_binding\":\"budget>0\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:visitor_interview:review_btn",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"review_btn\",\"box\":{\"h\":6,\"w\":40,\"x\":53,\"y\":91},\"type\":\"button\",\"label\":\"단서 대조\",\"state_binding\":\"clues>=2\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CMP:visitor_interview:visitor",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"visitor\",\"box\":{\"h\":27,\"w\":50,\"x\":25,\"y\":8},\"type\":\"portrait\",\"label\":\"방문객\",\"state_binding\":\"\"}",
+      "observed": "The scene contains the component rectangle, but required script attachment, live data, state binding, or visible content is absent for the component set.",
+      "rationale": "Geometry alone does not satisfy the required component responsibility and state/presentation binding.",
+      "repair_group": "g2_geometry_presentation"
+    },
+    {
+      "requirement_id": "CNT:mvp_scope",
+      "verdict": "MISSING",
+      "expected": "세로 모바일 1개 밤, 완성 사건 5개, 물건 회전/확대/hotspot, 질문 예산, 단서 카드 비교, RETURN/HOLD/REPORT, Outcome, Shift Summary.",
+      "observed": "No case/evidence/visitor content resource or rule-relevant content dataset exists in the final project.",
+      "rationale": "Rule-relevant content quantity and meaning must exist as data reachable by the session.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "CNT:screen_inventory",
+      "verdict": "MISSING",
+      "expected": "[\"Night Desk — 근무 시작\",\"Case Intake — 발견 정보\",\"Inspection Desk — 물건 조사\",\"Visitor Interview — 제한 질문\",\"Evidence Review — 단서 대조\",\"Decision Confirm — 조치 확인\",\"Outcome — 결과\",\"Shift Summary — 3사건 요약\"]",
+      "observed": "No case/evidence/visitor content resource or rule-relevant content dataset exists in the final project.",
+      "rationale": "Rule-relevant content quantity and meaning must exist as data reachable by the session.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "GST:decision_locked",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"decision_locked\",\"rule\":\"판정 후 back/수정 금지\"}",
+      "observed": "Global-state helpers return constants or bare variables; pause/loading/input-lock behavior is not wired through the scene.",
+      "rationale": "The approved global state requires executable lock/loading/pause behavior, not declaration-only helpers.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "GST:loading",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"loading\",\"rule\":\"사건 데이터 준비 중 입력 차단\"}",
+      "observed": "Global-state helpers return constants or bare variables; pause/loading/input-lock behavior is not wired through the scene.",
+      "rationale": "The approved global state requires executable lock/loading/pause behavior, not declaration-only helpers.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "GST:pause",
+      "verdict": "PARTIAL",
+      "expected": "{\"id\":\"pause\",\"rule\":\"현재 사건 상태 보존\"}",
+      "observed": "Global-state helpers return constants or bare variables; pause/loading/input-lock behavior is not wired through the scene.",
+      "rationale": "The approved global state requires executable lock/loading/pause behavior, not declaration-only helpers.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "INP:1",
+      "verdict": "PARTIAL",
+      "expected": "{\"use\":\"hotspot/questions/choices/buttons\",\"input\":\"tap\",\"priority\":3}",
+      "observed": "Only partial raw touch handling exists; long-press drag, cancellation, priority/conflict handling, and complete target routing are absent.",
+      "rationale": "Input modality, cancel semantics, priority, and spatial target behavior are part of the approved experience.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INP:2",
+      "verdict": "PARTIAL",
+      "expected": "{\"use\":\"evidence cards\",\"input\":\"long-press drag\",\"priority\":4}",
+      "observed": "Only partial raw touch handling exists; long-press drag, cancellation, priority/conflict handling, and complete target routing are absent.",
+      "rationale": "Input modality, cancel semantics, priority, and spatial target behavior are part of the approved experience.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INP:3",
+      "verdict": "PARTIAL",
+      "expected": "{\"use\":\"object rotation\",\"input\":\"drag\",\"priority\":2}",
+      "observed": "Only partial raw touch handling exists; long-press drag, cancellation, priority/conflict handling, and complete target routing are absent.",
+      "rationale": "Input modality, cancel semantics, priority, and spatial target behavior are part of the approved experience.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INP:4",
+      "verdict": "PARTIAL",
+      "expected": "{\"use\":\"object zoom\",\"input\":\"pinch\",\"priority\":5}",
+      "observed": "Only partial raw touch handling exists; long-press drag, cancellation, priority/conflict handling, and complete target routing are absent.",
+      "rationale": "Input modality, cancel semantics, priority, and spatial target behavior are part of the approved experience.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INP:5",
+      "verdict": "PARTIAL",
+      "expected": "{\"use\":\"irreversible decision\",\"input\":\"horizontal confirm swipe\",\"priority\":5}",
+      "observed": "Only partial raw touch handling exists; long-press drag, cancellation, priority/conflict handling, and complete target routing are absent.",
+      "rationale": "Input modality, cancel semantics, priority, and spatial target behavior are part of the approved experience.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:case_intake:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"Inspection 진입\",\"target\":\"inspect_btn\",\"trigger\":\"tap\",\"feedback\":\"fade + light haptic\",\"precondition\":\"case loaded\",\"state_change\":\"Inspection\",\"invalid_input\":\"로딩 중 입력 차단\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:decision_confirm:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"조치 선택\",\"target\":\"decision buttons\",\"trigger\":\"tap\",\"feedback\":\"selected outline\",\"precondition\":\"clues>=2\",\"state_change\":\"selected\",\"invalid_input\":\"근거 부족이면 Review 안내\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:decision_confirm:2",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"판정 잠금\",\"target\":\"confirm_rail\",\"trigger\":\"horizontal swipe\",\"feedback\":\"stamp + rigid haptic\",\"precondition\":\"decision selected\",\"state_change\":\"locked\",\"invalid_input\":\"중간 release면 rail reset\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:evidence_review:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"슬롯에 배치\",\"target\":\"evidence_card\",\"trigger\":\"long-press drag\",\"feedback\":\"slot highlight\",\"precondition\":\"card available\",\"state_change\":\"one_slot|comparing\",\"invalid_input\":\"중복 카드면 원위치\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:evidence_review:2",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"관계 계산/기록\",\"target\":\"slot\",\"trigger\":\"drop\",\"feedback\":\"line + medium haptic\",\"precondition\":\"two unique clues\",\"state_change\":\"relation_recorded\",\"invalid_input\":\"부적합 drop bounce\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:inspection_desk:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"물건 회전\",\"target\":\"object\",\"trigger\":\"drag\",\"feedback\":\"surface moves\",\"precondition\":\"Inspection\",\"state_change\":\"rotating\",\"invalid_input\":\"viewport 밖 drag는 clamp\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:inspection_desk:2",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"확대/축소\",\"target\":\"object\",\"trigger\":\"pinch\",\"feedback\":\"scale feedback\",\"precondition\":\"Inspection\",\"state_change\":\"zoomed\",\"invalid_input\":\"min/max clamp\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:inspection_desk:3",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"단서 카드 생성\",\"target\":\"hotspot\",\"trigger\":\"tap\",\"feedback\":\"ring + card pop + light haptic\",\"precondition\":\"hotspot active\",\"state_change\":\"hotspot_revealed\",\"invalid_input\":\"비 hotspot은 약한 경계 반응\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:night_desk:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"첫 사건 로드\",\"target\":\"start_shift\",\"trigger\":\"tap\",\"feedback\":\"button depress + light haptic\",\"precondition\":\"ready\",\"state_change\":\"Intake\",\"invalid_input\":\"중복 tap 무시\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:outcome:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"다음 사건 또는 요약\",\"target\":\"continue\",\"trigger\":\"tap\",\"feedback\":\"success/neutral haptic\",\"precondition\":\"outcome shown\",\"state_change\":\"complete\",\"invalid_input\":\"연타 무시\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:shift_summary:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"Night Desk 복귀\",\"target\":\"finish\",\"trigger\":\"tap\",\"feedback\":\"fade\",\"precondition\":\"summary\",\"state_change\":\"ready\",\"invalid_input\":\"none\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "INT:visitor_interview:1",
+      "verdict": "MISSING",
+      "expected": "{\"action\":\"질문 소비·응답 단서 생성\",\"target\":\"question_card\",\"trigger\":\"tap\",\"feedback\":\"핵심 구절 강조\",\"precondition\":\"budget>0\",\"state_change\":\"answering\",\"invalid_input\":\"budget=0이면 잠금 사유 표시\"}",
+      "observed": "The required action/feedback/invalid-cancel path is missing or replaced by a string-returning stub; several source buttons have no signal connection.",
+      "rationale": "The Blueprint requires executable target→action→state→feedback paths with invalid/cancel handling.",
+      "repair_group": "g4_input_spatial"
+    },
+    {
+      "requirement_id": "RUL:clues",
+      "verdict": "CONFLICT",
+      "expected": "3~5, 결정 최소 2",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "RUL:decisions",
+      "verdict": "CONFLICT",
+      "expected": "[\"RETURN\",\"HOLD\",\"REPORT\"]",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "RUL:grades",
+      "verdict": "CONFLICT",
+      "expected": "{\"A\":280,\"B\":220,\"C\":0,\"S\":330}",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "RUL:principle",
+      "verdict": "CONFLICT",
+      "expected": "소유주 맞히기가 아니라 증거 수준에 맞는 조치를 고른다.",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "RUL:questions",
+      "verdict": "CONFLICT",
+      "expected": "기본 3회",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "RUL:score",
+      "verdict": "CONFLICT",
+      "expected": "{\"correct\":100,\"false_report\":-25,\"reckless_return\":-40,\"supported_reason\":30,\"unnecessary_question\":-5}",
+      "observed": "The committed rules do not preserve the approved values and branches (for example grade thresholds and score outcomes differ from source).",
+      "rationale": "Numeric scoring/grade semantics are source-authoritative and the implementation contradicts or omits them.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:case_intake:intake",
+      "verdict": "PARTIAL",
+      "expected": "intake",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:decision_confirm:blocked",
+      "verdict": "PARTIAL",
+      "expected": "blocked",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:decision_confirm:confirming",
+      "verdict": "PARTIAL",
+      "expected": "confirming",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:decision_confirm:locked",
+      "verdict": "PARTIAL",
+      "expected": "locked",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:decision_confirm:selected",
+      "verdict": "PARTIAL",
+      "expected": "selected",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:decision_confirm:unselected",
+      "verdict": "PARTIAL",
+      "expected": "unselected",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:evidence_review:comparing",
+      "verdict": "PARTIAL",
+      "expected": "comparing",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:evidence_review:empty",
+      "verdict": "PARTIAL",
+      "expected": "empty",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:evidence_review:one_slot",
+      "verdict": "PARTIAL",
+      "expected": "one_slot",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:evidence_review:relation_recorded",
+      "verdict": "PARTIAL",
+      "expected": "relation_recorded",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:inspection_desk:hotspot_revealed",
+      "verdict": "PARTIAL",
+      "expected": "hotspot_revealed",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:inspection_desk:idle",
+      "verdict": "PARTIAL",
+      "expected": "idle",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:inspection_desk:rotating",
+      "verdict": "PARTIAL",
+      "expected": "rotating",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:inspection_desk:zoomed",
+      "verdict": "PARTIAL",
+      "expected": "zoomed",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:night_desk:ready",
+      "verdict": "PARTIAL",
+      "expected": "ready",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:outcome:complete",
+      "verdict": "PARTIAL",
+      "expected": "complete",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:outcome:correct",
+      "verdict": "PARTIAL",
+      "expected": "correct",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:outcome:incorrect",
+      "verdict": "PARTIAL",
+      "expected": "incorrect",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:shift_summary:summary",
+      "verdict": "PARTIAL",
+      "expected": "summary",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:visitor_interview:answering",
+      "verdict": "PARTIAL",
+      "expected": "answering",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:visitor_interview:budget_empty",
+      "verdict": "PARTIAL",
+      "expected": "budget_empty",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "STA:visitor_interview:question_ready",
+      "verdict": "PARTIAL",
+      "expected": "question_ready",
+      "observed": "State predicates are placeholder booleans derived from screen/clue counts and do not implement distinct variants, guards, feedback, or ownership paths.",
+      "rationale": "Named states and variants must have distinct executable transitions and visible consequences.",
+      "repair_group": "g3_state_rules"
+    },
+    {
+      "requirement_id": "TRN:case_intake:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"inspection\",\"from\":\"intake\",\"trigger\":\"tap inspect_btn\",\"animation\":\"short fade\",\"condition\":\"always\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:decision_confirm:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"outcome\",\"from\":\"decision_confirm\",\"trigger\":\"confirm complete\",\"animation\":\"short fade\",\"condition\":\"always\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:evidence_review:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"decision_confirm\",\"from\":\"evidence_review\",\"trigger\":\"tap decision_btn\",\"animation\":\"short fade\",\"condition\":\"clues>=2\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:inspection_desk:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"visitor_interview\",\"from\":\"inspection\",\"trigger\":\"tap interview_btn\",\"animation\":\"short fade\",\"condition\":\"always\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:inspection_desk:2",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"evidence_review\",\"from\":\"inspection\",\"trigger\":\"tap review_btn\",\"animation\":\"short fade\",\"condition\":\"clues>=2\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:night_desk:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"case_intake\",\"from\":\"ready\",\"trigger\":\"tap start_shift\",\"animation\":\"short fade\",\"condition\":\"always\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:outcome:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"case_intake\",\"from\":\"outcome\",\"trigger\":\"tap continue\",\"animation\":\"short fade\",\"condition\":\"case_index<3\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:outcome:2",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"shift_summary\",\"from\":\"outcome\",\"trigger\":\"tap continue\",\"animation\":\"short fade\",\"condition\":\"case_index=3\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:shift_summary:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"night_desk\",\"from\":\"shift_summary\",\"trigger\":\"tap finish\",\"animation\":\"short fade\",\"condition\":\"always\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:visitor_interview:1",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"inspection\",\"from\":\"visitor_interview\",\"trigger\":\"tap back_inspect\",\"animation\":\"short fade\",\"condition\":\"return_count<1\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    },
+    {
+      "requirement_id": "TRN:visitor_interview:2",
+      "verdict": "MISSING",
+      "expected": "{\"to\":\"evidence_review\",\"from\":\"visitor_interview\",\"trigger\":\"tap review_btn\",\"animation\":\"short fade\",\"condition\":\"clues>=2\"}",
+      "observed": "Most required transitions have no scene signal/action connection, so the eight-screen session path is not reachable.",
+      "rationale": "A helper function without a connected trigger does not provide the required transition path.",
+      "repair_group": "g5_integration_traceability"
+    }
+  ],
+  "repair_groups": [
+    {
+      "id": "g1_architecture",
+      "depends_on": [],
+      "requirement_ids": [
+        "ARC:implementation_order",
+        "ARC:persistence",
+        "ARC:required_data",
+        "ARC:reusable",
+        "ARC:scene_hierarchy",
+        "ARC:state_owner"
+      ]
+    },
+    {
+      "id": "g2_geometry_presentation",
+      "depends_on": [
+        "g1_architecture"
+      ],
+      "requirement_ids": [
+        "CMP:case_intake:case_meta",
+        "CMP:case_intake:inspect_btn",
+        "CMP:case_intake:item_preview",
+        "CMP:decision_confirm:confirm_rail",
+        "CMP:decision_confirm:evidence_summary",
+        "CMP:decision_confirm:hold",
+        "CMP:decision_confirm:report",
+        "CMP:decision_confirm:return",
+        "CMP:evidence_review:decision_btn",
+        "CMP:evidence_review:evidence_cards",
+        "CMP:evidence_review:relation",
+        "CMP:evidence_review:slot_a",
+        "CMP:evidence_review:slot_b",
+        "CMP:inspection_desk:clue_tray",
+        "CMP:inspection_desk:interview_btn",
+        "CMP:inspection_desk:object",
+        "CMP:inspection_desk:review_btn",
+        "CMP:night_desk:case_counter",
+        "CMP:night_desk:shift_title",
+        "CMP:night_desk:start_shift",
+        "CMP:outcome:continue",
+        "CMP:outcome:reason",
+        "CMP:outcome:result_stamp",
+        "CMP:outcome:score",
+        "CMP:shift_summary:case_rows",
+        "CMP:shift_summary:finish",
+        "CMP:shift_summary:grade",
+        "CMP:visitor_interview:back_inspect",
+        "CMP:visitor_interview:budget",
+        "CMP:visitor_interview:question_cards",
+        "CMP:visitor_interview:review_btn",
+        "CMP:visitor_interview:visitor"
+      ]
+    },
+    {
+      "id": "g3_state_rules",
+      "depends_on": [
+        "g1_architecture"
+      ],
+      "requirement_ids": [
+        "CNT:mvp_scope",
+        "CNT:screen_inventory",
+        "GST:decision_locked",
+        "GST:loading",
+        "GST:pause",
+        "RUL:clues",
+        "RUL:decisions",
+        "RUL:grades",
+        "RUL:principle",
+        "RUL:questions",
+        "RUL:score",
+        "STA:case_intake:intake",
+        "STA:decision_confirm:blocked",
+        "STA:decision_confirm:confirming",
+        "STA:decision_confirm:locked",
+        "STA:decision_confirm:selected",
+        "STA:decision_confirm:unselected",
+        "STA:evidence_review:comparing",
+        "STA:evidence_review:empty",
+        "STA:evidence_review:one_slot",
+        "STA:evidence_review:relation_recorded",
+        "STA:inspection_desk:hotspot_revealed",
+        "STA:inspection_desk:idle",
+        "STA:inspection_desk:rotating",
+        "STA:inspection_desk:zoomed",
+        "STA:night_desk:ready",
+        "STA:outcome:complete",
+        "STA:outcome:correct",
+        "STA:outcome:incorrect",
+        "STA:shift_summary:summary",
+        "STA:visitor_interview:answering",
+        "STA:visitor_interview:budget_empty",
+        "STA:visitor_interview:question_ready"
+      ]
+    },
+    {
+      "id": "g4_input_spatial",
+      "depends_on": [
+        "g1_architecture",
+        "g2_geometry_presentation",
+        "g3_state_rules"
+      ],
+      "requirement_ids": [
+        "INP:1",
+        "INP:2",
+        "INP:3",
+        "INP:4",
+        "INP:5",
+        "INT:case_intake:1",
+        "INT:decision_confirm:1",
+        "INT:decision_confirm:2",
+        "INT:evidence_review:1",
+        "INT:evidence_review:2",
+        "INT:inspection_desk:1",
+        "INT:inspection_desk:2",
+        "INT:inspection_desk:3",
+        "INT:night_desk:1",
+        "INT:outcome:1",
+        "INT:shift_summary:1",
+        "INT:visitor_interview:1"
+      ]
+    },
+    {
+      "id": "g5_integration_traceability",
+      "depends_on": [
+        "g2_geometry_presentation",
+        "g3_state_rules",
+        "g4_input_spatial"
+      ],
+      "requirement_ids": [
+        "ACC:1",
+        "ACC:2",
+        "ACC:3",
+        "ACC:4",
+        "ACC:5",
+        "ACC:6",
+        "ACC:7",
+        "TRN:case_intake:1",
+        "TRN:decision_confirm:1",
+        "TRN:evidence_review:1",
+        "TRN:inspection_desk:1",
+        "TRN:inspection_desk:2",
+        "TRN:night_desk:1",
+        "TRN:outcome:1",
+        "TRN:outcome:2",
+        "TRN:shift_summary:1",
+        "TRN:visitor_interview:1",
+        "TRN:visitor_interview:2"
+      ]
+    }
+  ],
+  "summary": "Independent static review found placeholder and disconnected construction. The project is not yet playable end-to-end."
+}
