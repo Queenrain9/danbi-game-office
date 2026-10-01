@@ -1,0 +1,28 @@
+{
+  "source": "simulation",
+  "reference_hash": "49f93d312ce6c8188677564361646ed40c49151b712134bf94f99eaf04c2cdb9",
+  "authored_routes": {
+    "M1": {
+      "turns": 13,
+      "air_remaining": 9,
+      "result": "success"
+    },
+    "M2": {
+      "turns": 14,
+      "air_remaining": 9,
+      "result": "success",
+      "uses_hide": true
+    },
+    "M3": {
+      "turns": 14,
+      "air_remaining": 10,
+      "result": "success",
+      "uses_clicker": true
+    }
+  },
+  "boundary_checks": {
+    "invalid_unrevealed_move": "returns false; no state/resource/predator change",
+    "success_on_last_air": "success takes priority over Air=0 failure",
+    "hide": "contact immunity applies only to predator step caused by that Hide action"
+  }
+}
