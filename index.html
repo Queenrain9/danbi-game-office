@@ -728,6 +728,8 @@ const NAV = [
     ["planning","▦","기획본부 대시보드"],
     ["ideas","♢","아이디어 연구소"],
     ["design","◇","게임 디자인실"],
+    ["design_validation","✓","게임 디자인 검증실"],
+    ["first_build","▥","첫 빌드 기획실"],
     ["wireframe","▤","프리프로덕션"]
   ]],
   ["AI 제작본부", [
@@ -774,6 +776,9 @@ let ideaGenreFilter = localStorage.getItem("danbiIdeaGenreFilter") || "all";
 let ideaSortMode = localStorage.getItem("danbiIdeaSortMode") || "queue";
 let ideaSearchQuery = "";
 let gameDesigns = [];
+let frontPipeline = [];
+let designValidations = [];
+let firstBuildPlans = [];
 let wireframePacks = [];
 let implementationContracts = [];
 let buildJobs = [];
@@ -1027,6 +1032,37 @@ async function loadGameDesigns(showToast=false){
   }catch(err){
     console.error("Game Design load failed",err);
     if(showToast) toast("Game Design 불러오기 실패");
+  }
+}
+
+async function loadFrontPipeline(showToast=false){
+  try{
+    const res=await fetch(CLOUD_URL+"?view=front_pipeline&limit=200",{method:"GET",headers:publicHeaders(),cache:"no-store"});
+    if(!res.ok){
+      const payload=await res.json().catch(()=>({}));
+      throw new Error(payload.error || ("HTTP "+res.status));
+    }
+    const payload=await res.json();
+    frontPipeline=Array.isArray(payload.pipeline)?payload.pipeline:[];
+    designValidations=Array.isArray(payload.validations)?payload.validations:[];
+    firstBuildPlans=Array.isArray(payload.first_builds)?payload.first_builds:[];
+    if(["design","design_validation","first_build","planning","wireframe","review"].includes(current)) render();
+    if(showToast) toast("Front Design Pipeline 새로고침");
+  }catch(err){
+    console.error("Front Design Pipeline load failed",err);
+    if(showToast) toast("Front Design Pipeline 불러오기 실패");
+  }
+}
+function frontRowForDesign(id){ return frontPipeline.find(x=>x.design_id===id)||null; }
+async function optInFrontPipeline(id){
+  try{
+    await cloudRequest("POST",{action:"opt_in_front_pipeline",design_id:id,mode:"experiment"});
+    await loadFrontPipeline(false);
+    render();
+    toast("v0.4 설계 검증 실험에 등록됨");
+  }catch(err){
+    console.error("Front pipeline opt-in failed",err);
+    toast("설계 검증 등록 실패");
   }
 }
 
@@ -1352,6 +1388,7 @@ function startPipelinePolling(){
     loadPromotedIdeas(false);
     loadIdeaSelection(false);
     loadGameDesigns(false);
+    loadFrontPipeline(false);
     loadWireframePacks(false);
     loadImplementationContracts(false);
     loadBuildJobs(false);
@@ -1374,7 +1411,7 @@ async function initCloud(){
       await cloudRequest("POST",{state});
     }
     cloudReady=true;
-    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadPlaytestShowcase(false),loadPostPlaytest(false),loadCeoDashboard(false)]);
+    await Promise.all([loadPromotedIdeas(false),loadIdeaSelection(false),loadGameDesigns(false),loadFrontPipeline(false),loadWireframePacks(false),loadImplementationContracts(false),loadBuildJobs(false),loadFidelityReviews(false),loadRepairTickets(false),loadPlaytestShowcase(false),loadPostPlaytest(false),loadCeoDashboard(false)]);
     startPipelinePolling();
     setCloudStatus("☁ Cloud synced", true);
     render();
@@ -1426,10 +1463,12 @@ function count(stage){
 function titleInfo(){
   const map={
     dashboard:["대표 대시보드","공장이 잘 돌고 있나 · 내가 결정할 것 · 무엇이 나왔나"],
-    planning:["기획본부 대시보드","Idea Lab → Game Design → Pre-production의 실제 현재 상태를 한눈에 봅니다."],
+    planning:["기획본부 대시보드","Idea Lab → Game Design → Validation → First Build → Pre-production의 현재 상태를 봅니다."],
     ideas:["아이디어 연구소",""],
-    design:["게임 디자인실","승격된 아이디어를 실제로 플레이 가능한 규칙과 MVP 범위로 정의합니다."],
-    wireframe:["프리프로덕션","Playable Concept Brief를 구현 가능한 화면·상태·인터랙션 설계도로 번역합니다."],
+    design:["게임 디자인실","승격된 아이디어를 완성 게임 수준의 규칙과 구조로 정의합니다."],
+    design_validation:["게임 디자인 검증실","독립 비평 → 규칙 실행 검증 → 숫자를 본 재비평으로 설계를 깨뜨리고 수렴시킵니다."],
+    first_build:["첫 빌드 기획실","검증된 전체 게임에서 첫 playable이 증명할 최소 조각과 잠긴 RULE 검사를 만듭니다."],
+    wireframe:["프리프로덕션","FIRST BUILD READY 계약을 화면·상태·인터랙션으로 번역하고 INPUT 검사를 잠급니다."],
     implementation:["구현 설계실","Wireframe을 구현 설계도로 컴파일하고, 독립 검수를 통과한 설계만 Build Farm으로 넘깁니다."],
     build:["빌드 팜","Implementation Contract를 실제 Godot playable로 구현합니다."],
     fidelity:["설계 검수실","Wireframe + Contract와 실제 코드를 독립적으로 대조하고 실패하면 Build Farm으로 반송합니다."],
@@ -2049,6 +2088,9 @@ function designCard(p){
     <div class="card-actions">
       <button class="btn primary" onclick="showDesignSpec('${p.id}')">전체 Spec 보기</button>
       ${archived?`<button class="btn ghost" onclick="openDesignArchive('${p.id}')">GitHub</button>`:""}
+      ${frontRowForDesign(p.id)
+        ? `<button class="btn ghost" onclick="go('design_validation')">v0.4 · ${esc(frontRowForDesign(p.id).stage)}</button>`
+        : `<button class="btn ghost" onclick="optInFrontPipeline('${p.id}')">v0.4 검증 실험</button>`}
     </div>
   </div>`;
 }
@@ -2177,6 +2219,60 @@ function wireCard(p){
       ${sourceDesign?`<button class="btn ghost" onclick="showDesignSpec('${sourceDesign.id}')">원본 Game Design</button>`:""}
     </div>
   </div>`;
+}
+
+function frontStageLabel(stage){
+  return ({
+    validation_pending:"검증 대기",validation_running:"검증 중",game_design_repair:"Game Design 수정",
+    validation_unresolved:"대표 판단 필요",design_ready:"DESIGN READY",first_build_running:"첫 빌드 기획 중",
+    first_build_ready:"FIRST BUILD READY",first_build_conditional:"조건부 FIRST BUILD READY",
+    preproduction_running:"Pre-production 진행",wireframe_ready:"WIREFRAME READY",held:"보류",completed:"완료"
+  })[stage]||stage||"-";
+}
+function frontValidationCard(row){
+  const v=designValidations.find(x=>x.id===row.validation_id);
+  const risks=Array.isArray(row.validation_known_risks)?row.validation_known_risks:[];
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">DESIGN VALIDATION</div><div class="card-title">'+esc(row.title)+'</div></div>'+
+    '<span class="badge '+(row.stage==="design_ready"?"green":row.stage==="validation_unresolved"?"red":"amber")+'">'+esc(frontStageLabel(row.stage))+'</span></div>'+
+    '<div class="card-desc">'+esc(row.one_line||"")+'</div>'+
+    '<div class="meta"><span>'+esc(row.validation_method||"대기")+'</span><span>검증 강도 '+esc(row.validation_strength||"-")+'</span><span>revision '+Number(row.validation_revision_count||0)+'</span><span>manual '+Number(row.manual_run_count||0)+'</span></div>'+
+    (risks.length?'<div class="human-gate"><b>Known Risk</b><br>'+esc(typeof risks[0]==="string"?risks[0]:JSON.stringify(risks[0]))+'</div>':'')+
+    (v?.report_markdown?'<details class="pt-fold"><summary>최근 Validation Report</summary><pre style="white-space:pre-wrap">'+esc(v.report_markdown)+'</pre></details>':'')+
+    '</div>';
+}
+function designValidationPage(){
+  const rows=[...frontPipeline].sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
+  return genericHeader(
+    "Game Design Validation v0.4",
+    "문서 비평과 Simulation/대체 검증을 한 고리로 묶습니다. PASS는 blocking defect가 0일 때 한 번만 부여합니다.",
+    '<button class="btn" onclick="loadFrontPipeline(true)">↻ 새로고침</button>'
+  )+
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>검증 계약</strong><span>Phase 1 · manual first</span></div>'+
+  '<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span>비평 → 실행 → 숫자 재비평</span><span>결함은 batch 반송</span><span>UNRESOLVED는 대표 판단</span><span>검증 왕복은 downstream bounce와 별도</span></div></div>'+
+  '<div class="cards">'+(rows.map(frontValidationCard).join("")||'<div class="empty">v0.4에 opt-in 된 Game Design이 없습니다.<br>Phase 2 실험 대상으로 등록하면 여기에 나타납니다.</div>')+'</div>';
+}
+function firstBuildCard(plan){
+  const row=frontPipeline.find(x=>x.design_id===plan.design_id);
+  const goals=Array.isArray(plan.goal)?plan.goal:[];
+  const must=Array.isArray(plan.must_work)?plan.must_work:[];
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">FIRST BUILD v'+Number(plan.version||1)+'</div><div class="card-title">'+esc(row?.title||plan.design_id)+'</div></div>'+
+    '<span class="badge '+(plan.status==="ready"?"green":plan.status==="conditional"?"amber":"red")+'">'+esc(plan.status)+'</span></div>'+
+    '<div class="card-desc">'+esc(goals.map(x=>typeof x==="string"?x:(x.text||x.goal||JSON.stringify(x))).join(" · ")||"Goal 미기록")+'</div>'+
+    '<div class="meta"><span>Must Work '+must.length+'</span><span>'+esc(plan.expectation_source)+'</span><span>RULE '+esc((plan.rules_test_hash||"").slice(0,8))+'</span></div>'+
+    (plan.known_validation_gap?'<div class="human-gate"><b>Known validation gap</b><br>'+esc(plan.known_validation_gap)+'</div>':'')+
+    '</div>';
+}
+function firstBuildPage(){
+  const readyRows=frontPipeline.filter(x=>["design_ready","first_build_running","first_build_ready","first_build_conditional","preproduction_running","wireframe_ready"].includes(x.stage));
+  const plans=[...firstBuildPlans].sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
+  return genericHeader(
+    "First Build Planning v0.4",
+    "전체 게임을 다시 쓰지 않고, 첫 playable의 검증 목표·고정 콘텐츠·Must Work·잠긴 RULE 검사를 확정합니다.",
+    '<button class="btn" onclick="loadFrontPipeline(true)">↻ 새로고침</button>'
+  )+
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>현재 DESIGN READY / 이후</strong><span>'+readyRows.length+' games</span></div>'+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap">'+readyRows.map(x=>'<span class="badge '+(x.stage==="design_ready"?"amber":"green")+'">'+esc(x.title)+' · '+esc(frontStageLabel(x.stage))+'</span>').join("")+'</div></div>'+
+  '<div class="cards">'+(plans.map(firstBuildCard).join("")||'<div class="empty">아직 First Build Contract가 없습니다.<br>DESIGN READY 게임을 첫 빌드 기획 프롬프트로 처리하면 이곳에 나타납니다.</div>')+'</div>';
 }
 
 function wirePage(){
@@ -2565,7 +2661,7 @@ function playtestGalleryContent(){
     const cover=opt?playtestArtUrl(row,opt):"";
     return '<button class="pt-library-card" id="pt-card-'+esc(row.build_job_id)+'" onclick="openPlaytestGame(\''+esc(row.build_job_id)+'\')">'+
       '<div class="pt-library-cover">'+(cover?'<img src="'+esc(cover)+'" alt="" loading="lazy">':'<span aria-hidden="true">🎮</span>')+'</div>'+
-      '<div class="pt-library-copy"><div class="pt-library-meta"><span>'+esc(playtestGalleryLabel(row))+'</span><span>'+esc(playtestWebUrl(row)?"▶ 플레이 가능":"웹 준비 중")+'</span></div>'+
+      '<div class="pt-library-copy"><div class="pt-library-meta"><span>'+esc(playtestGalleryLabel(row))+'</span><span>'+esc(playtestWebUrl(row)?"▶ 플레이 가능":"웹 준비 중")+'</span>'+(row.design_validation?'<span>'+esc(row.design_validation.validation_strength==="reduced"?"검증 제한적":"설계 검증 표준")+'</span>':'')+'</div>'+
       '<h3>'+esc(row.title)+'</h3><p>'+esc(row.one_line||"게임을 눌러 자세히 보기")+'</p><span class="pt-library-open">게임 열기 ↗</span></div></button>';
   }).join("");
   return '<div class="pt-library-count">'+rows.length+'개 게임</div><div class="pt-library-grid">'+
@@ -2786,6 +2882,7 @@ function render(){
   sub.style.display=s?"":"none";
   const topActions=document.querySelector(".top-actions");
   if(current==="ideas") topActions.innerHTML='<button class="btn ghost" title="아이디어는 매시간 자동 생성됩니다. 사이트 직접 실행은 아직 연결 전입니다." onclick="ideaRunUnavailable()">지금 생성</button><button class="btn ghost" title="새로고침" onclick="loadPromotedIdeas(true)">↻</button>';
+  else if(["design_validation","first_build"].includes(current)) topActions.innerHTML='<button class="btn ghost" onclick="loadFrontPipeline(true)">↻ 새로고침</button>';
   else if(["review","diagnostic","enhancement","art_direction","asset_spec","asset_production","visual_integration","graveyard"].includes(current)) topActions.innerHTML='<button class="btn ghost" onclick="Promise.all([loadPlaytestShowcase(false),loadPostPlaytest(false)]).then(()=>toast(\'새로고침 완료\'))">↻ 새로고침</button>';
   else topActions.innerHTML="";
   const pages={
