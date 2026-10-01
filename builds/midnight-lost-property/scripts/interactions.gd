@@ -13,7 +13,19 @@ var dragging_evidence := false
 var confirm_progress := 0.0
 
 func game():
-	return get_parent()
+	return get_tree().root.get_node("AppRoot")
+
+func _ready():
+	if name != "InteractionController":
+		return
+	game().get_node("Screens/inspection_desk/interview_btn").pressed.connect(on_interview_from_inspection)
+	game().get_node("Screens/inspection_desk/review_btn").pressed.connect(on_review_from_inspection)
+	game().get_node("Screens/visitor_interview/back_inspect").pressed.connect(on_back_to_inspection)
+	game().get_node("Screens/visitor_interview/review_btn").pressed.connect(on_review_from_interview)
+	game().get_node("Screens/evidence_review/decision_btn").pressed.connect(on_decision_from_review)
+	game().get_node("Screens/decision_confirm/return").pressed.connect(on_decision_confirm_01_item.bind("RETURN"))
+	game().get_node("Screens/decision_confirm/hold").pressed.connect(on_decision_confirm_01_item.bind("HOLD"))
+	game().get_node("Screens/decision_confirm/report").pressed.connect(on_decision_confirm_01_item.bind("REPORT"))
 
 func on_night_desk_01_item():
 	game().start_shift()
@@ -117,7 +129,20 @@ func apply_int_outcome_1(): game().next_case()
 func apply_int_shift_summary_1(): game().finish()
 func apply_int_visitor_interview_1(): on_visitor_interview_01_item()
 
+func _gui_input(event):
+	if name == "question_cards" and (event is InputEventScreenTouch or event is InputEventMouseButton) and event.pressed:
+		on_visitor_interview_01_item()
+		accept_event()
+	elif name == "object":
+		_handle_inspection(event)
+	elif name == "evidence_cards":
+		_handle_evidence(event)
+	elif name == "confirm_rail":
+		_handle_confirm(event)
+
 func _unhandled_input(event):
+	if name != "InteractionController":
+		return
 	if game().locked:
 		return
 	if game().screen == "inspection_desk":
@@ -193,3 +218,21 @@ func _handle_confirm(event):
 	elif pointer_down and (event is InputEventScreenDrag or event is InputEventMouseMotion):
 		var progress = (event.position.x - rail.global_position.x) / maxf(rail.size.x, 1.0)
 		on_decision_confirm_02_item(progress, false)
+
+# Canonical Blueprint structured-input handler symbols.
+func input_inspection_desk_01(event = null):
+	if event is InputEventScreenDrag or event is InputEventMouseMotion:
+		on_inspection_desk_01_item(event.relative)
+	return "rotating"
+func input_inspection_desk_02(event = null):
+	if event is InputEventMagnifyGesture:
+		on_inspection_desk_02_item(event.factor)
+	return "zoomed"
+func input_inspection_desk_03(event = null):
+	if event is InputEventScreenTouch or event is InputEventMouseButton:
+		on_inspection_desk_03_item(event.position)
+	return "hotspot_revealed"
+func input_visitor_interview_01(_event = null): return on_visitor_interview_01_item()
+func input_evidence_review_01(_event = null): return apply_int_evidence_review_1()
+func input_evidence_review_02(_event = null): return apply_int_evidence_review_2()
+func input_decision_confirm_02(_event = null): return apply_int_decision_confirm_2()
