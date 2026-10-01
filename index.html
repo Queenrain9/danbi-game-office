@@ -2351,26 +2351,49 @@ function buildCard(p){
   const labels={b0_intake:"B0 · Intake / Setup",b1_architecture:"B1 · Architecture",b2_gameplay:"B2 · Gameplay Systems",b3_screens:"B3 · Full Screen Flow",b4_content:"B4 · MVP Content",b5_integration:"B5 · Full Integration",b6_verification:"B6 · Verification",complete:"Implementation Complete"};
   const brief=implementationGameBrief(p);
   const status=String(p.status||"").toLowerCase();
-  const statusLabels={building:"빌드 중",repair:"수리 중",blocked:"작업 중단",fidelity_pending:"Godot 빌드 완료 · 설계 검수 대기"};
+  const statusLabels={building:"빌드 중",repair:"수리 중",blocked:"문제 확인",fidelity_pending:"설계 검수 대기"};
   const blockers=Array.isArray(p.blockers)?p.blockers:[];
+  const tickets=repairTickets.filter(x=>x.build_job_id===p.id && x.status==="open");
+  const repairGroups=[...new Set(tickets.map(x=>String(x.repair_group||"")).filter(Boolean))];
   const historical=isHistoricalBuild(p);
   const softReset=String(p.build_summary||"").startsWith("SOFT_RESET:");
   const kicker=historical?"HISTORICAL BUILD · DO NOT REUSE":status==="fidelity_pending"?"GODOT BUILD":"GODOT BUILD JOB";
   const badge=softReset?"SUPERSEDED":(statusLabels[status]||p.status);
-  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+(historical?'amber':status==="fidelity_pending"?'green':'blue')+'">'+esc(badge)+'</span></div>'+
+  const tone=historical?"amber":status==="fidelity_pending"?"green":status==="repair"||status==="blocked"?"red":"blue";
+  return '<div class="game-card"><div class="card-top"><div><div class="kicker">'+kicker+'</div><div class="card-title">'+esc(p.title)+'</div></div><span class="badge '+tone+'">'+esc(badge)+'</span></div>'+
   '<div class="card-desc" style="margin-top:8px">'+esc(brief)+'</div>'+
   '<div class="meta"><span>'+esc(p.build_version||"-")+'</span><span>'+esc(labels[p.current_stage]||p.current_stage||"-")+'</span><span>Godot 4.x</span></div>'+
   '<div class="progress"><i style="width:'+(Number(p.progress)||0)+'%"></i></div><div class="progress-row"><span>설계 요구사항 구현</span><b>'+(Number(p.progress)||0)+'%</b></div>'+
-  (status==="fidelity_pending"?'<div class="human-gate" style="margin-top:12px"><b>Godot 빌드 완료</b><br>Build Farm 시공이 끝났습니다. 독립 설계 검수를 기다리고 있습니다.</div>':softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>현재 작업</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
+  (status==="repair"?'<div class="human-gate" style="margin-top:12px"><b>Build Repair 진행 대상</b><br>Open repair tickets '+tickets.length+'건'+(repairGroups.length?' · Repair Plan '+repairGroups.length+'그룹':'')+'<br><span style="color:#a9bdd4">다음 → Build Farm 수리 → Static Fidelity 재검수</span></div>':status==="fidelity_pending"?'<div class="human-gate" style="margin-top:12px"><b>Godot 빌드 완료</b><br>Build Farm 시공이 끝났습니다. 독립 설계 검수를 기다리고 있습니다.</div>':softReset?'<div class="human-gate" style="margin-top:12px"><b>과거 구현 보존본</b><br>Pre-production reset 이전 파일입니다. 새 Blueprint의 구현 시작점이나 구현 증거로 재사용하지 않습니다.</div>':p.build_summary?'<div class="detail-box" style="margin-top:12px"><h3>현재 작업</h3><p>'+esc(p.build_summary)+'</p></div>':'')+
   '<div class="meta"><span>'+esc(p.project_path||"-")+'</span>'+(!historical&&p.last_commit?'<span>'+esc(String(p.last_commit).slice(0,8))+'</span>':'')+'</div>'+
   (blockers.length&&!historical?'<div class="human-gate"><b>Blocker</b><br>'+blockers.map(x=>esc(typeof x==="string"?x:JSON.stringify(x))).join("<br>")+'</div>':'')+'</div>';
 }
+function buildStatusSection(title,desc,tone,items,emptyText){
+  return '<div style="margin-top:22px">'+
+    '<div class="section-head"><div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p></div><span class="badge '+tone+'">'+items.length+'개</span></div>'+
+    '<div class="cards">'+(items.map(buildCard).join("") || '<div class="empty">'+esc(emptyText)+'</div>')+'</div>'+
+  '</div>';
+}
 function buildPage(){
-  const buildOutputs=buildJobs.filter(b=>!isHistoricalBuild(b) && ["building","repair","blocked","fidelity_pending"].includes(String(b.status||"").toLowerCase()));
-  return genericHeader("Build Farm","승인된 Implementation Blueprint를 실제 Godot playable로 만들고, 완성된 Build를 설계 검수 전까지 보관합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false),loadGameDesigns(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
-  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm Hourly</strong><span>active build limit · 1</span></div><div style="display:flex;gap:22px;flex-wrap:wrap;font-size:11px;color:#91a5bd"><span><b style="color:#eaf3ff">매시간 40분</b></span><span>Blueprint → Godot Build</span><span>완료 → 설계 검수 대기</span><span>검수 FAIL → Repair</span></div></div>'+
-  '<div class="section-head"><div><h2>Godot Build</h2><p>현재 제작·수리 중인 Build와 설계 검수를 기다리는 완성 Build입니다.</p></div></div>'+
-  '<div class="cards">'+(buildOutputs.map(buildCard).join("") || '<div class="empty">현재 Build Farm에 Godot Build가 없습니다.<br>새 Blueprint가 승인되면 이곳에서 제작됩니다.</div>')+'</div>';
+  const active=buildJobs.filter(b=>!isHistoricalBuild(b));
+  const building=active.filter(b=>String(b.status||"").toLowerCase()==="building");
+  const repair=active.filter(b=>String(b.status||"").toLowerCase()==="repair");
+  const fidelityPending=active.filter(b=>String(b.status||"").toLowerCase()==="fidelity_pending");
+  const blocked=active.filter(b=>String(b.status||"").toLowerCase()==="blocked");
+  return genericHeader("Build Farm","승인된 Implementation Blueprint를 실제 Godot playable로 만들고, 검수에서 돌아온 Build는 여기서 다시 수리합니다.",'<button class="btn" onclick="Promise.all([loadBuildJobs(false),loadRepairTickets(false),loadGameDesigns(false)]).then(()=>toast(\'Build Farm 새로고침\'))">↻ 새로고침</button>')+
+  '<div class="panel" style="margin-bottom:14px"><div class="panel-title"><strong>Build Farm 흐름</strong><span>active build limit · 1</span></div>'+
+    '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:11px;color:#91a5bd">'+
+      '<span class="badge blue">빌드 중 '+building.length+'</span><span>→</span>'+
+      '<span class="badge amber">설계 검수 대기 '+fidelityPending.length+'</span>'+
+      (repair.length?'<span style="margin-left:6px">↺</span><span class="badge red">수리 중 '+repair.length+'</span>':'')+
+      (blocked.length?'<span style="margin-left:6px">·</span><span class="badge red">문제 확인 '+blocked.length+'</span>':'')+
+    '</div>'+
+    '<div style="margin-top:12px;font-size:11px;color:#7f95af">Static Fidelity Gate에서 Build 결함이 확인되면 “수리 중”으로 돌아오고, Build Farm이 Repair Plan을 처리한 뒤 다시 설계 검수 대기로 보냅니다.</div>'+
+  '</div>'+
+  buildStatusSection("빌드 중","승인된 Blueprint를 Godot 프로젝트로 시공하고 있는 게임입니다.","blue",building,"현재 새로 시공 중인 Build가 없습니다.")+
+  (repair.length?buildStatusSection("수리 중","Static Fidelity Gate에서 실제 Build 결함이 확인되어 Repair Plan을 처리 중인 게임입니다.","red",repair,""):"")+
+  buildStatusSection("설계 검수 대기","Build Farm 시공을 마치고 독립 Static Fidelity Gate를 기다리는 완성 Build입니다.","amber",fidelityPending,"현재 설계 검수를 기다리는 Build가 없습니다.")+
+  (blocked.length?buildStatusSection("문제 확인","Build Farm에서 semantic/source blocker 확인이 필요한 게임입니다.","red",blocked,""):"");
 }
 
 function reviewResultColumn(decision,title,sub){
