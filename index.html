@@ -575,8 +575,8 @@
 .pt-library-card{display:block;width:100%;max-width:420px;padding:0;border:1px solid #25364a;border-radius:16px;background:#101b29;color:#dce8f6;text-align:left;font:inherit;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s}
 .pt-library-card:hover{border-color:#688db9;transform:translateY(-2px)}
 .pt-library-card:focus-visible,.pt-art-preview:focus-visible{outline:2px solid #8ab4f8;outline-offset:4px}
-.pt-library-cover{height:220px;background:#08111d;display:flex;align-items:center;justify-content:center;padding:12px}
-.pt-library-cover img{width:100%;height:100%;object-fit:contain;display:block;border-radius:5px}
+.pt-library-cover{aspect-ratio:4/3;background:#08111d;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pt-library-cover img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}
 .pt-library-cover>span{font-size:48px}
 .pt-library-copy{padding:17px}
 .pt-library-meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#8dafd4}
@@ -593,7 +593,8 @@ html:has(.pt-game-dialog[open]){overflow:hidden}
 .pt-dialog-head .btn{flex-shrink:0}
 .pt-dialog-body{padding:20px 24px}
 .pt-game-intro p{font-size:12px;line-height:1.7;color:#9ab0c9;margin:12px 0 18px}
-.pt-game-dialog .pt-player{margin-top:0}
+.pt-game-dialog{width:min(780px,calc(100vw - 40px))}
+.pt-game-dialog .pt-player{margin-top:0;padding:0 0 18px;border:0;border-bottom:1px solid #26384e;border-radius:0;background:none}
 .pt-game-dialog .pt-player-frame{width:min(100%,calc(66dvh * 9 / 16),360px);aspect-ratio:9/16;margin-top:14px}
 .pt-game-dialog:has(iframe) .pt-game-intro,.pt-game-dialog:has(iframe) .pt-art-section,.pt-game-dialog:has(iframe) .pt-fold{display:none}
 .pt-game-dialog:has(iframe){position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-height:100dvh;border:0;border-radius:0;background:#05090f;display:flex;flex-direction:column;overflow:hidden}
@@ -610,10 +611,11 @@ html:has(.pt-game-dialog[open]){overflow:hidden}
 .pt-art-section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
 .pt-art-section-head h3{font-size:14px;margin:0}
 .pt-art-section-head>span{font-size:11px;color:#8fa5bf}
-.pt-art-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pt-art-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;max-width:550px;margin:0 auto}
 .pt-art-thumb{min-width:0}
-.pt-art-preview{display:flex;align-items:center;justify-content:center;width:100%;height:190px;padding:8px;border:1px solid #293e55;border-radius:10px;background:#07111e;cursor:zoom-in;color:#8ca0b7}
-.pt-art-preview img{width:100%;height:100%;object-fit:contain;display:block}
+.pt-art-preview{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/2;padding:0;border:0;border-radius:10px;background:transparent;cursor:zoom-in;color:#8ca0b7;transition:transform .15s}
+.pt-art-preview:hover{transform:translateY(-3px)}
+.pt-art-preview img{width:100%;height:100%;object-fit:contain;display:block;border-radius:10px}
 .pt-art-thumb.choice .pt-art-preview{border-color:#8ab4f8;box-shadow:0 0 0 2px #8ab4f833}
 .pt-art-caption{display:flex;gap:8px;align-items:baseline;margin-top:9px;line-height:1.5;font-size:11px}
 .pt-art-caption b{font-size:13px;color:#a4c7f5}
@@ -635,8 +637,8 @@ html:has(.pt-game-dialog[open]){overflow:hidden}
 .pt-art-dialog .pt-art-full{flex:1;min-height:0;overflow:hidden}
 .pt-art-dialog .pt-art-full img{width:100%;height:100%;max-height:100%;object-fit:contain}
 .pt-art-dialog .pt-art-description{flex-shrink:0;max-height:32dvh;overflow:auto}
-@media(max-width:600px){.pt-library-head{align-items:stretch;flex-direction:column;gap:16px}.pt-library-tools input{flex:1;width:auto}.pt-library-tools select{width:128px}.pt-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pt-library-cover{height:170px;padding:8px}.pt-library-copy{padding:12px}.pt-library-copy h3{font-size:13px}.pt-library-meta{flex-direction:column;gap:4px}.pt-library-head h2{font-size:22px}.pt-game-dialog,.pt-art-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:13px}.pt-dialog-head{padding:14px}.pt-dialog-head h2{font-size:15px}.pt-dialog-body{padding:15px}.pt-art-thumbs{gap:8px}.pt-art-preview{height:145px;padding:4px}.pt-art-caption{font-size:10px;gap:4px;align-items:flex-start}.pt-art-caption span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pt-player-head{gap:10px}.pt-player-actions{gap:6px}.pt-player-actions .btn{font-size:11px;padding:9px}.pt-art-full{padding:10px}.pt-art-description{padding:0 15px 15px}.pt-art-full img{max-height:calc(100dvh - 280px)}}
-@media(max-width:360px){.pt-library-grid{grid-template-columns:1fr}.pt-art-preview{height:115px}}
+@media(max-width:600px){.pt-library-head{align-items:stretch;flex-direction:column;gap:16px}.pt-library-tools input{flex:1;width:auto}.pt-library-tools select{width:128px}.pt-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pt-library-cover{aspect-ratio:4/3}.pt-library-copy{padding:12px}.pt-library-copy h3{font-size:13px}.pt-library-meta{flex-direction:column;gap:4px}.pt-library-head h2{font-size:22px}.pt-game-dialog,.pt-art-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:13px}.pt-dialog-head{padding:14px}.pt-dialog-head h2{font-size:15px}.pt-dialog-body{padding:15px}.pt-art-thumbs{gap:8px}.pt-art-preview{padding:0}.pt-art-caption{font-size:10px;gap:4px;align-items:flex-start}.pt-art-caption span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pt-player-head{gap:10px}.pt-player-actions{gap:6px}.pt-player-actions .btn{font-size:11px;padding:9px}.pt-art-full{padding:10px}.pt-art-description{padding:0 15px 15px}.pt-art-full img{max-height:calc(100dvh - 280px)}}
+@media(max-width:360px){.pt-library-grid{grid-template-columns:1fr}.pt-art-thumbs{gap:6px}}
 
 /* Post-playtest Studio v0.1 */
 .pt-art-card.choice{outline:2px solid rgba(111,160,226,.75);box-shadow:0 0 0 4px rgba(111,160,226,.08)}
