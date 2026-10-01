@@ -1,0 +1,70 @@
+{
+  "contract_id": "12d1ced1-78b7-4ae2-bf76-d73445773ec8",
+  "title": "Miniature Moving Day",
+  "blueprint_hash": "3575cab01502a690387c33d30694ac60b5c1ea0c7fd1958f70051e0ec6276b88",
+  "source_checked": true,
+  "validator_passed": true,
+  "verification_scope": "construction_blueprint_static",
+  "reviewed_at": "2026-10-01T01:05:50.33003Z",
+  "execution_id": "0750af60-eabd-415d-875f-ebcd7e48fee8",
+  "connector_native": true,
+  "checks": {
+    "schema_identity": true,
+    "current_source_matches_frozen": true,
+    "requirements_match_contract": true,
+    "screens_match_frozen_pack": true,
+    "hash_identity": {
+      "embedded_matches_contract": true,
+      "history_row_present": true,
+      "compiler_checkpoint_complete": true,
+      "algorithm": "sha256-canonical-json-v1"
+    },
+    "source_coverage": {
+      "version": "source-coverage-v1",
+      "expected_count": 124,
+      "covered_count": 124,
+      "missing_count": 0
+    },
+    "geometry": {
+      "reference_size": {
+        "width": 540,
+        "height": 960
+      },
+      "coordinate_space": "screen_percent",
+      "stretch_mode": "canvas_items",
+      "geometry_tolerance_px": 2
+    },
+    "requirement_static_coverage": {
+      "requirements": 91,
+      "implementations": 91,
+      "tests": 91,
+      "missing_implementation": 0,
+      "missing_static_test": 0,
+      "unknown_test_requirement": 0,
+      "duplicate_test_ids": 0
+    },
+    "stages": [
+      "skeleton",
+      "geometry",
+      "state",
+      "input",
+      "presentation",
+      "integration"
+    ],
+    "runtime_recorded_as_static": false,
+    "design_wireframe_discrepancy": "none after repaired Wireframe explicitly models placed and reset_confirm states without changing Game Design semantics",
+    "semantic_fidelity": {
+      "core_loop_preserved": true,
+      "input_modalities_preserved": true,
+      "numeric_rules_preserved": [
+        "goal_overlap=0.85",
+        "angle_tolerance_deg=12",
+        "mvp_stages=6"
+      ],
+      "reset_confirmation_preserved": true,
+      "placed_state_preserved": true,
+      "legacy_unstructured_interactions_use_explicit_script_fallback": true
+    }
+  },
+  "evidence_path": "production/contracts/12d1ced1-78b7-4ae2-bf76-d73445773ec8/reviews/gate-3575cab01502a690387c33d30694ac60b5c1ea0c7fd1958f70051e0ec6276b88.json"
+}
