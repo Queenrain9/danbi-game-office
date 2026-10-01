@@ -1,0 +1,25 @@
+{
+  "version": "v0.1",
+  "read_only": [
+    "state",
+    "mission_id",
+    "air",
+    "clickers",
+    "player_tile",
+    "predator_tile",
+    "predator_mode",
+    "predator_hunt_target",
+    "predator_hunt_steps",
+    "predator_return_target",
+    "relic_collected",
+    "revealed_tiles",
+    "result"
+  ],
+  "debug_methods": {
+    "debug_load_fixture(fixture_id:String)": "Load an authored First Build fixture without presentation delay.",
+    "debug_act(action:Dictionary)->bool": "Resolve exactly one accepted/invalid game action immediately through production rule logic.",
+    "debug_snapshot()->Dictionary": "Return the read-only rule state used by tests.",
+    "debug_retry()": "Restore authored initial rule state."
+  },
+  "compatibility": "Adding new read-only observers is compatible and does not change existing rule semantics."
+}
