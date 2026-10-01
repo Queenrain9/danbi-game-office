@@ -324,3 +324,22 @@ A later deprecation does not invalidate an approved historical Blueprint: valida
 ### Historical build verification
 
 `check-build` does **not** compare a game-local adapter to whatever file happens to be current on main. It hashes the adapter copy in the reviewed final game checkout and compares it to the SHA-256 pinned in that Blueprint. This makes old game verification reproducible even after newer adapter versions become production.
+
+
+## Front design pipeline v0.4
+
+The pre-production front-end experiment is defined in `docs/PREPRODUCTION_DESIGN_PIPELINE_V0.4.md`.
+
+It is opt-in and additive during Phase 1. A design enrolled in `danbi_design_pipeline_optins` must pass independent Design Validation and First Build Planning before a new Wireframe can be inserted. Its Wireframe must then register a locked INPUT test before a new Implementation Contract can be inserted.
+
+Legacy designs that are not opted in continue to use the existing production flow unchanged.
+
+Locked front-pipeline identities carried toward production are:
+
+- validation reference hash
+- first-build semantic spec hash
+- RULE test hash
+- Wireframe semantic hash
+- INPUT test hash
+
+The Builder may not modify locked RULE/INPUT tests. Static Fidelity should focus on presentation fidelity, source lineage, not-now violations, test-path honesty and requirements that executable tests do not cover.
