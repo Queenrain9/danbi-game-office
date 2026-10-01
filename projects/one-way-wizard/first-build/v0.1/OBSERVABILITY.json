@@ -1,0 +1,29 @@
+{
+  "version": "v0.1",
+  "read_only": [
+    "state",
+    "sim_time",
+    "rule_tick",
+    "hp",
+    "mana",
+    "redirect_charges",
+    "split_charges",
+    "projectiles",
+    "enemies",
+    "wave_index",
+    "spawn_cursor",
+    "paused",
+    "result"
+  ],
+  "debug_methods": {
+    "debug_load_fixture(name:String)": "Load a fixed First Build rule fixture.",
+    "debug_step(seconds:float)": "Advance production rules by exact fixed ticks, independent from render FPS.",
+    "debug_set_move_vector(v:Vector2)": "Set semantic movement vector without screen coordinates.",
+    "debug_cast(angle_degrees:float)->bool": "Invoke production Cast rule without touch mapping.",
+    "debug_launch_tool(tool:String,angle_degrees:float)->bool": "Launch Redirect/Split pulse through production rule logic.",
+    "debug_snapshot()->Dictionary": "Return read-only deterministic rule state.",
+    "debug_pause(value:bool)": "Set Pause through production state transition.",
+    "debug_retry()": "Restore fixed Wave2 initial rule state."
+  },
+  "compatibility": "New read-only observers are compatible extensions; changing rule semantics is not."
+}
